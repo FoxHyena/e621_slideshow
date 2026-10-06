@@ -48,6 +48,10 @@ const SWIPE_MIN_PX = 50;
 /** Skip a post whose media hasn't become displayable in this long. */
 const STALL_MS = 30_000;
 const PREVIOUS_KEPT = 2;
+/** Enough for the deepest style (the prints pile) plus slack. */
+const TRAIL_MAX = 8;
+/** Upcoming posts a style may draw on (the prints background takes panels from them). */
+const UPCOMING_SHOWN = 12;
 
 /** Identity of a queue: anything that changes which posts we'd show. */
 function queueKey(
@@ -96,7 +100,8 @@ export default function App() {
   const [active, setActive] = useState<Active | null>(null);
   const [, setVersion] = useState(0);
   const [index, setIndex] = useState(0);
-  const [previous, setPrevious] = useState<Post | null>(null);
+  /** Posts shown before the current one, newest first, for styles that keep them on screen. */
+  const [trail, setTrail] = useState<Post[]>([]);
   const [paused, setPaused] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -210,7 +215,7 @@ export default function App() {
     }
     setActive({ queue: q, key });
     setIndex(0);
-    setPrevious(null);
+    setTrail([]);
     setReady(null);
     void q.ensure(0);
     if (!isRec(s)) {
@@ -262,7 +267,11 @@ export default function App() {
 
   // ---- navigation ---------------------------------------------------------
   const goTo = (i: number) => {
-    if (current) setPrevious(current);
+    const target = queue?.posts[i];
+    // Stepping back to the post just shown takes it off the trail instead of
+    // pushing the one we left, so prev/next don't pile up duplicates.
+    if (target && trail[0]?.id === target.id) setTrail(trail.slice(1));
+    else if (current) setTrail([current, ...trail.filter((p) => p.id !== current.id)].slice(0, TRAIL_MAX));
     setIndex(i);
     setReady(null);
   };
@@ -425,9 +434,9 @@ export default function App() {
   };
 
   // ---- swipe --------------------------------------------------------------
-  // 1:1 is excluded: a sideways drag there pans the overflowing image.
+  // Classic 1:1 is excluded: a sideways drag there pans the overflowing image.
   const swipeStart = useRef<{ x: number; y: number; id: number } | null>(null);
-  const swipeable = !galleryOpen && !panelOpen && playback.fit !== "original";
+  const swipeable = !galleryOpen && !panelOpen && !(playback.style === "classic" && playback.fit === "original");
   const onPointerDown = (e: React.PointerEvent) => {
     swipeStart.current = null;
     if (e.pointerType !== "touch" || !swipeable) return;
@@ -613,9 +622,12 @@ export default function App() {
       {current && !galleryOpen && (
         <Stage
           post={current}
-          previous={previous}
+          trail={trail}
+          upcoming={posts.slice(currentIndex + 1, currentIndex + 1 + UPCOMING_SHOWN)}
           playback={playback}
           currentReady={isReady}
+          durationMs={durationMs}
+          running={running}
           onReady={(id, durationSec) => setReady({ id, durationSec })}
           onError={(id) => queue?.remove(id)}
         />

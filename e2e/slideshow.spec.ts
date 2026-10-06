@@ -409,6 +409,81 @@ test("the previous image fades out to black instead of staying underneath", asyn
   expect(bg).toBe("rgb(0, 0, 0)");
 });
 
+// ---- slide styles ---------------------------------------------------------
+
+/** Where each style keeps the posts shown before the current one. */
+const KEPT: Record<string, string> = { prints: "print", collage: "collage-tile", kenburns: "previous-layer", reflections: "previous-layer" };
+
+for (const style of ["prints", "kenburns", "collage", "reflections"]) {
+  test(`${style}: plays a video, advances, and keeps the previous post on screen`, async ({ page }) => {
+    await start(page, [{ id: 3, ext: "webm", duration: 2 }, { id: 2 }, { id: 1 }], { playback: { style, intervalSec: 1 } });
+    await play(page);
+    await expect(page.getByTestId(`${style}-stage`)).toBeVisible();
+    const video = page.getByTestId("slide-video");
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(0.2);
+    await expect(slide(page)).toHaveAttribute("data-post-id", "2", { timeout: 5000 });
+    const kept = page.getByTestId(KEPT[style]);
+    await expect(kept.first()).toBeAttached();
+    // The video's background copy is its poster, never a second player.
+    await expect(page.locator("video")).toHaveCount(0);
+    if (style === "prints" || style === "collage") await expect(kept.and(page.locator('[data-post-id="3"]'))).toBeAttached();
+    if (style === "prints") await expect(page.locator('[data-testid=prints-scene][data-scene-id="3"]')).toHaveCSS("opacity", "0");
+  });
+}
+
+test("prints: one colour print over a grey heap; each slide dips to black and arrives whole", async ({ page }) => {
+  await start(page, undefined, { playback: { style: "prints", intervalSec: 60 } });
+  await play(page);
+  const scene = (id: number) => page.locator(`[data-testid=prints-scene][data-scene-id="${id}"]`);
+  const ids = (sel: string) => page.locator(sel).evaluateAll((els) => els.map((e) => e.getAttribute("data-post-id")));
+
+  // A full heap from the first slide (drawn from upcoming posts), one focus print on top.
+  await expect(scene(1150).getByTestId("prints-bg")).toHaveCount(6);
+  await expect(scene(1150).getByTestId("print")).toHaveCount(1);
+  const heap = await ids("[data-scene-id='1150'] [data-testid=prints-bg]");
+  expect(heap).not.toContain("1150");
+
+  await page.keyboard.press("ArrowRight");
+  await expect(slide(page)).toHaveAttribute("data-post-id", "1149");
+  // The focus print never animates on its own: no scale, always opaque; the scene layer fades it in.
+  const focus = scene(1149).getByTestId("print");
+  const pose = await focus.evaluate((el) => {
+    const m = new DOMMatrix(getComputedStyle(el).transform);
+    return { scale: Math.hypot(m.a, m.b), opacity: getComputedStyle(el).opacity };
+  });
+  expect(pose.scale).toBeCloseTo(1, 5);
+  expect(pose.opacity).toBe("1");
+  expect(await scene(1149).evaluate((el) => getComputedStyle(el).transitionDelay)).toBe("0.7s");
+  await expect.poll(() => scene(1150).evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+  await expect.poll(() => scene(1149).evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+  // The old scene keeps its own heap while it fades.
+  expect(await ids("[data-scene-id='1150'] [data-testid=prints-bg]")).toEqual(heap);
+  await expect(page.getByTestId("print")).toHaveCount(2);
+});
+
+test("collage: the fourth post replaces the oldest tile", async ({ page }) => {
+  await start(page, undefined, { playback: { style: "collage", intervalSec: 60 } });
+  await play(page);
+  for (const id of [1149, 1148, 1147]) {
+    await page.keyboard.press("ArrowRight");
+    await expect(slide(page)).toHaveAttribute("data-post-id", String(id));
+  }
+  const ids = await page.getByTestId("collage-tile").evaluateAll((els) => els.map((e) => e.getAttribute("data-post-id")).sort());
+  expect(ids).toEqual(["1148", "1149"]);
+});
+
+test("the style picker persists and hides the classic-only controls", async ({ page }) => {
+  await start(page);
+  await expect(page.getByRole("radiogroup", { name: "Fit" })).toBeVisible();
+  await page.getByTestId("style-select").selectOption("prints");
+  await expect(page.getByRole("radiogroup", { name: "Fit" })).toHaveCount(0);
+  await expect(page.getByRole("radiogroup", { name: "Transition" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByTestId("style-select")).toHaveValue("prints");
+  await play(page);
+  await expect(page.getByTestId("prints-stage")).toBeVisible();
+});
+
 const tiles = (page: Page) => page.getByTestId("gallery-tile");
 
 test("preview shows results as a grid; picking a tile starts the show there", async ({ page }) => {
