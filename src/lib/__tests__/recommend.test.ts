@@ -1,0 +1,230 @@
+import { describe, expect, it } from "vitest";
+import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
+import { scorePost } from "../recommend/rank";
+import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
+import { CAT_MULT, computeWeights, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
+import { makePost } from "./fixtures";
+
+const NOW = 1_700_000_000_000;
+const N_SITE = 1_000_000;
+
+/** 100 favorites: all `anthro`, 20 `niche_kink`, 2 `one_off`, all `hi_res` (meta). */
+function profile(): Profile {
+  const favs = Array.from({ length: 100 }, (_, i) =>
+    makePost({
+      id: 5000 + i,
+      tags: {
+        general: ["anthro", ...(i < 20 ? ["niche_kink"] : []), ...(i < 2 ? ["one_off"] : [])],
+        meta: ["hi_res"],
+        ...(i < 10 ? { artist: ["fave_artist"] } : {}),
+      },
+    }),
+  );
+  return addFavorites(emptyProfile("pup"), favs, NOW);
+}
+
+const GLOBAL = {
+  anthro: 700_000, // 70% of the site
+  niche_kink: 2_000, // 0.2%
+  one_off: 50,
+  hi_res: 10_000,
+  fave_artist: 500,
+};
+
+describe("addFavorites", () => {
+  it("counts tags per favorite with their category, skipping posts already counted", () => {
+    const p = profile();
+    expect(p.favIds).toHaveLength(100);
+    expect(p.tags.anthro).toEqual({ n: 100, cat: "general" });
+    expect(p.tags.fave_artist).toEqual({ n: 10, cat: "artist" });
+    const again = addFavorites(p, [makePost({ id: 5000, tagList: ["anthro"] })], NOW + 1);
+    expect(again.tags.anthro.n).toBe(100);
+  });
+
+  it("puts new favorites in front so favIds[0] is the newest", () => {
+    const p = addFavorites(profile(), [makePost({ id: 9, tagList: ["x"] })], NOW + 1);
+    expect(p.favIds[0]).toBe(9);
+    expect(p.syncedAt).toBe(NOW + 1);
+  });
+});
+
+describe("computeWeights", () => {
+  const w = computeWeights(profile(), GLOBAL, N_SITE);
+
+  it("ignores a tag that is about as common on the site as in favorites", () => {
+    // 100% vs 70%: lift ln(1.43) is small next to the niche tag's
+    expect(w.get("anthro")!).toBeLessThan(w.get("niche_kink")! / 5);
+  });
+
+  it("boosts a tag that is far more common in favorites than on the site", () => {
+    expect(w.get("niche_kink")).toBeGreaterThan(2);
+  });
+
+  it("requires minimum support and drops meta tags", () => {
+    expect(w.has("one_off")).toBe(false);
+    expect(w.has("hi_res")).toBe(false);
+  });
+
+  it("skips tags with no global count", () => {
+    expect(computeWeights(profile(), {}, N_SITE).size).toBe(0);
+  });
+
+  it("caps lift, so a rare tag on a few favorites can't outweigh a strong one on many", () => {
+    // fave_artist: 10% of favorites, 0.05% of the site (200×, capped at 50×)
+    // niche_kink: 20% of favorites, 0.2% of the site (100×, also capped)
+    const capped = computeWeights(profile(), GLOBAL, N_SITE);
+    expect(capped.get("niche_kink")!).toBeGreaterThan(capped.get("fave_artist")!);
+    // with the same lift, the tag on more favorites wins through n / (n + SHRINK)
+    expect(capped.get("niche_kink")! / capped.get("fave_artist")!).toBeCloseTo((20 / 25) / (10 / 15), 5);
+  });
+
+  it("gives artists no bonus over other tags", () => {
+    expect(CAT_MULT.artist).toBe(CAT_MULT.general);
+  });
+
+  it("pins to the top weight and mutes to zero", () => {
+    const o = computeWeights(profile(), GLOBAL, N_SITE, { pinned: ["anthro"], muted: ["niche_kink"] });
+    expect(o.has("niche_kink")).toBe(false);
+    expect(topTags(o, 1)).toEqual(["anthro"]);
+  });
+});
+
+describe("scorePost", () => {
+  const weights = new Map([
+    ["niche_kink", 4],
+    ["fave_artist", 3],
+    ["wolf", 1],
+  ]);
+
+  it("counts only the strongest matches, so a pile of mild ones can't beat a strong one", () => {
+    const mild = new Map([...weights, ...Array.from({ length: 10 }, (_, i) => [`generic${i}`, 1.4] as const)]);
+    const strong = makePost({ tagList: ["niche_kink", "fave_artist", "wolf"] }); // 4 + 3 + 1 = 8
+    const pile = makePost({ tagList: Array.from({ length: 10 }, (_, i) => `generic${i}`) }); // only 5 × 1.4 = 7 count
+    expect(scorePost(strong, mild).score).toBe(8);
+    expect(scorePost(pile, mild).score).toBeCloseTo(7);
+    // summing all ten (14) would have beaten the strong post
+    expect(scorePost(pile, mild).score).toBeLessThan(scorePost(strong, mild).score);
+  });
+
+  it("ignores how many other tags a post has", () => {
+    const focused = makePost({ tagList: ["niche_kink", "wolf", "a", "b"] });
+    const sprawl = makePost({ tagList: ["niche_kink", "wolf", ...Array.from({ length: 80 }, (_, i) => `t${i}`)] });
+    expect(scorePost(sprawl, weights).score).toBe(scorePost(focused, weights).score);
+  });
+
+  it("explains with the top 3 contributors", () => {
+    const post = makePost({ tagList: ["wolf", "niche_kink", "fave_artist", "x"] });
+    expect(scorePost(post, weights).reasons).toEqual(["niche_kink", "fave_artist", "wolf"]);
+  });
+});
+
+describe("syncProfile", () => {
+  /** Fake account: `ids` newest-favorited first; reports `count` (defaults to ids.length). */
+  function fakeApi(ids: number[], count = ids.length) {
+    const calls: number[] = [];
+    const api: RecApi = {
+      favoriteCount: async () => count,
+      favorites: async (page, limit) => {
+        calls.push(page);
+        return ids.slice((page - 1) * limit, page * limit).map((id) => makePost({ id, tagList: ["t"] }));
+      },
+      tagCounts: async () => [],
+      newestPostId: async () => 1,
+    };
+    return { api, calls };
+  }
+  const range = (from: number, n: number) => Array.from({ length: n }, (_, i) => from - i);
+
+  it("builds from scratch across pages", async () => {
+    const { api, calls } = fakeApi(range(1000, FAV_PAGE + 5));
+    const p = await syncProfile(null, "pup", api, NOW);
+    expect(p.favIds).toHaveLength(FAV_PAGE + 5);
+    expect(p.tags.t.n).toBe(FAV_PAGE + 5);
+    expect(calls).toEqual([1, 2]);
+  });
+
+  it("reads only favorites newer than the last one seen", async () => {
+    const stored = await syncProfile(null, "pup", fakeApi(range(1000, 10)).api, NOW);
+    const { api, calls } = fakeApi([2001, 2000, ...range(1000, 10)]);
+    const p = await syncProfile(stored, "pup", api, NOW + 1);
+    expect(calls).toEqual([1]);
+    expect(p.favIds.slice(0, 3)).toEqual([2001, 2000, 1000]);
+    expect(p.tags.t.n).toBe(12);
+  });
+
+  it("rebuilds when something was unfavorited", async () => {
+    const stored = await syncProfile(null, "pup", fakeApi(range(1000, 10)).api, NOW);
+    // 995 removed, one new: count unchanged though one new favorite appeared
+    const ids = [2000, ...range(1000, 10).filter((id) => id !== 995)];
+    const { api, calls } = fakeApi(ids);
+    const p = await syncProfile(stored, "pup", api, NOW + 1);
+    expect(calls).toEqual([1, 1]);
+    expect(p.favIds).not.toContain(995);
+    expect(p.tags.t.n).toBe(10);
+  });
+
+  it("tolerates favorites the API never lists (deleted posts)", async () => {
+    const stored = await syncProfile(null, "pup", fakeApi(range(1000, 10), 12).api, NOW);
+    const { api, calls } = fakeApi([2000, ...range(1000, 10)], 13);
+    await syncProfile(stored, "pup", api, NOW + 1);
+    expect(calls).toEqual([1]);
+  });
+
+  it("ignores a profile that belongs to another account", async () => {
+    const stored = await syncProfile(null, "other", fakeApi(range(1000, 10)).api, NOW);
+    const p = await syncProfile(stored, "pup", fakeApi(range(50, 3)).api, NOW);
+    expect(p.username).toBe("pup");
+    expect(p.favIds).toEqual([50, 49, 48]);
+  });
+});
+
+describe("refreshTagCache", () => {
+  it("looks up only missing or stale tags, batched, and caches unknown ones as 0", async () => {
+    const asked: string[][] = [];
+    const api = {
+      tagCounts: async (names: string[]) => {
+        asked.push(names);
+        return names.filter((n) => n !== "gone").map((name) => ({ name, post_count: 7 }));
+      },
+      newestPostId: async () => 999,
+    } as unknown as RecApi;
+    const tags = ["fresh", "gone", ...Array.from({ length: TAG_BATCH }, (_, i) => `x${i}`)];
+    const cache: TagCache = { counts: { fresh: { c: 3, at: NOW } }, site: null };
+    const out = await refreshTagCache(cache, tags, api, NOW + 1);
+    expect(asked).toHaveLength(2);
+    expect(asked.flat()).not.toContain("fresh");
+    expect(out.counts.gone.c).toBe(0);
+    expect(out.counts.x0.c).toBe(7);
+    expect(out.site).toEqual({ n: 999, at: NOW + 1 });
+
+    asked.length = 0;
+    await refreshTagCache(out, tags, api, NOW + 2);
+    expect(asked).toHaveLength(0);
+  });
+
+  it("only looks up tags with support in a weighted category", () => {
+    const p = profile();
+    expect(tagsToLookUp(p).sort()).toEqual(["anthro", "fave_artist", "niche_kink"]);
+  });
+});
+
+describe("searchPlan", () => {
+  // weight order: rare_artist, niche_kink, fave_artist, anthro (anthro is on the most favorites)
+  const w = new Map([
+    ["rare_artist", 9],
+    ["niche_kink", 3],
+    ["fave_artist", 3 - 1e-9],
+    ["anthro", 1],
+  ]);
+  const plan = (breadth: number, o = NO_OVERRIDES) => searchPlan(w, o, breadth).map((s) => `${s.kind}:${s.tag}`);
+
+  it("searches the highest-weight tags, not the most common ones", () => {
+    expect(plan(2)).toEqual(["signature:rare_artist", "signature:niche_kink"]);
+    expect(plan(3)).not.toContain("signature:anthro");
+    expect(plan(10)).toHaveLength(4);
+  });
+
+  it("puts pins first and counts them against breadth", () => {
+    expect(plan(2, { pinned: ["anthro"], muted: [] })).toEqual(["pinned:anthro", "signature:rare_artist"]);
+  });
+});

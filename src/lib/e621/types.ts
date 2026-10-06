@@ -66,6 +66,20 @@ export interface CurrentUser {
   tag_query_limit?: number;
 }
 
+/** `/users/<id>.json`; only the fields we read. */
+export interface UserProfile {
+  id: number;
+  name: string;
+  favorite_count: number;
+}
+
+/** `/tags.json` row. `category` is numeric; see TAG_CATEGORIES. */
+export interface TagInfo {
+  name: string;
+  post_count: number;
+  category: number;
+}
+
 export const TAG_CATEGORIES: Record<number, TagCategoryName> = {
   0: "general",
   1: "artist",

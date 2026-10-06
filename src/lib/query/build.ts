@@ -1,6 +1,6 @@
 import type { SearchSettings } from "../settings";
 import { parseBlacklist, ruleToQuery, type BlacklistRule } from "./blacklist";
-import { dateMetatag } from "./date";
+import { DEFAULT_DATE_FILTER, dateMetatag, type DateFilter } from "./date";
 
 export const DEFAULT_TAG_LIMIT = 40;
 /** e621 refuses page numbers past this; cursor paging (`b<id>`) has no cap. */
@@ -108,4 +108,51 @@ export function buildQuery(s: SearchSettings, tagLimit = DEFAULT_TAG_LIMIT): Bui
     rules,
     paging,
   };
+}
+
+/** Recommended's window when the user hasn't set a usable date filter. */
+export const REC_DEFAULT_WINDOW: DateFilter = {
+  ...DEFAULT_DATE_FILTER,
+  enabled: true,
+  mode: "within",
+  amount: 7,
+  unit: "days",
+};
+
+/** Recommended always searches a window; an unset or incomplete filter means the last 7 days. */
+export function recommendedWindow(date: DateFilter): DateFilter {
+  return dateMetatag(date) ? date : REC_DEFAULT_WINDOW;
+}
+
+/** Tag slots left for the blacklist after the candidate tags, so it isn't squeezed out entirely. */
+export const REC_BLACKLIST_RESERVE = 5;
+
+export interface RecommendedQuery extends BuiltQuery {
+  /** profile tags actually OR'd in, after capping breadth to the tag budget */
+  candidates: string[];
+  /** breadth asked for more tags than e621's tag limit leaves room for */
+  capped: boolean;
+}
+
+/**
+ * Candidate query for Recommended: the top profile tags OR'd together inside
+ * the window, best-scored first. One query, paged, instead of one per tag: the
+ * searched tags are the highest-weight ones, which are rare enough that their
+ * union usually fits in a page or two, so a 20-tag search costs 1–2 requests
+ * instead of 20+. Each tag takes one of e621's tag slots, so breadth is capped
+ * to what's left after the filters and REC_BLACKLIST_RESERVE.
+ */
+export function buildRecommendedQuery(
+  s: SearchSettings,
+  ranked: string[],
+  tagLimit = DEFAULT_TAG_LIMIT,
+): RecommendedQuery {
+  const base: SearchSettings = { ...s, date: recommendedWindow(s.date), order: "score", tags: "" };
+  const filters = buildQuery({ ...base, blacklist: "" }, tagLimit).tagCount;
+  const room = Math.max(0, tagLimit - filters - REC_BLACKLIST_RESERVE);
+  const wanted = ranked.slice(0, s.breadth);
+  const candidates = wanted.slice(0, room);
+  // A lone `~tag` isn't an OR; send it plain.
+  const tags = candidates.length === 1 ? candidates[0] : candidates.map((t) => `~${t}`).join(" ");
+  return { ...buildQuery({ ...base, tags }, tagLimit), candidates, capped: candidates.length < wanted.length };
 }
