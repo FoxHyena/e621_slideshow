@@ -41,6 +41,8 @@ export interface SearchSettings {
   seed: number;
   blacklist: string;
   date: DateFilter;
+  /** only posts with at least this e621 score; null = off */
+  minScore: number | null;
 }
 
 /** Everything that only changes how posts are shown. Applied live. */
@@ -66,6 +68,7 @@ export const DEFAULT_SEARCH: SearchSettings = {
   seed: 1,
   blacklist: "",
   date: DEFAULT_DATE_FILTER,
+  minScore: null,
 };
 
 export const DEFAULT_PLAYBACK: PlaybackSettings = {

@@ -47,6 +47,9 @@ export interface SettingsPanelProps {
   stats: QueueStats | null;
 }
 
+/** Rows rendered in the profile tag list; the filter still searches all of them. */
+const TAG_LIST_MAX = 100;
+
 const field = "rounded-md border border-line bg-black/40 px-2 py-1.5 text-sm focus:border-accent focus:outline-none";
 
 function Section({
@@ -152,12 +155,12 @@ function Subsection({
   );
 }
 
-function filtersSummary(s: Pick<SearchSettings, "ratings" | "media">): string {
+function filtersSummary(s: Pick<SearchSettings, "ratings" | "media" | "minScore">): string {
   const ratings = (["s", "q", "e"] as const).filter((r) => s.ratings[r]).map((r) => r.toUpperCase());
   const media = (["image", "gif", "video"] as const).filter((m) => s.media[m]);
   const r = ratings.length ? ratings.join("·") : "no ratings";
   const m = media.length === 3 ? "all media" : media.length ? media.map((x) => `${x}s`).join("·") : "no media";
-  return `${r} · ${m}`;
+  return `${r} · ${m}${s.minScore != null ? ` · score ≥${s.minScore}` : ""}`;
 }
 
 function Toggle({
@@ -298,7 +301,8 @@ function RecommendedPanel({
     { kind: null, label: "Not searched. Still count when ranking; pin one to search it", tags: group(null) },
   ].filter((g) => g.tags.length > 0);
   const ordered = groups.flatMap((g) => g.tags);
-  const shown = needle ? ordered.filter((t) => t.includes(needle)) : ordered;
+  const matched = needle ? ordered.filter((t) => t.includes(needle)) : ordered;
+  const shown = matched.slice(0, TAG_LIST_MAX);
   const headerAt = new Map(groups.map((g) => [g.tags[0], g]));
   const iconBtn = (on: boolean, tone: string) =>
     `rounded p-1 ${on ? tone : "text-neutral-500 opacity-60 hover:opacity-100"} hover:bg-white/10`;
@@ -430,7 +434,7 @@ function RecommendedPanel({
             />
             {needle && (
               <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-neutral-500">
-                {shown.length.toLocaleString()} of {recTags.length.toLocaleString()}
+                {matched.length.toLocaleString()} of {recTags.length.toLocaleString()}
               </span>
             )}
           </div>
@@ -458,6 +462,11 @@ function RecommendedPanel({
             })}
             {shown.length === 0 && <li className="px-1 py-0.5 text-xs text-neutral-500">No profile tags match.</li>}
           </ul>
+          {matched.length > shown.length && (
+            <p className="mt-1 text-[11px] text-neutral-500" data-testid="rec-tags-truncated">
+              Showing top {shown.length} of {matched.length.toLocaleString()}. Use Find a tag for the rest.
+            </p>
+          )}
         </div>
       ) : (
         !rec.syncing && (
@@ -841,6 +850,25 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 >
                   Videos
                 </Toggle>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <label className="text-neutral-400" htmlFor="min-score">
+                  Min score
+                </label>
+                <input
+                  id="min-score"
+                  type="number"
+                  inputMode="numeric"
+                  step={1}
+                  value={s.minScore ?? ""}
+                  onChange={(e) => {
+                    const n = Number.parseInt(e.target.value, 10);
+                    setS({ minScore: Number.isFinite(n) ? n : null });
+                  }}
+                  placeholder="off"
+                  className={`${field} w-24`}
+                  data-testid="min-score"
+                />
               </div>
             </Subsection>
             <Subsection

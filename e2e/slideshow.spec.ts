@@ -418,7 +418,8 @@ test("preview shows results as a grid; picking a tile starts the show there", as
   await expect(tiles(page)).toHaveCount(100);
   await expect(page.getByTestId("gallery-count")).toHaveText("100+ posts");
   await expect(slide(page)).toHaveCount(0);
-  await expect(tiles(page).first().locator("img")).toHaveAttribute("src", /\/sample\/mock\/1150\.jpg$/);
+  await expect(tiles(page).first().getByTestId("tile-preview")).toHaveAttribute("src", /\/data\/mock\/1150\.png$/);
+  await expect(tiles(page).first().getByTestId("tile-sample")).toHaveAttribute("src", /\/sample\/mock\/1150\.jpg$/);
 
   await tiles(page).nth(2).click();
   await expect(page.getByTestId("gallery")).toHaveCount(0);
@@ -696,4 +697,45 @@ test("muting from the info overlay hides the upcoming posts with that tag right 
   await page.getByTestId("info-overlay").getByRole("button", { name: "Mute rope" }).click();
   await page.keyboard.press("s");
   await expect(page.getByTestId("rec-muted")).toContainText("rope");
+});
+
+test.describe("touch", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+
+  /** A one-finger drag of (dx, dy) from the middle of the screen. */
+  async function swipe(page: Page, dx: number, dy = 0) {
+    const app = page.getByTestId("app");
+    const x = 195;
+    const y = 300;
+    const base = { pointerType: "touch", pointerId: 7, isPrimary: true, bubbles: true };
+    await app.dispatchEvent("pointerdown", { ...base, clientX: x, clientY: y });
+    await app.dispatchEvent("pointerup", { ...base, clientX: x + dx, clientY: y + dy });
+  }
+
+  test("swiping left and right changes the slide", async ({ page }) => {
+    await start(page, undefined, { playback: { intervalSec: 60 } });
+    await play(page);
+    expect(await slideId(page)).toBe(1150);
+    await swipe(page, -120);
+    await expect(slide(page)).toHaveAttribute("data-post-id", "1149");
+    await swipe(page, 120);
+    await expect(slide(page)).toHaveAttribute("data-post-id", "1150");
+  });
+
+  test("short or mostly vertical drags don't change the slide", async ({ page }) => {
+    await start(page, undefined, { playback: { intervalSec: 60 } });
+    await play(page);
+    await swipe(page, -20);
+    await swipe(page, -60, 120);
+    await page.waitForTimeout(300);
+    expect(await slideId(page)).toBe(1150);
+  });
+
+  test("1:1 fit leaves sideways drags for panning", async ({ page }) => {
+    await start(page, undefined, { playback: { intervalSec: 60, fit: "original" } });
+    await play(page);
+    await swipe(page, -120);
+    await page.waitForTimeout(300);
+    expect(await slideId(page)).toBe(1150);
+  });
 });

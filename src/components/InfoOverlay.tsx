@@ -29,6 +29,7 @@ export default function InfoOverlay({ post, onClose, onAddTag, onExcludeTag, rea
     <aside
       className="absolute bottom-20 left-4 top-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col rounded-lg border border-line bg-panel/95 text-sm shadow-2xl backdrop-blur"
       data-testid="info-overlay"
+      data-no-swipe
       aria-label="Post info"
     >
       <header className="flex items-start justify-between gap-2 border-b border-line p-3">

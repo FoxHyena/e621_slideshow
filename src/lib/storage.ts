@@ -68,6 +68,7 @@ export const storage = {
       ratings: { ...DEFAULT_SEARCH.ratings, ...s.ratings },
       media: { ...DEFAULT_SEARCH.media, ...s.media },
       date: { ...DEFAULT_SEARCH.date, ...s.date },
+      minScore: s.minScore ?? null,
     };
   },
   saveSearch: (s: SearchSettings) => {
