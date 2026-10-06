@@ -398,3 +398,62 @@ test("the previous image fades out to black instead of staying underneath", asyn
   const bg = await slide(page).evaluate((el) => getComputedStyle(el.closest(".bg-black")!).backgroundColor);
   expect(bg).toBe("rgb(0, 0, 0)");
 });
+
+const tiles = (page: Page) => page.getByTestId("gallery-tile");
+
+test("preview shows results as a grid; picking a tile starts the show there", async ({ page }) => {
+  const mock = await start(page);
+  await page.getByTestId("preview-button").click();
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(tiles(page)).toHaveCount(100);
+  await expect(page.getByTestId("gallery-count")).toHaveText("100+ posts");
+  await expect(slide(page)).toHaveCount(0);
+  await expect(tiles(page).first().locator("img")).toHaveAttribute("src", /\/sample\/mock\/1150\.jpg$/);
+
+  await tiles(page).nth(2).click();
+  await expect(page.getByTestId("gallery")).toHaveCount(0);
+  expect(await slideId(page)).toBe(1148);
+  await expect(page.getByTestId("counter")).toHaveText(/^3 \//);
+  expect(mock.searches).toHaveLength(1);
+});
+
+test("scrolling the gallery loads the next page", async ({ page }) => {
+  const mock = await start(page, defaultSpecs(150));
+  await page.getByTestId("preview-button").click();
+  await expect(tiles(page)).toHaveCount(100);
+  expect(mock.searches).toHaveLength(1);
+  await tiles(page).last().scrollIntoViewIfNeeded();
+  await expect(tiles(page)).toHaveCount(150);
+  await expect(page.getByTestId("gallery-count")).toHaveText("150 posts");
+  expect(mock.searches.map((s) => s.page)).toEqual([null, "b1051"]);
+});
+
+test("the gallery leaves out blacklisted posts and badges videos", async ({ page }) => {
+  const specs = defaultSpecs(5);
+  specs[0].tags = ["wild_thing"];
+  specs[1] = { ...specs[1], ext: "webm", duration: 75 };
+  await start(page, specs, { search: { blacklist: "wild*" } });
+  await page.getByTestId("preview-button").click();
+  await expect(tiles(page)).toHaveCount(4);
+  await expect(page.locator("[data-testid=gallery-tile][data-post-id='1005']")).toHaveCount(0);
+  await expect(page.locator("[data-testid=gallery-tile][data-post-id='1004']")).toContainText("VIDEO 1:15");
+  await expect(page.getByTestId("gallery")).toContainText("1 blacklisted");
+});
+
+test("G opens the gallery mid-show on the current post and freezes the timer", async ({ page }) => {
+  await start(page, undefined, { playback: { intervalSec: 1 } });
+  await play(page);
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  expect(await slideId(page)).toBe(1148);
+  await page.keyboard.press("g");
+  await expect(page.locator("[data-testid=gallery-tile][aria-current]")).toHaveAttribute("data-post-id", "1148");
+  await page.waitForTimeout(1500);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("gallery")).toHaveCount(0);
+  expect(await slideId(page)).toBe(1148);
+
+  await page.getByTestId("gallery-button").click();
+  await page.getByTestId("gallery-play").click();
+  expect(await slideId(page)).toBe(1148);
+});

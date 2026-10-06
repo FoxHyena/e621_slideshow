@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { Bookmark, Check, ChevronDown, Dices, ExternalLink, History, Loader2, Play, Trash2, X } from "lucide-react";
+import { Bookmark, Check, ChevronDown, Dices, ExternalLink, History, LayoutGrid, Loader2, Play, Trash2, X } from "lucide-react";
 import type { Credentials } from "@/lib/e621/client";
 import type { CurrentUser } from "@/lib/e621/types";
 import type { BuiltQuery } from "@/lib/query/build";
@@ -16,6 +16,8 @@ export interface SettingsPanelProps {
   open: boolean;
   onClose: () => void;
   onPlay: () => void;
+  /** Open the results as a grid without starting the show. */
+  onPreview: () => void;
   playLabel: string;
   search: SearchSettings;
   setSearch: (s: SearchSettings) => void;
@@ -453,7 +455,7 @@ function SavedSection({
 }
 
 export default function SettingsPanel(props: SettingsPanelProps) {
-  const { open, onClose, onPlay, playLabel, search, setSearch, playback, setPlayback, built, creds } = props;
+  const { open, onClose, onPlay, onPreview, playLabel, search, setSearch, playback, setPlayback, built, creds } = props;
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [sections, setSections] = useState(storage.loadSections);
   const collapse = (id: string, summary?: string) => ({
@@ -740,6 +742,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 ["F", "Fullscreen"],
                 ["I", "Post info"],
                 ["L", "Favorite"],
+                ["G", "Gallery"],
                 ["O", "Open on e621"],
                 ["S / Esc", "Settings"],
               ].map(([k, v]) => (
@@ -754,12 +757,21 @@ export default function SettingsPanel(props: SettingsPanelProps) {
           </Section>
         </div>
 
-        <footer className="border-t border-line p-4">
+        <footer className="flex gap-2 border-t border-line p-4">
+          <button
+            type="button"
+            onClick={onPreview}
+            disabled={built.overLimit}
+            className="flex items-center justify-center gap-2 rounded-md border border-line px-4 py-2.5 font-semibold text-neutral-200 hover:bg-white/5 disabled:opacity-40"
+            data-testid="preview-button"
+          >
+            <LayoutGrid className="size-4" aria-hidden /> Preview
+          </button>
           <button
             type="button"
             onClick={onPlay}
             disabled={built.overLimit}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-accent py-2.5 font-semibold text-black hover:bg-accent-strong disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md bg-accent py-2.5 font-semibold text-black hover:bg-accent-strong disabled:opacity-40"
             data-testid="play-button"
           >
             <Play className="size-4 fill-current" aria-hidden /> {playLabel}

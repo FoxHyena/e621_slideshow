@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Heart,
   Info,
+  LayoutGrid,
   Loader2,
   Maximize,
   Minimize,
@@ -28,6 +29,7 @@ import type { PlaybackSettings, SearchSettings } from "@/lib/settings";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import { PostQueue } from "@/lib/slideshow/queue";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
+import Gallery from "./Gallery";
 import InfoOverlay from "./InfoOverlay";
 import SettingsPanel from "./SettingsPanel";
 import Stage from "./Stage";
@@ -83,6 +85,7 @@ export default function App() {
   const [paused, setPaused] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [ready, setReady] = useState<{ id: number; durationSec?: number } | null>(null);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
@@ -176,13 +179,22 @@ export default function App() {
   const apply = (resume: boolean, s: SearchSettings = search) => {
     if (buildQuery(s, tagLimit).overLimit) {
       showToast(`Too many tags: e621 allows ${tagLimit}`);
-      return;
+      return false;
     }
     startQueue(s);
     setPanelOpen(false);
     // Focus left inside the (now inert) panel would swallow keyboard shortcuts.
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-    if (resume) setPaused(false);
+    if (resume) {
+      setPaused(false);
+      setGalleryOpen(false);
+    }
+    return true;
+  };
+
+  /** Show the current search as a grid instead of starting the show. */
+  const openPreview = () => {
+    if (apply(false)) setGalleryOpen(true);
   };
 
   const pendingKey = queueKey(built, search.media, creds);
@@ -209,6 +221,17 @@ export default function App() {
       }
     }
   };
+
+  /** Start the show at a post picked from the gallery. */
+  const pick = (i: number) => {
+    if (i !== currentIndex) goTo(i);
+    setGalleryOpen(false);
+    setPaused(false);
+  };
+
+  const needMore = useCallback(() => {
+    if (queue) void queue.ensure(queue.posts.length - 1);
+  }, [queue]);
 
   const prev = () => {
     if (!queue || currentIndex === 0) return;
@@ -257,7 +280,7 @@ export default function App() {
     return Math.max(base, Math.min(len, cap) * 1000);
   }, [current, ready, playback.intervalSec, playback.videoMaxSec]);
 
-  const running = isReady && !paused && !panelOpen && !infoOpen;
+  const running = isReady && !paused && !panelOpen && !infoOpen && !galleryOpen;
   const timer = useRef<{ key: string; remaining: number }>({ key: "", remaining: 0 });
   const timerKey = `${current?.id}:${durationMs}`;
   const onTimerDone = useEffectEvent(() => void next());
@@ -278,7 +301,7 @@ export default function App() {
     showToast(`Post #${id} didn't load, skipped`);
     void next();
   });
-  const stallWatch = !!current && !isReady && !paused && !panelOpen;
+  const stallWatch = !!current && !isReady && !paused && !panelOpen && !galleryOpen;
   useEffect(() => {
     if (!stallWatch || !current) return;
     const id = current.id;
@@ -344,6 +367,14 @@ export default function App() {
       return;
     }
     if (isTyping(e.target)) return;
+    if (galleryOpen) {
+      // Leave arrows/space alone so they scroll the grid.
+      if (["Escape", "g", "G"].includes(e.key)) {
+        e.preventDefault();
+        setGalleryOpen(false);
+      } else if (e.key === "s" || e.key === "S") setPanelOpen(true);
+      return;
+    }
     switch (e.key) {
       case "ArrowRight":
         e.preventDefault();
@@ -368,6 +399,13 @@ export default function App() {
       case "l":
       case "L":
         void toggleFavorite();
+        break;
+      case "g":
+      case "G":
+        if (queue) {
+          setInfoOpen(false);
+          setGalleryOpen(true);
+        }
         break;
       case "o":
       case "O":
@@ -467,7 +505,7 @@ export default function App() {
       onClick={poke}
       data-testid="app"
     >
-      {current && (
+      {current && !galleryOpen && (
         <Stage
           post={current}
           previous={previous}
@@ -478,7 +516,7 @@ export default function App() {
         />
       )}
 
-      {current && !isReady && (
+      {current && !isReady && !galleryOpen && (
         <div className="delayed-show pointer-events-none absolute inset-0 flex items-center justify-center" data-testid="slide-loading">
           <Loader2 className="size-10 animate-spin text-white/50" aria-label="Loading" />
         </div>
@@ -494,6 +532,26 @@ export default function App() {
         </div>
       )}
 
+      {galleryOpen && queue && (
+        <Gallery
+          posts={posts}
+          currentIndex={currentIndex}
+          loading={queue.loading}
+          exhausted={queue.exhausted}
+          error={queue.error}
+          stats={queue.stats}
+          signedIn={!!user}
+          onPick={pick}
+          onNeedMore={needMore}
+          onRetry={() => {
+            queue.retry();
+            needMore();
+          }}
+          onClose={() => setGalleryOpen(false)}
+          onPlay={() => pick(currentIndex)}
+        />
+      )}
+
       {infoOpen && current && (
         <InfoOverlay
           post={current}
@@ -504,7 +562,7 @@ export default function App() {
       )}
 
       {/* controls */}
-      <div
+      {!galleryOpen && <div
         className={`pointer-events-none absolute inset-0 z-10 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
@@ -529,6 +587,20 @@ export default function App() {
                 className={`size-5 ${current.is_favorited ? "fill-red-500 text-red-500" : ""}`}
                 aria-hidden
               />
+            </button>
+          )}
+          {queue && (
+            <button
+              type="button"
+              className={iconBtn}
+              onClick={() => {
+                setInfoOpen(false);
+                setGalleryOpen(true);
+              }}
+              aria-label="Gallery"
+              data-testid="gallery-button"
+            >
+              <LayoutGrid className="size-5" aria-hidden />
             </button>
           )}
           {current && (
@@ -594,9 +666,9 @@ export default function App() {
             </span>
           </div>
         )}
-      </div>
+      </div>}
 
-      {current && isReady && (
+      {current && isReady && !galleryOpen && (
         <div className="absolute inset-x-0 bottom-0 z-10 h-0.5 bg-white/10">
           <div
             key={timerKey}
@@ -621,6 +693,7 @@ export default function App() {
         open={panelOpen}
         onClose={() => apply(false)}
         onPlay={() => apply(true)}
+        onPreview={openPreview}
         playLabel={playLabel}
         search={search}
         setSearch={setSearch}
