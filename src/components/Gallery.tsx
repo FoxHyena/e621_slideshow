@@ -28,10 +28,14 @@ function formatDuration(sec: number) {
 }
 
 function Tile({ post, index, current, onPick }: { post: Post; index: number; current: boolean; onPick: (i: number) => void }) {
-  const [failed, setFailed] = useState(false);
+  const [previewFailed, setPreviewFailed] = useState(false);
+  const [sampleState, setSampleState] = useState<"loading" | "loaded" | "failed">("loading");
   const kind = mediaKind(post);
-  // Samples are static JPGs for both GIFs and videos, which is what a grid wants.
-  const src = post.sample.url ?? post.preview.url;
+  // The tiny preview shows at once; the sharper sample (a static JPG for GIFs and
+  // videos too) fades in over it. A screenful of samples is several MB and queues
+  // on the CDN, so without the preview, slow tiles sit blank.
+  const preview = previewFailed ? null : post.preview.url;
+  const sample = sampleState === "failed" || post.sample.url === post.preview.url ? null : post.sample.url;
   return (
     <button
       type="button"
@@ -44,19 +48,34 @@ function Tile({ post, index, current, onPick }: { post: Post; index: number; cur
       data-testid="gallery-tile"
       data-post-id={post.id}
     >
-      {src && !failed ? (
-        // eslint-disable-next-line @next/next/no-img-element -- remote CDN thumbnails, no Next image optimization wanted
+      {/* eslint-disable @next/next/no-img-element -- remote CDN thumbnails, no Next image optimization wanted */}
+      {preview && (
         <img
-          src={src}
+          src={preview}
           alt=""
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover"
-          onError={() => setFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+          onError={() => setPreviewFailed(true)}
+          data-testid="tile-preview"
         />
-      ) : (
-        <ImageOff className="m-auto size-6 text-neutral-600" aria-hidden />
       )}
+      {sample && (
+        <img
+          src={sample}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${
+            sampleState === "loaded" ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setSampleState("loaded")}
+          onError={() => setSampleState("failed")}
+          data-testid="tile-sample"
+        />
+      )}
+      {/* eslint-enable @next/next/no-img-element */}
+      {!preview && !sample && <ImageOff className="absolute inset-0 m-auto size-6 text-neutral-600" aria-hidden />}
       {(kind === "video" || kind === "gif") && (
         <span className="absolute bottom-1.5 right-1.5 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white">
           {kind === "video" ? `VIDEO${post.duration ? ` ${formatDuration(post.duration)}` : ""}` : "GIF"}

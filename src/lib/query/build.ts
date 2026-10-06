@@ -44,7 +44,7 @@ const ORDER_TOKENS: Record<SearchSettings["order"], string | null> = {
   mpixels: "order:mpixels",
 };
 
-function filterTokens(s: SearchSettings, userHasOrder: boolean): string[] {
+function filterTokens(s: SearchSettings, userHasOrder: boolean, userHasScore: boolean): string[] {
   const out: string[] = [];
 
   const { s: safe, q, e } = s.ratings;
@@ -61,6 +61,8 @@ function filterTokens(s: SearchSettings, userHasOrder: boolean): string[] {
   if (!s.media.gif) out.push("-type:gif");
   if (!s.media.video) out.push("-type:webm", "-type:mp4");
 
+  if (s.minScore != null && !userHasScore) out.push(`score:>=${s.minScore}`);
+
   const date = dateMetatag(s.date);
   if (date) out.push(date);
 
@@ -75,7 +77,8 @@ function filterTokens(s: SearchSettings, userHasOrder: boolean): string[] {
 export function buildQuery(s: SearchSettings, tagLimit = DEFAULT_TAG_LIMIT): BuiltQuery {
   const user = tokenize(s.tags);
   const userOrder = user.find((t) => /^-?order:/.test(t));
-  const filters = filterTokens(s, !!userOrder);
+  const userHasScore = user.some((t) => /^-?score:/.test(t));
+  const filters = filterTokens(s, !!userOrder, userHasScore);
   const base = [...user, ...filters];
   let used = countTags(base);
 

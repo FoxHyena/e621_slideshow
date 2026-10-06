@@ -43,6 +43,8 @@ import Stage from "./Stage";
 import { useRecommendations } from "./useRecommendations";
 
 const HIDE_CONTROLS_MS = 2500;
+/** A touch drag at least this far sideways changes the slide. */
+const SWIPE_MIN_PX = 50;
 /** Skip a post whose media hasn't become displayable in this long. */
 const STALL_MS = 30_000;
 const PREVIOUS_KEPT = 2;
@@ -422,6 +424,27 @@ export default function App() {
     }, HIDE_CONTROLS_MS);
   };
 
+  // ---- swipe --------------------------------------------------------------
+  // 1:1 is excluded: a sideways drag there pans the overflowing image.
+  const swipeStart = useRef<{ x: number; y: number; id: number } | null>(null);
+  const swipeable = !galleryOpen && !panelOpen && playback.fit !== "original";
+  const onPointerDown = (e: React.PointerEvent) => {
+    swipeStart.current = null;
+    if (e.pointerType !== "touch" || !swipeable) return;
+    if ((e.target as Element).closest("button, a, input, select, textarea, [data-no-swipe]")) return;
+    swipeStart.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    if (!start || start.id !== e.pointerId) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= 1.5 * Math.abs(dy)) return;
+    if (dx < 0) void next();
+    else prev();
+  };
+
   // ---- fullscreen ---------------------------------------------------------
   const toggleFullscreen = () => {
     if (document.fullscreenElement) void document.exitFullscreen();
@@ -577,9 +600,14 @@ export default function App() {
 
   return (
     <main
-      className={`relative h-full w-full select-none overflow-hidden ${showControls || panelOpen ? "" : "cursor-none"}`}
+      className={`relative h-full w-full select-none overflow-hidden ${showControls || panelOpen ? "" : "cursor-none"} ${
+        swipeable ? "touch-pan-y" : ""
+      }`}
       onMouseMove={poke}
       onClick={poke}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => (swipeStart.current = null)}
       data-testid="app"
     >
       {current && !galleryOpen && (

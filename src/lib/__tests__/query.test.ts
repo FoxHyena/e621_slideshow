@@ -155,6 +155,25 @@ describe("buildQuery", () => {
     expect(b.query).toContain("date:month");
   });
 
+  it("min score adds a score:>= filter that counts as a tag", () => {
+    const b = buildQuery(search({ tags: "wolf", minScore: 100 }));
+    expect(b.query).toBe("wolf score:>=100");
+    expect(b.tagCount).toBe(2);
+  });
+
+  it("no min score, no score filter", () => {
+    expect(buildQuery(search({ tags: "wolf" })).query).toBe("wolf");
+  });
+
+  it("user's own score: wins over min score", () => {
+    const b = buildQuery(search({ tags: "wolf score:>500", minScore: 100 }));
+    expect(b.query).toBe("wolf score:>500");
+  });
+
+  it("min score applies to Recommended", () => {
+    expect(buildRecommendedQuery(search({ minScore: 50 }), ["a", "b"]).query).toContain("score:>=50");
+  });
+
   it("packs blacklist rules until the tag budget is spent", () => {
     const blacklist = Array.from({ length: 50 }, (_, i) => `tag${i}`).join("\n");
     const b = buildQuery(search({ tags: "wolf", blacklist }));
