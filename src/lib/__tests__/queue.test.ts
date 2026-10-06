@@ -1,0 +1,120 @@
+import { describe, expect, it, vi } from "vitest";
+import { buildQuery } from "../query/build";
+import { DEFAULT_SEARCH, type SearchSettings } from "../settings";
+import { PAGE_SIZE, PostQueue, type PageFetcher } from "../slideshow/queue";
+import { makePost } from "./fixtures";
+
+const search = (over: Partial<SearchSettings> = {}): SearchSettings => ({
+  ...DEFAULT_SEARCH,
+  blacklist: "",
+  ...over,
+});
+
+/** Fake e621: `total` posts with descending ids, honoring b<id> cursors and page numbers. */
+function fakeApi(total: number, decorate: (id: number) => Parameters<typeof makePost>[0] = () => ({})) {
+  const all = Array.from({ length: total }, (_, i) => makePost({ id: total - i, ...decorate(total - i) }));
+  const calls: (string | number)[] = [];
+  const fetcher: PageFetcher = async (_tags, page, limit) => {
+    calls.push(page);
+    if (typeof page === "string" && page.startsWith("b")) {
+      const before = Number(page.slice(1));
+      return all.filter((p) => p.id < before).slice(0, limit);
+    }
+    const n = typeof page === "number" ? page : 1;
+    return all.slice((n - 1) * limit, n * limit);
+  };
+  return { fetcher: vi.fn(fetcher), calls };
+}
+
+describe("PostQueue", () => {
+  it("loads the first page and refills near the end via cursor", async () => {
+    const api = fakeApi(250);
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts).toHaveLength(PAGE_SIZE);
+    expect(api.calls).toEqual([""]);
+
+    await q.ensure(50); // far from the end: no fetch
+    expect(api.calls).toHaveLength(1);
+
+    await q.ensure(PAGE_SIZE - 5);
+    expect(api.calls[1]).toBe("b151");
+    expect(q.posts).toHaveLength(200);
+
+    await q.ensure(195);
+    expect(q.posts).toHaveLength(250);
+    expect(q.exhausted).toBe(true);
+    expect(new Set(q.posts.map((p) => p.id)).size).toBe(250);
+  });
+
+  it("uses numbered pages for non-id orders", async () => {
+    const api = fakeApi(150);
+    const s = search({ order: "score" });
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    await q.ensure(95);
+    expect(api.calls).toEqual([1, 2]);
+  });
+
+  it("skips posts without a file url and counts them", async () => {
+    const api = fakeApi(10, (id) => (id % 2 ? { file: { ...makePost().file, url: null } } : {}));
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts).toHaveLength(5);
+    expect(q.stats.hidden).toBe(5);
+  });
+
+  it("applies the blacklist locally, even for rules in the query", async () => {
+    const api = fakeApi(10, (id) => ({ tagList: id <= 3 ? ["gore"] : ["wolf"] }));
+    const s = search({ blacklist: "gore" });
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts.map((p) => p.id)).toEqual([10, 9, 8, 7, 6, 5, 4]);
+    expect(q.stats.blacklisted).toBe(3);
+  });
+
+  it("filters disabled media kinds", async () => {
+    const api = fakeApi(4, (id) => ({ file: { ...makePost().file, ext: id % 2 ? "webm" : "png" } }));
+    const s = search({ media: { image: true, gif: true, video: false } });
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts.every((p) => p.file.ext === "png")).toBe(true);
+  });
+
+  it("drops Flash posts, which browsers can't play", async () => {
+    const api = fakeApi(4, (id) => ({ file: { ...makePost().file, ext: id === 4 ? "swf" : "png" } }));
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts.map((p) => p.id)).toEqual([3, 2, 1]);
+  });
+
+  it("keeps fetching when a whole page is filtered out", async () => {
+    const api = fakeApi(300, (id) => ({ tagList: id > 150 ? ["gore"] : ["wolf"] }));
+    const s = search({ blacklist: "gore" });
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(api.calls).toEqual(["", "b201"]);
+    expect(q.posts[0].id).toBe(150);
+  });
+
+  it("dedupes concurrent ensure calls", async () => {
+    const api = fakeApi(50);
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await Promise.all([q.ensure(0), q.ensure(0), q.ensure(1)]);
+    expect(api.fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("surfaces fetch errors and stops until retried", async () => {
+    const s = search();
+    const fetcher = vi.fn<PageFetcher>().mockRejectedValueOnce(new Error("You cannot search for more than 40 tags at a time"));
+    const q = new PostQueue(buildQuery(s), s.media, fetcher);
+    await q.ensure(0);
+    expect(q.error).toMatch(/40 tags/);
+    await q.ensure(0);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+});

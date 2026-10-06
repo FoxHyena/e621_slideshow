@@ -1,0 +1,150 @@
+import type { Page, Route } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+const IMG = readFileSync(path.join(__dirname, "fixtures/img.png"));
+const CLIP = readFileSync(path.join(__dirname, "fixtures/clip.webm"));
+
+const CORS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD",
+  "access-control-allow-headers": "authorization, content-type",
+};
+
+export interface MockPostSpec {
+  id: number;
+  tags?: string[];
+  ext?: string;
+  rating?: "s" | "q" | "e";
+  is_favorited?: boolean;
+  hidden?: boolean;
+  duration?: number;
+}
+
+export function mockPost(spec: MockPostSpec) {
+  const ext = spec.ext ?? "png";
+  const url = spec.hidden ? null : `https://static1.e621.net/data/mock/${spec.id}.${ext}`;
+  return {
+    id: spec.id,
+    created_at: "2024-05-01T12:00:00.000-04:00",
+    file: { width: 64, height: 48, ext, size: 1000, md5: `md5${spec.id}`, url },
+    preview: { width: 64, height: 48, url },
+    sample: {
+      has: true,
+      width: 64,
+      height: 48,
+      url: spec.hidden ? null : `https://static1.e621.net/data/sample/mock/${spec.id}.jpg`,
+      alternates: {},
+    },
+    score: { up: 5, down: 1, total: 4 },
+    tags: { general: spec.tags ?? ["solo"], artist: ["mock_artist"], species: ["wolf"] },
+    rating: spec.rating ?? "s",
+    fav_count: 3,
+    is_favorited: spec.is_favorited ?? false,
+    uploader_id: 1,
+    uploader_name: "uploader",
+    pools: [],
+    sources: [],
+    duration: spec.duration ?? null,
+    flags: { deleted: false, pending: false, flagged: false },
+  };
+}
+
+export interface E621Mock {
+  /** every /posts.json request: tags + page */
+  searches: { tags: string; page: string | null; auth: string | null }[];
+  favorites: { method: string; postId: number }[];
+  autocompleteQueries: string[];
+  /** media URLs the browser actually requested */
+  media: string[];
+  posts: ReturnType<typeof mockPost>[];
+  setPosts(specs: MockPostSpec[]): void;
+}
+
+/** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
+export function defaultSpecs(n = 150): MockPostSpec[] {
+  return Array.from({ length: n }, (_, i) => ({ id: 1000 + n - i }));
+}
+
+export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs()): Promise<E621Mock> {
+  const state: E621Mock = {
+    searches: [],
+    favorites: [],
+    autocompleteQueries: [],
+    media: [],
+    posts: specs.map(mockPost),
+    setPosts(s) {
+      state.posts = s.map(mockPost);
+    },
+  };
+
+  const json = (route: Route, body: unknown, status = 200) =>
+    route.fulfill({ status, headers: { ...CORS, "content-type": "application/json" }, body: JSON.stringify(body) });
+
+  await page.route("https://e621.net/**", async (route) => {
+    const req = route.request();
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
+    const url = new URL(req.url());
+    const auth = req.headers()["authorization"] ?? null;
+
+    if (url.pathname === "/posts.json") {
+      const tags = url.searchParams.get("tags") ?? "";
+      const pageParam = url.searchParams.get("page");
+      const limit = Number(url.searchParams.get("limit") ?? 75);
+      state.searches.push({ tags, page: pageParam, auth });
+      if (tags.includes("nothing_matches")) return json(route, { posts: [] });
+      if (tags.includes("server_error")) return json(route, { success: false, message: "Mock search failure" }, 422);
+      let list = state.posts;
+      // honour simple negations so blacklist-in-query behaves like e621
+      const negs = tags.split(" ").filter((t) => /^-[a-z_]+$/.test(t)).map((t) => t.slice(1));
+      list = list.filter((p) => !negs.some((n) => Object.values(p.tags).flat().includes(n)));
+      if (pageParam?.startsWith("b")) {
+        const before = Number(pageParam.slice(1));
+        list = list.filter((p) => p.id < before);
+        return json(route, { posts: list.slice(0, limit) });
+      }
+      const n = Number(pageParam ?? 1);
+      return json(route, { posts: list.slice((n - 1) * limit, n * limit) });
+    }
+
+    if (url.pathname === "/tags/autocomplete.json") {
+      const q = url.searchParams.get("search[name_matches]") ?? "";
+      state.autocompleteQueries.push(q);
+      return json(route, [
+        { id: 1, name: `${q}_species`, post_count: 123456, category: 5, antecedent_name: null },
+        { id: 2, name: `${q}_artist`, post_count: 789, category: 1, antecedent_name: null },
+        { id: 3, name: "canine", post_count: 2_000_000, category: 5, antecedent_name: `${q}boy` },
+      ]);
+    }
+
+    if (url.pathname === "/users/me.json") {
+      if (!auth) return json(route, { id: null, name: "Anonymous", blacklisted_tags: "gore" });
+      const [user, key] = Buffer.from(auth.replace("Basic ", ""), "base64").toString().split(":");
+      if (key !== "goodkey") return json(route, { success: false, message: "Invalid API key" }, 401);
+      return json(route, { id: 42, name: user, blacklisted_tags: "account_rule\nsecond_rule other", tag_query_limit: 40 });
+    }
+
+    if (url.pathname === "/favorites.json" && req.method() === "POST") {
+      const postId = Number(new URLSearchParams(req.postData() ?? "").get("post_id"));
+      state.favorites.push({ method: "POST", postId });
+      if (postId === 999) return json(route, { success: false, message: "You have already favorited this post" }, 422);
+      return json(route, { post: state.posts.find((p) => p.id === postId) });
+    }
+    const fav = url.pathname.match(/^\/favorites\/(\d+)\.json$/);
+    if (fav && req.method() === "DELETE") {
+      state.favorites.push({ method: "DELETE", postId: Number(fav[1]) });
+      return route.fulfill({ status: 204, headers: CORS });
+    }
+
+    return json(route, { success: false, reason: "not mocked" }, 404);
+  });
+
+  await page.route("https://static1.e621.net/**", async (route) => {
+    const url = route.request().url();
+    state.media.push(url);
+    if (url.endsWith(".webm")) return route.fulfill({ body: CLIP, contentType: "video/webm" });
+    return route.fulfill({ body: IMG, contentType: url.endsWith(".jpg") ? "image/jpeg" : "image/png" });
+  });
+
+  return state;
+}

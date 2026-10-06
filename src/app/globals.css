@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #fcb328;
+  --color-accent-strong: #ffd479;
+  --color-panel: #0f1a2b;
+  --color-panel-2: #16243a;
+  --color-line: #263a57;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html,
+body {
+  background: #000;
+  color-scheme: dark;
+}
+
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.progress-bar {
+  transform-origin: left;
+  animation-name: progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar {
+    animation: none;
+  }
+}
+
+/* Show only if still present after a beat, so fast loads don't flash a spinner. */
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+.delayed-show {
+  opacity: 0;
+  animation: appear 150ms ease 600ms forwards;
+}

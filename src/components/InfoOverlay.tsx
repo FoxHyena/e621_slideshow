@@ -1,0 +1,96 @@
+"use client";
+
+import { ExternalLink, Minus, Plus, X } from "lucide-react";
+import { postPageUrl } from "@/lib/e621/client";
+import { TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
+
+const ORDER: TagCategoryName[] = ["artist", "copyright", "character", "species", "general", "meta", "lore", "contributor", "invalid"];
+const RATING = { s: "Safe", q: "Questionable", e: "Explicit" } as const;
+
+interface Props {
+  post: Post;
+  onClose: () => void;
+  onAddTag: (tag: string) => void;
+  onExcludeTag: (tag: string) => void;
+}
+
+export default function InfoOverlay({ post, onClose, onAddTag, onExcludeTag }: Props) {
+  return (
+    <aside
+      className="absolute bottom-20 left-4 top-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col rounded-lg border border-line bg-panel/95 text-sm shadow-2xl backdrop-blur"
+      data-testid="info-overlay"
+      aria-label="Post info"
+    >
+      <header className="flex items-start justify-between gap-2 border-b border-line p-3">
+        <div className="min-w-0">
+          <a
+            href={postPageUrl(post.id)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 font-semibold text-accent hover:underline"
+          >
+            Post #{post.id} <ExternalLink className="size-3.5" aria-hidden />
+          </a>
+          <p className="mt-1 text-xs text-neutral-400">
+            {RATING[post.rating]} · ▲{post.score.total} · ♥{post.fav_count} · {post.file.width}×{post.file.height}{" "}
+            {post.file.ext.toUpperCase()}
+            {post.duration ? ` · ${Math.round(post.duration)}s` : ""}
+          </p>
+          <p className="text-xs text-neutral-500">{new Date(post.created_at).toLocaleDateString()}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close info"
+          className="rounded p-1 text-neutral-400 hover:bg-white/10 hover:text-white"
+        >
+          <X className="size-4" aria-hidden />
+        </button>
+      </header>
+      <div className="flex-1 space-y-3 overflow-y-auto p-3">
+        {ORDER.map((cat) => {
+          const tags = post.tags[cat];
+          if (!tags?.length) return null;
+          return (
+            <div key={cat}>
+              <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">{cat}</h3>
+              <ul className="space-y-0.5">
+                {tags.map((tag) => (
+                  <li key={tag} className="group flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onAddTag(tag)}
+                      aria-label={`Add ${tag} to search`}
+                      title="Add to search"
+                      className="rounded p-0.5 text-neutral-500 opacity-60 hover:bg-white/10 hover:text-green-400 group-hover:opacity-100"
+                    >
+                      <Plus className="size-3.5" aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onExcludeTag(tag)}
+                      aria-label={`Exclude ${tag} from search`}
+                      title="Exclude from search"
+                      className="rounded p-0.5 text-neutral-500 opacity-60 hover:bg-white/10 hover:text-red-400 group-hover:opacity-100"
+                    >
+                      <Minus className="size-3.5" aria-hidden />
+                    </button>
+                    <a
+                      href={`https://e621.net/posts?tags=${encodeURIComponent(tag)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="truncate font-mono text-xs hover:underline"
+                      style={{ color: TAG_CATEGORY_COLORS[cat] }}
+                    >
+                      {tag.replace(/_/g, " ")}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
+}
