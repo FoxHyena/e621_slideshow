@@ -6,7 +6,7 @@ import type { Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORY_COLORS, type CurrentUser } from "@/lib/e621/types";
 import { REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
 import { dateMetatag } from "@/lib/query/date";
-import { BREADTH_MAX, BREADTH_MIN, ORDER_LABELS, randomSeed, type Order, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
+import { BREADTH_MAX, BREADTH_MIN, ORDER_LABELS, randomSeed, STYLE_LABELS, type Order, type PlaybackSettings, type SearchSettings, type SlideStyle } from "@/lib/settings";
 import { storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import DatePanel from "./DatePanel";
@@ -705,7 +705,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
   const s = search;
   const p = playback;
   const dateTag = dateMetatag(s.date);
-  const fitLabel = { contain: "Fit", cover: "Fill", original: "1:1" }[p.fit];
+  const fitLabel = p.style === "classic" ? { contain: "Fit", cover: "Fill", original: "1:1" }[p.fit] : STYLE_LABELS[p.style];
   const setS = (patch: Partial<SearchSettings>) => setSearch({ ...s, ...patch });
   const setP = (patch: Partial<PlaybackSettings>) => setPlayback({ ...p, ...patch });
 
@@ -974,16 +974,36 @@ export default function SettingsPanel(props: SettingsPanelProps) {
               max={10}
               onChange={(preloadCount) => setP({ preloadCount })}
             />
-            <Segmented
-              label="Fit"
-              value={p.fit}
-              onChange={(fit) => setP({ fit })}
-              options={[
-                { id: "contain", label: "Fit" },
-                { id: "cover", label: "Fill" },
-                { id: "original", label: "1:1" },
-              ]}
-            />
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <label className="text-neutral-300" htmlFor="slide-style">
+                Style
+              </label>
+              <select
+                id="slide-style"
+                value={p.style}
+                onChange={(e) => setP({ style: e.target.value as SlideStyle })}
+                className={field}
+                data-testid="style-select"
+              >
+                {(Object.keys(STYLE_LABELS) as SlideStyle[]).map((st) => (
+                  <option key={st} value={st}>
+                    {STYLE_LABELS[st]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {p.style === "classic" && (
+              <Segmented
+                label="Fit"
+                value={p.fit}
+                onChange={(fit) => setP({ fit })}
+                options={[
+                  { id: "contain", label: "Fit" },
+                  { id: "cover", label: "Fill" },
+                  { id: "original", label: "1:1" },
+                ]}
+              />
+            )}
             <Segmented
               label="Quality"
               value={p.quality}
@@ -993,15 +1013,17 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 { id: "sample", label: "Fast" },
               ]}
             />
-            <Segmented
-              label="Transition"
-              value={p.transition}
-              onChange={(transition) => setP({ transition })}
-              options={[
-                { id: "fade", label: "Fade" },
-                { id: "none", label: "None" },
-              ]}
-            />
+            {p.style === "classic" && (
+              <Segmented
+                label="Transition"
+                value={p.transition}
+                onChange={(transition) => setP({ transition })}
+                options={[
+                  { id: "fade", label: "Fade" },
+                  { id: "none", label: "None" },
+                ]}
+              />
+            )}
             <NumberRow
               label="Max video length (0 = full)"
               value={p.videoMaxSec}

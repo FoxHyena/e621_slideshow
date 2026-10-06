@@ -45,8 +45,20 @@ export interface SearchSettings {
   minScore: number | null;
 }
 
+export type SlideStyle = "classic" | "prints" | "kenburns" | "collage" | "reflections";
+
+export const STYLE_LABELS: Record<SlideStyle, string> = {
+  classic: "Classic",
+  prints: "Vintage Prints",
+  kenburns: "Ken Burns",
+  collage: "Collage",
+  reflections: "Reflections",
+};
+
 /** Everything that only changes how posts are shown. Applied live. */
 export interface PlaybackSettings {
+  /** Classic honours `fit` and `transition`; the other styles bring their own. */
+  style: SlideStyle;
   intervalSec: number;
   preloadCount: number;
   fit: "contain" | "cover" | "original";
@@ -72,6 +84,7 @@ export const DEFAULT_SEARCH: SearchSettings = {
 };
 
 export const DEFAULT_PLAYBACK: PlaybackSettings = {
+  style: "classic",
   intervalSec: 6,
   preloadCount: 4,
   fit: "contain",
