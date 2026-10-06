@@ -59,6 +59,19 @@ export interface E621Mock {
   media: string[];
   posts: ReturnType<typeof mockPost>[];
   setPosts(specs: MockPostSpec[]): void;
+  /** the signed-in user's favorites, newest-favorited first (GET /favorites.json) */
+  favPosts: ReturnType<typeof mockPost>[];
+  setFavorites(specs: MockPostSpec[]): void;
+  /** global post_count per tag for /tags.json; unknown tags get 100,000 */
+  tagCounts: Record<string, number>;
+  /** names asked for in each /tags.json request */
+  tagLookups: string[][];
+  /** page numbers of each GET /favorites.json request */
+  favoritePages: number[];
+  /** when set, plain tags in /posts.json queries must match (off by default: older tests search freely) */
+  filterPositive: boolean;
+  /** artificial latency for a /posts.json request, in ms */
+  searchDelay: (tags: string, page: number) => number;
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -76,6 +89,15 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     setPosts(s) {
       state.posts = s.map(mockPost);
     },
+    favPosts: [],
+    setFavorites(s) {
+      state.favPosts = s.map(mockPost);
+    },
+    tagCounts: {},
+    tagLookups: [],
+    favoritePages: [],
+    filterPositive: false,
+    searchDelay: () => 0,
   };
 
   const json = (route: Route, body: unknown, status = 200) =>
@@ -98,6 +120,16 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       // honour simple negations so blacklist-in-query behaves like e621
       const negs = tags.split(" ").filter((t) => /^-[a-z_]+$/.test(t)).map((t) => t.slice(1));
       list = list.filter((p) => !negs.some((n) => Object.values(p.tags).flat().includes(n)));
+      // `~a ~b`: keep posts with any of them, like e621's OR
+      const ors = tags.split(" ").filter((t) => t.startsWith("~")).map((t) => t.slice(1));
+      if (ors.length) list = list.filter((p) => ors.some((o) => Object.values(p.tags).flat().includes(o)));
+      if (state.filterPositive) {
+        // plain tags outside `-( … )` groups (those are blacklist rules)
+        const required = tags.replace(/-?\([^)]*\)/g, "").split(" ").filter((t) => /^[a-z_]+$/.test(t));
+        list = list.filter((p) => required.every((r) => Object.values(p.tags).flat().includes(r)));
+      }
+      const delay = state.searchDelay(tags, Number(pageParam ?? 1));
+      if (delay) await new Promise((r) => setTimeout(r, delay));
       if (pageParam?.startsWith("b")) {
         const before = Number(pageParam.slice(1));
         list = list.filter((p) => p.id < before);
@@ -122,6 +154,26 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const [user, key] = Buffer.from(auth.replace("Basic ", ""), "base64").toString().split(":");
       if (key !== "goodkey") return json(route, { success: false, message: "Invalid API key" }, 401);
       return json(route, { id: 42, name: user, blacklisted_tags: "account_rule\nsecond_rule other", tag_query_limit: 40 });
+    }
+
+    if (url.pathname === "/users/42.json") {
+      return json(route, { id: 42, name: "tester", favorite_count: state.favPosts.length });
+    }
+
+    if (url.pathname === "/favorites.json" && req.method() === "GET") {
+      const n = Number(url.searchParams.get("page") ?? 1);
+      const limit = Number(url.searchParams.get("limit") ?? 75);
+      state.favoritePages.push(n);
+      return json(route, { posts: state.favPosts.slice((n - 1) * limit, n * limit) });
+    }
+
+    if (url.pathname === "/tags.json") {
+      const names = (url.searchParams.get("search[name]") ?? "").split(",").filter(Boolean);
+      state.tagLookups.push(names);
+      return json(
+        route,
+        names.map((name, i) => ({ id: i + 1, name, post_count: state.tagCounts[name] ?? 100_000, category: 0 })),
+      );
     }
 
     if (url.pathname === "/favorites.json" && req.method() === "POST") {

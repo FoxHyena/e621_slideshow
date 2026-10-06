@@ -17,12 +17,65 @@ export interface QueueStats {
   blacklisted: number;
 }
 
+export interface SearchProgress {
+  /** pages fetched so far; how many remain isn't known until a short page arrives */
+  done: number;
+  /** distinct posts that matched the profile so far */
+  found: number;
+}
+
+/** What the app drives a slideshow source through. */
+export interface SlideQueue {
+  readonly posts: Post[];
+  readonly exhausted: boolean;
+  readonly loading: boolean;
+  readonly error: string | null;
+  readonly stats: QueueStats;
+  readonly query: string;
+  ensure(index: number): Promise<void>;
+  remove(id: number): void;
+  patch(id: number, patch: Partial<Post>): void;
+  retry(): void;
+  /** ranked sources: how well a post matched the profile, and the tags that drove it */
+  matchFor?(id: number): { score: number; reasons: string[] } | undefined;
+  /** stop any background fetching */
+  dispose?(): void;
+  /** background search progress, for sources that fetch ahead on their own */
+  readonly progress?: SearchProgress;
+}
+
+export interface PostFilter {
+  seen: Set<number>;
+  media: SearchSettings["media"];
+  rules: BlacklistRule[];
+  ctx: MatchContext;
+  stats: QueueStats;
+}
+
+/** Whether a fetched post can be shown; counts hidden and blacklisted posts in `f.stats`. */
+export function acceptPost(post: Post, f: PostFilter): boolean {
+  if (f.seen.has(post.id)) return false;
+  f.seen.add(post.id);
+  if (!post.file.url) {
+    f.stats.hidden++;
+    return false;
+  }
+  const kind = mediaKind(post);
+  if (kind === "other") return false;
+  if (!f.media[kind]) return false;
+  if (blacklistedBy(f.rules, post, f.ctx)) {
+    f.stats.blacklisted++;
+    return false;
+  }
+  return true;
+}
+
 /**
  * Buffer of displayable posts for one query. Pages are fetched on demand,
  * deduplicated, and filtered (blacklist, missing file URL, disabled media).
  * Mutable; the owner re-renders via `onChange`.
  */
-export class PostQueue {
+export class PostQueue implements SlideQueue {
   posts: Post[] = [];
   exhausted = false;
   loading = false;
@@ -85,20 +138,7 @@ export class PostQueue {
   }
 
   private accept(post: Post): boolean {
-    if (this.seen.has(post.id)) return false;
-    this.seen.add(post.id);
-    if (!post.file.url) {
-      this.stats.hidden++;
-      return false;
-    }
-    const kind = mediaKind(post);
-    if (kind === "other") return false;
-    if (!this.media[kind]) return false;
-    if (blacklistedBy(this.rules, post, this.ctx)) {
-      this.stats.blacklisted++;
-      return false;
-    }
-    return true;
+    return acceptPost(post, { seen: this.seen, media: this.media, rules: this.rules, ctx: this.ctx, stats: this.stats });
   }
 
   private async refill() {

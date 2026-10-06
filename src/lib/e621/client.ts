@@ -1,4 +1,4 @@
-import type { AutocompleteTag, CurrentUser, Post } from "./types";
+import type { AutocompleteTag, CurrentUser, Post, TagInfo, UserProfile } from "./types";
 
 export const E621_BASE = "https://e621.net";
 
@@ -119,6 +119,40 @@ export async function autocompleteTags(
 
 export function getCurrentUser(creds: Credentials): Promise<CurrentUser> {
   return request<CurrentUser>("/users/me.json", { creds });
+}
+
+export function getUser(id: number, creds: Credentials | null): Promise<UserProfile> {
+  return request<UserProfile>(`/users/${id}.json`, { creds });
+}
+
+/** A user's favorites, most recently favorited first (unlike `fav:name`, which sorts by post id). */
+export async function getFavorites(
+  userId: number,
+  page: number,
+  limit: number,
+  creds: Credentials | null,
+): Promise<Post[]> {
+  const res = await request<{ posts: Post[] }>("/favorites.json", {
+    params: { user_id: userId, page, limit },
+    creds,
+  });
+  return res.posts ?? [];
+}
+
+/** Post counts for exact tag names. Names e621 doesn't know are simply absent. */
+export async function getTags(names: string[], creds: Credentials | null): Promise<TagInfo[]> {
+  if (names.length === 0) return [];
+  const res = await request<TagInfo[] | Record<string, unknown>>("/tags.json", {
+    params: { "search[name]": names.join(","), limit: 320 },
+    creds,
+  });
+  return Array.isArray(res) ? res : [];
+}
+
+/** Id of the newest post, a close stand-in for the site's total post count. */
+export async function newestPostId(creds: Credentials | null): Promise<number> {
+  const [post] = await searchPosts("", 1, 1, creds);
+  return post?.id ?? 0;
 }
 
 export async function addFavorite(postId: number, creds: Credentials): Promise<void> {

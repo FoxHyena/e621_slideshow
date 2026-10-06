@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { blacklistedBy, mergeBlacklists, parseBlacklist, removeBlacklistLines, ruleToQuery, syncAccountBlacklist, DEFAULT_BLACKLIST } from "../query/blacklist";
-import { buildQuery, countTags } from "../query/build";
+import { buildQuery, buildRecommendedQuery, countTags, REC_BLACKLIST_RESERVE } from "../query/build";
 import { dateMetatag, DEFAULT_DATE_FILTER, nextDay } from "../query/date";
 import { inRange, parseRange } from "../query/range";
 import { DEFAULT_SEARCH, type SearchSettings } from "../settings";
@@ -174,5 +174,39 @@ describe("buildQuery", () => {
   it("flags user terms over the limit", () => {
     const tags = Array.from({ length: 45 }, (_, i) => `t${i}`).join(" ");
     expect(buildQuery(search({ tags })).overLimit).toBe(true);
+  });
+});
+
+describe("buildRecommendedQuery", () => {
+  const top = Array.from({ length: 40 }, (_, i) => `tag${i}`);
+
+  it("ORs the top tags inside a default 7-day window, ordered by score", () => {
+    const q = buildRecommendedQuery(search({ breadth: 3, tags: "ignored order:random" }), top);
+    expect(q.query).toBe("~tag0 ~tag1 ~tag2 date:>=7_days_ago order:score");
+    expect(q.candidates).toEqual(["tag0", "tag1", "tag2"]);
+    expect(q.capped).toBe(false);
+    expect(q.paging).toBe("numbered");
+  });
+
+  it("keeps the user's own window and filters, then fits the blacklist", () => {
+    const date = { ...DEFAULT_DATE_FILTER, enabled: true, mode: "preset" as const, preset: "month" as const };
+    const q = buildRecommendedQuery(
+      search({ breadth: 2, date, ratings: { s: false, q: false, e: true }, blacklist: "gore" }),
+      top,
+    );
+    expect(q.query).toBe("~tag0 ~tag1 rating:e date:month order:score -gore");
+  });
+
+  it("caps breadth to the tag budget, keeping the blacklist reserve, and says so", () => {
+    // filters: date + order + rating = 3 → room 20 − 3 − reserve
+    const q = buildRecommendedQuery(search({ breadth: 30, ratings: { s: false, q: false, e: true } }), top, 20);
+    expect(q.candidates).toHaveLength(20 - 3 - REC_BLACKLIST_RESERVE);
+    expect(q.capped).toBe(true);
+    expect(q.overLimit).toBe(false);
+  });
+
+  it("sends a single candidate without the OR prefix, and none when the profile is empty", () => {
+    expect(buildRecommendedQuery(search({ breadth: 15 }), ["solo_tag"]).query).toMatch(/^solo_tag date:/);
+    expect(buildRecommendedQuery(search({ breadth: 15 }), []).candidates).toEqual([]);
   });
 });

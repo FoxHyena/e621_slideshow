@@ -1,16 +1,18 @@
 "use client";
 
-import { useId, useState } from "react";
-import { Bookmark, Check, ChevronDown, Dices, ExternalLink, History, LayoutGrid, Loader2, Play, Trash2, X } from "lucide-react";
+import { Fragment, useId, useState } from "react";
+import { Bookmark, Check, ChevronDown, Dices, ExternalLink, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
 import type { Credentials } from "@/lib/e621/client";
-import type { CurrentUser } from "@/lib/e621/types";
-import type { BuiltQuery } from "@/lib/query/build";
+import { TAG_CATEGORY_COLORS, type CurrentUser } from "@/lib/e621/types";
+import { REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
 import { dateMetatag } from "@/lib/query/date";
-import { ORDER_LABELS, randomSeed, type Order, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
+import { BREADTH_MAX, BREADTH_MIN, ORDER_LABELS, randomSeed, type Order, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
 import { storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import DatePanel from "./DatePanel";
+import type { PlannedSearch, SearchKind } from "@/lib/recommend/weights";
 import TagInput from "./TagInput";
+import type { Recommendations } from "./useRecommendations";
 
 export interface SettingsPanelProps {
   open: boolean;
@@ -24,6 +26,11 @@ export interface SettingsPanelProps {
   playback: PlaybackSettings;
   setPlayback: (p: PlaybackSettings) => void;
   built: BuiltQuery;
+  rec: Recommendations;
+  /** every weighted profile tag, strongest first (pins included, mutes excluded) */
+  recTags: string[];
+  /** the tags that get their own search, and why */
+  recPlan: PlannedSearch[];
   creds: Credentials | null;
   user: CurrentUser | null;
   remember: boolean;
@@ -248,6 +255,224 @@ function NumberRow({
         {suffix && <span className="w-6 text-xs text-neutral-400">{suffix}</span>}
       </span>
     </label>
+  );
+}
+
+function RecommendedPanel({
+  search,
+  setS,
+  rec,
+  recTags,
+  searched,
+  capped,
+  user,
+}: {
+  search: SearchSettings;
+  setS: (patch: Partial<SearchSettings>) => void;
+  rec: Recommendations;
+  recTags: string[];
+  /** tags in the candidate search, and why */
+  searched: ReadonlyMap<string, SearchKind>;
+  /** breadth was cut short by e621's tag limit */
+  capped: boolean;
+  user: CurrentUser | null;
+}) {
+  const [filter, setFilter] = useState("");
+  if (!user) {
+    return (
+      <p className="rounded-md bg-accent/10 px-3 py-2 text-xs text-accent" data-testid="rec-signin">
+        Sign in under e621 account to get recommendations from your favorites.
+      </p>
+    );
+  }
+  const { profile, weights, overrides } = rec;
+  // Match the way tags are shown: "pink pawpads" finds pink_pawpads.
+  const needle = filter.trim().toLowerCase().replace(/\s+/g, "_");
+  // Grouped by why a tag is searched, each group in weight order (the number on the row).
+  const byWeight = (a: string, b: string) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0) || a.localeCompare(b);
+  const group = (kind: SearchKind | null) =>
+    recTags.filter((t) => (searched.get(t) ?? null) === kind).sort(byWeight);
+  const groups = [
+    { kind: "pinned", label: "Pinned", tags: group("pinned") },
+    { kind: "signature", label: "Searched: your most distinctive tags", tags: group("signature") },
+    { kind: null, label: "Not searched. Still count when ranking; pin one to search it", tags: group(null) },
+  ].filter((g) => g.tags.length > 0);
+  const ordered = groups.flatMap((g) => g.tags);
+  const shown = needle ? ordered.filter((t) => t.includes(needle)) : ordered;
+  const headerAt = new Map(groups.map((g) => [g.tags[0], g]));
+  const iconBtn = (on: boolean, tone: string) =>
+    `rounded p-1 ${on ? tone : "text-neutral-500 opacity-60 hover:opacity-100"} hover:bg-white/10`;
+  const tagRow = (tag: string) => {
+    const cat = profile?.tags[tag]?.cat ?? "general";
+    const pinned = overrides.pinned.includes(tag);
+    const muted = overrides.muted.includes(tag);
+    // Past the breadth cutoff: not searched, but still scored. Dim it; Pin stays bright so it can be promoted.
+    const dim = !muted && !searched.has(tag);
+    return (
+      <li key={tag} className="flex items-center gap-1" data-testid="rec-tag" data-searched={!dim && !muted}>
+        <button
+          type="button"
+          onClick={() => rec.togglePin(tag)}
+          aria-label={`${pinned ? "Unpin" : "Pin"} ${tag}`}
+          aria-pressed={pinned}
+          className={iconBtn(pinned, "text-accent")}
+        >
+          <Pin className="size-3.5" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={() => rec.toggleMute(tag)}
+          aria-label={`${muted ? "Unmute" : "Mute"} ${tag}`}
+          title={muted ? "Unmute" : "Mute: hide posts with this tag"}
+          aria-pressed={muted}
+          className={`${iconBtn(muted, "text-red-400")} ${dim ? "opacity-30" : ""}`}
+        >
+          <VolumeX className="size-3.5" aria-hidden />
+        </button>
+        <span
+          className={`min-w-0 flex-1 truncate font-mono text-xs ${muted ? "line-through opacity-50" : dim ? "opacity-40" : ""}`}
+          style={{ color: TAG_CATEGORY_COLORS[cat] }}
+        >
+          {tag.replace(/_/g, " ")}
+        </span>
+        {!muted && (
+          <span className={`font-mono text-[11px] text-neutral-500 ${dim ? "opacity-50" : ""}`}>
+            {profile?.tags[tag] ? `×${profile.tags[tag].n} · ` : ""}
+            {(weights.get(tag) ?? 0).toFixed(1)}
+          </span>
+        )}
+      </li>
+    );
+  };
+
+  return (
+    <div className="space-y-3" data-testid="rec-panel">
+      <div className="flex items-center justify-between gap-2 text-xs text-neutral-400">
+        <span data-testid="rec-status" aria-live="polite">
+          {rec.syncing ? (
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="size-3 animate-spin" aria-hidden /> {rec.progress ?? "Syncing favorites…"}
+            </span>
+          ) : profile ? (
+            `${profile.favIds.length.toLocaleString()} favorites · synced ${new Date(profile.syncedAt).toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+            })}`
+          ) : (
+            "No favorites read yet"
+          )}
+        </span>
+        <button
+          type="button"
+          onClick={rec.rebuild}
+          disabled={rec.syncing}
+          className="flex items-center gap-1 rounded-md border border-line px-2.5 py-1 hover:border-neutral-400 disabled:opacity-40"
+          data-testid="rec-rebuild"
+          title="Re-read every favorite from scratch"
+        >
+          <RefreshCw className="size-3" aria-hidden /> Rebuild
+        </button>
+      </div>
+      {rec.error && (
+        <p className="text-xs text-red-400" role="alert">
+          Couldn&apos;t read favorites: {rec.error}
+        </p>
+      )}
+      <div className="space-y-1">
+        <label htmlFor="rec-breadth" className="flex items-center justify-between text-sm">
+          <span className="text-neutral-300">Breadth</span>
+          <span className="font-mono text-xs text-neutral-400" data-testid="rec-breadth-value">
+            {capped ? `${searched.size} tags (e621 tag limit)` : `${search.breadth} tags`}
+          </span>
+        </label>
+        <input
+          id="rec-breadth"
+          type="range"
+          min={BREADTH_MIN}
+          max={BREADTH_MAX}
+          step={1}
+          value={search.breadth}
+          onChange={(e) => setS({ breadth: Number(e.target.value) })}
+          className="h-6 w-full cursor-pointer accent-accent"
+          data-testid="rec-breadth"
+        />
+        <div className="flex justify-between text-[11px] text-neutral-500" aria-hidden>
+          <span>focused</span>
+          <span>varied</span>
+        </div>
+      </div>
+      <p className="text-xs text-neutral-500">
+        Your highest-weight tags, searched together in one query. Lower stays close to your strongest interests;
+        higher brings more variety. Each tag uses one of e621&apos;s search-tag slots.
+      </p>
+      {recTags.length > 0 ? (
+        <div>
+          <h3 className="mb-1 text-xs text-neutral-400">
+            Your profile: {recTags.length.toLocaleString()} tags you favorite far more than e621 at large.{" "}
+            {searched.size} are searched; all of them count when ranking.
+          </h3>
+          <div className="relative mb-1.5">
+            <input
+              type="search"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              onKeyDown={(e) => {
+                // Esc clears the filter instead of closing the panel
+                if (e.key === "Escape" && filter) {
+                  e.stopPropagation();
+                  setFilter("");
+                }
+              }}
+              placeholder="Find a tag"
+              aria-label="Filter profile tags"
+              className={`${field} w-full`}
+              data-testid="rec-filter"
+            />
+            {needle && (
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-neutral-500">
+                {shown.length.toLocaleString()} of {recTags.length.toLocaleString()}
+              </span>
+            )}
+          </div>
+          <ul
+            className="max-h-72 space-y-0.5 overflow-y-auto overscroll-contain rounded-md bg-black/20 p-1.5"
+            data-testid="rec-tags"
+            tabIndex={0}
+            aria-label="Profile tags, strongest first"
+          >
+            {shown.map((tag, i) => {
+              // Group headers, unless a filter has scrambled positions.
+              const g = needle ? undefined : headerAt.get(tag);
+              if (!g) return tagRow(tag);
+              return (
+                <Fragment key={tag}>
+                  <li
+                    className={`px-1 pb-0.5 text-[11px] text-neutral-500 ${i > 0 ? "mt-1 border-t border-line pt-1.5" : ""}`}
+                    data-testid={g.kind ? `rec-group-${g.kind}` : "rec-cutoff"}
+                  >
+                    {g.label}
+                  </li>
+                  {tagRow(tag)}
+                </Fragment>
+              );
+            })}
+            {shown.length === 0 && <li className="px-1 py-0.5 text-xs text-neutral-500">No profile tags match.</li>}
+          </ul>
+        </div>
+      ) : (
+        !rec.syncing && (
+          <p className="text-xs text-neutral-400">Not enough favorites yet: a tag needs to be on at least 3 of them.</p>
+        )
+      )}
+      {overrides.muted.length > 0 && (
+        <div>
+          <h3 className="mb-1 text-xs text-neutral-400">Muted: posts with these tags are hidden from recommendations</h3>
+          <ul className="space-y-0.5" data-testid="rec-muted">
+            {overrides.muted.map(tagRow)}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -522,43 +747,72 @@ export default function SettingsPanel(props: SettingsPanelProps) {
               </a>
             }
           >
-            <TagInput
-              label="Search tags"
-              value={s.tags}
-              onChange={(tags) => setS({ tags })}
-              creds={creds}
-              placeholder="e.g. wolf solo score:>100"
-              onSubmit={onPlay}
-              testId="search-input"
+            <Segmented
+              label="Source"
+              value={s.source}
+              onChange={(source) => setS({ source })}
+              options={[
+                { id: "search", label: "Search" },
+                { id: "recommended", label: "Recommended" },
+              ]}
             />
-            <div className="flex items-center gap-2 text-sm">
-              <label className="text-neutral-300" htmlFor="order">
-                Order
-              </label>
-              <select
-                id="order"
-                value={s.order}
-                onChange={(e) => setS({ order: e.target.value as Order })}
-                className={`${field} flex-1`}
-                data-testid="order-select"
-              >
-                {(Object.keys(ORDER_LABELS) as Order[]).map((o) => (
-                  <option key={o} value={o}>
-                    {ORDER_LABELS[o]}
-                  </option>
-                ))}
-              </select>
-              {s.order === "random" && (
-                <button
-                  type="button"
-                  onClick={() => setS({ seed: randomSeed() })}
-                  className="flex items-center gap-1 rounded-md border border-line px-2 py-1.5 text-xs hover:border-neutral-400"
-                  title="New random order"
-                >
-                  <Dices className="size-4" aria-hidden /> Reshuffle
-                </button>
-              )}
-            </div>
+            {s.source === "recommended" ? (
+              <RecommendedPanel
+                search={s}
+                setS={setS}
+                rec={props.rec}
+                recTags={props.recTags}
+                searched={
+                  new Map(
+                    props.recPlan
+                      .filter((p) => "candidates" in built && (built as RecommendedQuery).candidates.includes(p.tag))
+                      .map((p) => [p.tag, p.kind]),
+                  )
+                }
+                capped={"capped" in built && (built as RecommendedQuery).capped}
+                user={props.user}
+              />
+            ) : (
+              <>
+                <TagInput
+                  label="Search tags"
+                  value={s.tags}
+                  onChange={(tags) => setS({ tags })}
+                  creds={creds}
+                  placeholder="e.g. wolf solo score:>100"
+                  onSubmit={onPlay}
+                  testId="search-input"
+                />
+                <div className="flex items-center gap-2 text-sm">
+                  <label className="text-neutral-300" htmlFor="order">
+                    Order
+                  </label>
+                  <select
+                    id="order"
+                    value={s.order}
+                    onChange={(e) => setS({ order: e.target.value as Order })}
+                    className={`${field} flex-1`}
+                    data-testid="order-select"
+                  >
+                    {(Object.keys(ORDER_LABELS) as Order[]).map((o) => (
+                      <option key={o} value={o}>
+                        {ORDER_LABELS[o]}
+                      </option>
+                    ))}
+                  </select>
+                  {s.order === "random" && (
+                    <button
+                      type="button"
+                      onClick={() => setS({ seed: randomSeed() })}
+                      className="flex items-center gap-1 rounded-md border border-line px-2 py-1.5 text-xs hover:border-neutral-400"
+                      title="New random order"
+                    >
+                      <Dices className="size-4" aria-hidden /> Reshuffle
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
             <Subsection title="Filters" testId="subsection-filters" collapse={collapse("filters", filtersSummary(s))}>
               <div className="flex flex-wrap gap-x-4 gap-y-2">
                 <span className="text-sm text-neutral-400">Rating</span>
@@ -589,7 +843,17 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 </Toggle>
               </div>
             </Subsection>
-            <Subsection title="Upload date" testId="subsection-date" collapse={collapse("date", dateTag ?? "off")}>
+            <Subsection
+              title="Upload date"
+              testId="subsection-date"
+              collapse={collapse("date", dateTag ?? (s.source === "recommended" ? "last 7 days" : "off"))}
+            >
+              {s.source === "recommended" && !dateTag && (
+                <p className="text-xs text-neutral-400">
+                  Recommendations always search a window. With no date set, that&apos;s{" "}
+                  <code className="text-neutral-300">{dateMetatag(REC_DEFAULT_WINDOW)}</code>.
+                </p>
+              )}
               <DatePanel value={s.date} onChange={(date) => setS({ date })} />
             </Subsection>
             <details className="text-xs text-neutral-400">

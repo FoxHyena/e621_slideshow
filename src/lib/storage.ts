@@ -1,6 +1,9 @@
 import type { Credentials } from "./e621/client";
 import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
+import type { Profile } from "./recommend/profile";
+import { EMPTY_TAG_CACHE, type TagCache } from "./recommend/sync";
+import { NO_OVERRIDES, type Overrides } from "./recommend/weights";
 import {
   DEFAULT_PLAYBACK,
   DEFAULT_SEARCH,
@@ -25,12 +28,15 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
-function write(key: string, value: unknown) {
+/** Returns false when storage is full or disabled; callers that care can say so. */
+function write(key: string, value: unknown): boolean {
   try {
     if (value === null) localStorage.removeItem(PREFIX + key);
     else localStorage.setItem(PREFIX + key, JSON.stringify(value));
+    return true;
   } catch {
     // storage full or disabled: settings just won't persist
+    return false;
   }
 }
 
@@ -64,7 +70,9 @@ export const storage = {
       date: { ...DEFAULT_SEARCH.date, ...s.date },
     };
   },
-  saveSearch: (s: SearchSettings) => write("search", s),
+  saveSearch: (s: SearchSettings) => {
+    write("search", s);
+  },
   loadPlayback: (): PlaybackSettings => read("playback", DEFAULT_PLAYBACK),
   savePlayback: (p: PlaybackSettings) => write("playback", p),
   /** Only present when the user ticked "remember on this device". */
@@ -80,6 +88,17 @@ export const storage = {
   /** Which collapsible settings sections are expanded. */
   loadSections: (): Record<string, boolean> => read<Record<string, boolean>>("sections", {}),
   saveSections: (s: Record<string, boolean>) => write("sections", s),
+  /** Favorites tag profile, per account. Can be large; save returns false if it didn't fit. */
+  loadProfile: (username: string): Profile | null => {
+    const p = read<Profile | null>(`profile:${username}`, null);
+    return p && Array.isArray(p.favIds) && p.tags ? p : null;
+  },
+  saveProfile: (p: Profile): boolean => write(`profile:${p.username}`, p),
+  /** Global tag counts are the same for everyone, so one cache serves every account. */
+  loadTagCache: (): TagCache => read("tagCache", EMPTY_TAG_CACHE),
+  saveTagCache: (c: TagCache): boolean => write("tagCache", c),
+  loadOverrides: (username: string): Overrides => read(`overrides:${username}`, NO_OVERRIDES),
+  saveOverrides: (username: string, o: Overrides) => write(`overrides:${username}`, o),
 };
 
 export function pushHistory(history: HistoryEntry[], tags: string, now: number): HistoryEntry[] {

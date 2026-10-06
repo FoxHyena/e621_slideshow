@@ -40,6 +40,16 @@ async function play(page: Page) {
   await expect(slide(page)).toBeVisible();
 }
 
+test("search mode shows only e621's score, and it fades with the controls", async ({ page }) => {
+  await start(page, undefined, { playback: { intervalSec: 60 } });
+  await play(page);
+  await page.mouse.move(400, 300);
+  const score = page.getByTestId("post-score");
+  await expect(score).toHaveText("▲ 4");
+  await expect(page.getByTestId("controls")).toHaveAttribute("data-visible", "true");
+  await expect(page.getByTestId("controls")).toHaveAttribute("data-visible", "false", { timeout: 5000 });
+});
+
 test("play starts the show and auto-advances on the timer", async ({ page }) => {
   const mock = await start(page);
   await page.getByTestId("search-input").fill("wolf");
@@ -456,4 +466,234 @@ test("G opens the gallery mid-show on the current post and freezes the timer", a
   await page.getByTestId("gallery-button").click();
   await page.getByTestId("gallery-play").click();
   expect(await slideId(page)).toBe(1148);
+});
+
+// ---- Recommended ----------------------------------------------------------
+
+/** 10 favorites tagged `pawpads` (rare on the site) and `solo` (common). */
+async function startRecommended(page: Page) {
+  const specs = defaultSpecs().map((s) => {
+    if (s.id === 1100) return { ...s, tags: ["pawpads", "solo"] };
+    if (s.id === 1050) return { ...s, tags: ["pawpads", "solo", "a", "b", "c"] };
+    if (s.id === 1120) return { ...s, tags: ["pawpads"] }; // already a favorite, still recommended
+    return s;
+  });
+  const mock = await mockE621(page, specs);
+  mock.setFavorites([{ id: 1120, tags: ["pawpads"] }, ...Array.from({ length: 9 }, (_, i) => ({ id: 2000 + i, tags: ["pawpads", "solo"] }))]);
+  mock.tagCounts = { pawpads: 5 };
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/");
+  await expect(page.getByTestId("signed-in")).toBeVisible();
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
+  return mock;
+}
+
+test("recommended ranks the window by favorite tags and explains why", async ({ page }) => {
+  const mock = await startRecommended(page);
+  const profile = page.getByTestId("rec-tags");
+  await expect(profile).toContainText("pawpads");
+  await expect(profile).not.toContainText("solo"); // as common on the site as in favorites
+  await expect(page.getByTestId("search-input")).toBeHidden();
+
+  await play(page);
+  // the favorite plays too; all three match only pawpads, so the tie goes to the newer post
+  expect(await slideId(page)).toBe(1120);
+  await expect(page.getByTestId("counter")).toHaveText("1 / 3");
+  const query = mock.searches.find((s) => s.tags.startsWith("pawpads"))!.tags;
+  // candidates + window + score order, then the synced account blacklist
+  expect(query).toMatch(/^pawpads date:>=7_days_ago order:score -account_rule/);
+
+  // moving the mouse shows the match score next to e621's own
+  await page.mouse.move(400, 300);
+  await expect(page.getByTestId("post-score")).toHaveText(/^Match \d+\.\d·▲ 4$/);
+
+  await page.keyboard.press("i");
+  await expect(page.getByTestId("rec-reasons")).toHaveText("Recommended because: pawpads");
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => slideId(page)).toBe(1100);
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => slideId(page)).toBe(1050); // extra unweighted tags neither help nor hurt
+});
+
+test("recommended keeps the profile across reloads and only reads new favorites", async ({ page }) => {
+  const mock = await startRecommended(page);
+  await expect(page.getByTestId("rec-tags")).toContainText("pawpads");
+  const lookups = mock.tagLookups.length;
+  mock.favoritePages.length = 0;
+  await page.reload();
+  await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
+  await expect.poll(() => mock.favoritePages).toEqual([1]);
+  expect(mock.tagLookups).toHaveLength(lookups); // counts cached
+});
+
+test("muting the only profile tag leaves nothing to recommend", async ({ page }) => {
+  await startRecommended(page);
+  await page.getByRole("button", { name: "Mute pawpads" }).click();
+  await expect(page.getByTestId("rec-muted")).toContainText("pawpads");
+  await page.getByTestId("play-button").click();
+  await expect(page.getByTestId("toast")).toContainText("Not enough favorites");
+  await page.getByRole("button", { name: "Unmute pawpads" }).click();
+  await play(page);
+  expect(await slideId(page)).toBe(1120);
+});
+
+test("recommended asks signed-out users to sign in", async ({ page }) => {
+  await start(page);
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-signin")).toBeVisible();
+  await page.getByTestId("play-button").click();
+  await expect(page.getByTestId("toast")).toContainText("Sign in");
+});
+
+test("recommended ORs the profile tags into one paged search and starts once it's all ranked", async ({ page }) => {
+  // 700 pawpads posts + 20 toebeans posts → the OR query pages 320, 320, 80 (short = done)
+  const specs = [
+    ...Array.from({ length: 700 }, (_, i) => ({ id: 5000 - i, tags: ["pawpads"] })),
+    ...Array.from({ length: 20 }, (_, i) => ({ id: 1000 - i, tags: ["toebeans"] })),
+  ];
+  const mock = await mockE621(page, specs);
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads", "toebeans"] })));
+  mock.tagCounts = { pawpads: 5, toebeans: 5 };
+  // the last page is slow, so the wait is observable
+  mock.searchDelay = (tags, n) => (tags.startsWith("~") && n === 3 ? 3000 : 0);
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-tags")).toContainText("toebeans");
+  await expect(page.getByTestId("query-preview")).toContainText("~pawpads ~toebeans date:>=7_days_ago order:score");
+
+  await page.getByTestId("play-button").click();
+  const progress = page.getByTestId("search-progress");
+  await expect(progress).toContainText("Searching · page 3");
+  await expect(slide(page)).toHaveCount(0); // nothing plays until every page is in and ranked
+  const rec = () => mock.searches.filter((s) => s.tags.startsWith("~"));
+  await expect.poll(() => rec().map((s) => s.page)).toEqual(["1", "2", "3"]);
+  expect(new Set(rec().map((s) => s.tags)).size).toBe(1); // one query, paged
+
+  await expect(slide(page)).toBeVisible({ timeout: 10_000 });
+  await expect(progress).toBeHidden();
+  await expect(page.getByTestId("counter")).toHaveText("1 / 720"); // complete: no "+"
+});
+
+test("the profile list shows every weighted tag in a scrollable box", async ({ page }) => {
+  const mock = await mockE621(page);
+  const niche = Array.from({ length: 45 }, (_, i) => `niche_${String(i).padStart(2, "0")}`);
+  mock.setFavorites(Array.from({ length: 5 }, (_, i) => ({ id: 9000 + i, tags: niche })));
+  mock.tagCounts = Object.fromEntries(niche.map((t) => [t, 5]));
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  const list = page.getByTestId("rec-tags");
+  await expect(list.getByTestId("rec-tag")).toHaveCount(45);
+  await expect(page.getByText("Your profile: 45 tags")).toBeVisible();
+  const { scrollHeight, clientHeight } = await list.evaluate((el) => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
+  expect(scrollHeight).toBeGreaterThan(clientHeight);
+  await list.getByRole("button", { name: "Pin niche_44" }).scrollIntoViewIfNeeded();
+  await expect(list.getByRole("button", { name: "Pin niche_44" })).toBeInViewport();
+});
+
+test("the profile filter narrows the list and Esc clears it", async ({ page }) => {
+  const mock = await mockE621(page);
+  const tags = ["pink_pawpads", "black_pawpads", "toe_beans", "knot", "paw_print"];
+  mock.setFavorites(Array.from({ length: 5 }, (_, i) => ({ id: 9000 + i, tags })));
+  mock.tagCounts = Object.fromEntries(tags.map((t) => [t, 5]));
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  const rows = page.getByTestId("rec-tags").getByTestId("rec-tag");
+  await expect(rows).toHaveCount(5);
+
+  const filter = page.getByTestId("rec-filter");
+  await filter.fill("pink pawpads"); // spaces match underscores
+  await expect(rows).toHaveCount(1);
+  await filter.fill("PAW");
+  await expect(rows).toHaveCount(3);
+  await expect(page.getByText("3 of 5")).toBeVisible();
+  await filter.fill("zzz");
+  await expect(page.getByText("No profile tags match.")).toBeVisible();
+
+  await filter.press("Escape");
+  await expect(filter).toHaveValue("");
+  await expect(rows).toHaveCount(5);
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+});
+
+test("the highest-weight tags are searched, the rest dimmed, and pinning promotes one", async ({ page }) => {
+  const mock = await mockE621(page);
+  // 8 favorites: a on 8, b on 7, c on 6, d on 5. Site counts make the weights d > c > b > a,
+  // so a is on the most favorites but weighs least: it must not be searched just for being common.
+  const favs = Array.from({ length: 8 }, (_, i) => ({
+    id: 9000 + i,
+    tags: ["tag_a", ...(i < 7 ? ["tag_b"] : []), ...(i < 6 ? ["tag_c"] : []), ...(i < 5 ? ["tag_d"] : [])],
+  }));
+  mock.setFavorites(favs);
+  // site counts keep every ratio under the 50× lift cap, so the ratios (not just n) set the order
+  mock.tagCounts = { tag_a: 200, tag_b: 100, tag_c: 40, tag_d: 20 };
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, search: { source: "recommended", breadth: 2 } });
+  await page.goto("/");
+  const rows = page.getByTestId("rec-tags").getByTestId("rec-tag");
+  await expect(rows).toHaveCount(4);
+  const searchedRows = rows.and(page.locator("[data-searched=true]"));
+  await expect(searchedRows).toHaveText([/tag d/, /tag c/]);
+  await expect(page.getByTestId("rec-group-signature")).toBeVisible();
+  await expect(rows.and(page.locator("[data-searched=false]"))).toHaveText([/tag b/, /tag a/]);
+  await expect(page.getByTestId("rec-cutoff")).toBeVisible();
+  // the list reads top to bottom by weight
+  await expect(rows).toHaveText([/tag d/, /tag c/, /tag b/, /tag a/]);
+
+  // the Breadth slider: one more search adds the next weight down
+  const slider = page.getByTestId("rec-breadth");
+  await slider.focus();
+  await slider.press("ArrowRight");
+  await expect(page.getByTestId("rec-breadth-value")).toHaveText("3 tags");
+  await expect(searchedRows).toHaveText([/tag d/, /tag c/, /tag b/]);
+  await slider.press("ArrowLeft");
+  await expect(searchedRows).toHaveText([/tag d/, /tag c/]);
+
+  await page.getByRole("button", { name: "Pin tag_a" }).click(); // still clickable while dimmed
+  await expect(page.getByTestId("rec-group-pinned")).toBeVisible();
+  await expect(searchedRows).toHaveText([/tag a/, /tag d/]);
+});
+
+/** Ranked 1120, 1100 (pawpads + rope) then 1050 (pawpads only). */
+async function startMuteCase(page: Page) {
+  const specs = defaultSpecs().map((s) =>
+    s.id === 1120 || s.id === 1100 ? { ...s, tags: ["pawpads", "rope"] } : s.id === 1050 ? { ...s, tags: ["pawpads"] } : s,
+  );
+  const mock = await mockE621(page, specs);
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads", "rope"] })));
+  mock.tagCounts = { pawpads: 5, rope: 5 };
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-tags")).toContainText("rope");
+}
+
+test("a tag muted in the profile hides every post carrying it", async ({ page }) => {
+  await startMuteCase(page);
+  await page.getByRole("button", { name: "Mute rope" }).click();
+  await play(page);
+  expect(await slideId(page)).toBe(1050);
+  await expect(page.getByTestId("counter")).toHaveText("1 / 1");
+});
+
+test("muting from the info overlay hides the upcoming posts with that tag right away", async ({ page }) => {
+  await startMuteCase(page);
+  await play(page);
+  expect(await slideId(page)).toBe(1120);
+  await expect(page.getByTestId("counter")).toHaveText("1 / 3");
+  await page.keyboard.press("i");
+  await page.getByTestId("info-overlay").getByRole("button", { name: "Mute rope" }).click();
+  await expect(page.getByTestId("toast")).toHaveText("Muted rope: hid 1 upcoming");
+  await expect(page.getByTestId("counter")).toHaveText("1 / 2");
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => slideId(page)).toBe(1050); // 1100 had rope
+
+  // pressing − again on a muted tag keeps it muted (it used to toggle it back on)
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("i");
+  await page.getByTestId("info-overlay").getByRole("button", { name: "Mute rope" }).click();
+  await page.keyboard.press("s");
+  await expect(page.getByTestId("rec-muted")).toContainText("rope");
 });

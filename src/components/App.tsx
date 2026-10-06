@@ -22,17 +22,25 @@ import {
   searchPosts,
   type Credentials,
 } from "@/lib/e621/client";
-import { mediaKind, type CurrentUser, type Post } from "@/lib/e621/types";
+import { allTags, mediaKind, type CurrentUser, type Post } from "@/lib/e621/types";
 import { DEFAULT_BLACKLIST, mergeBlacklists, syncAccountBlacklist } from "@/lib/query/blacklist";
-import { buildQuery, DEFAULT_TAG_LIMIT, type BuiltQuery } from "@/lib/query/build";
+import {
+  buildQuery,
+  buildRecommendedQuery,
+  DEFAULT_TAG_LIMIT,
+  type BuiltQuery,
+} from "@/lib/query/build";
+import { RecommendedQueue, REC_PAGE_BUDGET } from "@/lib/recommend/stream";
+import { searchPlan, topTags } from "@/lib/recommend/weights";
 import type { PlaybackSettings, SearchSettings } from "@/lib/settings";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
-import { PostQueue } from "@/lib/slideshow/queue";
+import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
 import Gallery from "./Gallery";
 import InfoOverlay from "./InfoOverlay";
 import SettingsPanel from "./SettingsPanel";
 import Stage from "./Stage";
+import { useRecommendations } from "./useRecommendations";
 
 const HIDE_CONTROLS_MS = 2500;
 /** Skip a post whose media hasn't become displayable in this long. */
@@ -40,8 +48,14 @@ const STALL_MS = 30_000;
 const PREVIOUS_KEPT = 2;
 
 /** Identity of a queue: anything that changes which posts we'd show. */
-function queueKey(built: BuiltQuery, media: SearchSettings["media"], creds: Credentials | null) {
-  return JSON.stringify([built.query, built.rules.map((r) => r.line), media, creds?.username ?? null]);
+function queueKey(
+  built: BuiltQuery,
+  media: SearchSettings["media"],
+  creds: Credentials | null,
+  /** Recommended only: the ranking inputs, which the query string doesn't capture */
+  ranking: string | null,
+) {
+  return JSON.stringify([built.query, built.rules.map((r) => r.line), media, creds?.username ?? null, ranking]);
 }
 
 function isTyping(target: EventTarget | null) {
@@ -51,7 +65,7 @@ function isTyping(target: EventTarget | null) {
 }
 
 interface Active {
-  queue: PostQueue;
+  queue: SlideQueue;
   key: string;
 }
 
@@ -75,7 +89,6 @@ export default function App() {
   };
 
   const tagLimit = user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
-  const built = useMemo(() => buildQuery(search, tagLimit), [search, tagLimit]);
 
   // ---- slideshow state ----------------------------------------------------
   const [active, setActive] = useState<Active | null>(null);
@@ -95,6 +108,7 @@ export default function App() {
   const posts = queue?.posts ?? [];
   const current: Post | undefined = posts[Math.min(index, posts.length - 1)];
   const currentIndex = current ? Math.min(index, posts.length - 1) : 0;
+  const match = current ? queue?.matchFor?.(current.id) : undefined;
 
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const showToast = useCallback((msg: string) => {
@@ -102,6 +116,26 @@ export default function App() {
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 4000);
   }, []);
+
+  // ---- recommendations ----------------------------------------------------
+  const rec = useRecommendations(creds, user, showToast);
+  /** every weighted profile tag, strongest first, for the settings panel */
+  const recTags = useMemo(() => topTags(rec.weights, rec.weights.size), [rec.weights]);
+  /** the tags that get their own candidate search: pins, then the highest weights */
+  const recCandidates = useMemo(
+    () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth) : []),
+    [rec.weights, rec.profile, rec.overrides, search.breadth],
+  );
+  const isRec = (s: SearchSettings) => s.source === "recommended";
+  const recTagNames = useMemo(() => recCandidates.map((c) => c.tag), [recCandidates]);
+  const buildFor = (s: SearchSettings): BuiltQuery =>
+    isRec(s) ? buildRecommendedQuery(s, recTagNames, tagLimit) : buildQuery(s, tagLimit);
+  const keyFor = (s: SearchSettings, b: BuiltQuery) =>
+    queueKey(b, s.media, creds, isRec(s) ? rec.signature : null);
+  const built = useMemo(
+    () => (isRec(search) ? buildRecommendedQuery(search, recTagNames, tagLimit) : buildQuery(search, tagLimit)),
+    [search, recTagNames, tagLimit],
+  );
 
   /** Replace defaults/old account lines with the account's current blacklist. */
   const syncBlacklist = (u: CurrentUser) => {
@@ -154,30 +188,54 @@ export default function App() {
 
   // ---- starting / applying ------------------------------------------------
   const startQueue = (s: SearchSettings) => {
-    const b = buildQuery(s, tagLimit);
-    const key = queueKey(b, s.media, creds);
+    const b = buildFor(s);
+    const key = keyFor(s, b);
     if (active && active.key === key) return false;
-    const q = new PostQueue(
-      b,
-      s.media,
-      (tags, page, limit) => searchPosts(tags, page, limit, creds),
-      { username: user?.name },
-      () => setVersion((v) => v + 1),
-    );
+    const onChange = () => setVersion((v) => v + 1);
+    const ctx = { username: user?.name };
+    let q: SlideQueue;
+    if (isRec(s)) {
+      q = new RecommendedQueue(
+        [{ tag: "candidates", query: b.query, pages: REC_PAGE_BUDGET }],
+        (query, page, limit) => searchPosts(query, page, limit, creds),
+        rec.weights,
+        { media: s.media, rules: b.rules, ctx },
+        new Set(rec.overrides.muted),
+        onChange,
+      );
+    } else {
+      q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);
+    }
     setActive({ queue: q, key });
     setIndex(0);
     setPrevious(null);
     setReady(null);
     void q.ensure(0);
-    const h = pushHistory(history, s.tags, Date.now());
-    setHistory(h);
-    storage.saveHistory(h);
+    if (!isRec(s)) {
+      const h = pushHistory(history, s.tags, Date.now());
+      setHistory(h);
+      storage.saveHistory(h);
+    }
     return true;
+  };
+
+  /** Why Recommended can't run yet, or null if it can. */
+  const recBlocker = (): string | null => {
+    if (!user || !creds) return "Sign in to get recommendations from your favorites";
+    if (recCandidates.length > 0) return null;
+    if (rec.syncing) return rec.progress ?? "Still reading your favorites…";
+    if (rec.error) return `Couldn't read favorites: ${rec.error}`;
+    return "Not enough favorites yet: a tag needs to be on at least 3 of them";
   };
 
   /** Close the panel; restart only if the query changed. */
   const apply = (resume: boolean, s: SearchSettings = search) => {
-    if (buildQuery(s, tagLimit).overLimit) {
+    const blocker = isRec(s) ? recBlocker() : null;
+    if (blocker) {
+      showToast(blocker);
+      return false;
+    }
+    if (buildFor(s).overLimit) {
       showToast(`Too many tags: e621 allows ${tagLimit}`);
       return false;
     }
@@ -197,7 +255,7 @@ export default function App() {
     if (apply(false)) setGalleryOpen(true);
   };
 
-  const pendingKey = queueKey(built, search.media, creds);
+  const pendingKey = keyFor(search, built);
   const playLabel = !active ? "Play" : active.key !== pendingKey ? "Play new search" : "Resume";
 
   // ---- navigation ---------------------------------------------------------
@@ -242,6 +300,9 @@ export default function App() {
   useEffect(() => {
     void queue?.ensure(currentIndex);
   }, [queue, currentIndex]);
+
+  // A replaced (or unmounted) show stops fetching, so it can't eat the rate limit.
+  useEffect(() => () => queue?.dispose?.(), [queue]);
 
   // ---- preloading ---------------------------------------------------------
   const [preloader] = useState(() => new Preloader());
@@ -326,6 +387,22 @@ export default function App() {
 
   // ---- info overlay tag actions --------------------------------------------
   const editTags = (token: string) => {
+    if (isRec(search)) {
+      // Recommended has no tag box: + / − pin and mute profile tags instead.
+      const tag = token.replace(/^-/, "");
+      setInfoOpen(false);
+      if (!token.startsWith("-")) {
+        if (!rec.overrides.pinned.includes(tag)) rec.togglePin(tag);
+        showToast(`Pinned ${tag}. Press Play in settings to re-rank`);
+        return;
+      }
+      if (!rec.overrides.muted.includes(tag)) rec.toggleMute(tag);
+      // Muting hides posts with the tag; take the upcoming ones out of this show now.
+      const upcoming = queue ? queue.posts.slice(currentIndex + 1).filter((p) => allTags(p).includes(tag)) : [];
+      for (const p of upcoming) queue?.remove(p.id);
+      showToast(`Muted ${tag}${upcoming.length ? `: hid ${upcoming.length} upcoming` : ""}`);
+      return;
+    }
     const tags = `${search.tags} ${token}`.trim();
     const s = { ...search, tags };
     setSearch(s);
@@ -443,7 +520,7 @@ export default function App() {
     storage.saveSaved(list);
   };
   const loadSaved = (e: SavedSearch) =>
-    setSearch({ ...search, tags: e.tags, ratings: e.ratings, date: e.date, order: e.order });
+    setSearch({ ...search, source: "search", tags: e.tags, ratings: e.ratings, date: e.date, order: e.order });
   const deleteSaved = (id: string) => {
     const list = saved.filter((s) => s.id !== id);
     setSaved(list);
@@ -555,10 +632,36 @@ export default function App() {
       {infoOpen && current && (
         <InfoOverlay
           post={current}
+          reasons={match?.reasons}
+          recommended={isRec(search)}
           onClose={() => setInfoOpen(false)}
           onAddTag={(t) => editTags(t)}
           onExcludeTag={(t) => editTags(`-${t}`)}
         />
+      )}
+
+      {/* search progress (Recommended): the show starts once every page is in and ranked */}
+      {queue?.progress && !queue.exhausted && !queue.error && !galleryOpen && (
+        <div
+          className={`pointer-events-none absolute bottom-6 left-4 z-10 w-48 rounded-md bg-black/75 px-3 py-2 backdrop-blur transition-opacity duration-300 ${
+            showControls ? "opacity-100" : "opacity-80"
+          }`}
+          role="status"
+          aria-label="Search progress"
+          data-testid="search-progress"
+        >
+          <div className="flex items-center justify-between gap-2 text-[11px] text-neutral-300">
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="size-3 animate-spin" aria-hidden />
+              Searching · page {queue.progress.done + 1}
+            </span>
+            <span className="text-neutral-400">{queue.progress.found.toLocaleString()} found</span>
+          </div>
+          {/* indeterminate: the last page is only known when a short one arrives */}
+          <div className="mt-1.5 h-0.5 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full w-1/3 animate-pulse bg-accent/80" />
+          </div>
+        </div>
       )}
 
       {/* controls */}
@@ -666,6 +769,21 @@ export default function App() {
             </span>
           </div>
         )}
+
+        {current && (
+          <div
+            className="pointer-events-none absolute bottom-6 left-4 rounded-full bg-black/50 px-3 py-1 font-mono text-xs text-neutral-300 backdrop-blur"
+            data-testid="post-score"
+          >
+            {match && (
+              <span title="How well this post matches your profile: its 5 strongest tag weights, summed">
+                Match {match.score.toFixed(1)}
+                <span className="px-1.5 text-neutral-600">·</span>
+              </span>
+            )}
+            <span title="Score on e621">▲ {current.score.total}</span>
+          </div>
+        )}
       </div>}
 
       {current && isReady && !galleryOpen && (
@@ -700,6 +818,9 @@ export default function App() {
         playback={playback}
         setPlayback={setPlayback}
         built={built}
+        rec={rec}
+        recTags={recTags}
+        recPlan={recCandidates}
         creds={creds}
         user={user}
         remember={remember}
@@ -711,7 +832,7 @@ export default function App() {
         onLoadSaved={loadSaved}
         onDeleteSaved={deleteSaved}
         history={history}
-        onLoadHistory={(tags) => setSearch({ ...search, tags })}
+        onLoadHistory={(tags) => setSearch({ ...search, source: "search", tags })}
         onClearHistory={() => {
           setHistory([]);
           storage.saveHistory([]);
