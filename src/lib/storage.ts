@@ -1,4 +1,5 @@
 import type { Credentials } from "./e621/client";
+import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
 import {
   DEFAULT_PLAYBACK,
@@ -52,8 +53,12 @@ export const HISTORY_MAX = 20;
 export const storage = {
   loadSearch: (): SearchSettings => {
     const s = read("search", DEFAULT_SEARCH);
+    // Earlier versions pre-filled e621's anonymous default blacklist. Clear it
+    // if it was never edited; any change the user made is kept as-is.
+    const blacklist = s.blacklist.trim() === DEFAULT_BLACKLIST ? "" : s.blacklist;
     return {
       ...s,
+      blacklist,
       ratings: { ...DEFAULT_SEARCH.ratings, ...s.ratings },
       media: { ...DEFAULT_SEARCH.media, ...s.media },
       date: { ...DEFAULT_SEARCH.date, ...s.date },

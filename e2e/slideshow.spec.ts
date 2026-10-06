@@ -99,7 +99,7 @@ test("opening settings keeps the position; changing the query restarts", async (
   await expect(page.getByTestId("play-button")).toHaveText(/Play new search/);
   await page.getByTestId("play-button").click();
   await expect(page.getByTestId("counter")).toHaveText("1 / 100+");
-  expect(mock.searches.at(-1)!.tags.startsWith("fox ")).toBe(true);
+  expect(mock.searches.at(-1)!.tags).toBe("fox");
 });
 
 test("preloads the next N posts", async ({ page }) => {
@@ -174,6 +174,18 @@ test("signed out, import adds e621 defaults; signing in syncs the account blackl
   await page.getByTestId("import-blacklist").click();
   await expect(page.getByText("Synced 2 rules from your account.")).toBeVisible();
   await expect(page.getByTestId("blacklist-input")).toHaveValue("my_rule\naccount_rule\nsecond_rule other");
+});
+
+test("new users start with an empty blacklist; an untouched old default list is cleared", async ({ page }) => {
+  const defaults = "gore\nsnuff\nrape\nyoung -rating:s\ndiaper -rating:s\nfeces\nurine\nfart_fetish\nrealistic_feral rating:e\npolitics";
+  const mock = await start(page, undefined, { search: { blacklist: defaults } });
+  await expect(page.getByTestId("blacklist-input")).toHaveValue("");
+  await play(page);
+  expect(mock.searches[0].tags).toBe("");
+  // an edited list is left alone
+  await page.evaluate(() => localStorage.setItem("e6ss:v1:search", JSON.stringify({ blacklist: "gore\nmy_rule" })));
+  await page.reload();
+  await expect(page.getByTestId("blacklist-input")).toHaveValue("gore\nmy_rule");
 });
 
 test("a remembered key syncs the account blacklist on load", async ({ page }) => {
@@ -288,10 +300,10 @@ test("info overlay shows tags and can add one to the search", async ({ page }) =
   await expect(info).toContainText("mock_artist".replace(/_/g, " "));
   await info.getByRole("button", { name: "Add mock_artist to search" }).click();
   await expect(info).toBeHidden();
-  await expect.poll(() => mock.searches.at(-1)!.tags).toMatch(/^mock_artist /);
+  await expect.poll(() => mock.searches.at(-1)!.tags).toBe("mock_artist");
   await page.keyboard.press("i");
   await page.getByTestId("info-overlay").getByRole("button", { name: "Exclude solo from search" }).click();
-  await expect.poll(() => mock.searches.at(-1)!.tags).toMatch(/^mock_artist -solo /);
+  await expect.poll(() => mock.searches.at(-1)!.tags).toBe("mock_artist -solo");
 });
 
 test("saved searches and history persist across reloads", async ({ page }) => {
@@ -359,7 +371,7 @@ test("settings sections other than Search are collapsible and remember their sta
   // Search itself never collapses
   await expect(page.getByTestId("section-search")).not.toHaveAttribute("data-open", /.*/);
   // collapsed headers still summarize what's active
-  await expect(page.getByTestId("section-blacklist")).toContainText("10 rules");
+  await expect(page.getByTestId("section-blacklist")).toContainText("0 rules");
   await expect(page.getByTestId("blacklist-input")).toHaveCount(0);
 
   const header = page.getByRole("button", { name: /Blacklist/ });

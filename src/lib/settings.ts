@@ -1,4 +1,3 @@
-import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import { DEFAULT_DATE_FILTER, type DateFilter } from "./query/date";
 
 export type Order =
@@ -53,7 +52,7 @@ export const DEFAULT_SEARCH: SearchSettings = {
   media: { image: true, gif: true, video: true },
   order: "newest",
   seed: 1,
-  blacklist: DEFAULT_BLACKLIST,
+  blacklist: "",
   date: DEFAULT_DATE_FILTER,
 };
 
