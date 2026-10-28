@@ -854,3 +854,44 @@ test("recommended has no share button", async ({ page }) => {
   await expect(page.getByTestId("gallery-button")).toBeVisible();
   await expect(page.getByTestId("share-button")).toHaveCount(0);
 });
+
+test("with the account toggle on, a share link signs the visitor in for that tab only", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page, undefined, { creds: { username: "tester", apiKey: "goodkey" } });
+  await expect(page.getByTestId("signed-in")).toBeVisible();
+  await expect(page.getByTestId("share-sign-in-warning")).toHaveCount(0);
+  await page.getByTestId("share-sign-in").check();
+  await expect(page.getByTestId("share-sign-in-warning")).toBeVisible();
+  await play(page);
+  await page.mouse.move(400, 300);
+  await page.getByTestId("share-button").click();
+  await expect(page.getByTestId("toast")).toHaveText("Share link copied, with your sign-in");
+  const url = await page.evaluate(() => navigator.clipboard.readText());
+  expect(new URL(url).hash).toBe("#u=tester&k=goodkey");
+  expect(new URL(url).search).not.toContain("goodkey");
+
+  // A fresh visitor with their own saved key: the link's sign-in is used but not saved over it.
+  const visitor = await context.browser()!.newContext();
+  const p2 = await visitor.newPage();
+  const mock2 = await mockE621(p2);
+  await p2.addInitScript(() => {
+    localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "mine", apiKey: "goodkey" }));
+    localStorage.setItem("e6ss:v1:sections", JSON.stringify({ account: true }));
+  });
+  await p2.goto(url);
+  await expect(slide(p2)).toBeVisible();
+  expect(mock2.searches[0].auth).toBe(`Basic ${Buffer.from("tester:goodkey").toString("base64")}`);
+  expect(p2.url()).not.toContain("goodkey");
+  await p2.keyboard.press("s");
+  await expect(p2.getByTestId("signed-in")).toContainText("tester");
+  await expect(p2.getByTestId("share-sign-in")).toHaveCount(0); // a borrowed key can't be re-shared
+  expect(await p2.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:creds")!))).toEqual({ username: "mine", apiKey: "goodkey" });
+  await visitor.close();
+});
+
+test("signing out turns sharing the sign-in back off", async ({ page }) => {
+  await start(page, undefined, { creds: { username: "tester", apiKey: "goodkey" } });
+  await page.getByTestId("share-sign-in").check();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  expect(await page.evaluate(() => localStorage.getItem("e6ss:v1:shareSignIn"))).toBeNull();
+});

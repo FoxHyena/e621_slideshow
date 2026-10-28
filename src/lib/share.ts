@@ -1,3 +1,4 @@
+import type { Credentials } from "./e621/client";
 import type { DateFilter, DateMode, DatePreset, DateUnit } from "./query/date";
 import {
   DEFAULT_PLAYBACK,
@@ -135,4 +136,21 @@ export function decodeShare(params: URLSearchParams): SharedShow | null {
       loop: bool(get("loop"), P.loop),
     },
   };
+}
+
+/**
+ * Sign-in rides in the fragment, never the query: browsers don't send `#...`
+ * to the server, so the key stays out of host logs and link-preview fetches.
+ */
+export function encodeShareCreds(c: Credentials): string {
+  return new URLSearchParams({ u: c.username, k: c.apiKey }).toString();
+}
+
+export function decodeShareCreds(hash: string): Credentials | null {
+  const p = new URLSearchParams(hash.replace(/^#/, ""));
+  const username = p.get("u")?.trim() ?? "";
+  const apiKey = p.get("k")?.trim() ?? "";
+  if (!username || /\s/.test(username) || username.length > 64) return null;
+  if (!/^[A-Za-z0-9]{1,128}$/.test(apiKey)) return null;
+  return { username, apiKey };
 }

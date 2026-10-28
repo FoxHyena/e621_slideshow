@@ -34,7 +34,7 @@ import {
 import { RecommendedQueue, REC_PAGE_BUDGET } from "@/lib/recommend/stream";
 import { searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
-import { decodeShare, encodeShare, type SharedShow } from "@/lib/share";
+import { decodeShare, decodeShareCreds, encodeShare, encodeShareCreds, type SharedShow } from "@/lib/share";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
@@ -98,8 +98,16 @@ export default function App() {
   );
   const [saved, setSaved] = useState<SavedSearch[]>(storage.loadSaved);
   const [history, setHistory] = useState<HistoryEntry[]>(storage.loadHistory);
-  const [creds, setCreds] = useState<Credentials | null>(storage.loadCredentials);
-  const [remember, setRemember] = useState(() => storage.loadCredentials() !== null);
+  // A link's sign-in is used for this tab only: never saved, and it doesn't replace a saved key.
+  const [linkCreds] = useState(() => decodeShareCreds(location.hash));
+  const [linkSession, setLinkSession] = useState(linkCreds !== null);
+  const [creds, setCreds] = useState<Credentials | null>(() => linkCreds ?? storage.loadCredentials());
+  const [remember, setRemember] = useState(() => !linkCreds && storage.loadCredentials() !== null);
+  const [shareSignIn, setShareSignInState] = useState(storage.loadShareSignIn);
+  const setShareSignIn = (on: boolean) => {
+    setShareSignInState(on);
+    storage.saveShareSignIn(on);
+  };
   const [user, setUser] = useState<CurrentUser | null>(null);
 
   const setSearch = (s: SearchSettings) => {
@@ -142,7 +150,8 @@ export default function App() {
   }, []);
 
   // ---- recommendations ----------------------------------------------------
-  const rec = useRecommendations(creds, user, showToast);
+  // A borrowed sign-in doesn't read (and store) the sharer's favorites profile.
+  const rec = useRecommendations(linkSession ? null : creds, linkSession ? null : user, showToast);
   /** every weighted profile tag, strongest first, for the settings panel */
   const recTags = useMemo(() => topTags(rec.weights, rec.weights.size), [rec.weights]);
   /** the tags that get their own candidate search: pins, then the highest weights */
@@ -164,13 +173,15 @@ export default function App() {
   /** Replace defaults/old account lines with the account's current blacklist. */
   const syncBlacklist = (u: CurrentUser) => {
     const account = u.blacklisted_tags ?? "";
+    // A link's sign-in applies the sharer's blacklist for this visit without saving it.
+    const keep = !linkSession;
     setSearchState((prev) => {
       const blacklist = syncAccountBlacklist(prev.blacklist, storage.loadAccountBlacklist(), account);
       // Save only the blacklist: `prev` may be an unsaved share link's search.
-      storage.saveSearch({ ...storage.loadSearch(), blacklist });
+      if (keep) storage.saveSearch({ ...storage.loadSearch(), blacklist });
       return { ...prev, blacklist };
     });
-    storage.saveAccountBlacklist(account);
+    if (keep) storage.saveAccountBlacklist(account);
     return account.split("\n").filter((l) => l.trim()).length;
   };
 
@@ -197,6 +208,7 @@ export default function App() {
   const signIn = async (c: Credentials, keep: boolean) => {
     const u = await getCurrentUser(c);
     if (u.id === null) throw new Error("e621 didn't accept that username and API key");
+    setLinkSession(false);
     setCreds(c);
     setUser(u);
     syncBlacklist(u);
@@ -208,7 +220,10 @@ export default function App() {
     setCreds(null);
     setUser(null);
     setRemember(false);
-    storage.saveCredentials(null);
+    setShareSignIn(false);
+    // Leaving a link's sign-in keeps whatever key this browser had saved.
+    if (linkSession) setLinkSession(false);
+    else storage.saveCredentials(null);
   };
 
   // ---- starting / applying ------------------------------------------------
@@ -284,9 +299,11 @@ export default function App() {
   const sharedStarted = useRef(false);
   const onShared = useEffectEvent(() => {
     // Strict Mode mounts twice in dev; a second start would orphan the first queue.
-    if (!shared || sharedStarted.current) return;
+    if (!(shared || linkCreds) || sharedStarted.current) return;
     sharedStarted.current = true;
+    // Also drops a sign-in fragment, so the key doesn't sit in the address bar or history.
     window.history.replaceState(null, "", location.pathname);
+    if (!shared) return;
     if (apply(true) && shared.playback.videoMuted === false) showToast("Videos start muted: unmute in settings");
   });
   // Starting the show is the point of the link, so this one effect sets state on mount.
@@ -295,10 +312,12 @@ export default function App() {
 
   const shareLink = async () => {
     if (!active) return;
-    const url = `${location.origin}${location.pathname}?${encodeShare(active.search, playback)}`;
+    const withSignIn = shareSignIn && !!creds && !!user && !linkSession;
+    const hash = withSignIn ? `#${encodeShareCreds(creds)}` : "";
+    const url = `${location.origin}${location.pathname}?${encodeShare(active.search, playback)}${hash}`;
     try {
       await navigator.clipboard.writeText(url);
-      showToast("Share link copied");
+      showToast(withSignIn ? "Share link copied, with your sign-in" : "Share link copied");
     } catch {
       window.prompt("Copy this link", url);
     }
@@ -921,6 +940,9 @@ export default function App() {
         creds={creds}
         user={user}
         remember={remember}
+        linkSession={linkSession}
+        shareSignIn={shareSignIn}
+        setShareSignIn={setShareSignIn}
         onSignIn={signIn}
         onSignOut={signOut}
         onImportBlacklist={importBlacklist}

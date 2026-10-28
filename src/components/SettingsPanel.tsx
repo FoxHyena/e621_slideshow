@@ -34,6 +34,10 @@ export interface SettingsPanelProps {
   creds: Credentials | null;
   user: CurrentUser | null;
   remember: boolean;
+  /** signed in with a key that came in a share link */
+  linkSession: boolean;
+  shareSignIn: boolean;
+  setShareSignIn: (on: boolean) => void;
   onSignIn: (c: Credentials, remember: boolean) => Promise<void>;
   onSignOut: () => void;
   onImportBlacklist: () => Promise<string>;
@@ -489,10 +493,16 @@ function AccountSection({
   creds,
   user,
   remember,
+  linkSession,
+  shareSignIn,
+  setShareSignIn,
   onSignIn,
   onSignOut,
   stats,
-}: Pick<SettingsPanelProps, "creds" | "user" | "remember" | "onSignIn" | "onSignOut" | "stats">) {
+}: Pick<
+  SettingsPanelProps,
+  "creds" | "user" | "remember" | "linkSession" | "shareSignIn" | "setShareSignIn" | "onSignIn" | "onSignOut" | "stats"
+>) {
   const [username, setUsername] = useState(creds?.username ?? "");
   const [apiKey, setApiKey] = useState(creds?.apiKey ?? "");
   const [keep, setKeep] = useState(remember);
@@ -507,8 +517,25 @@ function AccountSection({
           Signed in as <strong>{user.name}</strong>
         </p>
         <p className="text-xs text-neutral-400">
-          {remember ? "Key saved in this browser." : "Key kept for this tab only."} Favoriting is enabled.
+          {linkSession
+            ? "Signed in from a share link, for this tab only."
+            : remember
+              ? "Key saved in this browser."
+              : "Key kept for this tab only."}{" "}
+          Favoriting is enabled.
         </p>
+        {!linkSession && (
+          <div className="space-y-1">
+            <Toggle checked={shareSignIn} onChange={setShareSignIn} testId="share-sign-in">
+              Include my sign-in in share links
+            </Toggle>
+            {shareSignIn && (
+              <p className="text-xs text-amber-300" data-testid="share-sign-in-warning">
+                Anyone with a link you share can act as you on e621 until you regenerate your API key.
+              </p>
+            )}
+          </div>
+        )}
         <button
           type="button"
           onClick={onSignOut}

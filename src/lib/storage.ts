@@ -79,6 +79,9 @@ export const storage = {
   /** Only present when the user ticked "remember on this device". */
   loadCredentials: (): Credentials | null => read<Credentials | null>("creds", null),
   saveCredentials: (c: Credentials | null) => write("creds", c),
+  /** Whether share links carry the sign-in. Off until the user turns it on; cleared on sign-out. */
+  loadShareSignIn: (): boolean => read("shareSignIn", false),
+  saveShareSignIn: (on: boolean) => write("shareSignIn", on || null),
   loadSaved: (): SavedSearch[] => read<SavedSearch[]>("saved", []),
   saveSaved: (s: SavedSearch[]) => write("saved", s),
   loadHistory: (): HistoryEntry[] => read<HistoryEntry[]>("history", []),

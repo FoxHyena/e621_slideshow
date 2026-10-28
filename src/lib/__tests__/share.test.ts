@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_DATE_FILTER } from "../query/date";
 import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "../settings";
-import { decodeShare, encodeShare } from "../share";
+import { decodeShare, decodeShareCreds, encodeShare, encodeShareCreds } from "../share";
 
 const decode = (qs: string) => decodeShare(new URLSearchParams(qs));
 
@@ -70,5 +70,17 @@ describe("share links", () => {
   it("ignores URLs that aren't share links", () => {
     expect(decode("tags=wolf")).toBeNull();
     expect(decode("v=2&tags=wolf")).toBeNull();
+  });
+
+  it("round-trips a sign-in through the fragment", () => {
+    const c = { username: "some_user-1", apiKey: "AbC123xyz" };
+    expect(decodeShareCreds(`#${encodeShareCreds(c)}`)).toEqual(c);
+  });
+
+  it("rejects a malformed sign-in", () => {
+    expect(decodeShareCreds("")).toBeNull();
+    expect(decodeShareCreds("#u=me")).toBeNull();
+    expect(decodeShareCreds("#u=me&k=bad%20key")).toBeNull();
+    expect(decodeShareCreds("#u=two%20words&k=abc")).toBeNull();
   });
 });
