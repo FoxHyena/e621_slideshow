@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { blacklistedBy, mergeBlacklists, parseBlacklist, removeBlacklistLines, ruleToQuery, syncAccountBlacklist, DEFAULT_BLACKLIST } from "../query/blacklist";
-import { buildQuery, buildRecommendedQuery, countTags, REC_BLACKLIST_RESERVE } from "../query/build";
+import { blacklistedBy, mergeBlacklists, parseBlacklist, removeBlacklistLines, syncAccountBlacklist, DEFAULT_BLACKLIST } from "../query/blacklist";
+import { buildQuery, buildRecommendedQuery, countTags } from "../query/build";
 import { dateMetatag, DEFAULT_DATE_FILTER, nextDay } from "../query/date";
 import { inRange, parseRange } from "../query/range";
 import { DEFAULT_SEARCH, type SearchSettings } from "../settings";
@@ -86,13 +86,6 @@ describe("blacklist parsing + matching", () => {
     );
   });
 
-  it("translates rules to query terms", () => {
-    const [single, multi, wild, onlyNeg] = parseBlacklist("gore\nyoung -rating:s\na_*\n-solo");
-    expect(ruleToQuery(single)).toEqual({ query: "-gore", cost: 1 });
-    expect(ruleToQuery(multi)).toEqual({ query: "-( young -rating:s )", cost: 2 });
-    expect(ruleToQuery(wild)).toBeNull();
-    expect(ruleToQuery(onlyNeg)).toBeNull();
-  });
 });
 
 describe("date metatag", () => {
@@ -174,20 +167,16 @@ describe("buildQuery", () => {
     expect(buildRecommendedQuery(search({ minScore: 50 }), ["a", "b"]).query).toContain("score:>=50");
   });
 
-  it("packs blacklist rules until the tag budget is spent", () => {
+  it("keeps the blacklist out of the query so it costs no tag slots", () => {
     const blacklist = Array.from({ length: 50 }, (_, i) => `tag${i}`).join("\n");
     const b = buildQuery(search({ tags: "wolf", blacklist }));
-    expect(b.tagCount).toBe(40);
-    expect(b.inQuery).toHaveLength(39); // wolf + 39 rules
-    expect(b.localOnly).toHaveLength(11);
+    expect(b.query).toBe("wolf");
+    expect(b.tagCount).toBe(1);
     expect(b.rules).toHaveLength(50);
   });
 
   it("group parens don't count as tags", () => {
     expect(countTags(["-(", "a", "b", ")", "-( a b )".split(" ")].flat())).toBe(4);
-    const b = buildQuery(search({ blacklist: "young -rating:s" }));
-    expect(b.query).toBe("-( young -rating:s )");
-    expect(b.tagCount).toBe(2);
   });
 
   it("flags user terms over the limit", () => {
@@ -207,19 +196,19 @@ describe("buildRecommendedQuery", () => {
     expect(q.paging).toBe("numbered");
   });
 
-  it("keeps the user's own window and filters, then fits the blacklist", () => {
+  it("keeps the user's own window and filters, and leaves the blacklist out", () => {
     const date = { ...DEFAULT_DATE_FILTER, enabled: true, mode: "preset" as const, preset: "month" as const };
     const q = buildRecommendedQuery(
       search({ breadth: 2, date, ratings: { s: false, q: false, e: true }, blacklist: "gore" }),
       top,
     );
-    expect(q.query).toBe("~tag0 ~tag1 rating:e date:month order:score -gore");
+    expect(q.query).toBe("~tag0 ~tag1 rating:e date:month order:score");
   });
 
-  it("caps breadth to the tag budget, keeping the blacklist reserve, and says so", () => {
-    // filters: date + order + rating = 3 → room 20 − 3 − reserve
+  it("caps breadth to the tag budget and says so", () => {
+    // filters: date + order + rating = 3 → room 20 − 3
     const q = buildRecommendedQuery(search({ breadth: 30, ratings: { s: false, q: false, e: true } }), top, 20);
-    expect(q.candidates).toHaveLength(20 - 3 - REC_BLACKLIST_RESERVE);
+    expect(q.candidates).toHaveLength(20 - 3);
     expect(q.capped).toBe(true);
     expect(q.overLimit).toBe(false);
   });

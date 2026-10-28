@@ -16,6 +16,9 @@ pnpm dev            # http://localhost:3000
   an optional upload-date filter, and a blacklist. Hit **Play**.
 - Move the mouse to show the controls; they hide after 2.5s idle.
 - Reopening settings pauses the timer and keeps your place. Only changing the query restarts the show.
+- The link button (or **C**) copies a share link with the current search and playback settings.
+  Opening it starts the show straight away; your own blacklist still applies, and nothing is saved
+  until you change a setting. Not available in Recommended mode.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 
@@ -27,13 +30,14 @@ pnpm dev            # http://localhost:3000
 | I | post info (add/exclude tags) |
 | L | favorite |
 | O | open post on e621 |
+| C | copy share link |
 | S / Esc | settings |
 
 ## How the query is built
 
-`src/lib/query/build.ts`: your tags, then rating/type/date/order metatags, then blacklist rules as
-`-tag` / `-( a b )` groups until e621's 40-tag limit. Every blacklist rule also runs client-side,
-so rules that didn't fit (and wildcards / `fav:me`) still apply.
+`src/lib/query/build.ts`: your tags, then rating/type/date/order metatags, up to e621's 40-tag
+limit. The blacklist never goes into the query: every rule runs client-side, so it costs no tag
+slots and wildcards / `fav:me` work too.
 
 ## Test
 

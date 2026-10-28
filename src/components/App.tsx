@@ -7,6 +7,7 @@ import {
   Heart,
   Info,
   LayoutGrid,
+  Link,
   Loader2,
   Maximize,
   Minimize,
@@ -32,7 +33,8 @@ import {
 } from "@/lib/query/build";
 import { RecommendedQueue, REC_PAGE_BUDGET } from "@/lib/recommend/stream";
 import { searchPlan, topTags } from "@/lib/recommend/weights";
-import type { PlaybackSettings, SearchSettings } from "@/lib/settings";
+import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
+import { decodeShare, encodeShare, type SharedShow } from "@/lib/share";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
@@ -73,12 +75,27 @@ function isTyping(target: EventTarget | null) {
 interface Active {
   queue: SlideQueue;
   key: string;
+  /** what the show was started with, so a share link describes what's playing */
+  search: SearchSettings;
+}
+
+/** A share link's settings on top of the visitor's own blacklist and preload. Not saved. */
+function sharedSearch(shared: SharedShow): SearchSettings {
+  return { ...DEFAULT_SEARCH, ...shared.search, blacklist: storage.loadSearch().blacklist };
+}
+function sharedPlayback(shared: SharedShow): PlaybackSettings {
+  // Unmuted video can't autoplay without a click, so a link always starts muted.
+  return { ...DEFAULT_PLAYBACK, ...shared.playback, preloadCount: storage.loadPlayback().preloadCount, videoMuted: true };
 }
 
 export default function App() {
   // ---- persisted settings -------------------------------------------------
-  const [search, setSearchState] = useState<SearchSettings>(storage.loadSearch);
-  const [playback, setPlaybackState] = useState<PlaybackSettings>(storage.loadPlayback);
+  // A share link's settings apply for this visit; they're saved only once the visitor edits something.
+  const [shared] = useState(() => decodeShare(new URLSearchParams(location.search)));
+  const [search, setSearchState] = useState<SearchSettings>(() => (shared ? sharedSearch(shared) : storage.loadSearch()));
+  const [playback, setPlaybackState] = useState<PlaybackSettings>(() =>
+    shared ? sharedPlayback(shared) : storage.loadPlayback(),
+  );
   const [saved, setSaved] = useState<SavedSearch[]>(storage.loadSaved);
   const [history, setHistory] = useState<HistoryEntry[]>(storage.loadHistory);
   const [creds, setCreds] = useState<Credentials | null>(storage.loadCredentials);
@@ -148,9 +165,10 @@ export default function App() {
   const syncBlacklist = (u: CurrentUser) => {
     const account = u.blacklisted_tags ?? "";
     setSearchState((prev) => {
-      const next = { ...prev, blacklist: syncAccountBlacklist(prev.blacklist, storage.loadAccountBlacklist(), account) };
-      storage.saveSearch(next);
-      return next;
+      const blacklist = syncAccountBlacklist(prev.blacklist, storage.loadAccountBlacklist(), account);
+      // Save only the blacklist: `prev` may be an unsaved share link's search.
+      storage.saveSearch({ ...storage.loadSearch(), blacklist });
+      return { ...prev, blacklist };
     });
     storage.saveAccountBlacklist(account);
     return account.split("\n").filter((l) => l.trim()).length;
@@ -213,7 +231,7 @@ export default function App() {
     } else {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);
     }
-    setActive({ queue: q, key });
+    setActive({ queue: q, key, search: s });
     setIndex(0);
     setTrail([]);
     setReady(null);
@@ -260,6 +278,30 @@ export default function App() {
   /** Show the current search as a grid instead of starting the show. */
   const openPreview = () => {
     if (apply(false)) setGalleryOpen(true);
+  };
+
+  // A share link plays straight away, then leaves the address bar so a reload is a plain visit.
+  const sharedStarted = useRef(false);
+  const onShared = useEffectEvent(() => {
+    // Strict Mode mounts twice in dev; a second start would orphan the first queue.
+    if (!shared || sharedStarted.current) return;
+    sharedStarted.current = true;
+    window.history.replaceState(null, "", location.pathname);
+    if (apply(true) && shared.playback.videoMuted === false) showToast("Videos start muted: unmute in settings");
+  });
+  // Starting the show is the point of the link, so this one effect sets state on mount.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => onShared(), []);
+
+  const shareLink = async () => {
+    if (!active) return;
+    const url = `${location.origin}${location.pathname}?${encodeShare(active.search, playback)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("Share link copied");
+    } catch {
+      window.prompt("Copy this link", url);
+    }
   };
 
   const pendingKey = keyFor(search, built);
@@ -516,6 +558,10 @@ export default function App() {
           setGalleryOpen(true);
         }
         break;
+      case "c":
+      case "C":
+        if (active && !isRec(active.search)) void shareLink();
+        break;
       case "o":
       case "O":
         if (current) window.open(postPageUrl(current.id), "_blank", "noopener");
@@ -744,6 +790,17 @@ export default function App() {
               data-testid="gallery-button"
             >
               <LayoutGrid className="size-5" aria-hidden />
+            </button>
+          )}
+          {active && !isRec(active.search) && (
+            <button
+              type="button"
+              className={iconBtn}
+              onClick={() => void shareLink()}
+              aria-label="Copy share link"
+              data-testid="share-button"
+            >
+              <Link className="size-5" aria-hidden />
             </button>
           )}
           {current && (
