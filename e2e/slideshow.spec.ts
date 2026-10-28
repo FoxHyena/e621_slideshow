@@ -153,18 +153,18 @@ test("tag autocomplete suggests and completes the token under the cursor", async
   await expect(bl).toHaveValue("fox_species ");
 });
 
-test("blacklist builds the query and filters locally", async ({ page }) => {
+test("blacklist stays out of the query and filters locally", async ({ page }) => {
   const specs = defaultSpecs(20);
   specs[0].tags = ["solo", "badtag"]; // 1020 → hidden by multi-tag rule
-  specs[1].tags = ["wildcard_thing"]; // 1019 → hidden by local-only wildcard rule
-  specs[2].tags = ["single"]; // 1018 → hidden by single rule (server + local)
+  specs[1].tags = ["wildcard_thing"]; // 1019 → hidden by wildcard rule
+  specs[2].tags = ["single"]; // 1018 → hidden by single rule
   const mock = await start(page, specs, { search: { blacklist: "badtag solo\nwild*\nsingle\n# comment" } });
-  await expect(page.getByTestId("blacklist-stats")).toHaveText("2 in query · 1 filtered locally");
+  await expect(page.getByTestId("blacklist-stats")).toHaveText("3 rules · filtered locally");
   await page.locator("summary", { hasText: "Query sent to e621" }).click();
-  await expect(page.getByTestId("query-preview")).toHaveText("-( badtag solo ) -single");
+  await expect(page.getByTestId("query-preview")).toHaveText("(everything)");
   await play(page);
   expect(await slideId(page)).toBe(1017);
-  expect(mock.searches[0].tags).toBe("-( badtag solo ) -single");
+  expect(mock.searches[0].tags).toBe("");
 });
 
 test("signed out, import adds e621 defaults; signing in syncs the account blacklist", async ({ page }) => {
@@ -577,8 +577,8 @@ test("recommended ranks the window by favorite tags and explains why", async ({ 
   expect(await slideId(page)).toBe(1120);
   await expect(page.getByTestId("counter")).toHaveText("1 / 3");
   const query = mock.searches.find((s) => s.tags.startsWith("pawpads"))!.tags;
-  // candidates + window + score order, then the synced account blacklist
-  expect(query).toMatch(/^pawpads date:>=7_days_ago order:score -account_rule/);
+  // candidates + window + score order; the synced account blacklist stays client-side
+  expect(query).toBe("pawpads date:>=7_days_ago order:score");
 
   // moving the mouse shows the match score next to e621's own
   await page.mouse.move(400, 300);
@@ -813,4 +813,44 @@ test.describe("touch", () => {
     await page.waitForTimeout(300);
     expect(await slideId(page)).toBe(1150);
   });
+});
+
+// ---- Share links ----------------------------------------------------------
+
+test("a share link plays straight away without touching saved settings", async ({ page }) => {
+  const mock = await mockE621(page, defaultSpecs().map((s) => (s.id === 1150 ? { ...s, tags: ["badtag"] } : s)));
+  const own = { tags: "my_search", blacklist: "badtag" };
+  await seed(page, { search: own, playback: { intervalSec: 60 } });
+  await page.goto("/?v=1&tags=wolf&style=kenburns&int=30&mute=0");
+
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(slide(page)).toBeVisible();
+  expect(mock.searches[0].tags).toContain("wolf");
+  expect(await slideId(page)).toBe(1149); // the visitor's own blacklist still applies
+  await expect(page.getByTestId("toast")).toContainText("Videos start muted");
+  expect(new URL(page.url()).search).toBe("");
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!))).toEqual(own);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({ intervalSec: 60 });
+});
+
+test("the share button copies a link to what's playing", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await start(page);
+  await page.getByTestId("search-input").fill("wolf");
+  await play(page);
+  await page.mouse.move(400, 300);
+  await page.getByTestId("share-button").click();
+  await expect(page.getByTestId("toast")).toHaveText("Share link copied");
+  const url = new URL(await page.evaluate(() => navigator.clipboard.readText()));
+  expect(url.searchParams.get("v")).toBe("1");
+  expect(url.searchParams.get("tags")).toBe("wolf");
+  expect(url.searchParams.get("int")).toBe("1");
+});
+
+test("recommended has no share button", async ({ page }) => {
+  await startRecommended(page);
+  await play(page);
+  await page.mouse.move(400, 300);
+  await expect(page.getByTestId("gallery-button")).toBeVisible();
+  await expect(page.getByTestId("share-button")).toHaveCount(0);
 });

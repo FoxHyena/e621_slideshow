@@ -933,7 +933,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
             />
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-400">
               <span data-testid="blacklist-stats">
-                {built.inQuery.length} in query · {built.localOnly.length} filtered locally
+                {built.rules.length} rules · filtered locally
               </span>
               <button
                 type="button"
@@ -1058,6 +1058,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 ["L", "Favorite"],
                 ["G", "Gallery"],
                 ["O", "Open on e621"],
+                ["C", "Copy share link"],
                 ["S / Esc", "Settings"],
               ].map(([k, v]) => (
                 <div key={k} className="contents">

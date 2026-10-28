@@ -66,7 +66,7 @@ describe("PostQueue", () => {
     expect(q.stats.hidden).toBe(5);
   });
 
-  it("applies the blacklist locally, even for rules in the query", async () => {
+  it("applies the blacklist locally", async () => {
     const api = fakeApi(10, (id) => ({ tagList: id <= 3 ? ["gore"] : ["wolf"] }));
     const s = search({ blacklist: "gore" });
     const q = new PostQueue(buildQuery(s), s.media, api.fetcher);

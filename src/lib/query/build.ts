@@ -1,5 +1,5 @@
 import type { SearchSettings } from "../settings";
-import { parseBlacklist, ruleToQuery, type BlacklistRule } from "./blacklist";
+import { parseBlacklist, type BlacklistRule } from "./blacklist";
 import { DEFAULT_DATE_FILTER, dateMetatag, type DateFilter } from "./date";
 
 export const DEFAULT_TAG_LIMIT = 40;
@@ -14,11 +14,7 @@ export interface BuiltQuery {
   tagLimit: number;
   /** user's own terms + filters already exceed the limit */
   overLimit: boolean;
-  /** blacklist rules excluded server-side */
-  inQuery: BlacklistRule[];
-  /** blacklist rules that only run client-side (didn't fit, or not expressible) */
-  localOnly: BlacklistRule[];
-  /** all rules, always applied client-side too */
+  /** blacklist rules; applied client-side only, so they never cost a tag slot */
   rules: BlacklistRule[];
   /** `cursor` = page=b<id> (newest-first); `numbered` = page=1..750 */
   paging: "cursor" | "numbered";
@@ -80,35 +76,18 @@ export function buildQuery(s: SearchSettings, tagLimit = DEFAULT_TAG_LIMIT): Bui
   const userHasScore = user.some((t) => /^-?score:/.test(t));
   const filters = filterTokens(s, !!userOrder, userHasScore);
   const base = [...user, ...filters];
-  let used = countTags(base);
-
-  const rules = parseBlacklist(s.blacklist);
-  const inQuery: BlacklistRule[] = [];
-  const localOnly: BlacklistRule[] = [];
-  const parts = [...base];
-  for (const rule of rules) {
-    const q = ruleToQuery(rule);
-    if (q && used + q.cost <= tagLimit) {
-      parts.push(q.query);
-      used += q.cost;
-      inQuery.push(rule);
-    } else {
-      localOnly.push(rule);
-    }
-  }
+  const used = countTags(base);
 
   const effectiveOrder = userOrder ? userOrder.replace(/^-/, "") : ORDER_TOKENS[s.order];
   const paging =
     !effectiveOrder || effectiveOrder === "order:id_desc" ? "cursor" : "numbered";
 
   return {
-    query: parts.join(" "),
+    query: base.join(" "),
     tagCount: used,
     tagLimit,
-    overLimit: countTags(base) > tagLimit,
-    inQuery,
-    localOnly,
-    rules,
+    overLimit: used > tagLimit,
+    rules: parseBlacklist(s.blacklist),
     paging,
   };
 }
@@ -127,9 +106,6 @@ export function recommendedWindow(date: DateFilter): DateFilter {
   return dateMetatag(date) ? date : REC_DEFAULT_WINDOW;
 }
 
-/** Tag slots left for the blacklist after the candidate tags, so it isn't squeezed out entirely. */
-export const REC_BLACKLIST_RESERVE = 5;
-
 export interface RecommendedQuery extends BuiltQuery {
   /** profile tags actually OR'd in, after capping breadth to the tag budget */
   candidates: string[];
@@ -143,7 +119,7 @@ export interface RecommendedQuery extends BuiltQuery {
  * searched tags are the highest-weight ones, which are rare enough that their
  * union usually fits in a page or two, so a 20-tag search costs 1–2 requests
  * instead of 20+. Each tag takes one of e621's tag slots, so breadth is capped
- * to what's left after the filters and REC_BLACKLIST_RESERVE.
+ * to what's left after the filters.
  */
 export function buildRecommendedQuery(
   s: SearchSettings,
@@ -151,8 +127,8 @@ export function buildRecommendedQuery(
   tagLimit = DEFAULT_TAG_LIMIT,
 ): RecommendedQuery {
   const base: SearchSettings = { ...s, date: recommendedWindow(s.date), order: "score", tags: "" };
-  const filters = buildQuery({ ...base, blacklist: "" }, tagLimit).tagCount;
-  const room = Math.max(0, tagLimit - filters - REC_BLACKLIST_RESERVE);
+  const filters = buildQuery(base, tagLimit).tagCount;
+  const room = Math.max(0, tagLimit - filters);
   const wanted = ranked.slice(0, s.breadth);
   const candidates = wanted.slice(0, room);
   // A lone `~tag` isn't an OR; send it plain.

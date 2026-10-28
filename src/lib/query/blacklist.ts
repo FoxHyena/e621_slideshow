@@ -186,22 +186,6 @@ export function blacklistedBy(rules: BlacklistRule[], post: Post, ctx?: MatchCon
   return null;
 }
 
-/**
- * Translate a rule into query tokens that exclude it server-side, or null if
- * it can't be expressed safely (wildcards: e621 allows only one per search;
- * `fav:` depends on who is logged in; a rule of only `-` terms would exclude
- * nearly everything).
- */
-export function ruleToQuery(rule: BlacklistRule): { query: string; cost: number } | null {
-  if (rule.terms.some((t) => t.value.includes("*") || t.value.startsWith("fav:"))) return null;
-  if (rule.terms.every((t) => t.negated)) return null;
-  if (rule.terms.length === 1) {
-    const t = rule.terms[0];
-    return { query: `-${t.value}`, cost: 1 };
-  }
-  return { query: `-( ${rule.terms.map((t) => t.raw).join(" ")} )`, cost: rule.terms.length };
-}
-
 /** e621's anonymous default blacklist. */
 export const DEFAULT_BLACKLIST = [
   "gore",
