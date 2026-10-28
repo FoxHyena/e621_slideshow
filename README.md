@@ -19,6 +19,8 @@ pnpm dev            # http://localhost:3000
 - The link button (or **C**) copies a share link with the current search and playback settings.
   Opening it starts the show straight away; your own blacklist still applies, and nothing is saved
   until you change a setting. Not available in Recommended mode.
+  Turn on **Include my sign-in in share links** (e621 account section) to add your username and
+  API key to the link's `#` fragment; the visitor is signed in for that tab only, nothing is saved.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 
