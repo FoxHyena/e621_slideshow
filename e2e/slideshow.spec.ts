@@ -614,6 +614,58 @@ test("T opens the feed mid-show on the current post; G and T switch views", asyn
   expect(await slideId(page)).toBe(1147);
 });
 
+/** Press J a post at a time (mock ids count down) until the feed is on this post. */
+async function stepTo(page: Page, id: number) {
+  const from = Number(await activeCard(page).getAttribute("data-post-id"));
+  for (let at = from - 1; at >= id; at--) {
+    await page.keyboard.press("j");
+    await expect(activeCard(page)).toHaveAttribute("data-post-id", String(at));
+  }
+}
+
+const feedTop = (page: Page) => page.getByTestId("feed").evaluate((el) => el.scrollTop);
+
+test("the feed's search button opens settings over the feed, which keeps its place", async ({ page }) => {
+  await start(page);
+  await page.getByTestId("scroll-button").click();
+  await stepTo(page, 1147);
+  await page.getByTestId("feed-search").click();
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  // closing settings on the same search goes back to the feed, still on the same post
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1147");
+});
+
+test("closing the feed goes back to where it was opened from, keeping the place", async ({ page }) => {
+  await start(page, undefined, { playback: { intervalSec: 60 } });
+  // opened from settings: X goes back to settings, and Resume plays from the post in view
+  await page.getByTestId("scroll-button").click();
+  await stepTo(page, 1147);
+  await page.getByTestId("feed-close").click();
+  await expect(page.getByTestId("feed")).toHaveCount(0);
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await play(page);
+  expect(await slideId(page)).toBe(1147);
+
+  // opened from the show: X goes back to the show, on the post in view
+  await page.keyboard.press("t");
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1147");
+  await stepTo(page, 1145);
+  await page.waitForTimeout(800); // let the smooth scroll settle
+  const top = await feedTop(page);
+  await page.getByTestId("feed-close").click();
+  await expect(page.getByTestId("feed")).toHaveCount(0);
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  expect(await slideId(page)).toBe(1145);
+
+  // reopening lands on the exact scroll offset it was left at
+  await page.getByTestId("feed-button").click();
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1145");
+  expect(await feedTop(page)).toBe(top);
+});
+
 test("the feed favorites by heart, by L, and by double-tap", async ({ page }) => {
   const specs = defaultSpecs(10);
   specs[1].is_favorited = true; // 1009
