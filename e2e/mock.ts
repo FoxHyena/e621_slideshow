@@ -147,6 +147,8 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     }
 
     if (url.pathname === "/tags/autocomplete.json") {
+      // Like e621: a request carrying an Authorization header fails CORS here.
+      if (auth) return route.abort("accessdenied");
       const q = url.searchParams.get("search[name_matches]") ?? "";
       state.autocompleteQueries.push(q);
       return json(route, [

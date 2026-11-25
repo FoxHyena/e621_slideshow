@@ -61,6 +61,8 @@ interface RequestOpts {
   body?: URLSearchParams;
   creds: Credentials | null;
   signal?: AbortSignal;
+  /** Skip the Authorization header. Some public endpoints reject the CORS preflight it triggers. */
+  anonymous?: boolean;
 }
 
 async function request<T>(path: string, opts: RequestOpts): Promise<T> {
@@ -71,7 +73,7 @@ async function request<T>(path: string, opts: RequestOpts): Promise<T> {
   url.searchParams.set("_client", clientParam(opts.creds));
 
   const headers: Record<string, string> = {};
-  if (opts.creds?.username && opts.creds.apiKey) {
+  if (!opts.anonymous && opts.creds?.username && opts.creds.apiKey) {
     headers.Authorization = "Basic " + btoa(`${opts.creds.username}:${opts.creds.apiKey}`);
   }
 
@@ -123,9 +125,11 @@ export async function autocompleteTags(
   signal?: AbortSignal,
 ): Promise<AutocompleteTag[]> {
   if (prefix.length < 3) return [];
+  // e621 answers the CORS preflight that an Authorization header triggers with an error on
+  // this endpoint, so signed-in users got no suggestions at all. The tags are public anyway.
   const res = await request<AutocompleteTag[] | Record<string, unknown>>(
     "/tags/autocomplete.json",
-    { params: { "search[name_matches]": prefix, expiry: 7 }, creds, signal },
+    { params: { "search[name_matches]": prefix, expiry: 7 }, creds, signal, anonymous: true },
   );
   return Array.isArray(res) ? res : [];
 }

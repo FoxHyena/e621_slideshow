@@ -153,6 +153,15 @@ test("tag autocomplete suggests and completes the token under the cursor", async
   await expect(bl).toHaveValue("fox_species ");
 });
 
+test("tag autocomplete works when signed in", async ({ page }) => {
+  const mock = await start(page, undefined, { creds: { username: "tester", apiKey: "goodkey" } });
+  const input = page.getByTestId("search-input");
+  await input.click();
+  await input.pressSequentially("wolf", { delay: 30 });
+  await expect(page.getByTestId("autocomplete").getByRole("option")).toHaveCount(3);
+  expect(mock.autocompleteQueries).toContain("wolf");
+});
+
 test("blacklist stays out of the query and filters locally", async ({ page }) => {
   const specs = defaultSpecs(20);
   specs[0].tags = ["solo", "badtag"]; // 1020 → hidden by multi-tag rule
