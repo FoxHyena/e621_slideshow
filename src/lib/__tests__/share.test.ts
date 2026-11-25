@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_DATE_FILTER } from "../query/date";
 import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "../settings";
-import { decodeShare, decodeShareCreds, encodeShare, encodeShareCreds } from "../share";
+import { decodeLaunch, decodeShare, decodeShareCreds, encodeShare, encodeShareCreds } from "../share";
 
 const decode = (qs: string) => decodeShare(new URLSearchParams(qs));
 
@@ -82,5 +82,32 @@ describe("share links", () => {
     expect(decodeShareCreds("#u=me")).toBeNull();
     expect(decodeShareCreds("#u=me&k=bad%20key")).toBeNull();
     expect(decodeShareCreds("#u=two%20words&k=abc")).toBeNull();
+  });
+});
+
+describe("launch links", () => {
+  const launch = (qs: string) => decodeLaunch(new URLSearchParams(qs));
+
+  it("reads tags and tidies the whitespace", () => {
+    expect(launch("tags=wolf+solo")).toEqual({ tags: "wolf solo" });
+    expect(launch("tags=%20wolf%09%0Asolo%20%20-fox%20")).toEqual({ tags: "wolf solo -fox" });
+  });
+
+  it("reads recommended mode", () => {
+    expect(launch("mode=recommended")).toEqual({ recommended: true });
+    expect(launch("mode=recommended&tags=wolf")).toEqual({ recommended: true });
+  });
+
+  it("ignores share links, empty tags, unknown modes and plain visits", () => {
+    expect(launch("v=1&tags=wolf")).toBeNull();
+    expect(launch("tags=")).toBeNull();
+    expect(launch("tags=%20%20")).toBeNull();
+    expect(launch("mode=whatever")).toBeNull();
+    expect(launch("")).toBeNull();
+    expect(launch(`tags=${"a".repeat(2001)}`)).toBeNull();
+  });
+
+  it("a share link isn't a launch, and a launch isn't a share link", () => {
+    expect(decodeShare(new URLSearchParams("tags=wolf"))).toBeNull();
   });
 });

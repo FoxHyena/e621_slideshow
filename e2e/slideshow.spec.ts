@@ -895,3 +895,48 @@ test("signing out turns sharing the sign-in back off", async ({ page }) => {
   await page.getByRole("button", { name: "Sign out" }).click();
   expect(await page.evaluate(() => localStorage.getItem("e6ss:v1:shareSignIn"))).toBeNull();
 });
+
+// ---- Launch links (the userscript's buttons) --------------------------------
+
+test("a ?tags= link plays straight away with the visitor's own settings, and saves the tags", async ({ page }) => {
+  const mock = await mockE621(page, defaultSpecs().map((s) => (s.id === 1150 ? { ...s, tags: ["badtag"] } : s)));
+  const own = { tags: "my_search", blacklist: "badtag", ratings: { s: true, q: false, e: false } };
+  await seed(page, { search: own, playback: { intervalSec: 60, style: "kenburns" } });
+  await page.goto("/?tags=wolf++solo");
+
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(slide(page)).toBeVisible();
+  expect(mock.searches[0].tags).toContain("wolf solo");
+  expect(mock.searches[0].tags).toContain("rating:s"); // saved ratings kept
+  expect(await slideId(page)).toBe(1149); // saved blacklist kept
+  expect(new URL(page.url()).search).toBe("");
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!));
+  expect(saved).toMatchObject({ ...own, tags: "wolf solo", source: "search" });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({
+    intervalSec: 60,
+    style: "kenburns",
+  });
+});
+
+test("?mode=recommended waits for the favorites to sync, then plays", async ({ page }) => {
+  const specs = defaultSpecs().map((s) => (s.id === 1120 ? { ...s, tags: ["pawpads"] } : s));
+  const mock = await mockE621(page, specs);
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 2000 + i, tags: ["pawpads", "solo"] })));
+  mock.tagCounts = { pawpads: 5 };
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/?mode=recommended");
+
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(slide(page)).toBeVisible();
+  expect(await slideId(page)).toBe(1120);
+  expect(new URL(page.url()).search).toBe("");
+});
+
+test("?mode=recommended asks signed-out visitors to sign in", async ({ page }) => {
+  await mockE621(page);
+  await seed(page);
+  await page.goto("/?mode=recommended");
+  await expect(page.getByTestId("toast")).toContainText("Sign in");
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(page.getByTestId("rec-signin")).toBeVisible();
+});

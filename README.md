@@ -21,6 +21,14 @@ pnpm dev            # http://localhost:3000
   until you change a setting. Not available in Recommended mode.
   Turn on **Include my sign-in in share links** (e621 account section) to add your username and
   API key to the link's `#` fragment; the visitor is signed in for that tab only, nothing is saved.
+- Launch links start a show from a URL with your own saved settings (ratings, media, blacklist,
+  style…). Only what the link names changes, and it's saved like a search you typed:
+  - `/?tags=wolf+solo` plays those tags.
+  - `/?mode=recommended` plays Recommended from your favorites once they've synced (needs sign-in).
+- **Userscript**: install [`/e621-slideshow.user.js`](https://e621.cumdump.dog/e621-slideshow.user.js)
+  with Tampermonkey or Violentmonkey. It adds **▶ Slideshow** (the current search, or the pool you're
+  on) and **★ Recommended** buttons under the e621/e926 search box. Source:
+  `public/e621-slideshow.user.js`; bump `@version` when you change it so installs update.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 
