@@ -170,10 +170,24 @@ export default function App() {
   /** Artists' feeds opened from the scroll view, innermost last; each covers the one below. */
   const [artistFeeds, setArtistFeeds] = useState<ArtistFeed[]>([]);
   const artistFeedId = useRef(0);
+  /**
+   * History entries pushed for open artist feeds, so the browser's back (a phone's edge
+   * swipe included) closes the artist feed instead of leaving the page.
+   */
+  const artistHistory = useRef(0);
+  /** Close every artist feed, taking their history entries back off too. */
+  const clearArtists = () => {
+    setArtistFeeds([]);
+    const n = artistHistory.current;
+    if (n === 0) return;
+    // The popstate this fires finds no entries left to close, so it does nothing.
+    artistHistory.current = 0;
+    window.history.go(-n);
+  };
   /** Leaving the scroll view (or switching views) closes any artist feeds over it. */
   const setBrowse = (view: "grid" | "feed" | null) => {
     setBrowseState(view);
-    setArtistFeeds([]);
+    clearArtists();
   };
   /** Where the open grid or feed was opened from, so closing it goes back there. */
   const browseFrom = useRef<"panel" | "show">("show");
@@ -311,7 +325,7 @@ export default function App() {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);
     }
     setActive({ queue: q, key, search: s, serial: (active?.serial ?? 0) + 1 });
-    setArtistFeeds([]);
+    clearArtists();
     setIndex(0);
     setTrail([]);
     setReady(null);
@@ -675,10 +689,28 @@ export default function App() {
       needMore: () => void q.ensure(q.posts.length - 1),
     };
     setArtistFeeds([...openArtists, feed]);
+    window.history.pushState({ artistFeed: feed.id }, "");
+    artistHistory.current++;
   };
 
   /** Back out of the innermost artist feed, to the feed under it. */
-  const closeArtist = () => setArtistFeeds(openArtists.slice(0, -1));
+  const closeArtist = () => {
+    // Go back through history, so the entry the feed pushed goes too; popstate closes it.
+    if (artistHistory.current > 0) window.history.back();
+    else setArtistFeeds(openArtists.slice(0, -1));
+  };
+
+  // The browser's back (or a phone's edge swipe) closes the innermost artist feed.
+  const onPopState = useEffectEvent(() => {
+    if (artistHistory.current === 0) return;
+    artistHistory.current--;
+    setArtistFeeds(openArtists.slice(0, -1));
+  });
+  useEffect(() => {
+    const handler = () => onPopState();
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, []);
 
   // ---- controls auto-hide -------------------------------------------------
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);

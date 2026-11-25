@@ -691,7 +691,9 @@ test("clicking an artist opens their posts over the feed; back returns to the sa
   await expect(artistFeed).toBeVisible();
   await expect(artistFeed).toHaveAttribute("data-artist", "mock_artist");
   await expect(page.getByTestId("artist-feed-name")).toHaveText("mock artist");
-  await expect(artistFeed.getByTestId("feed-card")).toHaveCount(100);
+  // the artist's first page is in, built a page of cards at a time like the main feed
+  await expect(artistFeed.getByTestId("feed-count")).toHaveText("100+ posts");
+  await expect(artistFeed.getByTestId("feed-card")).toHaveCount(20);
   expect(mock.searches.at(-1)?.tags.split(" ")).toContain("mock_artist");
   // the artist's feed has no show of its own to play
   await expect(artistFeed.getByTestId("feed-play-from")).toHaveCount(0);
@@ -717,6 +719,32 @@ test("clicking an artist opens their posts over the feed; back returns to the sa
   await page.getByTestId("artist-feed-back").click();
   await expect(artistFeed).toHaveCount(0);
   expect(await feedTop(page)).toBe(top);
+
+  // the browser's back (a phone's edge swipe) closes the artist feed instead of leaving the page
+  const url = page.url();
+  await activeCard(page).getByTestId("feed-artist").click();
+  await expect(artistFeed).toBeVisible();
+  await page.goBack();
+  await expect(artistFeed).toHaveCount(0);
+  await expect(page.getByTestId("feed")).toBeVisible();
+  expect(page.url()).toBe(url);
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1147");
+  expect(await feedTop(page)).toBe(top);
+});
+
+test("leaving the feed from an artist feed takes its history entry with it", async ({ page }) => {
+  await start(page);
+  await page.getByTestId("scroll-button").click();
+  const before = await page.evaluate(() => history.length);
+  await activeCard(page).getByTestId("feed-artist").click();
+  await expect(page.getByTestId("artist-feed")).toBeVisible();
+  expect(await page.evaluate(() => history.length)).toBe(before + 1);
+  // a new search from the artist feed's tag targets closes it and unwinds the entry
+  await page.getByTestId("artist-feed").locator("[data-testid=feed-tag][data-tag=wolf]").first().click();
+  await page.getByTestId("tag-action-search").click();
+  await expect(page.getByTestId("artist-feed")).toHaveCount(0);
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (history.state as { artistFeed?: number } | null)?.artistFeed)).toBeUndefined();
 });
 
 test("the feed favorites by heart, by L, and by double-tap", async ({ page }) => {
