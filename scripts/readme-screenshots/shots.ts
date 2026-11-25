@@ -67,7 +67,7 @@ ${ears}
 ${blush}${whiskers}`;
 }
 
-/** Sky gradient, sun or moon, rolling hills, and a character in front. */
+/** Sky gradient, sun or moon, rolling hills, and a character in front, all blurred. */
 function art(id: number): string {
   const [w, h] = SIZES[id % SIZES.length];
   const hue = Math.floor(hash(id) * 360);
@@ -75,15 +75,19 @@ function art(id: number): string {
   const sky1 = night ? `hsl(${hue},45%,12%)` : `hsl(${hue},65%,66%)`;
   const sky2 = night ? `hsl(${(hue + 40) % 360},40%,30%)` : `hsl(${(hue + 35) % 360},80%,84%)`;
   const sun = night ? "hsl(50,30%,92%)" : `hsl(${(hue + 20) % 360},95%,92%)`;
+  // Blurred like a censored preview: the README shows the app, not the art.
+  const blur = Math.min(w, h) * 0.025;
+  // Everything is drawn this far past the edges, so the blur has colour to pull in, not transparency.
+  const pad = Math.round(blur * 3);
   const ridge = (layer: number) => {
     const base = h * (0.6 + layer * 0.12);
-    const pts = [`0,${h}`];
+    const pts = [`${-pad},${h + pad}`];
     const steps = 6 + layer * 2;
     for (let i = 0; i <= steps; i++) {
       const y = base - hash(id * 13 + layer * 101 + i) * h * (0.16 - layer * 0.04);
-      pts.push(`${Math.round((i / steps) * w)},${Math.round(y)}`);
+      pts.push(`${Math.round(-pad + (i / steps) * (w + 2 * pad))},${Math.round(y)}`);
     }
-    pts.push(`${w},${h}`);
+    pts.push(`${w + pad},${h + pad}`);
     const light = night ? 10 + layer * 5 : 52 - layer * 10;
     return `<polygon points="${pts.join(" ")}" fill="hsl(${(hue + 150 + layer * 15) % 360},30%,${light}%)" stroke-linejoin="round"/>`;
   };
@@ -91,11 +95,14 @@ function art(id: number): string {
   const cx = w * (0.38 + hash(id + 9) * 0.24);
   const sunX = cx < w / 2 ? w * 0.8 : w * 0.2;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky1}"/><stop offset="1" stop-color="${sky2}"/></linearGradient></defs>
-<rect width="${w}" height="${h}" fill="url(#s)"/>
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky1}"/><stop offset="1" stop-color="${sky2}"/></linearGradient>
+<filter id="b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${blur.toFixed(1)}"/></filter></defs>
+<g filter="url(#b)">
+<rect x="${-pad}" y="${-pad}" width="${w + 2 * pad}" height="${h + 2 * pad}" fill="url(#s)"/>
 <circle cx="${Math.round(sunX)}" cy="${Math.round(h * 0.22)}" r="${Math.round(Math.min(w, h) * 0.08)}" fill="${sun}"/>
 ${ridge(0)}${ridge(1)}
 <g transform="translate(${Math.round(cx - 50 * scale)},${Math.round(h - 128 * scale)}) scale(${scale.toFixed(3)})">${character(id)}</g>
+</g>
 </svg>`;
 }
 
@@ -164,7 +171,7 @@ const hideControls = async (page: Page) => {
 
 test("settings panel", async ({ page }) => {
   await setup(page, {
-    search: { tags: "fox anthro -feral score:>50", blacklist: "gore\nscat\nyoung -rating:s" },
+    search: { tags: "wolf", blacklist: "gore\nscat" },
     playback: { intervalSec: 8 },
     sections: { filters: true, date: false, saved: false, blacklist: false, playback: false },
   });
@@ -177,7 +184,7 @@ test("settings panel", async ({ page }) => {
 });
 
 test("classic slideshow with controls", async ({ page }) => {
-  await setup(page, { search: { tags: "anthro solo" }, creds: { username: "wolfie", apiKey: "goodkey" } });
+  await setup(page, { search: { tags: "wolf" }, creds: { username: "wolfie", apiKey: "goodkey" } });
   await page.goto("/");
   await play(page);
   await showControls(page);
@@ -185,7 +192,7 @@ test("classic slideshow with controls", async ({ page }) => {
 });
 
 test("info overlay", async ({ page }) => {
-  await setup(page, { search: { tags: "anthro solo" } });
+  await setup(page, { search: { tags: "wolf" } });
   await page.goto("/");
   await play(page);
   await page.keyboard.press("i");
@@ -195,7 +202,7 @@ test("info overlay", async ({ page }) => {
 });
 
 test("gallery", async ({ page }) => {
-  await setup(page, { search: { tags: "anthro solo" } });
+  await setup(page, { search: { tags: "wolf" } });
   await page.goto("/");
   await play(page);
   await page.keyboard.press("g");
@@ -206,7 +213,7 @@ test("gallery", async ({ page }) => {
 
 for (const style of ["prints", "kenburns", "collage", "reflections"] as const) {
   test(`style ${style}`, async ({ page }) => {
-    await setup(page, { search: { tags: "anthro solo" }, playback: { style } });
+    await setup(page, { search: { tags: "wolf" }, playback: { style } });
     await page.goto("/");
     await play(page);
     if (style === "collage") {
