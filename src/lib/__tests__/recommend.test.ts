@@ -146,8 +146,10 @@ describe("syncProfile", () => {
   it("reads only favorites newer than the last one seen", async () => {
     const stored = await syncProfile(null, "pup", fakeApi(range(1000, 10)).api, NOW);
     const { api, calls } = fakeApi([2001, 2000, ...range(1000, 10)]);
-    const p = await syncProfile(stored, "pup", api, NOW + 1);
+    const read: number[] = [];
+    const p = await syncProfile(stored, "pup", api, NOW + 1, undefined, (posts) => read.push(...posts.map((x) => x.id)));
     expect(calls).toEqual([1]);
+    expect(read).toEqual([2001, 2000]); // only the new favorites were read
     expect(p.favIds.slice(0, 3)).toEqual([2001, 2000, 1000]);
     expect(p.tags.t.n).toBe(12);
   });

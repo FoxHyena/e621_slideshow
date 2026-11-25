@@ -1,8 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getFavorites, getTags, getUser, newestPostId, type Credentials } from "@/lib/e621/client";
-import type { CurrentUser } from "@/lib/e621/types";
+import { bigStorage } from "@/lib/bigStorage";
+import { getFavorites, getTags, getUser, newestPostId, searchPosts, type Credentials } from "@/lib/e621/client";
+import type { CurrentUser, Post } from "@/lib/e621/types";
+import {
+  covers,
+  favKey,
+  fitLearned,
+  mergeFeatures,
+  refreshNegatives,
+  withOverrides,
+  type FavFeatures,
+  type Learned,
+  type Negatives,
+} from "@/lib/recommend/model";
 import type { Profile } from "@/lib/recommend/profile";
 import { countsOf, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "@/lib/recommend/sync";
 import { computeWeights, NO_OVERRIDES, type Overrides } from "@/lib/recommend/weights";
@@ -11,6 +23,8 @@ import { storage } from "@/lib/storage";
 export interface Recommendations {
   profile: Profile | null;
   weights: Map<string, number>;
+  /** learned tag weights (model.ts) for ranking; null until fit, or where IndexedDB is missing */
+  learned: Map<string, number> | null;
   overrides: Overrides;
   syncing: boolean;
   /** what a running sync is doing, for the status line */
@@ -34,6 +48,10 @@ function recApi(userId: number, creds: Credentials): RecApi {
 
 const without = (list: string[], tag: string) => list.filter((t) => t !== tag);
 
+const featKey = (name: string) => `favFeatures:${name}`;
+const learnedKey = (name: string) => `learned:${name}`;
+const NEG_KEY = "negatives";
+
 /**
  * The signed-in user's favorites profile, kept in sync in the background:
  * loaded from storage at once, then refreshed (incrementally) on sign-in,
@@ -52,6 +70,7 @@ export function useRecommendations(
   const profile = name && synced?.username === name ? synced : stored;
 
   const [cache, setCache] = useState<TagCache>(storage.loadTagCache);
+  const [fit, setFit] = useState<Learned | null>(null);
 
   const storedOverrides = useMemo(() => (name ? storage.loadOverrides(name) : null), [name]);
   const [edited, setEdited] = useState<{ name: string; o: Overrides } | null>(null);
@@ -74,14 +93,21 @@ export function useRecommendations(
     const onProgress = (msg: string) => {
       if (!cancelled) setProgress(msg);
     };
-    const start = fullRebuild.current ? null : storage.loadProfile(name);
+    const rebuild = fullRebuild.current;
     fullRebuild.current = false;
 
     void (async () => {
       setSyncing(true);
       setError(null);
       try {
-        const p = await syncProfile(start, name, api, Date.now(), onProgress);
+        // The learned ranking needs each favorite's tags, which older profiles never kept:
+        // read every favorite once to fill them in.
+        const canLearn = await bigStorage.available();
+        const storedFeats = canLearn ? await bigStorage.get<FavFeatures>(featKey(name)) : undefined;
+        const loaded = rebuild ? null : storage.loadProfile(name);
+        const start = loaded && canLearn && !covers(storedFeats, loaded) ? null : loaded;
+        const read: Post[] = [];
+        const p = await syncProfile(start, name, api, Date.now(), onProgress, (posts) => read.push(...posts));
         if (cancelled) return;
         setSynced(p);
         if (!storage.saveProfile(p)) {
@@ -91,6 +117,23 @@ export function useRecommendations(
         if (cancelled) return;
         setCache(c);
         storage.saveTagCache(c);
+        if (canLearn) {
+          try {
+            const feats = mergeFeatures(storedFeats, p, read);
+            await bigStorage.set(featKey(name), feats);
+            const random = (page: number, limit: number) => searchPosts("order:random", page, limit, creds);
+            const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), random, Date.now(), onProgress);
+            await bigStorage.set(NEG_KEY, neg);
+            onProgress("Learning your taste…");
+            const l = await fitLearned(await bigStorage.get<Learned>(learnedKey(name)), p, feats, neg, () => cancelled);
+            if (cancelled || !l) return;
+            setFit(l);
+            await bigStorage.set(learnedKey(name), l);
+          } catch (e) {
+            // Ranking falls back to tag match; the profile itself is fine.
+            if (!cancelled) warn.current(`Couldn't learn your taste: ${e instanceof Error ? e.message : String(e)}`);
+          }
+        }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e));
       } finally {
@@ -104,6 +147,22 @@ export function useRecommendations(
       cancelled = true;
     };
   }, [name, userId, creds, run]);
+
+  // Last session's fit, so ranking uses it before this session's sync is done.
+  useEffect(() => {
+    if (!name) return;
+    let cancelled = false;
+    void bigStorage.get<Learned>(learnedKey(name)).then((l) => {
+      if (!cancelled && l) setFit((cur) => cur ?? l);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [name]);
+
+  // Only weights fit on exactly these favorites count.
+  const current = profile && fit?.favKey === favKey(profile) ? fit : null;
+  const learned = useMemo(() => (current ? withOverrides(current, overrides) : null), [current, overrides]);
 
   const weights = useMemo(
     () => (profile ? computeWeights(profile, countsOf(cache), cache.site?.n ?? 0, overrides) : new Map<string, number>()),
@@ -119,11 +178,12 @@ export function useRecommendations(
   return {
     profile,
     weights,
+    learned,
     overrides,
     syncing,
     progress,
     error,
-    signature: JSON.stringify([profile?.favIds.length ?? 0, profile?.favIds[0] ?? null, overrides]),
+    signature: JSON.stringify([profile?.favIds.length ?? 0, profile?.favIds[0] ?? null, overrides, current?.negAt ?? null]),
     rebuild: () => {
       fullRebuild.current = true;
       setRun((r) => r + 1);

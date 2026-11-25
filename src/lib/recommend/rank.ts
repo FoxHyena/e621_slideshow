@@ -105,12 +105,17 @@ export const QUALITY_WEIGHT = 1;
  * Final order: taste percentile + QUALITY_WEIGHT × quality percentile, best
  * first. Ties fall back to `byRank`. Percentiles keep the two on one scale, so
  * a few huge taste scores or favorite counts can't decide everything.
+ * `taste` defaults to the lift score; the app passes the learned one when it has it.
  */
-export function rankAll(ranked: Ranked[], qualityWeight = QUALITY_WEIGHT): Ranked[] {
-  const taste = percentiles(ranked.map((r) => r.score));
+export function rankAll(
+  ranked: Ranked[],
+  qualityWeight = QUALITY_WEIGHT,
+  taste: (r: Ranked) => number = (r) => r.score,
+): Ranked[] {
+  const tastes = percentiles(ranked.map(taste));
   const quality = cohortQuality(ranked.map((r) => r.post));
   return ranked
-    .map((r, i) => ({ r, v: taste[i] + qualityWeight * quality[i] }))
+    .map((r, i) => ({ r, v: tastes[i] + qualityWeight * quality[i] }))
     .sort((a, b) => b.v - a.v || byRank(a.r, b.r))
     .map(({ r }) => r);
 }
