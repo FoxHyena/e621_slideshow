@@ -666,6 +666,46 @@ test("closing the feed goes back to where it was opened from, keeping the place"
   expect(await feedTop(page)).toBe(top);
 });
 
+test("clicking an artist opens their posts over the feed; back returns to the same place", async ({ page }) => {
+  const mock = await start(page);
+  await page.getByTestId("scroll-button").click();
+  await stepTo(page, 1147);
+  await page.waitForTimeout(800); // let the smooth scroll settle
+  const top = await feedTop(page);
+
+  await activeCard(page).getByTestId("feed-artist").click();
+  const artistFeed = page.getByTestId("artist-feed");
+  await expect(artistFeed).toBeVisible();
+  await expect(artistFeed).toHaveAttribute("data-artist", "mock_artist");
+  await expect(page.getByTestId("artist-feed-name")).toHaveText("mock artist");
+  await expect(artistFeed.getByTestId("feed-card")).toHaveCount(100);
+  expect(mock.searches.at(-1)?.tags.split(" ")).toContain("mock_artist");
+  // the artist's feed has no show of its own to play
+  await expect(artistFeed.getByTestId("feed-play-from")).toHaveCount(0);
+
+  // J moves the artist's feed, not the one underneath
+  const artistActive = artistFeed.locator("[data-testid=feed-card][aria-current]");
+  await expect(artistActive).toHaveAttribute("data-post-id", "1150");
+  await page.keyboard.press("j");
+  await expect(artistActive).toHaveAttribute("data-post-id", "1149");
+  const mainActive = page.getByTestId("feed").locator("[data-testid=feed-card][aria-current]");
+  await expect(mainActive).toHaveCount(0); // suspended: nothing in view plays
+
+  // Esc goes back a level, to the same post and scroll offset
+  await page.keyboard.press("Escape");
+  await expect(artistFeed).toHaveCount(0);
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1147");
+  expect(await feedTop(page)).toBe(top);
+
+  // the back arrow does the same
+  await activeCard(page).getByTestId("feed-artist-avatar").click();
+  await expect(artistFeed).toBeVisible();
+  await page.getByTestId("artist-feed-back").click();
+  await expect(artistFeed).toHaveCount(0);
+  expect(await feedTop(page)).toBe(top);
+});
+
 test("the feed favorites by heart, by L, and by double-tap", async ({ page }) => {
   const specs = defaultSpecs(10);
   specs[1].is_favorited = true; // 1009
