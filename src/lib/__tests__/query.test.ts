@@ -204,6 +204,14 @@ describe("buildRecommendedQuery", () => {
     expect(q.paging).toBe("numbered");
   });
 
+  it("offers the same window and filters without tags, for the popular source", () => {
+    const q = buildRecommendedQuery(search({ breadth: 3, minScore: 20, ratings: { s: false, q: true, e: true } }), top);
+    expect(q.popular).toBe(q.query.replace("~tag0 ~tag1 ~tag2 ", ""));
+    expect(q.popular).toContain("date:>=7_days_ago");
+    expect(q.popular).toContain("score:>=20");
+    expect(q.popular).not.toContain("tag0");
+  });
+
   it("keeps the user's own window and filters, and leaves the blacklist out", () => {
     const date = { ...DEFAULT_DATE_FILTER, enabled: true, mode: "preset" as const, preset: "month" as const };
     const q = buildRecommendedQuery(

@@ -102,8 +102,11 @@ Other playback settings:
 ![Recommended mode with the taste profile](docs/screenshots/recommended.png)
 
 Switch **Source** to **Recommended** (needs sign-in). The app reads your favorites, finds the tags you
-favorite far more often than e621 does overall, and ranks recent posts by how well they match.
+favorite far more often than e621 does overall, and ranks recent posts by how well they match and how
+well liked they are for their age. Posts you've already favorited are left out.
 
+- Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
+  so a well-liked post with only some of your tags still gets ranked.
 - **Breadth** sets how many of your top tags are searched together: lower stays close to your strongest
   interests, higher brings more variety.
 - **Pin** a profile tag to always search it. **Mute** a tag to hide posts carrying it.
@@ -111,7 +114,7 @@ favorite far more often than e621 does overall, and ranks recent posts by how we
 - **Rebuild** re-reads every favorite. Otherwise only new favorites are read.
 - In the info overlay, "Recommended because" lists the tags that ranked the post, and **+ / −** pin and
   mute instead of editing a search.
-- Nothing plays until every candidate page is ranked, so the best match shows first.
+- Nothing plays until every candidate page is ranked, so the best post shows first.
 
 ### e621 account
 
@@ -256,8 +259,13 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
   - `sync.ts` reads favorites incrementally and looks up each tag's site-wide count.
   - `weights.ts` scores each tag by how much more common it is in your favorites than on e621
     (capped, damped for small counts, meta tags ignored).
-  - `rank.ts` scores a post by its 5 strongest matching tags, so common tags can't swamp a rare favorite.
-  - `stream.ts` fetches every candidate page, then plays them best match first.
+  - `rank.ts` scores a post by its 5 strongest matching tags, so common tags can't swamp a rare favorite,
+    then orders posts by taste percentile + quality percentile (favorites compared with posts uploaded
+    around the same time).
+  - `stream.ts` fetches the tag search and 3 pages of the window's popular posts, drops your favorites,
+    then plays the rest best first.
+  - [`scripts/rec-backtest.ts`](scripts/rec-backtest.ts) tests search and ranking changes on live data: it
+    hides accounts' recent favorites and counts how many the recommendations would show.
 - **Storage** ([`src/lib/storage.ts`](src/lib/storage.ts)): settings, saved searches, history,
   credentials and the taste profile live in `localStorage`.
 

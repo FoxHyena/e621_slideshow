@@ -1,10 +1,21 @@
 import { allTags, type Post } from "../e621/types";
 import { acceptPost, type PostFilter, type QueueStats, type SearchProgress, type SlideQueue } from "../slideshow/queue";
-import { byRank, scorePost, type Ranked } from "./rank";
+import { rankAll, scorePost, type Ranked } from "./rank";
 
 /** Most pages of candidates to fetch (8,000 posts). The search usually ends sooner, on a short page. */
 export const REC_PAGE_BUDGET = 25;
 export const REC_PAGE_SIZE = 320;
+/**
+ * Pages of the window's best-scored posts, whatever their tags, fetched next to
+ * the tag search and ranked with it. In a live backtest over 11 accounts (hide
+ * each one's last 30 days of favorites, rank the window), the tag search alone
+ * put 15.8% of those favorites in the top 200; adding 3 popular pages, 21.8%.
+ * 5 or 10 pages found more but ranked no better (22.0%, 21.8%), so 3 keeps the
+ * wait short. With the default 7-day window (9 accounts with enough recent
+ * favorites): 15.5% → 48.1%, and 5 pages did slightly worse (46.6%).
+ * See scripts/rec-backtest.ts.
+ */
+export const REC_POPULAR_PAGES = 3;
 export interface TagQuery {
   tag: string;
   query: string;
@@ -15,12 +26,14 @@ export type RecFetch = (query: string, page: number, limit: number) => Promise<P
 
 /**
  * A slideshow source that fetches every candidate page in the background, then
- * shows the whole set ranked by taste score. Nothing is shown until the search
+ * shows the whole set ranked by taste and quality (see `rankAll`), leaving out
+ * posts already in the user's favorites. Nothing is shown until the search
  * ends: results arrive in e621-score order, so the best match for this profile
  * can be on the last page, and showing early would play worse posts first.
  *
  * Takes a list of queries, fetched round by round, each until a short page or
- * its page budget; the app passes a single OR query.
+ * its page budget; the app passes the OR query of profile tags and the
+ * window's popular posts.
  */
 export class RecommendedQueue implements SlideQueue {
   posts: Post[] = [];
@@ -134,7 +147,7 @@ export class RecommendedQueue implements SlideQueue {
       this.running = false;
       this.loading = false;
       if (!this.disposed) {
-        this.ranked.sort(byRank);
+        this.ranked = rankAll(this.ranked);
         this.changed();
       }
     }
@@ -143,6 +156,8 @@ export class RecommendedQueue implements SlideQueue {
   private add(batch: Post[]) {
     for (const post of batch) {
       if (!acceptPost(post, this.filter)) continue;
+      // Already a favorite: seen, and it's part of the profile that ranks everything else.
+      if (post.stats.is_favorited) continue;
       if (this.muted.size && allTags(post).some((t) => this.muted.has(t))) continue;
       const r = scorePost(post, this.weights);
       if (r.score <= 0) continue;

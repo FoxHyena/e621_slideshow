@@ -32,7 +32,7 @@ import {
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
-import { RecommendedQueue, REC_PAGE_BUDGET } from "@/lib/recommend/stream";
+import { RecommendedQueue, REC_PAGE_BUDGET, REC_POPULAR_PAGES } from "@/lib/recommend/stream";
 import { searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
 import {
@@ -261,8 +261,12 @@ export default function App() {
     const ctx = { username: user?.name };
     let q: SlideQueue;
     if (isRec(s)) {
+      const rq = buildRecommendedQuery(s, recTagNames, tagLimit);
       q = new RecommendedQueue(
-        [{ tag: "candidates", query: b.query, pages: REC_PAGE_BUDGET }],
+        [
+          { tag: "candidates", query: rq.query, pages: REC_PAGE_BUDGET },
+          { tag: "popular", query: rq.popular, pages: REC_POPULAR_PAGES },
+        ],
         (query, page, limit) => searchPosts(query, page, limit, creds),
         rec.weights,
         { media: s.media, rules: b.rules, ctx },
