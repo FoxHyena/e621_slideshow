@@ -24,7 +24,7 @@ pnpm dev            # http://localhost:3000
 - Launch links (`/?tags=wolf+solo`) play an e621 search straight away, exactly as e621 runs it:
   default filters (all ratings and media, newest first), so you see the same posts. Your own
   blacklist and playback settings (style, speed…) still apply, and nothing is saved.
-- The [userscript](#userscript) adds a Slideshow button to e621 itself.
+- The [userscript](#userscript) adds a Slideshow button to e621 itself. Settings → **e621 button** links to it.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 

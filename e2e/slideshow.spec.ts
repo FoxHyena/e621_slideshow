@@ -9,7 +9,7 @@ interface Seed {
   sections?: Record<string, boolean>;
 }
 
-const ALL_OPEN = { filters: true, saved: true, date: true, blacklist: true, playback: true, account: true, keyboard: true };
+const ALL_OPEN = { filters: true, saved: true, date: true, blacklist: true, playback: true, account: true, keyboard: true, userscript: true };
 
 /** Seed localStorage once per test (not on reloads, so persistence is testable). */
 async function seed(page: Page, s: Seed = {}) {
@@ -922,4 +922,15 @@ test("a ?tags= link plays the e621 search as-is, with the visitor's playback and
     intervalSec: 60,
     style: "kenburns",
   });
+});
+
+test("settings link to the userscript and explain how to install it", async ({ page, request }) => {
+  await start(page);
+  const section = page.getByTestId("section-userscript");
+  await expect(section).toContainText("Allow User Scripts");
+  const install = section.getByTestId("userscript-install");
+  await expect(install).toHaveAttribute("href", "/e621-slideshow.user.js");
+  const res = await request.get("/e621-slideshow.user.js");
+  expect(res.ok()).toBe(true);
+  expect(await res.text()).toContain("// ==UserScript==");
 });
