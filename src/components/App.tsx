@@ -28,6 +28,7 @@ import { DEFAULT_BLACKLIST, mergeBlacklists, syncAccountBlacklist } from "@/lib/
 import {
   buildQuery,
   buildRecommendedQuery,
+  favoritesTags,
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
@@ -179,15 +180,21 @@ export default function App() {
     [rec.weights, rec.profile, rec.overrides, search.breadth],
   );
   const isRec = (s: SearchSettings) => s.source === "recommended";
+  const isFav = (s: SearchSettings) => s.source === "favorites";
+  /** The search e621 actually runs: Favorites swaps the tag box for `fav:<name>`. */
+  const effective = (s: SearchSettings): SearchSettings =>
+    isFav(s) && user ? { ...s, tags: favoritesTags(user.name) } : s;
   const recTagNames = useMemo(() => recCandidates.map((c) => c.tag), [recCandidates]);
   const buildFor = (s: SearchSettings): BuiltQuery =>
-    isRec(s) ? buildRecommendedQuery(s, recTagNames, tagLimit) : buildQuery(s, tagLimit);
+    isRec(s) ? buildRecommendedQuery(s, recTagNames, tagLimit) : buildQuery(effective(s), tagLimit);
   const keyFor = (s: SearchSettings, b: BuiltQuery) =>
     queueKey(b, s.media, creds, isRec(s) ? rec.signature : null);
-  const built = useMemo(
-    () => (isRec(search) ? buildRecommendedQuery(search, recTagNames, tagLimit) : buildQuery(search, tagLimit)),
-    [search, recTagNames, tagLimit],
-  );
+  const userName = user?.name ?? null;
+  const built = useMemo(() => {
+    if (search.source === "recommended") return buildRecommendedQuery(search, recTagNames, tagLimit);
+    const fav = search.source === "favorites" && userName;
+    return buildQuery(fav ? { ...search, tags: favoritesTags(userName) } : search, tagLimit);
+  }, [search, recTagNames, tagLimit, userName]);
 
   /** Replace defaults/old account lines with the account's current blacklist. */
   const syncBlacklist = (u: CurrentUser) => {
@@ -270,7 +277,7 @@ export default function App() {
     setTrail([]);
     setReady(null);
     void q.ensure(0);
-    if (!isRec(s)) {
+    if (s.source === "search") {
       const h = pushHistory(history, s.tags, Date.now());
       setHistory(h);
       storage.saveHistory(h);
@@ -289,7 +296,7 @@ export default function App() {
 
   /** Close the panel; restart only if the query changed. */
   const apply = (resume: boolean, s: SearchSettings = search) => {
-    const blocker = isRec(s) ? recBlocker() : null;
+    const blocker = isRec(s) ? recBlocker() : isFav(s) && !user ? "Sign in to play your favorites" : null;
     if (blocker) {
       showToast(blocker);
       return false;
@@ -337,7 +344,7 @@ export default function App() {
     if (!active) return;
     const withSignIn = shareSignIn && !!creds && !!user && !linkSession;
     const hash = withSignIn ? `#${encodeShareCreds(creds)}` : "";
-    const url = `${location.origin}${location.pathname}?${encodeShare(active.search, playback)}${hash}`;
+    const url = `${location.origin}${location.pathname}?${encodeShare(effective(active.search), playback)}${hash}`;
     try {
       await navigator.clipboard.writeText(url);
       showToast(withSignIn ? "Share link copied, with your sign-in" : "Share link copied");
@@ -499,8 +506,9 @@ export default function App() {
       showToast(`Muted ${tag}${upcoming.length ? `: hid ${upcoming.length} upcoming` : ""}`);
       return;
     }
-    const tags = `${search.tags} ${token}`.trim();
-    const s = { ...search, tags };
+    // From Favorites, + / − narrow the favorites as a plain search.
+    const tags = `${effective(search).tags} ${token}`.trim();
+    const s: SearchSettings = { ...search, source: "search", tags };
     setSearch(s);
     setInfoOpen(false);
     apply(true, s);
@@ -631,7 +639,7 @@ export default function App() {
     const entry: SavedSearch = {
       id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
       name,
-      tags: search.tags,
+      tags: effective(search).tags,
       ratings: search.ratings,
       date: search.date,
       order: search.order,

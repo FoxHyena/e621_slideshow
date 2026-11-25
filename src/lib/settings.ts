@@ -21,7 +21,7 @@ export const ORDER_LABELS: Record<Order, string> = {
   mpixels: "Largest",
 };
 
-export type Source = "search" | "recommended";
+export type Source = "search" | "favorites" | "recommended";
 
 /** How many top profile tags Recommended ORs together to find candidates. */
 export const BREADTH_MIN = 2;
@@ -29,7 +29,10 @@ export const BREADTH_MAX = 30;
 
 /** Everything that changes which posts are fetched. Changing any of it restarts the show. */
 export interface SearchSettings {
-  /** `search` plays `tags`; `recommended` ranks a date window by the user's favorites */
+  /**
+   * `search` plays `tags`; `favorites` plays the signed-in user's favorites (`fav:<name>`);
+   * `recommended` ranks a date window by the user's favorites
+   */
   source: Source;
   /** Recommended only: top-N tags used to gather candidates (capped by the tag budget) */
   breadth: number;

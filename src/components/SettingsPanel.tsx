@@ -1,10 +1,10 @@
 "use client";
 
-import { Fragment, useId, useState } from "react";
-import { Bookmark, Check, ChevronDown, Dices, Download, ExternalLink, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
+import { Fragment, useId, useState, type ReactNode } from "react";
+import { Bookmark, Check, ChevronDown, Dices, Download, ExternalLink, Heart, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
 import type { Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORY_COLORS, type CurrentUser } from "@/lib/e621/types";
-import { REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
+import { favoritesTags, REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
 import { dateMetatag } from "@/lib/query/date";
 import { BREADTH_MAX, BREADTH_MIN, ORDER_LABELS, randomSeed, STYLE_LABELS, type Order, type PlaybackSettings, type SearchSettings, type SlideStyle } from "@/lib/settings";
 import { storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
@@ -199,7 +199,7 @@ function Segmented<T extends string>({
   label,
 }: {
   value: T;
-  options: { id: T; label: string }[];
+  options: { id: T; label: string; icon?: ReactNode; testId?: string }[];
   onChange: (v: T) => void;
   label: string;
 }) {
@@ -214,14 +214,49 @@ function Segmented<T extends string>({
             role="radio"
             aria-checked={value === o.id}
             onClick={() => onChange(o.id)}
-            className={`rounded px-2.5 py-1 text-xs ${
+            data-testid={o.testId}
+            className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs ${
               value === o.id ? "bg-accent font-semibold text-black" : "text-neutral-300 hover:text-white"
             }`}
           >
+            {o.icon}
             {o.label}
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function OrderRow({ s, setS }: { s: SearchSettings; setS: (patch: Partial<SearchSettings>) => void }) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <label className="text-neutral-300" htmlFor="order">
+        Order
+      </label>
+      <select
+        id="order"
+        value={s.order}
+        onChange={(e) => setS({ order: e.target.value as Order })}
+        className={`${field} flex-1`}
+        data-testid="order-select"
+      >
+        {(Object.keys(ORDER_LABELS) as Order[]).map((o) => (
+          <option key={o} value={o}>
+            {ORDER_LABELS[o]}
+          </option>
+        ))}
+      </select>
+      {s.order === "random" && (
+        <button
+          type="button"
+          onClick={() => setS({ seed: randomSeed() })}
+          className="flex items-center gap-1 rounded-md border border-line px-2 py-1.5 text-xs hover:border-neutral-400"
+          title="New random order"
+        >
+          <Dices className="size-4" aria-hidden /> Reshuffle
+        </button>
+      )}
     </div>
   );
 }
@@ -832,10 +867,37 @@ export default function SettingsPanel(props: SettingsPanelProps) {
               onChange={(source) => setS({ source })}
               options={[
                 { id: "search", label: "Search" },
+                // Only a signed-in user has favorites to play; keep it visible if it's
+                // already picked so the sign-in check on load doesn't hide the choice.
+                ...(props.user || s.source === "favorites"
+                  ? [
+                      {
+                        id: "favorites" as const,
+                        label: "Favs",
+                        icon: <Heart className="size-3.5" fill="currentColor" aria-hidden />,
+                        testId: "source-favorites",
+                      },
+                    ]
+                  : []),
                 { id: "recommended", label: "Recommended" },
               ]}
             />
-            {s.source === "recommended" ? (
+            {s.source === "favorites" ? (
+              <>
+                <p className="text-xs text-neutral-400" data-testid="favorites-note">
+                  {props.user ? (
+                    <>
+                      Plays {props.user.name}&apos;s favorites (
+                      <code className="text-neutral-300">{favoritesTags(props.user.name)}</code>), with the filters
+                      below.
+                    </>
+                  ) : (
+                    <>Sign in under Account to play your favorites.</>
+                  )}
+                </p>
+                <OrderRow s={s} setS={setS} />
+              </>
+            ) : s.source === "recommended" ? (
               <RecommendedPanel
                 search={s}
                 setS={setS}
@@ -862,34 +924,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                   onSubmit={onPlay}
                   testId="search-input"
                 />
-                <div className="flex items-center gap-2 text-sm">
-                  <label className="text-neutral-300" htmlFor="order">
-                    Order
-                  </label>
-                  <select
-                    id="order"
-                    value={s.order}
-                    onChange={(e) => setS({ order: e.target.value as Order })}
-                    className={`${field} flex-1`}
-                    data-testid="order-select"
-                  >
-                    {(Object.keys(ORDER_LABELS) as Order[]).map((o) => (
-                      <option key={o} value={o}>
-                        {ORDER_LABELS[o]}
-                      </option>
-                    ))}
-                  </select>
-                  {s.order === "random" && (
-                    <button
-                      type="button"
-                      onClick={() => setS({ seed: randomSeed() })}
-                      className="flex items-center gap-1 rounded-md border border-line px-2 py-1.5 text-xs hover:border-neutral-400"
-                      title="New random order"
-                    >
-                      <Dices className="size-4" aria-hidden /> Reshuffle
-                    </button>
-                  )}
-                </div>
+                <OrderRow s={s} setS={setS} />
               </>
             )}
             <Subsection title="Filters" testId="subsection-filters" collapse={collapse("filters", filtersSummary(s))}>
