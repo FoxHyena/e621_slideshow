@@ -38,15 +38,190 @@ body {
   }
 }
 
-/* Show only if still present after a beat, so fast loads don't flash a spinner. */
-@keyframes appear {
+/* ---- loader (Loader.tsx) ----------------------------------------------- */
+
+/* Settles in after a beat (--loader-delay), so quick loads never flash it. */
+@keyframes loader-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.loader-in {
+  opacity: 0;
+  animation: loader-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--loader-delay, 150ms) forwards;
+}
+
+/* The incoming icon springs up past its size and settles; the outgoing one tumbles away. */
+@keyframes orb-icon-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.4) rotate(-20deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.12) rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes orb-icon-out {
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.5) rotate(15deg);
+  }
+}
+.orb-icon-in {
+  animation: orb-icon-in 520ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.orb-icon-out {
+  animation: orb-icon-out 220ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+/* An idle hop with a little squash on landing, so a long single phase still feels alive. */
+@keyframes orb-hop {
+  0%,
+  72%,
+  100% {
+    transform: none;
+  }
+  80% {
+    transform: translateY(-4px) scaleY(1.05);
+  }
+  88% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  94% {
+    transform: none;
+  }
+}
+.orb-hop {
+  animation: orb-hop 2.2s ease-in-out infinite;
+}
+
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orb-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: orb-spin 1.1s linear infinite;
+}
+.orb-arc {
+  transition: stroke-dashoffset 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.orb-arc-glow {
+  filter: drop-shadow(0 0 4px rgb(252 179 40 / 0.5));
+}
+
+/* Each new phase lands with a pop of the ring. */
+@keyframes orb-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.orb-pop {
+  animation: orb-pop 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes orb-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+.orb-glow {
+  animation: orb-glow 2.4s ease-in-out infinite;
+}
+
+/* Checklist: a finished step's tick pops in; the running one breathes. */
+@keyframes check-pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.check-pop {
+  animation: check-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes step-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(252 179 40 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgb(252 179 40 / 0);
+  }
+}
+.step-pulse {
+  animation: step-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
   to {
     opacity: 1;
   }
 }
-.delayed-show {
-  opacity: 0;
-  animation: appear 150ms ease 600ms forwards;
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb-hop,
+  .orb-glow,
+  .orb-pop,
+  .check-pop,
+  .step-pulse {
+    animation: none;
+  }
+  .orb-icon-in {
+    animation: fade-in 200ms ease both;
+  }
+  .orb-icon-out {
+    animation: fade-out 150ms ease forwards;
+  }
+  .orb-spin {
+    animation: breathe 1.6s ease-in-out infinite;
+  }
+  .orb-arc {
+    transition: none;
+  }
+  .loader-in {
+    animation-name: fade-in;
+  }
 }
 
 /* ---- slideshow styles -------------------------------------------------- */

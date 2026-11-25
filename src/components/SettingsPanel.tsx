@@ -10,6 +10,7 @@ import { BREADTH_MAX, BREADTH_MIN, ORDER_LABELS, randomSeed, STYLE_LABELS, type 
 import { storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import DatePanel from "./DatePanel";
+import { InlineLoader, stepText } from "./Loader";
 import type { PlannedSearch, SearchKind } from "@/lib/recommend/weights";
 import TagInput from "./TagInput";
 import type { Recommendations } from "./useRecommendations";
@@ -395,9 +396,7 @@ function RecommendedPanel({
       <div className="flex items-center justify-between gap-2 text-xs text-neutral-400">
         <span data-testid="rec-status" aria-live="polite">
           {rec.syncing ? (
-            <span className="flex items-center gap-1.5">
-              <Loader2 className="size-3 animate-spin" aria-hidden /> {rec.progress ?? "Syncing favorites…"}
-            </span>
+            <InlineLoader label={rec.step ? stepText(rec.step) : "Syncing favorites…"} size="xs" />
           ) : profile ? (
             `${profile.favIds.length.toLocaleString()} favorites · synced ${new Date(profile.syncedAt).toLocaleTimeString([], {
               hour: "numeric",

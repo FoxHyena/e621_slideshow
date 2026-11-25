@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ExternalLink, Heart, ImageOff, LayoutGrid, Loader2, Play, Search, X } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ExternalLink, Heart, ImageOff, LayoutGrid, Play, Search, X } from "lucide-react";
 import { postPageUrl } from "@/lib/e621/client";
 import { mediaKind, TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
 import type { PlaybackSettings } from "@/lib/settings";
 import { displayUrl } from "@/lib/slideshow/media";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import Avatar from "./Avatar";
+import { InlineLoader } from "./Loader";
 import { TagActionsOverlay, TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
 
 interface FeedProps {
   posts: Post[];
   currentIndex: number;
   loading: boolean;
+  /** shown in place of the results while the first ones are on their way */
+  loader?: ReactNode;
   exhausted: boolean;
   error: string | null;
   stats: QueueStats;
@@ -458,8 +461,10 @@ export default function Feed(props: FeedProps) {
               Retry
             </button>
           </div>
+        ) : loading && posts.length === 0 && props.loader ? (
+          <div className="flex min-h-[60vh] items-center justify-center">{props.loader}</div>
         ) : loading ? (
-          <Loader2 className="size-8 animate-spin text-neutral-500" aria-label="Loading" />
+          <InlineLoader label="Loading more…" />
         ) : exhausted && posts.length === 0 ? (
           <p className="text-lg text-neutral-300" data-testid="feed-empty">
             No posts found.

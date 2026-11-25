@@ -91,17 +91,23 @@ export async function refreshNegatives(
   let done = 0;
   for (const { query, pages } of NEG_QUERIES) {
     for (let page = 1; page <= pages; page++) {
-      onProgress(`Sampling e621 to compare against… ${++done}/${total}`);
+      onProgress({ phase: "sample", done, total });
       const batch = await search(query, page, NEG_PAGE_SIZE);
+      done++;
       for (const p of batch) {
         if (seen.has(p.id)) continue;
         seen.add(p.id);
         ids.push(p.id);
         feats.push(features(p));
       }
-      if (batch.length < NEG_PAGE_SIZE) break;
+      if (batch.length < NEG_PAGE_SIZE) {
+        // A short page ends this query early: its unused pages won't be fetched.
+        done += pages - page;
+        break;
+      }
     }
   }
+  onProgress({ phase: "sample", done: total, total });
   return { at: now, ids, feats };
 }
 
@@ -117,13 +123,16 @@ export async function fitLearned(
   favs: FavFeatures,
   negatives: Negatives,
   isCancelled: () => boolean = () => false,
+  onProgress: Progress = () => {},
 ): Promise<Learned | null> {
   const key = favKey(profile);
   if (stored && stored.favKey === key && stored.negAt === negatives.at) return stored;
   const positives = profile.favIds.flatMap((id) => (favs.feats[id] ? [favs.feats[id]] : []));
   const mine = new Set(profile.favIds);
   const others = negatives.feats.filter((_, i) => !mine.has(negatives.ids[i]));
-  const w = await learnWeightsAsync(positives, others, {}, isCancelled);
+  const w = await learnWeightsAsync(positives, others, {}, isCancelled, (done, total) =>
+    onProgress({ phase: "learn", done, total }),
+  );
   return w && { favKey: key, negAt: negatives.at, weights: [...w] };
 }
 

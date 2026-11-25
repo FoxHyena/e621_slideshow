@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { GalleryVerticalEnd, ImageOff, Loader2, Play, Search, X } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { GalleryVerticalEnd, ImageOff, Play, Search, X } from "lucide-react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import type { QueueStats } from "@/lib/slideshow/queue";
+import { InlineLoader } from "./Loader";
 
 interface GalleryProps {
   posts: Post[];
   currentIndex: number;
   loading: boolean;
+  /** shown in place of the results while the first ones are on their way */
+  loader?: ReactNode;
   exhausted: boolean;
   error: string | null;
   stats: QueueStats;
@@ -186,8 +189,10 @@ export default function Gallery(props: GalleryProps) {
               Retry
             </button>
           </div>
+        ) : loading && posts.length === 0 && props.loader ? (
+          <div className="flex min-h-[60vh] items-center justify-center">{props.loader}</div>
         ) : loading ? (
-          <Loader2 className="size-8 animate-spin text-neutral-500" aria-label="Loading" />
+          <InlineLoader label="Loading more…" />
         ) : exhausted && posts.length === 0 ? (
           <p className="text-lg text-neutral-300" data-testid="gallery-empty">
             No posts found.

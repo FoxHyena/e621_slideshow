@@ -931,7 +931,8 @@ test("recommended ORs the profile tags into one paged search and starts once it'
 
   await page.getByTestId("play-button").click();
   const progress = page.getByTestId("search-progress");
-  await expect(progress).toContainText("Searching · page 3");
+  await expect(progress).toContainText(/\d+ matches so far/); // pages 1 and 2 in, page 3 on its way
+  await expect(page.getByTestId("loader-steps")).toContainText("Find and rank posts");
   await expect(slide(page)).toHaveCount(0); // nothing plays until every page is in and ranked
   const rec = () => mock.searches.filter((s) => s.tags.startsWith("~"));
   await expect.poll(() => rec().map((s) => s.page)).toEqual(["1", "2", "3"]);
@@ -940,6 +941,26 @@ test("recommended ORs the profile tags into one paged search and starts once it'
   await expect(slide(page)).toBeVisible({ timeout: 10_000 });
   await expect(progress).toBeHidden();
   await expect(page.getByTestId("counter")).toHaveText("1 / 720"); // complete: no "+"
+});
+
+test("recommended can start during the first read of the favorites, and shows each step", async ({ page }) => {
+  const mock = await mockE621(page, Array.from({ length: 30 }, (_, i) => ({ id: 5000 - i, tags: ["pawpads"] })));
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads", "toebeans"] })));
+  mock.tagCounts = { pawpads: 5, toebeans: 5 };
+  mock.favoritesDelay = 2500;
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-status")).toContainText("Reading your favorites");
+  await page.getByTestId("play-button").click();
+
+  const sync = page.getByTestId("rec-sync-progress");
+  await expect(sync).toContainText("Reading your favorites");
+  await expect(page.getByTestId("loader-steps")).toContainText("Learn your taste");
+  await expect(page.getByTestId("toast")).toBeHidden(); // waits instead of refusing
+
+  await expect(slide(page)).toBeVisible({ timeout: 15_000 });
+  await expect(sync).toBeHidden();
 });
 
 test("the profile list shows every weighted tag in a scrollable box", async ({ page }) => {

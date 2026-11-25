@@ -22,6 +22,11 @@ export interface SearchProgress {
   done: number;
   /** distinct posts that matched the profile so far */
   found: number;
+  /** most pages the search can take: it usually ends sooner, on a short page */
+  max: number;
+  /** when the search started, and when the last page arrived (ms), for the time estimate */
+  startedAt: number;
+  at: number;
 }
 
 /** What the app drives a slideshow source through. */

@@ -72,6 +72,8 @@ export interface E621Mock {
   filterPositive: boolean;
   /** artificial latency for a /posts.json request, in ms */
   searchDelay: (tags: string, page: number) => number;
+  /** ms each GET /favorites.json waits before answering */
+  favoritesDelay: number;
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -98,6 +100,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     favoritePages: [],
     filterPositive: false,
     searchDelay: () => 0,
+    favoritesDelay: 0,
   };
 
   const json = (route: Route, body: unknown, status = 200) =>
@@ -173,6 +176,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const n = Number(url.searchParams.get("page") ?? 1);
       const limit = Number(url.searchParams.get("limit") ?? 75);
       state.favoritePages.push(n);
+      if (state.favoritesDelay) await new Promise((r) => setTimeout(r, state.favoritesDelay));
       return postList(state.favPosts.slice((n - 1) * limit, n * limit));
     }
 

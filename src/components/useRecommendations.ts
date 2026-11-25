@@ -15,6 +15,7 @@ import {
   type Learned,
   type Negatives,
 } from "@/lib/recommend/model";
+import { stamp, type Step } from "@/lib/progress";
 import type { Profile } from "@/lib/recommend/profile";
 import { countsOf, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "@/lib/recommend/sync";
 import { computeWeights, NO_OVERRIDES, type Overrides } from "@/lib/recommend/weights";
@@ -27,8 +28,8 @@ export interface Recommendations {
   learned: Map<string, number> | null;
   overrides: Overrides;
   syncing: boolean;
-  /** what a running sync is doing, for the status line */
-  progress: string | null;
+  /** what a running sync is doing, and how far along it is */
+  step: Step | null;
   error: string | null;
   /** changes whenever ranking inputs do, so a running show knows it's stale */
   signature: string;
@@ -77,7 +78,7 @@ export function useRecommendations(
   const overrides = (edited?.name === name ? edited?.o : storedOverrides) ?? NO_OVERRIDES;
 
   const [syncing, setSyncing] = useState(false);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [step, setStep] = useState<Step | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [run, setRun] = useState(0);
   const fullRebuild = useRef(false);
@@ -90,8 +91,8 @@ export function useRecommendations(
     if (!name || userId === null || !creds) return;
     let cancelled = false;
     const api = recApi(userId, creds);
-    const onProgress = (msg: string) => {
-      if (!cancelled) setProgress(msg);
+    const onProgress = (next: Step) => {
+      if (!cancelled) setStep((prev) => stamp(prev, next, Date.now()));
     };
     const rebuild = fullRebuild.current;
     fullRebuild.current = false;
@@ -99,6 +100,7 @@ export function useRecommendations(
     void (async () => {
       setSyncing(true);
       setError(null);
+      onProgress({ phase: "favorites" });
       try {
         // The learned ranking needs each favorite's tags, which older profiles never kept:
         // read every favorite once to fill them in.
@@ -124,8 +126,15 @@ export function useRecommendations(
             const search = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds);
             const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), search, Date.now(), onProgress);
             await bigStorage.set(NEG_KEY, neg);
-            onProgress("Learning your taste…");
-            const l = await fitLearned(await bigStorage.get<Learned>(learnedKey(name)), p, feats, neg, () => cancelled);
+            onProgress({ phase: "learn", done: 0 });
+            const l = await fitLearned(
+              await bigStorage.get<Learned>(learnedKey(name)),
+              p,
+              feats,
+              neg,
+              () => cancelled,
+              onProgress,
+            );
             if (cancelled || !l) return;
             setFit(l);
             await bigStorage.set(learnedKey(name), l);
@@ -139,7 +148,7 @@ export function useRecommendations(
       } finally {
         if (!cancelled) {
           setSyncing(false);
-          setProgress(null);
+          setStep(null);
         }
       }
     })();
@@ -181,7 +190,7 @@ export function useRecommendations(
     learned,
     overrides,
     syncing,
-    progress,
+    step,
     error,
     signature: JSON.stringify([profile?.favIds.length ?? 0, profile?.favIds[0] ?? null, overrides, current?.negAt ?? null]),
     rebuild: () => {
