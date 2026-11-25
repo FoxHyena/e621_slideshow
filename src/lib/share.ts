@@ -156,29 +156,19 @@ export function decodeShareCreds(hash: string): Credentials | null {
 }
 
 /**
- * A launch link (`?tags=wolf+solo`, `?mode=recommended`) is how the userscript
- * hands a search over from e621. Unlike a share link it's the visitor's own
- * launch, so it changes only what it names and the rest of their saved
- * settings stay.
+ * A launch link (`?tags=wolf+solo`) is how the userscript hands an e621 search
+ * over. The slideshow plays it with default filters, so it shows what e621 did.
  */
-export interface Launch {
-  /** play these tags (a search) */
-  tags?: string;
-  /** play Recommended from the visitor's own favorites */
-  recommended?: boolean;
-}
 
 /** Longer than any real query; keeps a hostile URL from filling the tag box. */
 const MAX_LAUNCH_TAGS = 2000;
 
-/** The launch a URL asks for, or null if it isn't a launch link (share links included). */
-export function decodeLaunch(params: URLSearchParams): Launch | null {
+/** The tags a launch link asks for, or null if it isn't one (share links included). */
+export function decodeLaunch(params: URLSearchParams): string | null {
   if (params.has("v")) return null;
-  if (params.get("mode") === "recommended") return { recommended: true };
   const raw = params.get("tags");
   if (raw === null) return null;
   // e621's search box separates tags with any whitespace; keep one space.
   const tags = raw.trim().split(/\s+/).filter(Boolean).join(" ");
-  if (!tags || tags.length > MAX_LAUNCH_TAGS) return null;
-  return { tags };
+  return tags && tags.length <= MAX_LAUNCH_TAGS ? tags : null;
 }
