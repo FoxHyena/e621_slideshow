@@ -53,10 +53,17 @@ Recommended plays from your favorites (sign in on the slideshow site first).
      [Tampermonkey](https://www.tampermonkey.net/)
    - Safari (Mac, iPhone, iPad): the free **Userscripts** app from the App Store, then turn it on in
      Safari → Settings → Extensions
-2. Open <https://e621.cumdump.dog/e621-slideshow.user.js>. The manager shows an install page.
-3. Click **Install**, then reload any e621 page.
+2. **Chrome, Edge, Brave only:** let the manager run scripts. Open `chrome://extensions`, click
+   **Details** on Violentmonkey/Tampermonkey, and turn on **Allow User Scripts**. (Older versions
+   have no such toggle: turn on **Developer mode** at the top right of the Extensions page instead.)
+   Without this the script installs but never runs.
+3. Open <https://e621.cumdump.dog/e621-slideshow.user.js>. The manager shows an install page.
+4. Click **Install**, then reload any e621 page.
 
 The manager checks that same URL for updates.
+
+**No buttons?** Click the manager's toolbar icon on an e621 page. The script should be listed and
+switched on. If the list is empty, recheck step 2 and that the manager is allowed on e621.net.
 
 ### Developing it
 
