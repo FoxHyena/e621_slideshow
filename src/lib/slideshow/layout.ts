@@ -17,7 +17,8 @@ const spread = (id: number, salt: number, max: number) => (rand(id, salt) * 2 - 
 
 /** Width / height, from whichever dimensions the post has. */
 export function aspectOf(post: Post): number {
-  const { width, height } = post.file.width && post.file.height ? post.file : post.sample;
+  const { original, sample } = post.files;
+  const { width, height } = original.width && original.height ? original : sample;
   return width > 0 && height > 0 ? width / height : 1;
 }
 

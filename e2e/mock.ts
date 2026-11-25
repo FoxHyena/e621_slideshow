@@ -24,28 +24,28 @@ export interface MockPostSpec {
 export function mockPost(spec: MockPostSpec) {
   const ext = spec.ext ?? "png";
   const url = spec.hidden ? null : `https://static1.e621.net/data/mock/${spec.id}.${ext}`;
+  const sample = spec.hidden ? null : `https://static1.e621.net/data/sample/mock/${spec.id}.jpg`;
+  // e621's posts format since 2026-11-18, `mode=extended` (tags grouped by category)
   return {
     id: spec.id,
     created_at: "2024-05-01T12:00:00.000-04:00",
-    file: { width: 64, height: 48, ext, size: 1000, md5: `md5${spec.id}`, url },
-    preview: { width: 64, height: 48, url },
-    sample: {
-      has: true,
-      width: 64,
-      height: 48,
-      url: spec.hidden ? null : `https://static1.e621.net/data/sample/mock/${spec.id}.jpg`,
-      alternates: {},
+    files: {
+      meta: { md5: `md5${spec.id}`, ext, size: 1000, duration: spec.duration ?? null, has_sample: true },
+      original: { width: 64, height: 48, url },
+      preview: { width: 64, height: 48, jpg: url, webp: null },
+      sample: { width: 64, height: 48, jpg: sample, webp: null },
     },
-    score: { up: 5, down: 1, total: 4 },
+    stats: {
+      score: { up: 5, down: 1, total: 4 },
+      fav_count: 3,
+      is_favorited: spec.is_favorited ?? false,
+    },
     tags: { general: spec.tags ?? ["solo"], artist: ["mock_artist"], species: ["wolf"] },
     rating: spec.rating ?? "s",
-    fav_count: 3,
-    is_favorited: spec.is_favorited ?? false,
     uploader_id: 1,
     uploader_name: "uploader",
     pools: [],
     sources: [],
-    duration: spec.duration ?? null,
     flags: { deleted: false, pending: false, flagged: false },
   };
 }
@@ -109,12 +109,19 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     const url = new URL(req.url());
     const auth = req.headers()["authorization"] ?? null;
 
+    // Like e621: a bare array of posts, with tags grouped by category only in `mode=extended`.
+    const postList = (list: ReturnType<typeof mockPost>[]) =>
+      json(
+        route,
+        url.searchParams.get("mode") === "extended" ? list : list.map((p) => ({ ...p, tags: Object.values(p.tags).flat() })),
+      );
+
     if (url.pathname === "/posts.json") {
       const tags = url.searchParams.get("tags") ?? "";
       const pageParam = url.searchParams.get("page");
       const limit = Number(url.searchParams.get("limit") ?? 75);
       state.searches.push({ tags, page: pageParam, auth });
-      if (tags.includes("nothing_matches")) return json(route, { posts: [] });
+      if (tags.includes("nothing_matches")) return postList([]);
       if (tags.includes("server_error")) return json(route, { success: false, message: "Mock search failure" }, 422);
       let list = state.posts;
       // honour simple negations so blacklist-in-query behaves like e621
@@ -133,10 +140,10 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       if (pageParam?.startsWith("b")) {
         const before = Number(pageParam.slice(1));
         list = list.filter((p) => p.id < before);
-        return json(route, { posts: list.slice(0, limit) });
+        return postList(list.slice(0, limit));
       }
       const n = Number(pageParam ?? 1);
-      return json(route, { posts: list.slice((n - 1) * limit, n * limit) });
+      return postList(list.slice((n - 1) * limit, n * limit));
     }
 
     if (url.pathname === "/tags/autocomplete.json") {
@@ -164,7 +171,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const n = Number(url.searchParams.get("page") ?? 1);
       const limit = Number(url.searchParams.get("limit") ?? 75);
       state.favoritePages.push(n);
-      return json(route, { posts: state.favPosts.slice((n - 1) * limit, n * limit) });
+      return postList(state.favPosts.slice((n - 1) * limit, n * limit));
     }
 
     if (url.pathname === "/tags.json") {

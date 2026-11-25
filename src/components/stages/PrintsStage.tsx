@@ -25,7 +25,7 @@ function pickBackground(post: Post, trail: Post[], upcoming: Post[]): Post[] {
   const skip = new Set([post.id]);
   const pool: Post[] = [];
   for (const p of [...trail.slice(0, 6), ...upcoming.slice(1, 12)]) {
-    if (skip.has(p.id) || !(p.sample.url ?? p.preview.url)) continue;
+    if (skip.has(p.id) || !(p.files.sample.jpg ?? p.files.preview.jpg)) continue;
     skip.add(p.id);
     pool.push(p);
   }
@@ -100,7 +100,7 @@ function SceneLayer({
           return (
             <Frame key={i} {...s} aspect={aspectOf(p)} className="prints-bg" testId="prints-bg" postId={p.id}>
               {/* eslint-disable-next-line @next/next/no-img-element -- remote CDN media */}
-              <img src={p.sample.url ?? p.preview.url ?? undefined} alt="" draggable={false} className="h-full w-full object-cover select-none" />
+              <img src={p.files.sample.jpg ?? p.files.preview.jpg ?? undefined} alt="" draggable={false} className="h-full w-full object-cover select-none" />
             </Frame>
           );
         })}

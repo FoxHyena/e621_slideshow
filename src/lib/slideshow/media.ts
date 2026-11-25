@@ -15,21 +15,21 @@ function canPlayWebm(): boolean {
 export function displayUrl(post: Post, quality: PlaybackSettings["quality"]): string | null {
   const kind = mediaKind(post);
   if (kind === "video") {
-    const alt = post.sample.alternates;
+    const alt = post.files.video;
     if (quality === "sample") {
       const s = alt?.samples?.["720p"]?.url ?? alt?.samples?.["480p"]?.url;
       if (s) return s;
     }
-    if (post.file.ext === "webm" && !canPlayWebm()) {
-      return alt?.variants?.mp4?.url ?? post.file.url;
+    if (post.files.meta.ext === "webm" && !canPlayWebm()) {
+      return alt?.variants?.mp4?.url ?? post.files.original.url;
     }
-    return post.file.url;
+    return post.files.original.url;
   }
   // Samples of GIFs are static JPGs; always use the original for animation.
-  if (kind === "image" && quality === "sample" && post.sample.has && post.sample.url) {
-    return post.sample.url;
+  if (kind === "image" && quality === "sample" && post.files.meta.has_sample && post.files.sample.jpg) {
+    return post.files.sample.jpg;
   }
-  return post.file.url;
+  return post.files.original.url;
 }
 
 /**

@@ -56,7 +56,7 @@ export interface PostFilter {
 export function acceptPost(post: Post, f: PostFilter): boolean {
   if (f.seen.has(post.id)) return false;
   f.seen.add(post.id);
-  if (!post.file.url) {
+  if (!post.files.original.url) {
     f.stats.hidden++;
     return false;
   }

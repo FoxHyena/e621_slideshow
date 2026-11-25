@@ -89,6 +89,19 @@ async function request<T>(path: string, opts: RequestOpts): Promise<T> {
   });
 }
 
+/**
+ * Posts and favorites come back as a bare array (e621's format since 2026-11-18).
+ * `extended` keeps tags grouped by category, which tag colors, the blacklist's
+ * category metatags, and recommendation weights all need.
+ */
+const POSTS_FORMAT = { mode: "extended" } as const;
+
+/** A post list, or an error: an unexpected shape must not read as "no results". */
+function postList(res: unknown): Post[] {
+  if (Array.isArray(res)) return res as Post[];
+  throw new E621Error("e621 sent posts in a format this app doesn't understand", 200);
+}
+
 export async function searchPosts(
   tags: string,
   page: string | number,
@@ -96,12 +109,12 @@ export async function searchPosts(
   creds: Credentials | null,
   signal?: AbortSignal,
 ): Promise<Post[]> {
-  const res = await request<{ posts: Post[] }>("/posts.json", {
-    params: { tags, page, limit },
+  const res = await request<unknown>("/posts.json", {
+    params: { tags, page, limit, ...POSTS_FORMAT },
     creds,
     signal,
   });
-  return res.posts ?? [];
+  return postList(res);
 }
 
 export async function autocompleteTags(
@@ -132,11 +145,11 @@ export async function getFavorites(
   limit: number,
   creds: Credentials | null,
 ): Promise<Post[]> {
-  const res = await request<{ posts: Post[] }>("/favorites.json", {
-    params: { user_id: userId, page, limit },
+  const res = await request<unknown>("/favorites.json", {
+    params: { user_id: userId, page, limit, ...POSTS_FORMAT },
     creds,
   });
-  return res.posts ?? [];
+  return postList(res);
 }
 
 /** Post counts for exact tag names. Names e621 doesn't know are simply absent. */

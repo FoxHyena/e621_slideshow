@@ -118,19 +118,19 @@ export function termMatches(
       case "rating":
         return RATING_ALIASES[arg] !== undefined && post.rating === RATING_ALIASES[arg];
       case "type":
-        return post.file.ext === arg;
+        return post.files.meta.ext === arg;
       case "id":
         return num(post.id);
       case "score":
-        return num(post.score.total);
+        return num(post.stats.score.total);
       case "favcount":
-        return num(post.fav_count);
+        return num(post.stats.fav_count);
       case "width":
-        return num(post.file.width);
+        return num(post.files.original.width);
       case "height":
-        return num(post.file.height);
+        return num(post.files.original.height);
       case "filesize":
-        return num(post.file.size, parseFileSize);
+        return num(post.files.meta.size, parseFileSize);
       case "tagcount":
         return num(tagSet.size);
       case "status":
@@ -147,7 +147,7 @@ export function termMatches(
       case "pool":
         return (post.pools ?? []).map(String).includes(arg);
       case "fav":
-        return arg === "me" || (ctx.username ?? "").toLowerCase() === arg ? post.is_favorited : false;
+        return arg === "me" || (ctx.username ?? "").toLowerCase() === arg ? post.stats.is_favorited : false;
       default:
         // Unknown metatag: treat as a literal tag (e.g. tags containing colons).
         break;
