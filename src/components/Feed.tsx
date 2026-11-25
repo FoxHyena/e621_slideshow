@@ -9,6 +9,7 @@ import { displayUrl } from "@/lib/slideshow/media";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import Avatar from "./Avatar";
 import { InlineLoader } from "./Loader";
+import { useShown } from "./useShown";
 import { TagActionsOverlay, TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
 
 interface FeedProps {
@@ -273,6 +274,9 @@ function isTyping(target: EventTarget | null) {
   return el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName);
 }
 
+/** Cards rendered per step as the feed scrolls (see useShown). */
+const FEED_PAGE = 20;
+
 export default function Feed(props: FeedProps) {
   const { posts, currentIndex, loading, exhausted, error, stats, onNeedMore, onFavorite, onPlayFrom } = props;
   const sentinel = useRef<HTMLDivElement>(null);
@@ -280,19 +284,22 @@ export default function Feed(props: FeedProps) {
   const [active, setActive] = useState(currentIndex);
   const [now] = useState(() => Date.now());
   const hold = useTagHold(props.onTag);
+  const shown = useShown(posts.length, currentIndex, FEED_PAGE);
+  const { more, showMore } = shown;
 
-  // Load more whenever the bottom comes within reach.
+  // Render (or load) more whenever the bottom comes within reach.
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
-    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && onNeedMore(), {
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && (more ? showMore() : onNeedMore()), {
       root: scroller.current,
       rootMargin: "1500px",
     });
     io.observe(el);
     return () => io.disconnect();
     // A new page can leave the sentinel still in view; re-observing re-fires it.
-  }, [onNeedMore, posts.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- showMore only bumps a counter
+  }, [onNeedMore, posts.length, shown.count, more]);
 
   // The post in view is the one crossing the middle of the screen.
   useEffect(() => {
@@ -308,7 +315,7 @@ export default function Feed(props: FeedProps) {
     );
     root.querySelectorAll("[data-testid=feed-card]").forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [posts.length]);
+  }, [shown.count]);
 
   // Reopen exactly where the feed was left, else on the post the show is at (mount only).
   useEffect(() => {
@@ -437,7 +444,7 @@ export default function Feed(props: FeedProps) {
       </header>
 
       <div className="mx-auto flex max-w-xl flex-col gap-3 py-3 sm:gap-5 sm:px-3 sm:py-5">
-        {posts.map((p, i) => (
+        {posts.slice(0, shown.count).map((p, i) => (
           <FeedCard
             key={p.id}
             post={p}
@@ -463,7 +470,7 @@ export default function Feed(props: FeedProps) {
           </div>
         ) : loading && posts.length === 0 && props.loader ? (
           <div className="flex min-h-[60vh] items-center justify-center">{props.loader}</div>
-        ) : loading ? (
+        ) : loading || more ? (
           <InlineLoader label="Loading more…" />
         ) : exhausted && posts.length === 0 ? (
           <p className="text-lg text-neutral-300" data-testid="feed-empty">
