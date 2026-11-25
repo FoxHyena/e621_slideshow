@@ -7,6 +7,7 @@ import { mediaKind, TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from 
 import type { PlaybackSettings } from "@/lib/settings";
 import { displayUrl } from "@/lib/slideshow/media";
 import type { QueueStats } from "@/lib/slideshow/queue";
+import Avatar from "./Avatar";
 import { TagActionsOverlay, TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
 
 interface FeedProps {
@@ -180,12 +181,8 @@ function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite,
       data-post-id={post.id}
     >
       <header className="flex items-center gap-3 px-3 py-2.5">
-        <div
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/15 font-semibold uppercase text-accent"
-          aria-hidden
-        >
-          {(by[0] ?? "?").charAt(0)}
-        </div>
+        {/* e621 has no artist pictures: a pattern drawn from the artist's name (or the post, if none). */}
+        <Avatar seed={by[0] ?? `post:${post.id}`} className="size-10" />
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate font-semibold" style={{ color: by.length ? TAG_CATEGORY_COLORS.artist : undefined }}>
             {by.length ? by.map((a) => a.replaceAll("_", " ")).join(", ") : "unknown artist"}
