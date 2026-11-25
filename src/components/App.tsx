@@ -157,6 +157,10 @@ export default function App() {
   const [infoOpen, setInfoOpen] = useState(false);
   /** A browsable view of the results over the show: the grid, or the scrolling feed. */
   const [browse, setBrowse] = useState<"grid" | "feed" | null>(null);
+  /** Where the open grid or feed was opened from, so closing it goes back there. */
+  const browseFrom = useRef<"panel" | "show">("show");
+  /** The feed's last place (post in view and scroll offset), so closing it doesn't lose it. */
+  const feedPlace = useRef<{ serial: number; id: number; top: number } | null>(null);
   const [ready, setReady] = useState<{ id: number; durationSec?: number } | null>(null);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
@@ -300,6 +304,24 @@ export default function App() {
     return true;
   };
 
+  const goTo = (i: number) => {
+    const target = queue?.posts[i];
+    // Stepping back to the post just shown takes it off the trail instead of
+    // pushing the one we left, so prev/next don't pile up duplicates.
+    if (target && trail[0]?.id === target.id) setTrail(trail.slice(1));
+    else if (current) setTrail([current, ...trail.filter((p) => p.id !== current.id)].slice(0, TRAIL_MAX));
+    setIndex(i);
+    setReady(null);
+  };
+
+  /** Move the show to the post the feed was last on, so leaving the feed keeps the place. */
+  const syncFeedPlace = () => {
+    const place = feedPlace.current;
+    if (browse !== "feed" || !place || !active || place.serial !== active.serial) return;
+    const i = posts.findIndex((p) => p.id === place.id);
+    if (i >= 0 && i !== currentIndex) goTo(i);
+  };
+
   /** Why Recommended can't run yet, or null if it can. */
   const recBlocker = (): string | null => {
     if (!user || !creds) return "Sign in to get recommendations from your favorites";
@@ -332,7 +354,8 @@ export default function App() {
       showToast(`Too many tags: e621 allows ${tagLimit}`);
       return false;
     }
-    startQueue(s);
+    // The same show resumes from where the feed was scrolled to; a new one starts over.
+    if (!startQueue(s) && resume) syncFeedPlace();
     setPanelOpen(false);
     // Focus left inside the (now inert) panel would swallow keyboard shortcuts.
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
@@ -345,7 +368,9 @@ export default function App() {
 
   /** Browse the current search (grid or scrolling feed) instead of starting the show. */
   const openPreview = (view: "grid" | "feed") => {
-    if (apply(false)) setBrowse(view);
+    if (!apply(false)) return;
+    browseFrom.current = "panel";
+    setBrowse(view);
   };
 
   const onSynced = useEffectEvent(() => {
@@ -398,14 +423,20 @@ export default function App() {
   const playLabel = !active ? "Play" : active.key !== pendingKey ? "Play new search" : "Resume";
 
   // ---- navigation ---------------------------------------------------------
-  const goTo = (i: number) => {
-    const target = queue?.posts[i];
-    // Stepping back to the post just shown takes it off the trail instead of
-    // pushing the one we left, so prev/next don't pile up duplicates.
-    if (target && trail[0]?.id === target.id) setTrail(trail.slice(1));
-    else if (current) setTrail([current, ...trail.filter((p) => p.id !== current.id)].slice(0, TRAIL_MAX));
-    setIndex(i);
-    setReady(null);
+  /** Open the grid or feed over the show. */
+  const openBrowse = (view: "grid" | "feed") => {
+    if (!queue) return;
+    setInfoOpen(false);
+    syncFeedPlace();
+    if (!browsing) browseFrom.current = "show";
+    setBrowse(view);
+  };
+
+  /** Close the grid or feed, back to the settings panel or the show, whichever opened it. */
+  const closeBrowse = () => {
+    syncFeedPlace();
+    setBrowse(null);
+    if (browseFrom.current === "panel") setPanelOpen(true);
   };
 
   const next = async () => {
@@ -646,10 +677,13 @@ export default function App() {
     if (browsing) {
       // Leave arrows/space alone so they scroll the grid or feed.
       const key = e.key.toLowerCase();
-      if (key === "escape") setBrowse(null);
+      if (key === "escape") closeBrowse();
       // G / T switch between the grid and the feed, or close the one already open.
-      else if (key === "g") setBrowse(browse === "grid" ? null : "grid");
-      else if (key === "t") setBrowse(browse === "feed" ? null : "feed");
+      else if (key === "g" || key === "t") {
+        const view = key === "g" ? "grid" : "feed";
+        if (browse === view) closeBrowse();
+        else openBrowse(view);
+      }
       else if (key === "s") setPanelOpen(true);
       else return;
       e.preventDefault();
@@ -682,17 +716,11 @@ export default function App() {
         break;
       case "g":
       case "G":
-        if (queue) {
-          setInfoOpen(false);
-          setBrowse("grid");
-        }
+        openBrowse("grid");
         break;
       case "t":
       case "T":
-        if (queue) {
-          setInfoOpen(false);
-          setBrowse("feed");
-        }
+        openBrowse("feed");
         break;
       case "c":
       case "C":
@@ -888,8 +916,14 @@ export default function App() {
             queue.retry();
             needMore();
           }}
-          onClose={() => setBrowse(null)}
-          onGrid={() => setBrowse("grid")}
+          onClose={closeBrowse}
+          onGrid={() => openBrowse("grid")}
+          onEditSearch={() => setPanelOpen(true)}
+          savedScroll={() => {
+            const place = feedPlace.current;
+            return place?.serial === active.serial && place.id === current?.id ? place.top : null;
+          }}
+          onPlace={(id, top) => (feedPlace.current = { serial: active.serial, id, top })}
           recommended={isRec(search)}
           onTag={(tag, action) => (action === "search" ? searchTag(tag) : blacklistTag(tag))}
         />
@@ -911,8 +945,9 @@ export default function App() {
             queue.retry();
             needMore();
           }}
-          onClose={() => setBrowse(null)}
-          onFeed={() => setBrowse("feed")}
+          onClose={closeBrowse}
+          onFeed={() => openBrowse("feed")}
+          onEditSearch={() => setPanelOpen(true)}
           onPlay={() => pick(currentIndex)}
         />
       )}
@@ -960,10 +995,7 @@ export default function App() {
             <button
               type="button"
               className={iconBtn}
-              onClick={() => {
-                setInfoOpen(false);
-                setBrowse("grid");
-              }}
+              onClick={() => openBrowse("grid")}
               aria-label="Gallery"
               data-testid="gallery-button"
             >
@@ -974,10 +1006,7 @@ export default function App() {
             <button
               type="button"
               className={iconBtn}
-              onClick={() => {
-                setInfoOpen(false);
-                setBrowse("feed");
-              }}
+              onClick={() => openBrowse("feed")}
               aria-label="Scroll view"
               data-testid="feed-button"
             >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { GalleryVerticalEnd, ImageOff, Play, X } from "lucide-react";
+import { GalleryVerticalEnd, ImageOff, Play, Search, X } from "lucide-react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import { InlineLoader } from "./Loader";
@@ -24,6 +24,8 @@ interface GalleryProps {
   onClose: () => void;
   /** Switch to the scrolling feed. */
   onFeed: () => void;
+  /** Open the settings panel to change the search, keeping the grid underneath. */
+  onEditSearch: () => void;
   onPlay: () => void;
 }
 
@@ -134,6 +136,16 @@ export default function Gallery(props: GalleryProps) {
             </p>
           )}
         </div>
+        <button
+          type="button"
+          onClick={props.onEditSearch}
+          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+          aria-label="Edit search"
+          title="Edit search (S)"
+          data-testid="gallery-search"
+        >
+          <Search className="size-5" aria-hidden />
+        </button>
         <button
           type="button"
           onClick={props.onFeed}

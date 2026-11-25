@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ExternalLink, Heart, ImageOff, LayoutGrid, Play, X } from "lucide-react";
+import { ExternalLink, Heart, ImageOff, LayoutGrid, Play, Search, X } from "lucide-react";
 import { postPageUrl } from "@/lib/e621/client";
 import { mediaKind, TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
 import type { PlaybackSettings } from "@/lib/settings";
@@ -32,6 +32,12 @@ interface FeedProps {
   onRetry: () => void;
   onClose: () => void;
   onGrid: () => void;
+  /** Open the settings panel to change the search, keeping the feed underneath. */
+  onEditSearch: () => void;
+  /** The scroll offset to reopen at, if the feed is coming back to where it was left. */
+  savedScroll: () => number | null;
+  /** Where the feed is now: the post in view and the scroll offset. */
+  onPlace: (postId: number, scrollTop: number) => void;
   /** Recommended: the search target pins the tag instead. */
   recommended: boolean;
   /** A tag was dropped on (or tapped onto) one of its targets. */
@@ -304,11 +310,26 @@ export default function Feed(props: FeedProps) {
     return () => io.disconnect();
   }, [posts.length]);
 
-  // Open on the post the show is at (mount only).
+  // Reopen exactly where the feed was left, else on the post the show is at (mount only).
   useEffect(() => {
-    scroller.current?.querySelector<HTMLElement>(`[data-index="${currentIndex}"]`)?.scrollIntoView({ block: "start" });
+    const root = scroller.current;
+    if (!root) return;
+    const top = props.savedScroll();
+    if (top !== null) root.scrollTop = top;
+    else root.querySelector<HTMLElement>(`[data-index="${currentIndex}"]`)?.scrollIntoView({ block: "start" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Report the place as it changes, so closing the feed (or reopening it) keeps it.
+  const report = () => {
+    const post = posts[active];
+    if (post && scroller.current) props.onPlace(post.id, scroller.current.scrollTop);
+  };
+  const reportRef = useRef(report);
+  useEffect(() => {
+    reportRef.current = report;
+  });
+  useEffect(() => reportRef.current(), [active]);
 
   const scrollTo = (i: number) => {
     const el = scroller.current?.querySelector<HTMLElement>(`[data-index="${i}"]`);
@@ -353,7 +374,10 @@ export default function Feed(props: FeedProps) {
       ref={scroller}
       className="absolute inset-0 z-20 overflow-y-auto overscroll-contain bg-black"
       // Targets left open for a tap would drift off their tag as the feed moves.
-      onScroll={() => hold.held && !hold.held.dragging && hold.close()}
+      onScroll={() => {
+        if (hold.held && !hold.held.dragging) hold.close();
+        report();
+      }}
       data-testid="feed"
     >
       <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel/95 px-4 py-3 backdrop-blur">
@@ -373,6 +397,16 @@ export default function Feed(props: FeedProps) {
             </p>
           )}
         </div>
+        <button
+          type="button"
+          onClick={props.onEditSearch}
+          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+          aria-label="Edit search"
+          title="Edit search (S)"
+          data-testid="feed-search"
+        >
+          <Search className="size-5" aria-hidden />
+        </button>
         <button
           type="button"
           onClick={props.onGrid}
