@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 464" width="780" height="464" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="780" height="464" rx="8" fill="#fcfcfb"/>
+<text x="24" y="36" font-size="17" font-weight="600" fill="#0b0b0b">Ranking variants, same candidates</text>
+<text x="24" y="58" font-size="13" fill="#52514e">Tag search + 3 popular pages; only the ranking (or, last row, the search tags) changes.</text>
+<rect x="24" y="76" width="12" height="12" rx="3" fill="#2a78d6"/>
+<text x="42" y="86.5" font-size="12.5" fill="#52514e">Last 7 days (8 accounts, 191 hidden)</text>
+<rect x="307.6" y="76" width="12" height="12" rx="3" fill="#eb6834"/>
+<text x="325.6" y="86.5" font-size="12.5" fill="#52514e">Last 30 days (11 accounts, 1,303 hidden)</text>
+<line x1="270.0" y1="106" x2="270.0" y2="414" stroke="#c9c8c2" stroke-width="1"/>
+<text x="270.0" y="432" font-size="11.5" fill="#8a8984" text-anchor="middle">0%</text>
+<line x1="383.5" y1="106" x2="383.5" y2="414" stroke="#e4e3df" stroke-width="1"/>
+<text x="383.5" y="432" font-size="11.5" fill="#8a8984" text-anchor="middle">20%</text>
+<line x1="497.0" y1="106" x2="497.0" y2="414" stroke="#e4e3df" stroke-width="1"/>
+<text x="497.0" y="432" font-size="11.5" fill="#8a8984" text-anchor="middle">40%</text>
+<line x1="610.5" y1="106" x2="610.5" y2="414" stroke="#e4e3df" stroke-width="1"/>
+<text x="610.5" y="432" font-size="11.5" fill="#8a8984" text-anchor="middle">60%</text>
+<line x1="724.0" y1="106" x2="724.0" y2="414" stroke="#e4e3df" stroke-width="1"/>
+<text x="724.0" y="432" font-size="11.5" fill="#8a8984" text-anchor="middle">80%</text>
+<text x="254" y="127.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">Tag-lift weights + quality</text>
+<text x="254" y="143.0" font-size="11.5" fill="#52514e" text-anchor="end">before learned weights</text>
+<path d="M270 112 H539.5 Q543.5 112 543.5 116 V122 Q543.5 126 539.5 126 H270 Z" fill="#2a78d6"/>
+<text x="549.5" y="123.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">48.2%</text>
+<path d="M270 128 H390.3 Q394.3 128 394.3 132 V138 Q394.3 142 390.3 142 H270 Z" fill="#eb6834"/>
+<text x="400.3" y="139.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">21.9%</text>
+<text x="254" y="184.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">Learned, 10 random pages</text>
+<path d="M270 164 H602.0 Q606.0 164 606.0 168 V174 Q606.0 178 602.0 178 H270 Z" fill="#2a78d6"/>
+<text x="612.0" y="175.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">59.2%</text>
+<path d="M270 180 H413.0 Q417.0 180 417.0 184 V190 Q417.0 194 413.0 194 H270 Z" fill="#eb6834"/>
+<text x="423.0" y="191.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">25.9%</text>
+<text x="254" y="231.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">Learned, 25 random pages</text>
+<text x="254" y="247.0" font-size="11.5" fill="#52514e" text-anchor="end">more negatives</text>
+<path d="M270 216 H592.9 Q596.9 216 596.9 220 V226 Q596.9 230 592.9 230 H270 Z" fill="#2a78d6"/>
+<text x="602.9" y="227.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">57.6%</text>
+<path d="M270 232 H412.4 Q416.4 232 416.4 236 V242 Q416.4 246 412.4 246 H270 Z" fill="#eb6834"/>
+<text x="422.4" y="243.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">25.8%</text>
+<text x="254" y="283.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">Learned, 10 popular pages</text>
+<text x="254" y="299.0" font-size="11.5" fill="#52514e" text-anchor="end">only passed-on posts</text>
+<path d="M270 268 H628.6 Q632.6 268 632.6 272 V278 Q632.6 282 628.6 282 H270 Z" fill="#2a78d6"/>
+<text x="638.6" y="279.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">63.9%</text>
+<path d="M270 284 H437.4 Q441.4 284 441.4 288 V294 Q441.4 298 437.4 298 H270 Z" fill="#eb6834"/>
+<text x="447.4" y="295.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">30.2%</text>
+<text x="254" y="335.0" font-size="13.5" fill="#0b0b0b" text-anchor="end" font-weight="600">Learned, 5 random + 5 popular</text>
+<text x="254" y="351.0" font-size="11.5" fill="#52514e" text-anchor="end">what the app uses</text>
+<path d="M270 320 H637.1 Q641.1 320 641.1 324 V330 Q641.1 334 637.1 334 H270 Z" fill="#2a78d6"/>
+<text x="647.1" y="331.5" font-size="12" fill="#52514e" font-weight="600" style="font-variant-numeric: tabular-nums">65.4%</text>
+<path d="M270 336 H449.3 Q453.3 336 453.3 340 V346 Q453.3 350 449.3 350 H270 Z" fill="#eb6834"/>
+<text x="459.3" y="347.5" font-size="12" fill="#52514e" font-weight="600" style="font-variant-numeric: tabular-nums">32.3%</text>
+<text x="254" y="387.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">…and search by learned tags</text>
+<text x="254" y="403.0" font-size="11.5" fill="#52514e" text-anchor="end">about 5× the requests</text>
+<path d="M270 372 H557.1 Q561.1 372 561.1 376 V382 Q561.1 386 557.1 386 H270 Z" fill="#2a78d6"/>
+<text x="567.1" y="383.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">51.3%</text>
+<path d="M270 388 H423.8 Q427.8 388 427.8 392 V398 Q427.8 402 423.8 402 H270 Z" fill="#eb6834"/>
+<text x="433.8" y="399.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">27.8%</text>
+</svg>

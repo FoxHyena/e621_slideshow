@@ -50,12 +50,19 @@ export async function syncProfile(
   api: RecApi,
   now: number,
   onProgress: Progress = () => {},
+  /** every favorite read, for callers that keep more of each post than the profile does */
+  onPosts: (posts: Post[]) => void = () => {},
 ): Promise<Profile> {
+  const read = async (stopAt: number | undefined) => {
+    const r = await fetchFavorites(api, stopAt, onProgress);
+    onPosts(r.posts);
+    return r;
+  };
   const count = await api.favoriteCount();
   const usable = stored?.username === username && stored.favIds.length > 0 ? stored : null;
 
   if (usable) {
-    const { posts, foundStop } = await fetchFavorites(api, usable.favIds[0], onProgress);
+    const { posts, foundStop } = await read(usable.favIds[0]);
     if (foundStop && count - usable.reported === posts.length) {
       return { ...addFavorites(usable, posts, now), reported: count };
     }
@@ -66,7 +73,7 @@ export async function syncProfile(
   }
 
   onProgress("Reading favorites…");
-  const { posts } = await fetchFavorites(api, undefined, onProgress);
+  const { posts } = await read(undefined);
   return { ...addFavorites(emptyProfile(username), posts, now), reported: count };
 }
 

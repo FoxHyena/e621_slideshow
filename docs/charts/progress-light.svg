@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 412" width="780" height="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<rect width="780" height="412" rx="8" fill="#fcfcfb"/>
+<text x="24" y="36" font-size="17" font-weight="600" fill="#0b0b0b">Hidden favorites ranked in the top 200, step by step</text>
+<text x="24" y="58" font-size="13" fill="#52514e">Each step adds to the one above. Same accounts and favorites throughout.</text>
+<rect x="24" y="76" width="12" height="12" rx="3" fill="#2a78d6"/>
+<text x="42" y="86.5" font-size="12.5" fill="#52514e">Last 7 days (8 accounts, 191 hidden)</text>
+<rect x="307.6" y="76" width="12" height="12" rx="3" fill="#eb6834"/>
+<text x="325.6" y="86.5" font-size="12.5" fill="#52514e">Last 30 days (11 accounts, 1,303 hidden)</text>
+<line x1="270.0" y1="106" x2="270.0" y2="362" stroke="#c9c8c2" stroke-width="1"/>
+<text x="270.0" y="380" font-size="11.5" fill="#8a8984" text-anchor="middle">0%</text>
+<line x1="383.5" y1="106" x2="383.5" y2="362" stroke="#e4e3df" stroke-width="1"/>
+<text x="383.5" y="380" font-size="11.5" fill="#8a8984" text-anchor="middle">20%</text>
+<line x1="497.0" y1="106" x2="497.0" y2="362" stroke="#e4e3df" stroke-width="1"/>
+<text x="497.0" y="380" font-size="11.5" fill="#8a8984" text-anchor="middle">40%</text>
+<line x1="610.5" y1="106" x2="610.5" y2="362" stroke="#e4e3df" stroke-width="1"/>
+<text x="610.5" y="380" font-size="11.5" fill="#8a8984" text-anchor="middle">60%</text>
+<line x1="724.0" y1="106" x2="724.0" y2="362" stroke="#e4e3df" stroke-width="1"/>
+<text x="724.0" y="380" font-size="11.5" fill="#8a8984" text-anchor="middle">80%</text>
+<text x="254" y="127.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">Tag search, tag-lift ranking</text>
+<text x="254" y="143.0" font-size="11.5" fill="#52514e" text-anchor="end">where we started</text>
+<path d="M270 112 H349.4 Q353.4 112 353.4 116 V122 Q353.4 126 349.4 126 H270 Z" fill="#2a78d6"/>
+<text x="359.4" y="123.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">14.7%</text>
+<path d="M270 128 H336.4 Q340.4 128 340.4 132 V138 Q340.4 142 336.4 142 H270 Z" fill="#eb6834"/>
+<text x="346.4" y="139.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">12.4%</text>
+<text x="254" y="184.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">+ quality for its age</text>
+<path d="M270 164 H349.4 Q353.4 164 353.4 168 V174 Q353.4 178 349.4 178 H270 Z" fill="#2a78d6"/>
+<text x="359.4" y="175.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">14.7%</text>
+<path d="M270 180 H355.7 Q359.7 180 359.7 184 V190 Q359.7 194 355.7 194 H270 Z" fill="#eb6834"/>
+<text x="365.7" y="191.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">15.8%</text>
+<text x="254" y="231.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">+ 3 pages of popular posts</text>
+<text x="254" y="247.0" font-size="11.5" fill="#52514e" text-anchor="end">in the candidate search</text>
+<path d="M270 216 H539.5 Q543.5 216 543.5 220 V226 Q543.5 230 539.5 230 H270 Z" fill="#2a78d6"/>
+<text x="549.5" y="227.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">48.2%</text>
+<path d="M270 232 H390.3 Q394.3 232 394.3 236 V242 Q394.3 246 390.3 246 H270 Z" fill="#eb6834"/>
+<text x="400.3" y="243.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">21.9%</text>
+<text x="254" y="283.0" font-size="13.5" fill="#0b0b0b" text-anchor="end">+ learned tag weights</text>
+<text x="254" y="299.0" font-size="11.5" fill="#52514e" text-anchor="end">favorites vs random posts</text>
+<path d="M270 268 H602.0 Q606.0 268 606.0 272 V278 Q606.0 282 602.0 282 H270 Z" fill="#2a78d6"/>
+<text x="612.0" y="279.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">59.2%</text>
+<path d="M270 284 H413.0 Q417.0 284 417.0 288 V294 Q417.0 298 413.0 298 H270 Z" fill="#eb6834"/>
+<text x="423.0" y="295.5" font-size="12" fill="#52514e" style="font-variant-numeric: tabular-nums">25.9%</text>
+<text x="254" y="335.0" font-size="13.5" fill="#0b0b0b" text-anchor="end" font-weight="600">+ popular posts in the sample</text>
+<text x="254" y="351.0" font-size="11.5" fill="#52514e" text-anchor="end">favorites vs random + passed-on posts</text>
+<path d="M270 320 H637.1 Q641.1 320 641.1 324 V330 Q641.1 334 637.1 334 H270 Z" fill="#2a78d6"/>
+<text x="647.1" y="331.5" font-size="12" fill="#52514e" font-weight="600" style="font-variant-numeric: tabular-nums">65.4%</text>
+<path d="M270 336 H449.3 Q453.3 336 453.3 340 V346 Q453.3 350 449.3 350 H270 Z" fill="#eb6834"/>
+<text x="459.3" y="347.5" font-size="12" fill="#52514e" font-weight="600" style="font-variant-numeric: tabular-nums">32.3%</text>
+</svg>
