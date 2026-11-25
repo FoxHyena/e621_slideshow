@@ -11,6 +11,25 @@
 // @updateURL    https://e621.cumdump.dog/e621-slideshow.user.js
 // ==/UserScript==
 
+/*
+ * Install
+ *   1. Add a userscript manager to your browser:
+ *      - Chrome, Edge, Brave, Firefox: Violentmonkey (https://violentmonkey.github.io/)
+ *        or Tampermonkey (https://www.tampermonkey.net/)
+ *      - Safari (Mac, iPhone, iPad): the free "Userscripts" app from the App Store,
+ *        then turn it on in Safari > Settings > Extensions
+ *   2. Open https://e621.cumdump.dog/e621-slideshow.user.js; the manager shows an install page.
+ *   3. Click Install, then reload any e621 page.
+ *   The manager checks that same URL for updates.
+ *
+ * Use
+ *   ▶ Slideshow plays what's in the search box (or the pool you're on) with your saved
+ *   slideshow settings. ★ Recommended plays from your favorites; sign in on the
+ *   slideshow site first.
+ *
+ * Editing: bump @version on every change, or installed copies won't update.
+ */
+
 (() => {
   "use strict";
 
