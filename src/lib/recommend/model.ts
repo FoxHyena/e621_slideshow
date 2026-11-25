@@ -7,7 +7,7 @@ import type { Overrides } from "./weights";
 /**
  * The learned ranking's inputs and output, kept in IndexedDB next to the
  * profile (they're too big for localStorage): each favorite's features, a
- * sample of random posts to compare against, and the fitted weights.
+ * sample of other posts to compare against, and the fitted weights.
  */
 
 /** Each favorite's features (tags + rating), by post id. Only favorites still in the profile. */
@@ -16,9 +16,14 @@ export interface FavFeatures {
   feats: Record<string, string[]>;
 }
 
-/** Random posts from across e621: what the favorites are told apart from. */
+/**
+ * What the favorites are told apart from: random posts from across e621, plus
+ * popular recent ones (posts the user likely saw and passed on). `ids` lets the
+ * user's own favorites be taken back out.
+ */
 export interface Negatives {
   at: number;
+  ids: number[];
   feats: string[][];
 }
 
@@ -30,8 +35,19 @@ export interface Learned {
   weights: [string, number][];
 }
 
-/** Pages of `order:random` posts sampled as negatives (3,200 posts, as in the backtest). */
-export const NEG_PAGES = 10;
+/**
+ * The sample: 5 pages of random posts and 5 of the best-scored posts from 30 to
+ * 210 days ago. In the backtest (scripts/rec-backtest.ts, model mix10) this
+ * mix beat 10 random pages: hidden favorites in the top 200 went from 25.9% to
+ * 32.3% on 30 days (10 of 11 accounts better, none worse) and 59.2% to 65.4% on
+ * 7 days. Popular posts alone did nearly as well on 7 days but split accounts
+ * on 30. The 30-day gap keeps the posts Recommended is about to rank (and the
+ * user hasn't got to yet) out of the "passed on" half.
+ */
+export const NEG_QUERIES = [
+  { query: "order:random", pages: 5 },
+  { query: "date:<30_days_ago date:>=210_days_ago order:score", pages: 5 },
+] as const;
 export const NEG_PAGE_SIZE = 320;
 /** The site's mix changes slowly; resample monthly. */
 export const NEG_TTL_MS = 30 * 24 * 3600_000;
@@ -62,31 +78,38 @@ export function mergeFeatures(stored: FavFeatures | undefined, profile: Profile,
 /** The stored sample while it's fresh, else a new one. */
 export async function refreshNegatives(
   stored: Negatives | undefined,
-  randomPosts: (page: number, limit: number) => Promise<Post[]>,
+  search: (query: string, page: number, limit: number) => Promise<Post[]>,
   now: number,
   onProgress: Progress = () => {},
 ): Promise<Negatives> {
-  if (stored && stored.feats.length && now - stored.at <= NEG_TTL_MS) return stored;
-  const seen = new Set<number>();
+  // Samples from before `ids` was kept are random-only: resample.
+  if (stored?.ids && stored.feats.length && now - stored.at <= NEG_TTL_MS) return stored;
+  const total = NEG_QUERIES.reduce((n, q) => n + q.pages, 0);
+  const ids: number[] = [];
   const feats: string[][] = [];
-  for (let page = 1; page <= NEG_PAGES; page++) {
-    onProgress(`Sampling e621 to compare against… ${page}/${NEG_PAGES}`);
-    const batch = await randomPosts(page, NEG_PAGE_SIZE);
-    for (const p of batch) {
-      if (seen.has(p.id)) continue;
-      seen.add(p.id);
-      feats.push(features(p));
+  const seen = new Set<number>();
+  let done = 0;
+  for (const { query, pages } of NEG_QUERIES) {
+    for (let page = 1; page <= pages; page++) {
+      onProgress(`Sampling e621 to compare against… ${++done}/${total}`);
+      const batch = await search(query, page, NEG_PAGE_SIZE);
+      for (const p of batch) {
+        if (seen.has(p.id)) continue;
+        seen.add(p.id);
+        ids.push(p.id);
+        feats.push(features(p));
+      }
+      if (batch.length < NEG_PAGE_SIZE) break;
     }
-    if (batch.length < NEG_PAGE_SIZE) break;
   }
-  return { at: now, feats };
+  return { at: now, ids, feats };
 }
 
 /**
  * Weights for the learned ranking: the stored ones if they were fit on these
- * favorites and this sample, else a new fit. Favorites that also turn up in
- * the random sample aren't removed: a few among thousands don't move the fit.
- * Returns null if cancelled.
+ * favorites and this sample, else a new fit. The user's favorites are taken
+ * out of the sample (many popular posts will be among them). Returns null if
+ * cancelled.
  */
 export async function fitLearned(
   stored: Learned | undefined,
@@ -98,7 +121,9 @@ export async function fitLearned(
   const key = favKey(profile);
   if (stored && stored.favKey === key && stored.negAt === negatives.at) return stored;
   const positives = profile.favIds.flatMap((id) => (favs.feats[id] ? [favs.feats[id]] : []));
-  const w = await learnWeightsAsync(positives, negatives.feats, {}, isCancelled);
+  const mine = new Set(profile.favIds);
+  const others = negatives.feats.filter((_, i) => !mine.has(negatives.ids[i]));
+  const w = await learnWeightsAsync(positives, others, {}, isCancelled);
   return w && { favKey: key, negAt: negatives.at, weights: [...w] };
 }
 

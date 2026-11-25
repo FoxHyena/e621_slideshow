@@ -13,14 +13,19 @@
 //   BACKTEST_BLACKLIST        extra blacklist lines for the run (newline-separated)
 //   BACKTEST_PLANS            comma-separated subset of the plans below (signature always runs)
 //   BACKTEST_CACHE            folder for cached favorites and tag counts (default: the OS temp folder)
-//   BACKTEST_LR               comma-separated C values for learned (logistic regression) rankings (default: 0.05,0.5)
-//   BACKTEST_NEG_PAGES        pages of random pre-window posts used as the learner's negatives (default: 10)
+//   BACKTEST_MODELS           comma-separated learned models, by their negatives (default: all four below)
+//   BACKTEST_QUALITY          comma-separated quality weights for the learned rankings (default: 0.5,0.75,1)
+//
+// Learned models (learn.ts, C = 0.05), by what the favorites are told apart from:
+//   random10, random25   that many pages of random posts uploaded before the window
+//   popular10            the 10 best-scored pages of the 180 days before the window: posts the user
+//                        likely saw and passed on
+//   mix10                5 pages of each (what the app samples; see NEG_QUERIES in model.ts)
 //
 // Rankings, all over the same candidates:
 //   taste          lift weights, top-5 sum (the app before quality)
-//   app            lift taste + cohort quality (rankAll, today's app)
-//   lr C           learned weights (learn.ts) in place of lift, + cohort quality
-//   lr C taste     learned weights alone
+//   app            lift taste + cohort quality (rankAll; the app without a learned model)
+//   MODEL qQ       the model's learned score + Q × cohort quality
 //
 // Plans, so search strategies are compared at the same request cost:
 //   signature      today's plan: the highest-weight tags
@@ -30,6 +35,8 @@
 //   cover-max      covering plan with the full page budget (only when named in BACKTEST_PLANS)
 //   mix-N          signature's search plus the window's N most popular pages, ranked together
 //   popular-same+N no tags, for as many pages as mix-N costs
+//   mix-3-lr       mix-3 with search tags picked by the first model's weights, and posts kept when
+//                  either lift or that model scores them above 0
 //
 // Caveat: people can only favorite what they saw, and popular posts are seen more, so the
 // rankings lean toward rewarding popularity.
@@ -53,7 +60,7 @@ import { addFavorites, emptyProfile } from "../src/lib/recommend/profile";
 import { byRank, rankAll, scorePost, type Ranked } from "../src/lib/recommend/rank";
 import { REC_PAGE_BUDGET, REC_PAGE_SIZE } from "../src/lib/recommend/stream";
 import { countsOf, EMPTY_TAG_CACHE, FAV_PAGE, refreshTagCache, tagsToLookUp, type RecApi, type TagCache } from "../src/lib/recommend/sync";
-import { computeWeights, searchPlan, NO_OVERRIDES } from "../src/lib/recommend/weights";
+import { CAT_MULT, computeWeights, searchPlan, NO_OVERRIDES } from "../src/lib/recommend/weights";
 import { DEFAULT_SEARCH } from "../src/lib/settings";
 import { acceptPost } from "../src/lib/slideshow/queue";
 
@@ -83,12 +90,16 @@ const PLANS = [
   "popular-same+10",
   "popular-max",
   "cover-max",
+  "mix-3-lr",
 ] as const;
 type Plan = (typeof PLANS)[number];
 const DEFAULT_PLANS = PLANS.filter((p) => p !== "cover-max"); // cover-max: 25 uncacheable pages per account
 const plans = ["signature", ...((process.env.BACKTEST_PLANS?.split(",") ?? DEFAULT_PLANS) as Plan[]).filter((p) => p !== "signature")] as Plan[];
-const lrCs = (process.env.BACKTEST_LR ?? "0.05,0.5").split(",").map(Number).filter((c) => c > 0);
-const negPages = Number(process.env.BACKTEST_NEG_PAGES ?? 10);
+const MODELS = ["random10", "random25", "popular10", "mix10"] as const;
+type Model = (typeof MODELS)[number];
+const models = (process.env.BACKTEST_MODELS?.split(",") ?? MODELS) as Model[];
+for (const m of models) if (!MODELS.includes(m)) throw new Error(`Unknown model ${m}`);
+const qualities = (process.env.BACKTEST_QUALITY ?? "0.5,0.75,1").split(",").map(Number);
 const cacheDir = process.env.BACKTEST_CACHE ?? join(tmpdir(), "e621-rec-backtest");
 mkdirSync(cacheDir, { recursive: true });
 const tagCacheFile = join(cacheDir, "tags.json");
@@ -207,15 +218,27 @@ async function runUser(name: string, share: number): Promise<Row[]> {
   const counts = countsOf(tagCache);
   const weights = computeWeights(profile, counts, tagCache.site?.n ?? 0);
   const favTags = train.map(allTags);
-  // Negatives for the learner: random posts uploaded before the window, minus the training favorites.
+  // Negatives for the learner, all uploaded before the window, minus the training favorites.
   const trainIds = new Set(train.map((p) => p.id));
-  const negatives = (await fetchQuery(`date:<${days}_days_ago order:random`, negPages)).posts.filter((p) => !trainIds.has(p.id));
-  const learned = lrCs.map((C) => {
+  const random = (pages: number) => fetchQuery(`date:<${days}_days_ago order:random`, pages);
+  const popularBefore = (pages: number) => fetchQuery(`date:<${days}_days_ago date:>=${days + 180}_days_ago order:score`, pages);
+  const negativesFor: Record<Model, () => Promise<Post[]>> = {
+    random10: async () => (await random(10)).posts,
+    random25: async () => (await random(25)).posts,
+    popular10: async () => (await popularBefore(10)).posts,
+    mix10: async () => [...(await random(5)).posts, ...(await popularBefore(5)).posts],
+  };
+  const positives = train.map(features);
+  const learned: [Model, Map<string, number>][] = [];
+  for (const m of models) {
+    const seen = new Set<number>();
+    const negs = (await negativesFor[m]()).filter((p) => !trainIds.has(p.id) && !seen.has(p.id) && seen.add(p.id));
     const t = Date.now();
-    const w = learnWeights(train.map(features), negatives.map(features), { C });
-    log(`  lr C=${C}: ${w.size} weights from ${train.length} favorites and ${negatives.length} random posts in ${Date.now() - t} ms`);
-    return [C, w] as const;
-  });
+    const w = learnWeights(positives, negs.map(features));
+    log(`  ${m}: ${w.size} weights from ${train.length} favorites and ${negs.length} negatives in ${Date.now() - t} ms`);
+    learned.push([m, w]);
+  }
+  const main = learned[0]?.[1];
   const settings = {
     ...DEFAULT_SEARCH,
     source: "recommended" as const,
@@ -230,6 +253,15 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     coverTags(weights, favTags, [], k, { posts: (t) => (counts[t] ?? 0) * share, budget: pages * REC_PAGE_SIZE });
   const query = (tags: string[]) => buildRecommendedQuery(settings, tags, user.tagLimit);
   const signature = query(searchPlan(weights, NO_OVERRIDES, breadth).map((p) => p.tag));
+  // The first model's strongest tags that lift could also search (no meta, no rating).
+  const lrTags = main
+    ? [...main.entries()]
+        .filter(([t, w]) => w > 0 && profile.tags[t] && CAT_MULT[profile.tags[t].cat] > 0)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, breadth)
+        .map(([t]) => t)
+    : [];
+  const lrSignature = query(lrTags);
   const popular = query([]);
   const sig = await fetchQuery(signature.query, REC_PAGE_BUDGET);
   const same = sig.pages;
@@ -245,6 +277,7 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     "popular-same+10": () => [{ query: popular.query, pages: same + 10 }],
     "popular-max": () => [{ query: popular.query, pages: REC_PAGE_BUDGET }],
     "cover-max": () => [{ query: query(cover(REC_PAGE_BUDGET)).query, pages: REC_PAGE_BUDGET }],
+    "mix-3-lr": () => [{ query: lrSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
   };
 
   const rows: Row[] = [];
@@ -261,7 +294,8 @@ async function runUser(name: string, share: number): Promise<Row[]> {
       for (const post of got.posts) {
         if (!acceptPost(post, filter)) continue;
         const r = scorePost(post, weights);
-        if (r.score <= 0) continue;
+        const lrMatch = plan === "mix-3-lr" && !!main && learnedScore(post, main) > 0;
+        if (r.score <= 0 && !lrMatch) continue;
         // Take the account's own favorite out of the count, so it doesn't help.
         const own = hidden.has(post.id) ? 1 : 0;
         ranked.push({ post: { ...post, stats: { ...post.stats, fav_count: post.stats.fav_count - own } }, ...r });
@@ -279,10 +313,9 @@ async function runUser(name: string, share: number): Promise<Row[]> {
         app: scores(rankAll(ranked), hidden),
       },
     };
-    for (const [C, w] of learned) {
+    for (const [m, w] of learned) {
       const relearned = ranked.map((r) => ({ ...r, score: learnedScore(r.post, w) }));
-      row.ranks[`lr ${C}`] = scores(rankAll(relearned), hidden);
-      row.ranks[`lr ${C} taste`] = scores(rankAll(relearned, 0), hidden);
+      for (const q of qualities) row.ranks[`${m} q${q}`] = scores(rankAll(relearned, q), hidden);
     }
     log(`  ${plan}: ${row.candidates} candidates in ${pages} pages, found ${row.found}`);
     rows.push(row);

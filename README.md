@@ -105,9 +105,10 @@ Switch **Source** to **Recommended** (needs sign-in). The app reads your favorit
 favorite far more often than e621 does overall, and ranks recent posts by how well they match and how
 well liked they are for their age. Posts you've already favorited are left out.
 
-- The match comes from a small model fit in your browser: your favorites against a random sample of
-  e621. It learns which tags you seek out and which you avoid. Each favorite's tags are kept in this
-  browser, and the random sample (10 pages) is taken once a month.
+- The match comes from a small model fit in your browser: your favorites against a sample of e621
+  (5 pages of random posts and 5 of popular ones from the last few months, minus your favorites). It
+  learns which tags you seek out and which you pass on. Each favorite's tags are kept in this browser,
+  and the sample is retaken once a month.
 
 - Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
   so a well-liked post with only some of your tags still gets ranked.
@@ -266,15 +267,15 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
   - `rank.ts` scores a post by its 5 strongest matching tags, so common tags can't swamp a rare favorite,
     then orders posts by taste percentile + quality percentile (favorites compared with posts uploaded
     around the same time).
-  - `learn.ts` and `model.ts` fit logistic-regression tag weights (favorites against random posts) at
-    sync; when present they replace the match score in the ranking. The lift weights still pick the
+  - `learn.ts` and `model.ts` fit logistic-regression tag weights (favorites against random and popular
+    posts) at sync; when present they replace the match score in the ranking. The lift weights still pick the
     search tags, decide which posts match, and explain them.
   - `stream.ts` fetches the tag search and 3 pages of the window's popular posts, drops your favorites,
     then plays the rest best first.
   - [`scripts/rec-backtest.ts`](scripts/rec-backtest.ts) tests search and ranking changes on live data: it
     hides accounts' recent favorites and counts how many the recommendations would show.
 - **Storage** ([`src/lib/storage.ts`](src/lib/storage.ts)): settings, saved searches, history,
-  credentials and the taste profile live in `localStorage`. Each favorite's tags, the random sample and
+  credentials and the taste profile live in `localStorage`. Each favorite's tags, the sample and
   the learned weights are bigger, so they go to IndexedDB ([`src/lib/bigStorage.ts`](src/lib/bigStorage.ts)).
 
 ### Project layout

@@ -121,8 +121,8 @@ export function useRecommendations(
           try {
             const feats = mergeFeatures(storedFeats, p, read);
             await bigStorage.set(featKey(name), feats);
-            const random = (page: number, limit: number) => searchPosts("order:random", page, limit, creds);
-            const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), random, Date.now(), onProgress);
+            const search = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds);
+            const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), search, Date.now(), onProgress);
             await bigStorage.set(NEG_KEY, neg);
             onProgress("Learning your taste…");
             const l = await fitLearned(await bigStorage.get<Learned>(learnedKey(name)), p, feats, neg, () => cancelled);

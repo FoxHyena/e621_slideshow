@@ -15,7 +15,7 @@ export interface LearnOptions {
 
 /**
  * Tag weights from L2-regularized logistic regression (after e621-stats'
- * tagmodel): favorites against random posts, each class weighted to count
+ * tagmodel): favorites against a sample of other posts, each class weighted to count
  * equally. Unlike lift, which judges each tag alone, the fit shares credit
  * between tags that come together (an artist and their usual character) and
  * gives negative weights to tags the user's favorites avoid.
