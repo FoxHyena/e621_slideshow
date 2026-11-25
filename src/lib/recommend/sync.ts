@@ -1,4 +1,5 @@
 import type { Post } from "../e621/types";
+import type { ProgressFn } from "../progress";
 import { MAX_PAGE } from "../query/build";
 import { addFavorites, emptyProfile, type Profile } from "./profile";
 import { CAT_MULT, MIN_SUPPORT } from "./weights";
@@ -18,21 +19,26 @@ export const TAG_BATCH = 200;
 export const TAG_TTL_MS = 7 * 24 * 3600_000;
 export const SITE_TTL_MS = 24 * 3600_000;
 
-export type Progress = (msg: string) => void;
+export type Progress = ProgressFn;
 
 async function fetchFavorites(
   api: RecApi,
   stopAt: number | undefined,
   onProgress: Progress,
+  /** favorites expected to be read, when known */
+  expected: number | undefined,
 ): Promise<{ posts: Post[]; foundStop: boolean }> {
   const posts: Post[] = [];
+  const report = () =>
+    onProgress({ phase: "favorites", done: posts.length, total: expected && Math.max(expected, posts.length) });
+  report();
   for (let page = 1; page <= MAX_PAGE; page++) {
     const batch = await api.favorites(page, FAV_PAGE);
     const stop = stopAt === undefined ? -1 : batch.findIndex((p) => p.id === stopAt);
     posts.push(...(stop >= 0 ? batch.slice(0, stop) : batch));
     if (stop >= 0) return { posts, foundStop: true };
     if (batch.length < FAV_PAGE) break;
-    onProgress(`Reading favorites… ${posts.length}`);
+    report();
   }
   return { posts, foundStop: false };
 }
@@ -53,8 +59,8 @@ export async function syncProfile(
   /** every favorite read, for callers that keep more of each post than the profile does */
   onPosts: (posts: Post[]) => void = () => {},
 ): Promise<Profile> {
-  const read = async (stopAt: number | undefined) => {
-    const r = await fetchFavorites(api, stopAt, onProgress);
+  const read = async (stopAt: number | undefined, expected: number | undefined) => {
+    const r = await fetchFavorites(api, stopAt, onProgress, expected);
     onPosts(r.posts);
     return r;
   };
@@ -62,7 +68,8 @@ export async function syncProfile(
   const usable = stored?.username === username && stored.favIds.length > 0 ? stored : null;
 
   if (usable) {
-    const { posts, foundStop } = await read(usable.favIds[0]);
+    const added = count - usable.reported;
+    const { posts, foundStop } = await read(usable.favIds[0], added > 0 ? added : undefined);
     if (foundStop && count - usable.reported === posts.length) {
       return { ...addFavorites(usable, posts, now), reported: count };
     }
@@ -72,8 +79,7 @@ export async function syncProfile(
     }
   }
 
-  onProgress("Reading favorites…");
-  const { posts } = await read(undefined);
+  const { posts } = await read(undefined, count);
   return { ...addFavorites(emptyProfile(username), posts, now), reported: count };
 }
 
@@ -106,7 +112,7 @@ export async function refreshTagCache(
   const counts = { ...cache.counts };
   const stale = tags.filter((t) => !counts[t] || now - counts[t].at > TAG_TTL_MS);
   for (let i = 0; i < stale.length; i += TAG_BATCH) {
-    if (stale.length > TAG_BATCH) onProgress(`Looking up tags… ${i}/${stale.length}`);
+    onProgress({ phase: "tags", done: i, total: stale.length });
     const names = stale.slice(i, i + TAG_BATCH);
     for (const name of names) counts[name] = { c: 0, at: now };
     for (const t of await api.tagCounts(names)) counts[t.name] = { c: t.post_count, at: now };

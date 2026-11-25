@@ -5,6 +5,8 @@ export function features(post: Post): string[] {
   return [...allTags(post), `rating:${post.rating}`];
 }
 
+const ITERATIONS = 300;
+
 export interface LearnOptions {
   /** Inverse regularization strength, as in scikit-learn (smaller = flatter weights). */
   C?: number;
@@ -37,12 +39,16 @@ export async function learnWeightsAsync(
   negatives: string[][],
   options: LearnOptions = {},
   isCancelled: () => boolean = () => false,
+  /** iterations done of the total, every few iterations */
+  onStep: (done: number, total: number) => void = () => {},
 ): Promise<Map<string, number> | null> {
+  const total = options.iterations ?? ITERATIONS;
   const steps = fit(positives, negatives, options);
   for (let i = 1; ; i++) {
     const r = steps.next();
     if (r.done) return r.value;
     if (i % 10 === 0) {
+      onStep(Math.min(i, total), total);
       await new Promise((resolve) => setTimeout(resolve, 0));
       if (isCancelled()) return null;
     }
@@ -53,7 +59,7 @@ export async function learnWeightsAsync(
 function* fit(
   positives: string[][],
   negatives: string[][],
-  { C = 0.05, minSupport = 3, iterations = 300 }: LearnOptions,
+  { C = 0.05, minSupport = 3, iterations = ITERATIONS }: LearnOptions,
 ): Generator<void, Map<string, number>> {
   const support = new Map<string, number>();
   for (const tags of [...positives, ...negatives]) {

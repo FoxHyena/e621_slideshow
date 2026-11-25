@@ -136,15 +136,15 @@ describe("RecommendedQueue", () => {
   it("reports pages fetched and posts found while it runs", async () => {
     const api = controlled();
     const q = new RecommendedQueue([tq("or", 5)], api.fetch, weights, filter, none);
-    expect(q.progress).toEqual({ done: 0, found: 0 });
+    expect(q.progress).toMatchObject({ done: 0, found: 0, max: 5 });
     await flush();
     api.calls[0].resolve(full(makePost({ tagList: ["a"] }), makePost({ tagList: ["zzz"] }))); // zzz: no weight
     await flush();
-    expect(q.progress).toEqual({ done: 1, found: 1 });
+    expect(q.progress).toMatchObject({ done: 1, found: 1, max: 5 });
     expect(q.loading).toBe(true);
     api.calls[1].resolve([makePost({ tagList: ["good"] })]);
     await flush();
-    expect(q.progress).toEqual({ done: 2, found: 2 });
+    expect(q.progress).toMatchObject({ done: 2, found: 2, max: 2 }); // short page: done early
     expect(q.loading).toBe(false);
   });
 

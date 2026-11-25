@@ -53,6 +53,10 @@ export class RecommendedQueue implements SlideQueue {
   private round = 1;
   private pos = 0;
   private requests = 0;
+  /** pages fetched per query tag */
+  private fetched = new Map<string, number>();
+  private startedAt = Date.now();
+  private at = this.startedAt;
   private running = false;
   private disposed = false;
   private waiters: { ready: () => boolean; resolve: () => void }[] = [];
@@ -76,7 +80,11 @@ export class RecommendedQueue implements SlideQueue {
   }
 
   get progress(): SearchProgress {
-    return { done: this.requests, found: this.ranked.length };
+    const left = this.queries.reduce(
+      (n, q) => n + (this.done.has(q.tag) ? 0 : Math.max(0, q.pages - (this.fetched.get(q.tag) ?? 0))),
+      0,
+    );
+    return { done: this.requests, found: this.ranked.length, max: this.requests + left, startedAt: this.startedAt, at: this.at };
   }
 
   get query(): string {
@@ -152,6 +160,8 @@ export class RecommendedQueue implements SlideQueue {
         // Advance only after success, so a retry repeats the failed page and nothing else.
         this.pos++;
         this.requests++;
+        this.fetched.set(next.tag, (this.fetched.get(next.tag) ?? 0) + 1);
+        this.at = Date.now();
         if (batch.length < REC_PAGE_SIZE) this.done.add(next.tag);
         this.add(batch);
         this.onChange(); // progress only; posts stay hidden until the end

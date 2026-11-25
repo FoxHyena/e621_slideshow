@@ -9,7 +9,6 @@ import {
   Info,
   LayoutGrid,
   Link,
-  Loader2,
   Maximize,
   Minimize,
   Pause,
@@ -51,6 +50,7 @@ import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib
 import Feed from "./Feed";
 import Gallery from "./Gallery";
 import InfoOverlay from "./InfoOverlay";
+import { ImageIcon, Loader, recSteps, stepText, VideoIcon } from "./Loader";
 import SettingsPanel from "./SettingsPanel";
 import Stage from "./Stage";
 import { useRecommendations } from "./useRecommendations";
@@ -161,6 +161,8 @@ export default function App() {
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  /** Recommended, asked for during the first read of the favorites: starts once that's done. */
+  const [waiting, setWaiting] = useState<SearchSettings | null>(null);
 
   const browsing = browse !== null;
   const queue = active?.queue ?? null;
@@ -264,6 +266,7 @@ export default function App() {
     const b = buildFor(s);
     const key = keyFor(s, b);
     if (active && active.key === key) return false;
+    setWaiting(null);
     const onChange = () => setVersion((v) => v + 1);
     const ctx = { username: user?.name };
     let q: SlideQueue;
@@ -301,13 +304,25 @@ export default function App() {
   const recBlocker = (): string | null => {
     if (!user || !creds) return "Sign in to get recommendations from your favorites";
     if (recCandidates.length > 0) return null;
-    if (rec.syncing) return rec.progress ?? "Still reading your favorites…";
+    if (rec.syncing) return rec.step ? stepText(rec.step) : "Still reading your favorites…";
     if (rec.error) return `Couldn't read favorites: ${rec.error}`;
     return "Not enough favorites yet: a tag needs to be on at least 3 of them";
   };
 
   /** Close the panel; restart only if the query changed. */
   const apply = (resume: boolean, s: SearchSettings = search) => {
+    // The first read of the favorites is still going: show its progress, and start when it's done.
+    if (isRec(s) && user && creds && recCandidates.length === 0 && rec.syncing) {
+      setActive(null);
+      setWaiting(s);
+      setPanelOpen(false);
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      if (resume) {
+        setPaused(false);
+        setBrowse(null);
+      }
+      return true;
+    }
     const blocker = isRec(s) ? recBlocker() : isFav(s) && !user ? "Sign in to play your favorites" : null;
     if (blocker) {
       showToast(blocker);
@@ -332,6 +347,20 @@ export default function App() {
   const openPreview = (view: "grid" | "feed") => {
     if (apply(false)) setBrowse(view);
   };
+
+  const onSynced = useEffectEvent(() => {
+    if (!waiting || rec.syncing) return;
+    const s = waiting;
+    setWaiting(null);
+    const blocker = recBlocker();
+    if (blocker) {
+      showToast(blocker);
+      setPanelOpen(true);
+    } else startQueue(s);
+  });
+  // Starting a show that was waiting on the favorites is a reaction to the sync ending.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => onSynced(), [waiting, rec.syncing]);
 
   // A share link plays straight away, then leaves the address bar so a reload is a plain visit.
   const sharedStarted = useRef(false);
@@ -725,6 +754,33 @@ export default function App() {
 
   // ---- render -------------------------------------------------------------
   const showControls = controlsVisible || !current;
+  const recProgress = queue?.progress;
+  /** What the search is doing, for the slideshow and for an empty gallery or feed. */
+  const searchLoader = waiting ? (
+    <Loader
+      step={rec.step ?? { phase: "favorites" }}
+      steps={recSteps(rec.step?.phase ?? "favorites")}
+      delayMs={0}
+      testId="rec-sync-progress"
+    />
+  ) : recProgress ? (
+    <Loader
+      step={{
+        phase: "search",
+        done: recProgress.done,
+        total: recProgress.max,
+        bound: true,
+        startedAt: recProgress.startedAt,
+        at: recProgress.at,
+      }}
+      label="Finding posts for you"
+      detail={recProgress.done > 0 ? `${recProgress.found.toLocaleString()} matches so far` : "Starting the search"}
+      steps={recSteps("search", { favorites: rec.profile?.favIds.length, learned: !!rec.learned })}
+      testId="search-progress"
+    />
+  ) : queue ? (
+    <Loader step={null} label="Searching e621" detail={queue.query || "all posts"} testId="search-loading" />
+  ) : null;
   const status = (() => {
     if (!queue) return null;
     if (queue.error)
@@ -743,7 +799,7 @@ export default function App() {
           </button>
         </div>
       );
-    if (!current && queue.loading) return <Loader2 className="size-10 animate-spin text-neutral-500" aria-label="Loading" />;
+    if (!current && queue.loading) return searchLoader;
     if (!current && queue.exhausted)
       return (
         <div className="space-y-2 text-center text-neutral-300" data-testid="no-results">
@@ -787,14 +843,23 @@ export default function App() {
       )}
 
       {current && !isReady && !browsing && (
-        <div className="delayed-show pointer-events-none absolute inset-0 flex items-center justify-center" data-testid="slide-loading">
-          <Loader2 className="size-10 animate-spin text-white/50" aria-label="Loading" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center" data-testid="slide-loading">
+          <Loader
+            step={{ phase: "media" }}
+            size="md"
+            bare
+            delayMs={600}
+            label={mediaKind(current) === "video" ? "Loading video" : "Loading image"}
+            icons={[mediaKind(current) === "video" ? VideoIcon : ImageIcon]}
+          />
         </div>
       )}
 
       {status && <div className="absolute inset-0 flex items-center justify-center p-6">{status}</div>}
 
-      {!queue && !panelOpen && (
+      {waiting && <div className="absolute inset-0 z-20 flex items-center justify-center bg-black p-6">{searchLoader}</div>}
+
+      {!queue && !panelOpen && !waiting && (
         <div className="absolute inset-0 flex items-center justify-center">
           <button type="button" className="rounded-md bg-accent px-5 py-2.5 font-semibold text-black" onClick={() => setPanelOpen(true)}>
             Set up a slideshow
@@ -818,6 +883,7 @@ export default function App() {
           onFavorite={(p) => void toggleFavorite(p)}
           onPlayFrom={pick}
           onNeedMore={needMore}
+          loader={searchLoader}
           onRetry={() => {
             queue.retry();
             needMore();
@@ -840,6 +906,7 @@ export default function App() {
           signedIn={!!user}
           onPick={pick}
           onNeedMore={needMore}
+          loader={searchLoader}
           onRetry={() => {
             queue.retry();
             needMore();
@@ -859,30 +926,6 @@ export default function App() {
           onAddTag={(t) => editTags(t)}
           onExcludeTag={(t) => editTags(`-${t}`)}
         />
-      )}
-
-      {/* search progress (Recommended): the show starts once every page is in and ranked */}
-      {queue?.progress && !queue.exhausted && !queue.error && !browsing && (
-        <div
-          className={`pointer-events-none absolute bottom-6 left-4 z-10 w-48 rounded-md bg-black/75 px-3 py-2 backdrop-blur transition-opacity duration-300 ${
-            showControls ? "opacity-100" : "opacity-80"
-          }`}
-          role="status"
-          aria-label="Search progress"
-          data-testid="search-progress"
-        >
-          <div className="flex items-center justify-between gap-2 text-[11px] text-neutral-300">
-            <span className="flex items-center gap-1.5">
-              <Loader2 className="size-3 animate-spin" aria-hidden />
-              Searching · page {queue.progress.done + 1}
-            </span>
-            <span className="text-neutral-400">{queue.progress.found.toLocaleString()} found</span>
-          </div>
-          {/* indeterminate: the last page is only known when a short one arrives */}
-          <div className="mt-1.5 h-0.5 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full w-1/3 animate-pulse bg-accent/80" />
-          </div>
-        </div>
       )}
 
       {/* controls */}
