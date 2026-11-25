@@ -18,9 +18,15 @@
  *        or Tampermonkey (https://www.tampermonkey.net/)
  *      - Safari (Mac, iPhone, iPad): the free "Userscripts" app from the App Store,
  *        then turn it on in Safari > Settings > Extensions
- *   2. Open https://e621.cumdump.dog/e621-slideshow.user.js; the manager shows an install page.
- *   3. Click Install, then reload any e621 page.
+ *   2. Chrome, Edge, Brave only: open chrome://extensions, click Details on the manager,
+ *      and turn on "Allow User Scripts" (older versions: turn on Developer mode instead).
+ *      Without this the script installs but never runs.
+ *   3. Open https://e621.cumdump.dog/e621-slideshow.user.js; the manager shows an install page.
+ *   4. Click Install, then reload any e621 page.
  *   The manager checks that same URL for updates.
+ *
+ *   No buttons? Click the manager's toolbar icon on an e621 page: this script should be
+ *   listed and switched on. If the list is empty, recheck step 2.
  *
  * Use
  *   ▶ Slideshow plays what's in the search box (or the pool you're on) with your saved
