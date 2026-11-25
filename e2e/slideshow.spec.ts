@@ -691,7 +691,9 @@ test("clicking an artist opens their posts over the feed; back returns to the sa
   await expect(artistFeed).toBeVisible();
   await expect(artistFeed).toHaveAttribute("data-artist", "mock_artist");
   await expect(page.getByTestId("artist-feed-name")).toHaveText("mock artist");
-  await expect(artistFeed.getByTestId("feed-card")).toHaveCount(100);
+  // the artist's first page is in, built a page of cards at a time like the main feed
+  await expect(artistFeed.getByTestId("feed-count")).toHaveText("100+ posts");
+  await expect(artistFeed.getByTestId("feed-card")).toHaveCount(20);
   expect(mock.searches.at(-1)?.tags.split(" ")).toContain("mock_artist");
   // the artist's feed has no show of its own to play
   await expect(artistFeed.getByTestId("feed-play-from")).toHaveCount(0);
