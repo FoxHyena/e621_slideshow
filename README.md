@@ -21,6 +21,11 @@ pnpm dev            # http://localhost:3000
   until you change a setting. Not available in Recommended mode.
   Turn on **Include my sign-in in share links** (e621 account section) to add your username and
   API key to the link's `#` fragment; the visitor is signed in for that tab only, nothing is saved.
+- Launch links start a show from a URL with your own saved settings (ratings, media, blacklist,
+  style…). Only what the link names changes, and it's saved like a search you typed:
+  - `/?tags=wolf+solo` plays those tags.
+  - `/?mode=recommended` plays Recommended from your favorites once they've synced (needs sign-in).
+- The [userscript](#userscript) adds Slideshow and Recommended buttons to e621 itself.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 
@@ -34,6 +39,30 @@ pnpm dev            # http://localhost:3000
 | O | open post on e621 |
 | C | copy share link |
 | S / Esc | settings |
+
+## Userscript
+
+Adds **▶ Slideshow** and **★ Recommended** buttons under the search box on e621.net and e926.net.
+Slideshow plays what's in the search box (or the pool you're on) with your saved settings;
+Recommended plays from your favorites (sign in on the slideshow site first).
+
+### Install
+
+1. Add a userscript manager to your browser:
+   - Chrome, Edge, Brave, Firefox: [Violentmonkey](https://violentmonkey.github.io/) or
+     [Tampermonkey](https://www.tampermonkey.net/)
+   - Safari (Mac, iPhone, iPad): the free **Userscripts** app from the App Store, then turn it on in
+     Safari → Settings → Extensions
+2. Open <https://e621.cumdump.dog/e621-slideshow.user.js>. The manager shows an install page.
+3. Click **Install**, then reload any e621 page.
+
+The manager checks that same URL for updates.
+
+### Developing it
+
+Source: [`public/e621-slideshow.user.js`](public/e621-slideshow.user.js), served from the site root.
+Bump `@version` whenever you change it, or installed copies won't update. The buttons open
+[launch links](#use) (`/?tags=…`, `/?mode=recommended`).
 
 ## How the query is built
 
