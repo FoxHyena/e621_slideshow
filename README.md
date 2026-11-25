@@ -8,7 +8,7 @@ Live at **<https://e621.cumdump.dog>**. Everything runs in your browser and talk
 
 ![Slideshow playing, with the controls showing](docs/screenshots/classic.png)
 
-> Screenshots use generated placeholder characters against a mocked e621, never real posts.
+> Screenshots use generated, blurred placeholder characters against a mocked e621, never real posts.
 > See [Regenerating the screenshots](#regenerating-the-screenshots).
 
 ## Quick start
@@ -301,5 +301,5 @@ pnpm screenshots
 ```
 
 Runs [`scripts/readme-screenshots/shots.ts`](scripts/readme-screenshots/shots.ts) against the e2e mock
-with generated SVG characters and writes `docs/screenshots/*.png`. It reuses a dev server on port 3621
+with generated, blurred SVG characters and writes `docs/screenshots/*.png`. It reuses a dev server on port 3621
 if one is running.
