@@ -32,6 +32,7 @@ Move the mouse to show the controls; they hide after 2.5 s idle.
 - [Share links and launch links](#share-links-and-launch-links)
 - [Userscript](#userscript)
 - [How it works](#how-it-works)
+- [Recommendation research](#recommendation-research)
 - [Development](#development)
 
 ## Features
@@ -109,7 +110,6 @@ well liked they are for their age. Posts you've already favorited are left out.
   (5 pages of random posts and 5 of popular ones from the last few months, minus your favorites). It
   learns which tags you seek out and which you pass on. Each favorite's tags are kept in this browser,
   and the sample is retaken once a month.
-
 - Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
   so a well-liked post with only some of your tags still gets ranked.
 - **Breadth** sets how many of your top tags are searched together: lower stays close to your strongest
@@ -120,6 +120,9 @@ well liked they are for their age. Posts you've already favorited are left out.
 - In the info overlay, "Recommended because" lists the tags that ranked the post, and **+ / −** pin and
   mute instead of editing a search.
 - Nothing plays until every candidate page is ranked, so the best post shows first.
+
+Every part of this was tested against real favorites first: see
+[Recommendation research](#recommendation-research).
 
 ### e621 account
 
@@ -290,7 +293,91 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
 | `src/lib/query/`, `src/lib/recommend/`, `src/lib/slideshow/` | Query building, recommendations, queue and layouts |
 | `src/lib/share.ts` | Share-link and launch-link encoding |
 | `e2e/` | Playwright tests against a mocked e621 |
-| `scripts/` | Live smoke test, test-video generator, README screenshots |
+| `scripts/` | Live smoke test, test-video generator, README screenshots, recommendation backtest |
+
+## Recommendation research
+
+Recommended was tuned on real favorites, not by feel. Most of the ideas came from e621-stats, a
+separate e621 taste-analysis project. Each one was tested live before it went into the app, and the
+ones that didn't help were left out.
+
+### How it's measured
+
+[`scripts/rec-backtest.ts`](scripts/rec-backtest.ts) replays the app on real accounts:
+
+1. Take an account's public favorites, and hide the ones uploaded in the last 7 or 30 days.
+2. Build the taste profile from the rest, exactly as the app does.
+3. Run the app's search for that window and rank the results.
+4. Count how many of the hidden favorites land in the top 20, 100 and 200. Each hidden favorite's
+   own favorite is taken off its count, so it can't help itself.
+
+It ran on 11 public accounts with large favorites lists (8 had enough favorites uploaded in the last
+7 days to count). The charts show the top-200 share: of the favorites the account went on to make,
+how many the recommendations would have shown in the first 200 slides.
+
+```bash
+node_modules/.bin/jiti scripts/rec-backtest.ts 30
+```
+
+Settings go in a gitignored `.env.backtest`; the header of the script lists the options.
+
+### What helped
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/charts/progress-dark.svg">
+  <img alt="Hidden favorites ranked in the top 200, step by step. Last 7 days: 14.7%, 14.7%, 48.2%, 59.2%, 65.4%. Last 30 days: 12.4%, 15.8%, 21.9%, 25.9%, 32.3%." src="docs/charts/progress-light.svg">
+</picture>
+
+1. **Quality for its age.** Posts are ranked by taste and by how many favorites they have compared
+   with posts uploaded around the same time, at equal weight. On 30 days the top-200 share rose from
+   12.4% to 15.8% (8 accounts better, 1 worse). On 7 days nothing changed, because the tag search
+   only found 14.7% of the hidden favorites: ranking can't show what was never fetched.
+2. **Popular posts in the search.** Adding 3 pages of the window's best-scored posts, whatever their
+   tags, raised what the search finds from 14.7% to 82% of hidden favorites on 7 days, and from 20% to
+   56% on 30 days. 5 or 10 pages found more but ranked no better.
+3. **Learned tag weights.** Tag lift judges each tag alone. A logistic regression fit on your
+   favorites against random posts shares credit between tags that come together and learns which tags
+   you avoid: 48.2% to 59.2% on 7 days, 21.9% to 25.9% on 30.
+4. **Popular posts in the sample.** Comparing favorites against random posts *and* popular posts the
+   user passed on teaches the model what they skip, not just what's rare: 65.4% on 7 days and 32.3% on
+   30, with 10 of 11 accounts better and none worse.
+
+Already-favorited posts are left out of the results too: the user has seen them.
+
+### Ranking variants
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/charts/models-dark.svg">
+  <img alt="Ranking variants on the same candidates, top-200 share for 7 and 30 days: tag-lift weights + quality 48.2% and 21.9%; learned with 10 random pages 59.2% and 25.9%; 25 random pages 57.6% and 25.8%; 10 popular pages 63.9% and 30.2%; 5 random + 5 popular 65.4% and 32.3%; the same but searching by learned tags 51.3% and 27.8%." src="docs/charts/models-light.svg">
+</picture>
+
+More random posts didn't help. Popular posts alone did nearly as well on 7 days, but on 30 days they
+ranked worse than tag lift for 3 of 11 accounts. The random half keeps it steady: the mix beat tag lift
+for 10 accounts and lost for none. Searching by the top learned tags found more
+hidden favorites, but they are broad tags, so the search took about 5× the requests and ranked worse.
+
+### What didn't help
+
+| Idea | Result |
+|---|---|
+| Profile from recent favorites only (last 250, 500 or 1,000, or the last 2 years) | Same or worse: 30-day top 200 was 21.9% for all favorites, 21.7% for 2 years, 18.0% for the last 250 |
+| More than 3 pages of popular posts | No better: 5 and 10 pages gave 22.0% and 21.8% on 30 days |
+| Picking search tags by sequential covering ([`cover.ts`](src/lib/recommend/cover.ts)) | A small gain, less than popular posts at the same number of requests |
+| Quality weight 0.5 or 0.75 instead of 1 | Within noise |
+| 25 pages of random posts instead of 10 | No gain |
+
+### Caveats
+
+- **Popularity bias.** People can only favorite what they saw, and popular posts get seen more. The
+  backtest rewards popular posts somewhat more than real taste would.
+- **Noise.** The random sample differs between runs, so the same setup can move about 3 points. Only
+  differences bigger than that are treated as real.
+- **Small sample.** 11 accounts, chosen for having many public favorites.
+- **Upload date, not favorite date.** e621 doesn't say when a favorite was added, so "recent" means
+  recently uploaded.
+
+Not tried yet: capping posts per artist and showing one post per parent/child family (both are about
+variety, which this backtest can't measure), and a learned re-ranker on top of the tag model.
 
 ## Development
 
