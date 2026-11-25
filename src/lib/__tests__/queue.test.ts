@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { parseBlacklist } from "../query/blacklist";
 import { buildQuery } from "../query/build";
 import { DEFAULT_SEARCH, type SearchSettings } from "../settings";
 import { PAGE_SIZE, PostQueue, type PageFetcher } from "../slideshow/queue";
@@ -27,6 +28,20 @@ function fakeApi(total: number, decorate: (id: number) => Parameters<typeof make
 }
 
 describe("PostQueue", () => {
+  it("setRules drops loaded posts the new blacklist hides and filters later pages", async () => {
+    const api = fakeApi(250, (id) => ({ tagList: id % 2 ? ["odd"] : ["even"] }));
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    await q.ensure(0);
+    expect(q.posts).toHaveLength(PAGE_SIZE);
+    q.setRules(parseBlacklist("odd"));
+    expect(q.posts).toHaveLength(PAGE_SIZE / 2);
+    expect(q.stats.blacklisted).toBe(PAGE_SIZE / 2);
+    await q.ensure(q.posts.length - 1);
+    expect(q.posts.every((p) => p.id % 2 === 0)).toBe(true);
+    expect(q.posts.length).toBeGreaterThan(PAGE_SIZE / 2);
+  });
+
   it("loads the first page and refills near the end via cursor", async () => {
     const api = fakeApi(250);
     const s = search();

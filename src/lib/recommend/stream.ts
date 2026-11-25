@@ -1,4 +1,5 @@
 import { allTags, type Post } from "../e621/types";
+import { blacklistedBy, type BlacklistRule } from "../query/blacklist";
 import { acceptPost, type PostFilter, type QueueStats, type SearchProgress, type SlideQueue } from "../slideshow/queue";
 import { rankAll, scorePost, type Ranked } from "./rank";
 
@@ -100,6 +101,14 @@ export class RecommendedQueue implements SlideQueue {
 
   retry() {
     this.error = null;
+    this.changed();
+  }
+
+  setRules(rules: BlacklistRule[]) {
+    this.filter.rules = rules;
+    const kept = this.ranked.filter((r) => !blacklistedBy(rules, r.post, this.filter.ctx));
+    this.stats.blacklisted += this.ranked.length - kept.length;
+    this.ranked = kept;
     this.changed();
   }
 
