@@ -116,6 +116,8 @@ export interface RecommendedQuery extends BuiltQuery {
   candidates: string[];
   /** breadth asked for more tags than e621's tag limit leaves room for */
   capped: boolean;
+  /** the same window and filters with no tags: its best-scored posts, ranked alongside */
+  popular: string;
 }
 
 /**
@@ -125,6 +127,9 @@ export interface RecommendedQuery extends BuiltQuery {
  * union usually fits in a page or two, so a 20-tag search costs 1–2 requests
  * instead of 20+. Each tag takes one of e621's tag slots, so breadth is capped
  * to what's left after the filters.
+ *
+ * `popular` is the window without the tags, for the queue's second source (see
+ * REC_POPULAR_PAGES).
  */
 export function buildRecommendedQuery(
   s: SearchSettings,
@@ -132,11 +137,17 @@ export function buildRecommendedQuery(
   tagLimit = DEFAULT_TAG_LIMIT,
 ): RecommendedQuery {
   const base: SearchSettings = { ...s, date: recommendedWindow(s.date), order: "score", tags: "" };
-  const filters = buildQuery(base, tagLimit).tagCount;
+  const windowOnly = buildQuery(base, tagLimit);
+  const filters = windowOnly.tagCount;
   const room = Math.max(0, tagLimit - filters);
   const wanted = ranked.slice(0, s.breadth);
   const candidates = wanted.slice(0, room);
   // A lone `~tag` isn't an OR; send it plain.
   const tags = candidates.length === 1 ? candidates[0] : candidates.map((t) => `~${t}`).join(" ");
-  return { ...buildQuery({ ...base, tags }, tagLimit), candidates, capped: candidates.length < wanted.length };
+  return {
+    ...buildQuery({ ...base, tags }, tagLimit),
+    candidates,
+    capped: candidates.length < wanted.length,
+    popular: windowOnly.query,
+  };
 }

@@ -65,7 +65,7 @@ describe("RecommendedQueue", () => {
     expect(api.calls.map(label)).toEqual(["a1", "b1", "c1", "b2"]);
   });
 
-  it("dedupes, keeps favorites, drops blacklisted and unmatched posts, and explains each", async () => {
+  it("dedupes, drops favorites, blacklisted and unmatched posts, and explains each", async () => {
     const api = controlled();
     const shared = makePost({ tagList: ["a", "b"] });
     const fav = makePost({ tagList: ["good"], stats: { is_favorited: true } });
@@ -77,7 +77,8 @@ describe("RecommendedQueue", () => {
     await flush();
     api.calls[1].resolve([shared]);
     await q.ensure();
-    expect(ids(q)).toEqual([fav.id, shared.id]);
+    expect(ids(q)).toEqual([shared.id]);
+    expect(q.matchFor(fav.id)).toBeUndefined();
     expect(q.stats.blacklisted).toBe(1);
     expect(q.matchFor(shared.id)).toEqual({ score: 2, reasons: ["a", "b"] });
   });

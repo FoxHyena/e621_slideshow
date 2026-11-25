@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
-import { scorePost } from "../recommend/rank";
+import { cohortQuality, percentiles, rankAll, scorePost, type Ranked } from "../recommend/rank";
 import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
 import { CAT_MULT, computeWeights, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
 import { makePost } from "./fixtures";
@@ -226,5 +226,67 @@ describe("searchPlan", () => {
 
   it("puts pins first and counts them against breadth", () => {
     expect(plan(2, { pinned: ["anthro"], muted: [] })).toEqual(["pinned:anthro", "signature:rare_artist"]);
+  });
+});
+
+describe("percentiles", () => {
+  it("spreads values from 0 to 1 and gives ties the midpoint", () => {
+    expect(percentiles([10, 30, 20])).toEqual([0, 1, 0.5]);
+    expect(percentiles([5, 5, 9])).toEqual([0.25, 0.25, 1]);
+    expect(percentiles([7])).toEqual([0.5]);
+  });
+});
+
+/** `n` posts uploaded an hour apart, oldest first, with the given favorite counts. */
+function hourly(favs: number[]) {
+  const t0 = Date.parse("2024-01-01T00:00:00Z");
+  return favs.map((fav_count, i) =>
+    makePost({ created_at: new Date(t0 + i * 3600_000).toISOString(), stats: { fav_count } }),
+  );
+}
+
+describe("cohortQuality", () => {
+  it("compares a post's favorites with posts of the same age, not with older ones", () => {
+    // 100 posts: favorites grow with age, so the newest posts have the fewest.
+    const favs = Array.from({ length: 100 }, (_, i) => 1000 - i * 10);
+    favs[95] = 500; // new, but far ahead of its neighbors (40–90 favorites)
+    favs[5] = 600; // old, but far behind its neighbors (~950)
+    const q = cohortQuality(hourly(favs));
+    expect(q[95]).toBe(1);
+    expect(q[5]).toBe(0);
+  });
+
+  it("keeps every cohort the same size at the ends of the window", () => {
+    const q = cohortQuality(hourly(Array.from({ length: 40 }, (_, i) => i)));
+    // k = 5: an 11-post cohort, slid inward at both ends
+    expect(q[0]).toBe(0);
+    expect(q[39]).toBe(1);
+    expect(q[20]).toBe(0.5);
+  });
+
+  it("is neutral for a single post", () => {
+    expect(cohortQuality(hourly([3]))).toEqual([0.5]);
+  });
+});
+
+describe("rankAll", () => {
+  const r = (score: number, fav_count: number): Ranked => ({
+    post: makePost({ stats: { fav_count } }),
+    score,
+    reasons: [],
+  });
+
+  it("lets a well-liked post with a good match beat the best match nobody liked", () => {
+    const top = r(9, 0); // best taste, worst quality
+    const solid = r(5, 100); // second-best taste, best quality
+    const weak = r(1, 50);
+    expect(rankAll([top, solid, weak])).toEqual([solid, top, weak]);
+  });
+
+  it("falls back to taste when quality is equal", () => {
+    const a = r(1, 5);
+    const b = r(9, 5);
+    const c = r(5, 5);
+    expect(rankAll([a, b, c])).toEqual([b, c, a]);
   });
 });

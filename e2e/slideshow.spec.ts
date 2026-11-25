@@ -551,7 +551,7 @@ async function startRecommended(page: Page) {
   const specs = defaultSpecs().map((s) => {
     if (s.id === 1100) return { ...s, tags: ["pawpads", "solo"] };
     if (s.id === 1050) return { ...s, tags: ["pawpads", "solo", "a", "b", "c"] };
-    if (s.id === 1120) return { ...s, tags: ["pawpads"] }; // already a favorite, still recommended
+    if (s.id === 1120) return { ...s, tags: ["pawpads"], is_favorited: true }; // already a favorite: left out
     return s;
   });
   const mock = await mockE621(page, specs);
@@ -573,12 +573,14 @@ test("recommended ranks the window by favorite tags and explains why", async ({ 
   await expect(page.getByTestId("search-input")).toBeHidden();
 
   await play(page);
-  // the favorite plays too; all three match only pawpads, so the tie goes to the newer post
-  expect(await slideId(page)).toBe(1120);
-  await expect(page.getByTestId("counter")).toHaveText("1 / 3");
+  // the favorite is left out; both match only pawpads, so the tie goes to the newer post
+  expect(await slideId(page)).toBe(1100);
+  await expect(page.getByTestId("counter")).toHaveText("1 / 2");
   const query = mock.searches.find((s) => s.tags.startsWith("pawpads"))!.tags;
   // candidates + window + score order; the synced account blacklist stays client-side
   expect(query).toBe("pawpads date:>=7_days_ago order:score");
+  // plus the window's popular posts, whatever their tags, ranked alongside
+  expect(mock.searches.some((s) => s.tags === "date:>=7_days_ago order:score")).toBe(true);
 
   // moving the mouse shows the match score next to e621's own
   await page.mouse.move(400, 300);
@@ -586,8 +588,6 @@ test("recommended ranks the window by favorite tags and explains why", async ({ 
 
   await page.keyboard.press("i");
   await expect(page.getByTestId("rec-reasons")).toHaveText("Recommended because: pawpads");
-  await page.keyboard.press("ArrowRight");
-  await expect.poll(() => slideId(page)).toBe(1100);
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => slideId(page)).toBe(1050); // extra unweighted tags neither help nor hurt
 });
@@ -611,7 +611,7 @@ test("muting the only profile tag leaves nothing to recommend", async ({ page })
   await expect(page.getByTestId("toast")).toContainText("Not enough favorites");
   await page.getByRole("button", { name: "Unmute pawpads" }).click();
   await play(page);
-  expect(await slideId(page)).toBe(1120);
+  expect(await slideId(page)).toBe(1100);
 });
 
 test("favs plays the signed-in user's favorites, ignores the tag box, keeps the order", async ({ page }) => {
