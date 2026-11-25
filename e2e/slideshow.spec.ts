@@ -614,6 +614,29 @@ test("muting the only profile tag leaves nothing to recommend", async ({ page })
   expect(await slideId(page)).toBe(1120);
 });
 
+test("favs plays the signed-in user's favorites, ignores the tag box, keeps the order", async ({ page }) => {
+  const mock = await start(page, undefined, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await expect(page.getByTestId("signed-in")).toBeVisible();
+  await page.getByTestId("search-input").fill("wolf");
+  await page.getByTestId("source-favorites").click();
+  await expect(page.getByTestId("search-input")).toHaveCount(0);
+  await expect(page.getByTestId("favorites-note")).toContainText("fav:tester");
+  await page.getByTestId("order-select").selectOption("score");
+  await expect(page.getByTestId("query-preview")).toHaveText("fav:tester order:score");
+  await play(page);
+  expect(mock.searches[0].tags).toBe("fav:tester order:score");
+  // back to Search, the tag box still has what was typed
+  await page.keyboard.press("s");
+  await page.getByRole("radio", { name: "Search" }).click();
+  await expect(page.getByTestId("search-input")).toHaveValue("wolf");
+});
+
+test("favs is only offered when signed in", async ({ page }) => {
+  await start(page);
+  await expect(page.getByRole("radio", { name: "Recommended" })).toBeVisible();
+  await expect(page.getByTestId("source-favorites")).toHaveCount(0);
+});
+
 test("recommended asks signed-out users to sign in", async ({ page }) => {
   await start(page);
   await page.getByRole("radio", { name: "Recommended" }).click();

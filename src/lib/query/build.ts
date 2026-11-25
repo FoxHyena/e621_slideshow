@@ -92,6 +92,11 @@ export function buildQuery(s: SearchSettings, tagLimit = DEFAULT_TAG_LIMIT): Bui
   };
 }
 
+/** The tags a Favorites show searches: the user's favorites, nothing else. */
+export function favoritesTags(username: string): string {
+  return `fav:${username}`;
+}
+
 /** Recommended's window when the user hasn't set a usable date filter. */
 export const REC_DEFAULT_WINDOW: DateFilter = {
   ...DEFAULT_DATE_FILTER,

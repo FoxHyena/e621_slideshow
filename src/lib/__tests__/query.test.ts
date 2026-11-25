@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { blacklistedBy, mergeBlacklists, parseBlacklist, removeBlacklistLines, syncAccountBlacklist, DEFAULT_BLACKLIST } from "../query/blacklist";
-import { buildQuery, buildRecommendedQuery, countTags } from "../query/build";
+import { buildQuery, buildRecommendedQuery, countTags, favoritesTags } from "../query/build";
 import { dateMetatag, DEFAULT_DATE_FILTER, nextDay } from "../query/date";
 import { inRange, parseRange } from "../query/range";
 import { DEFAULT_SEARCH, type SearchSettings } from "../settings";
@@ -182,6 +182,14 @@ describe("buildQuery", () => {
   it("flags user terms over the limit", () => {
     const tags = Array.from({ length: 45 }, (_, i) => `t${i}`).join(" ");
     expect(buildQuery(search({ tags })).overLimit).toBe(true);
+  });
+});
+
+describe("favorites", () => {
+  it("plays fav:<name> with the chosen order and filters", () => {
+    const b = buildQuery(search({ tags: favoritesTags("tester"), order: "score", ratings: { s: true, q: false, e: false } }));
+    expect(b.query).toBe("fav:tester rating:s order:score");
+    expect(b.paging).toBe("numbered");
   });
 });
 
