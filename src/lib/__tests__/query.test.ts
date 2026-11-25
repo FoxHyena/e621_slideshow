@@ -56,12 +56,12 @@ describe("blacklist parsing + matching", () => {
   });
 
   it("supports metatags and wildcards", () => {
-    expect(blacklistedBy(parseBlacklist("score:<0"), makePost({ score: { up: 0, down: 3, total: -3 } }))).not.toBeNull();
-    expect(blacklistedBy(parseBlacklist("type:webm"), makePost({ file: { ...makePost().file, ext: "webm" } }))).not.toBeNull();
+    expect(blacklistedBy(parseBlacklist("score:<0"), makePost({ stats: { score: { up: 0, down: 3, total: -3 } } }))).not.toBeNull();
+    expect(blacklistedBy(parseBlacklist("type:webm"), makePost({ meta: { ext: "webm" } }))).not.toBeNull();
     expect(blacklistedBy(parseBlacklist("type:webm"), makePost())).toBeNull();
     expect(blacklistedBy(parseBlacklist("african_*"), makePost({ tagList: ["african_wild_dog"] }))).not.toBeNull();
     expect(blacklistedBy(parseBlacklist("rating:explicit"), makePost({ rating: "e" }))).not.toBeNull();
-    expect(blacklistedBy(parseBlacklist("fav:me"), makePost({ is_favorited: true }))).not.toBeNull();
+    expect(blacklistedBy(parseBlacklist("fav:me"), makePost({ stats: { is_favorited: true } }))).not.toBeNull();
   });
 
   it("checks tags across all categories", () => {

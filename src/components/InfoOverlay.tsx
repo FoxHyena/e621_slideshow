@@ -43,9 +43,9 @@ export default function InfoOverlay({ post, onClose, onAddTag, onExcludeTag, rea
             Post #{post.id} <ExternalLink className="size-3.5" aria-hidden />
           </a>
           <p className="mt-1 text-xs text-neutral-400">
-            {RATING[post.rating]} · ▲{post.score.total} · ♥{post.fav_count} · {post.file.width}×{post.file.height}{" "}
-            {post.file.ext.toUpperCase()}
-            {post.duration ? ` · ${Math.round(post.duration)}s` : ""}
+            {RATING[post.rating]} · ▲{post.stats.score.total} · ♥{post.stats.fav_count} · {post.files.original.width}×{post.files.original.height}{" "}
+            {post.files.meta.ext.toUpperCase()}
+            {post.files.meta.duration ? ` · ${Math.round(post.files.meta.duration)}s` : ""}
           </p>
           <p className="text-xs text-neutral-500">{new Date(post.created_at).toLocaleDateString()}</p>
         </div>

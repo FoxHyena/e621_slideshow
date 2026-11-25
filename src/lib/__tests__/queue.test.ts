@@ -58,7 +58,7 @@ describe("PostQueue", () => {
   });
 
   it("skips posts without a file url and counts them", async () => {
-    const api = fakeApi(10, (id) => (id % 2 ? { file: { ...makePost().file, url: null } } : {}));
+    const api = fakeApi(10, (id) => (id % 2 ? { original: { url: null } } : {}));
     const s = search();
     const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
     await q.ensure(0);
@@ -76,15 +76,15 @@ describe("PostQueue", () => {
   });
 
   it("filters disabled media kinds", async () => {
-    const api = fakeApi(4, (id) => ({ file: { ...makePost().file, ext: id % 2 ? "webm" : "png" } }));
+    const api = fakeApi(4, (id) => ({ meta: { ext: id % 2 ? "webm" : "png" } }));
     const s = search({ media: { image: true, gif: true, video: false } });
     const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
     await q.ensure(0);
-    expect(q.posts.every((p) => p.file.ext === "png")).toBe(true);
+    expect(q.posts.every((p) => p.files.meta.ext === "png")).toBe(true);
   });
 
   it("drops Flash posts, which browsers can't play", async () => {
-    const api = fakeApi(4, (id) => ({ file: { ...makePost().file, ext: id === 4 ? "swf" : "png" } }));
+    const api = fakeApi(4, (id) => ({ meta: { ext: id === 4 ? "swf" : "png" } }));
     const s = search();
     const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
     await q.ensure(0);

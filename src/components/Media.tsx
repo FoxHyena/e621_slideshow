@@ -41,7 +41,7 @@ export function Media({ post, playback, onReady, onError, still, className, fade
       <video
         key={post.id}
         src={displayUrl(post, playback.quality) ?? undefined}
-        poster={post.sample.url ?? undefined}
+        poster={post.files.sample.jpg ?? undefined}
         className={cls}
         style={style}
         autoPlay
@@ -55,7 +55,7 @@ export function Media({ post, playback, onReady, onError, still, className, fade
         onLoadedMetadata={(e) => {
           setLoaded(true);
           const d = e.currentTarget.duration;
-          onReady?.(Number.isFinite(d) ? d : (post.duration ?? undefined));
+          onReady?.(Number.isFinite(d) ? d : (post.files.meta.duration ?? undefined));
         }}
         onError={onError}
       />
@@ -63,7 +63,7 @@ export function Media({ post, playback, onReady, onError, still, className, fade
   }
 
   // The outgoing layer of a video shows its poster frame rather than replaying it.
-  const src = kind === "video" ? post.sample.url : displayUrl(post, playback.quality);
+  const src = kind === "video" ? post.files.sample.jpg : displayUrl(post, playback.quality);
   if (!src) return null;
   return (
     // eslint-disable-next-line @next/next/no-img-element -- remote CDN media, no Next image optimization wanted

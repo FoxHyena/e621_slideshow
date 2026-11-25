@@ -1,24 +1,40 @@
 export type Rating = "s" | "q" | "e";
 
-export interface PostFile {
+/** A rendition's image URLs. Both are null when e621 hides the post from this viewer. */
+export interface PostImage {
   width: number;
   height: number;
-  ext: string;
-  size: number;
-  md5: string;
-  url: string | null;
+  jpg: string | null;
+  webp: string | null;
 }
 
-export interface PostSample {
-  has: boolean;
-  width: number;
-  height: number;
-  url: string | null;
-  alternates?: {
+/** e621's `files` group (the posts API format since 2026-11-18). */
+export interface PostFiles {
+  meta: {
+    md5: string;
+    ext: string;
+    size: number;
+    /** seconds, videos only */
+    duration: number | null;
+    has_sample: boolean;
+  };
+  /** `url` is null when e621 hides the post from this viewer */
+  original: { width: number; height: number; url: string | null };
+  preview: PostImage;
+  /** falls back to the original file when the post has no sample */
+  sample: PostImage;
+  /** videos only */
+  video?: {
     has?: boolean;
     variants?: { mp4?: { url: string | null } };
     samples?: Record<string, { url: string | null }>;
   };
+}
+
+export interface PostStats {
+  score: { up: number; down: number; total: number };
+  fav_count: number;
+  is_favorited: boolean;
 }
 
 export type TagCategoryName =
@@ -32,22 +48,19 @@ export type TagCategoryName =
   | "meta"
   | "lore";
 
+/** A post as `/posts.json` and `/favorites.json` return it with `mode=extended`; only the fields we read. */
 export interface Post {
   id: number;
   created_at: string;
-  file: PostFile;
-  preview: { width: number; height: number; url: string | null };
-  sample: PostSample;
-  score: { up: number; down: number; total: number };
+  files: PostFiles;
+  stats: PostStats;
+  /** grouped by category; `mode=extended` only (the default `basic` mode sends a flat list) */
   tags: Partial<Record<TagCategoryName, string[]>>;
   rating: Rating;
-  fav_count: number;
-  is_favorited: boolean;
   uploader_id?: number;
   uploader_name?: string;
   pools?: number[];
   sources?: string[];
-  duration: number | null;
   flags?: { deleted?: boolean; pending?: boolean; flagged?: boolean };
 }
 
@@ -112,7 +125,7 @@ export function allTags(post: Post): string[] {
 export type MediaKind = "image" | "gif" | "video" | "other";
 
 export function mediaKind(post: Post): MediaKind {
-  const ext = post.file.ext;
+  const ext = post.files.meta.ext;
   if (ext === "webm" || ext === "mp4") return "video";
   if (ext === "gif") return "gif";
   if (ext === "jpg" || ext === "png" || ext === "webp") return "image";

@@ -35,5 +35,5 @@ export function scorePost(post: Post, weights: Map<string, number>): Omit<Ranked
 
 /** Best first. Ties go to the higher e621 score, then the newer post. */
 export function byRank(a: Ranked, b: Ranked): number {
-  return b.score - a.score || b.post.score.total - a.post.score.total || b.post.id - a.post.id;
+  return b.score - a.score || b.post.stats.score.total - a.post.stats.score.total || b.post.id - a.post.id;
 }

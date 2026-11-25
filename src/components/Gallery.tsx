@@ -34,8 +34,8 @@ function Tile({ post, index, current, onPick }: { post: Post; index: number; cur
   // The tiny preview shows at once; the sharper sample (a static JPG for GIFs and
   // videos too) fades in over it. A screenful of samples is several MB and queues
   // on the CDN, so without the preview, slow tiles sit blank.
-  const preview = previewFailed ? null : post.preview.url;
-  const sample = sampleState === "failed" || post.sample.url === post.preview.url ? null : post.sample.url;
+  const preview = previewFailed ? null : post.files.preview.jpg;
+  const sample = sampleState === "failed" || post.files.sample.jpg === post.files.preview.jpg ? null : post.files.sample.jpg;
   return (
     <button
       type="button"
@@ -78,7 +78,7 @@ function Tile({ post, index, current, onPick }: { post: Post; index: number; cur
       {!preview && !sample && <ImageOff className="absolute inset-0 m-auto size-6 text-neutral-600" aria-hidden />}
       {(kind === "video" || kind === "gif") && (
         <span className="absolute bottom-1.5 right-1.5 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-white">
-          {kind === "video" ? `VIDEO${post.duration ? ` ${formatDuration(post.duration)}` : ""}` : "GIF"}
+          {kind === "video" ? `VIDEO${post.files.meta.duration ? ` ${formatDuration(post.files.meta.duration)}` : ""}` : "GIF"}
         </span>
       )}
     </button>

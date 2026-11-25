@@ -389,11 +389,11 @@ export default function App() {
       if (mediaKind(p) === "video") {
         // Buffer only the next video; for later ones just warm the poster.
         if (videos++ === 0) entries.push({ url, video: true });
-        else if (p.sample.url) entries.push({ url: p.sample.url, video: false });
+        else if (p.files.sample.jpg) entries.push({ url: p.files.sample.jpg, video: false });
       } else entries.push({ url, video: false });
     }
     for (const p of queue.posts.slice(Math.max(0, currentIndex - PREVIOUS_KEPT), currentIndex)) {
-      const url = mediaKind(p) === "video" ? p.sample.url : displayUrl(p, playback.quality);
+      const url = mediaKind(p) === "video" ? p.files.sample.jpg : displayUrl(p, playback.quality);
       if (url) entries.push({ url, video: false });
     }
     preloader.sync(entries);
@@ -408,7 +408,7 @@ export default function App() {
     if (!current) return playback.intervalSec * 1000;
     const base = playback.intervalSec * 1000;
     if (mediaKind(current) !== "video") return base;
-    const len = ready?.durationSec ?? current.duration ?? 0;
+    const len = ready?.durationSec ?? current.files.meta.duration ?? 0;
     const cap = playback.videoMaxSec > 0 ? playback.videoMaxSec : Infinity;
     return Math.max(base, Math.min(len, cap) * 1000);
   }, [current, ready, playback.intervalSec, playback.videoMaxSec]);
@@ -446,13 +446,14 @@ export default function App() {
   const toggleFavorite = async () => {
     if (!queue || !current || !creds || !user) return;
     const post = current;
-    const was = post.is_favorited;
-    queue.patch(post.id, { is_favorited: !was, fav_count: post.fav_count + (was ? -1 : 1) });
+    const { stats } = post;
+    const was = stats.is_favorited;
+    queue.patch(post.id, { stats: { ...stats, is_favorited: !was, fav_count: stats.fav_count + (was ? -1 : 1) } });
     try {
       if (was) await removeFavorite(post.id, creds);
       else await addFavorite(post.id, creds);
     } catch (e) {
-      queue.patch(post.id, { is_favorited: was, fav_count: post.fav_count });
+      queue.patch(post.id, { stats });
       showToast(`Favorite failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
@@ -787,12 +788,12 @@ export default function App() {
               type="button"
               className={iconBtn}
               onClick={() => void toggleFavorite()}
-              aria-label={current.is_favorited ? "Remove from favorites" : "Add to favorites"}
-              aria-pressed={current.is_favorited}
+              aria-label={current.stats.is_favorited ? "Remove from favorites" : "Add to favorites"}
+              aria-pressed={current.stats.is_favorited}
               data-testid="favorite-button"
             >
               <Heart
-                className={`size-5 ${current.is_favorited ? "fill-red-500 text-red-500" : ""}`}
+                className={`size-5 ${current.stats.is_favorited ? "fill-red-500 text-red-500" : ""}`}
                 aria-hidden
               />
             </button>
@@ -897,7 +898,7 @@ export default function App() {
                 <span className="px-1.5 text-neutral-600">·</span>
               </span>
             )}
-            <span title="Score on e621">▲ {current.score.total}</span>
+            <span title="Score on e621">▲ {current.stats.score.total}</span>
           </div>
         )}
       </div>}

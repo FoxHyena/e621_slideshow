@@ -133,11 +133,8 @@ describe("vintage prints", () => {
 describe("aspectOf", () => {
   it("uses file dimensions, falling back to sample, then 1", () => {
     expect(aspectOf(makePost())).toBeCloseTo(1.25);
-    const noFile = makePost();
-    noFile.file = { ...noFile.file, width: 0, height: 0 };
-    expect(aspectOf(noFile)).toBeCloseTo(850 / 680);
-    noFile.sample = { ...noFile.sample, width: 0, height: 0 };
-    expect(aspectOf(noFile)).toBe(1);
+    expect(aspectOf(makePost({ original: { width: 0, height: 0 } }))).toBeCloseTo(850 / 680);
+    expect(aspectOf(makePost({ original: { width: 0, height: 0 }, sample: { width: 0, height: 0 } }))).toBe(1);
   });
 });
 
