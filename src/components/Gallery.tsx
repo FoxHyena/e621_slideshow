@@ -5,6 +5,7 @@ import { GalleryVerticalEnd, ImageOff, Play, Search, X } from "lucide-react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import { InlineLoader } from "./Loader";
+import { useShown } from "./useShown";
 
 interface GalleryProps {
   posts: Post[];
@@ -92,23 +93,29 @@ function Tile({ post, index, current, onPick }: { post: Post; index: number; cur
   );
 }
 
+/** Tiles rendered per step as the grid scrolls (see useShown). */
+const GRID_PAGE = 120;
+
 export default function Gallery(props: GalleryProps) {
   const { posts, currentIndex, loading, exhausted, error, stats, onPick, onNeedMore } = props;
   const sentinel = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
+  const shown = useShown(posts.length, currentIndex, GRID_PAGE);
+  const { more, showMore } = shown;
 
-  // Load more whenever the bottom comes within reach.
+  // Render (or load) more whenever the bottom comes within reach.
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
-    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && onNeedMore(), {
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && (more ? showMore() : onNeedMore()), {
       root: scroller.current,
       rootMargin: "800px",
     });
     io.observe(el);
     return () => io.disconnect();
     // A new page can leave the sentinel still in view; re-observing re-fires it.
-  }, [onNeedMore, posts.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- showMore only bumps a counter
+  }, [onNeedMore, posts.length, shown.count, more]);
 
   // Open on the post the show is at (mount only).
   useEffect(() => {
@@ -176,7 +183,7 @@ export default function Gallery(props: GalleryProps) {
       </header>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-1 p-1">
-        {posts.map((p, i) => (
+        {posts.slice(0, shown.count).map((p, i) => (
           <Tile key={p.id} post={p} index={i} current={i === currentIndex} onPick={onPick} />
         ))}
       </div>
@@ -191,7 +198,7 @@ export default function Gallery(props: GalleryProps) {
           </div>
         ) : loading && posts.length === 0 && props.loader ? (
           <div className="flex min-h-[60vh] items-center justify-center">{props.loader}</div>
-        ) : loading ? (
+        ) : loading || more ? (
           <InlineLoader label="Loading more…" />
         ) : exhausted && posts.length === 0 ? (
           <p className="text-lg text-neutral-300" data-testid="gallery-empty">

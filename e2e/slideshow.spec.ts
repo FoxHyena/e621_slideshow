@@ -558,18 +558,31 @@ test("G opens the gallery mid-show on the current post and freezes the timer", a
 const cards = (page: Page) => page.getByTestId("feed-card");
 const activeCard = (page: Page) => page.locator("[data-testid=feed-card][aria-current]");
 
-test("scroll shows results as a timeline that loads more as it scrolls", async ({ page }) => {
+/** Scroll the feed's last card into view until it holds `n` cards. */
+async function scrollFeedTo(page: Page, n: number) {
+  await expect
+    .poll(
+      async () => {
+        await cards(page).last().scrollIntoViewIfNeeded();
+        return cards(page).count();
+      },
+      { timeout: 15_000 },
+    )
+    .toBe(n);
+}
+
+test("scroll shows results as a timeline that renders and loads more as it scrolls", async ({ page }) => {
   const mock = await start(page, defaultSpecs(150));
   await page.getByTestId("scroll-button").click();
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(cards(page)).toHaveCount(100);
+  // the first page is in, but only the cards near the top are built
   await expect(page.getByTestId("feed-count")).toHaveText("100+ posts");
+  await expect(cards(page)).toHaveCount(20);
   await expect(slide(page)).toHaveCount(0);
   await expect(cards(page).first()).toContainText("mock artist");
   await expect(cards(page).first().getByTestId("feed-tags")).toContainText("wolf");
   await expect(cards(page).first().getByTestId("feed-image")).toHaveAttribute("src", /\/mock\/1150\./);
-  await cards(page).last().scrollIntoViewIfNeeded();
-  await expect(cards(page)).toHaveCount(150);
+  await scrollFeedTo(page, 150);
   expect(mock.searches.map((s) => s.page)).toEqual([null, "b1051"]);
 });
 
@@ -981,6 +994,21 @@ test("recommended ORs the profile tags into one paged search and starts once it'
   await expect(slide(page)).toBeVisible({ timeout: 10_000 });
   await expect(progress).toBeHidden();
   await expect(page.getByTestId("counter")).toHaveText("1 / 720"); // complete: no "+"
+});
+
+test("the scroll view builds a big Recommended result set a page of cards at a time", async ({ page }) => {
+  // Recommended publishes every result at once; building them all crashed mobile tabs
+  const mock = await mockE621(page, Array.from({ length: 700 }, (_, i) => ({ id: 5000 - i, tags: ["pawpads"] })));
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads"] })));
+  mock.tagCounts = { pawpads: 5 };
+  await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
+  await page.goto("/");
+  await page.getByRole("radio", { name: "Recommended" }).click();
+  await expect(page.getByTestId("rec-tags")).toContainText("pawpads");
+  await page.getByTestId("scroll-button").click();
+  await expect(page.getByTestId("feed-count")).toHaveText("700 posts", { timeout: 10_000 });
+  await expect(cards(page)).toHaveCount(20);
+  await scrollFeedTo(page, 40);
 });
 
 test("recommended can start during the first read of the favorites, and shows each step", async ({ page }) => {
