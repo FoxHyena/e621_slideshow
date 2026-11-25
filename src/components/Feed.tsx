@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ExternalLink, Heart, ImageOff, LayoutGrid, Play, Search, X } from "lucide-react";
+import { ArrowLeft, ExternalLink, Heart, ImageOff, LayoutGrid, Play, Search, X } from "lucide-react";
 import { postPageUrl } from "@/lib/e621/client";
 import { mediaKind, TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
 import type { PlaybackSettings } from "@/lib/settings";
@@ -42,6 +42,15 @@ interface FeedProps {
   recommended: boolean;
   /** A tag was dropped on (or tapped onto) one of its targets. */
   onTag: (tag: string, action: TagAction) => void;
+  /** An artist's name (or avatar) was clicked: open a feed of their posts over this one. */
+  onArtist: (artist: string) => void;
+  /**
+   * Set when this feed is one artist's posts, opened from another feed: the header shows the
+   * artist and a back arrow, and there's no grid, search or play (those belong to the main search).
+   */
+  artist?: string;
+  /** Another feed is open over this one: it stays mounted (keeping its scroll) but goes quiet. */
+  suspended?: boolean;
 }
 
 /** Artist tags that aren't a person. */
@@ -87,7 +96,9 @@ interface CardProps {
   playback: PlaybackSettings;
   canFavorite: boolean;
   onFavorite: (post: Post) => void;
-  onPlayFrom: (index: number) => void;
+  /** absent in an artist's feed, which has no show to play */
+  onPlayFrom?: (index: number) => void;
+  onArtist: (artist: string) => void;
   hold: TagHold;
 }
 
@@ -166,7 +177,7 @@ function FeedMedia({ post, active, playback, onDoubleTap }: { post: Post; active
   );
 }
 
-function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite, onPlayFrom, hold }: CardProps) {
+function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite, onPlayFrom, onArtist, hold }: CardProps) {
   const [burst, setBurst] = useState(0);
   const by = artists(post);
   const rating = RATING[post.rating];
@@ -191,10 +202,38 @@ function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite,
     >
       <header className="flex items-center gap-3 px-3 py-2.5">
         {/* e621 has no artist pictures: a pattern drawn from the artist's name (or the post, if none). */}
-        <Avatar seed={by[0] ?? `post:${post.id}`} className="size-10" />
+        {by.length ? (
+          <button
+            type="button"
+            onClick={() => onArtist(by[0])}
+            className="shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-accent"
+            aria-label={`More from ${by[0].replaceAll("_", " ")}`}
+            data-testid="feed-artist-avatar"
+          >
+            <Avatar seed={by[0]} className="size-10" />
+          </button>
+        ) : (
+          <Avatar seed={`post:${post.id}`} className="size-10" />
+        )}
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate font-semibold" style={{ color: by.length ? TAG_CATEGORY_COLORS.artist : undefined }}>
-            {by.length ? by.map((a) => a.replaceAll("_", " ")).join(", ") : "unknown artist"}
+            {by.length
+              ? by.map((a, i) => (
+                  <span key={a}>
+                    {i > 0 && ", "}
+                    <button
+                      type="button"
+                      onClick={() => onArtist(a)}
+                      className="hover:underline"
+                      title={`More from ${a.replaceAll("_", " ")}`}
+                      data-testid="feed-artist"
+                      data-artist={a}
+                    >
+                      {a.replaceAll("_", " ")}
+                    </button>
+                  </span>
+                ))
+              : "unknown artist"}
           </p>
           <p className="truncate text-xs text-neutral-500">
             <a href={postPageUrl(post.id)} target="_blank" rel="noopener" className="hover:text-neutral-300 hover:underline">
@@ -243,14 +282,16 @@ function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite,
           ▲ {compact(post.stats.score.total)}
         </span>
         <div className="flex-1" />
-        <button
-          type="button"
-          onClick={() => onPlayFrom(index)}
-          className="flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm text-neutral-300 hover:bg-white/5"
-          data-testid="feed-play-from"
-        >
-          <Play className="size-4 fill-current" aria-hidden /> Play from here
-        </button>
+        {onPlayFrom && (
+          <button
+            type="button"
+            onClick={() => onPlayFrom(index)}
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm text-neutral-300 hover:bg-white/5"
+            data-testid="feed-play-from"
+          >
+            <Play className="size-4 fill-current" aria-hidden /> Play from here
+          </button>
+        )}
         <a
           href={postPageUrl(post.id)}
           target="_blank"
@@ -274,7 +315,8 @@ function isTyping(target: EventTarget | null) {
 }
 
 export default function Feed(props: FeedProps) {
-  const { posts, currentIndex, loading, exhausted, error, stats, onNeedMore, onFavorite, onPlayFrom } = props;
+  const { posts, currentIndex, loading, exhausted, error, stats, onNeedMore, onFavorite, onPlayFrom, artist } = props;
+  const suspended = !!props.suspended;
   const sentinel = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(currentIndex);
@@ -339,14 +381,16 @@ export default function Feed(props: FeedProps) {
   };
 
   // J / K step a post at a time, L favorites the post in view.
-  const keys = useRef({ active, posts, scrollTo, onFavorite, onPlayFrom, canFavorite: props.canFavorite });
+  const keys = useRef({ active, posts, scrollTo, onFavorite, onPlayFrom, canFavorite: props.canFavorite, suspended, artist });
   useEffect(() => {
-    keys.current = { active, posts, scrollTo, onFavorite, onPlayFrom, canFavorite: props.canFavorite };
+    keys.current = { active, posts, scrollTo, onFavorite, onPlayFrom, canFavorite: props.canFavorite, suspended, artist };
   });
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e.target)) return;
       const k = keys.current;
+      // Only the feed on top listens.
+      if (k.suspended) return;
       switch (e.key.toLowerCase()) {
         case "j":
           k.scrollTo(Math.min(k.active + 1, k.posts.length - 1));
@@ -358,7 +402,8 @@ export default function Feed(props: FeedProps) {
           if (k.canFavorite && k.posts[k.active]) k.onFavorite(k.posts[k.active]);
           break;
         case "enter":
-          if (e.target === document.body && k.posts[k.active]) k.onPlayFrom(k.active);
+          if (k.artist || e.target !== document.body || !k.posts[k.active]) return;
+          k.onPlayFrom(k.active);
           break;
         default:
           return;
@@ -373,16 +418,39 @@ export default function Feed(props: FeedProps) {
     <div
       ref={scroller}
       className="absolute inset-0 z-20 overflow-y-auto overscroll-contain bg-black"
+      inert={suspended}
+      aria-hidden={suspended || undefined}
       // Targets left open for a tap would drift off their tag as the feed moves.
       onScroll={() => {
         if (hold.held && !hold.held.dragging) hold.close();
         report();
       }}
-      data-testid="feed"
+      data-testid={artist ? "artist-feed" : "feed"}
+      data-artist={artist}
     >
       <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel/95 px-4 py-3 backdrop-blur">
+        {artist && (
+          <>
+            <button
+              type="button"
+              onClick={props.onClose}
+              className="-ml-2 flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+              aria-label="Back"
+              title="Back (Esc)"
+              data-testid="artist-feed-back"
+            >
+              <ArrowLeft className="size-5" aria-hidden />
+            </button>
+            <Avatar seed={artist} className="size-9" />
+          </>
+        )}
         <div className="min-w-0 flex-1">
-          <p className="font-semibold" data-testid="feed-count">
+          {artist && (
+            <p className="truncate font-semibold" style={{ color: TAG_CATEGORY_COLORS.artist }} data-testid="artist-feed-name">
+              {artist.replaceAll("_", " ")}
+            </p>
+          )}
+          <p className={artist ? "text-xs text-neutral-400" : "font-semibold"} data-testid="feed-count">
             {posts.length}
             {exhausted ? "" : "+"} post{posts.length === 1 && exhausted ? "" : "s"}
           </p>
@@ -397,43 +465,47 @@ export default function Feed(props: FeedProps) {
             </p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={props.onEditSearch}
-          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
-          aria-label="Edit search"
-          title="Edit search (S)"
-          data-testid="feed-search"
-        >
-          <Search className="size-5" aria-hidden />
-        </button>
-        <button
-          type="button"
-          onClick={props.onGrid}
-          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
-          aria-label="Switch to grid"
-          data-testid="feed-grid"
-        >
-          <LayoutGrid className="size-5" aria-hidden />
-        </button>
-        <button
-          type="button"
-          onClick={() => onPlayFrom(active)}
-          disabled={posts.length === 0}
-          className="flex items-center gap-2 rounded-md bg-accent px-4 py-2 font-semibold text-black hover:bg-accent-strong disabled:opacity-40"
-          data-testid="feed-play"
-        >
-          <Play className="size-4 fill-current" aria-hidden /> Play
-        </button>
-        <button
-          type="button"
-          onClick={props.onClose}
-          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
-          aria-label="Close scroll view"
-          data-testid="feed-close"
-        >
-          <X className="size-5" aria-hidden />
-        </button>
+        {!artist && (
+          <>
+            <button
+              type="button"
+              onClick={props.onEditSearch}
+              className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+              aria-label="Edit search"
+              title="Edit search (S)"
+              data-testid="feed-search"
+            >
+              <Search className="size-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={props.onGrid}
+              className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+              aria-label="Switch to grid"
+              data-testid="feed-grid"
+            >
+              <LayoutGrid className="size-5" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => onPlayFrom(active)}
+              disabled={posts.length === 0}
+              className="flex items-center gap-2 rounded-md bg-accent px-4 py-2 font-semibold text-black hover:bg-accent-strong disabled:opacity-40"
+              data-testid="feed-play"
+            >
+              <Play className="size-4 fill-current" aria-hidden /> Play
+            </button>
+            <button
+              type="button"
+              onClick={props.onClose}
+              className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+              aria-label="Close scroll view"
+              data-testid="feed-close"
+            >
+              <X className="size-5" aria-hidden />
+            </button>
+          </>
+        )}
       </header>
 
       <div className="mx-auto flex max-w-xl flex-col gap-3 py-3 sm:gap-5 sm:px-3 sm:py-5">
@@ -442,12 +514,13 @@ export default function Feed(props: FeedProps) {
             key={p.id}
             post={p}
             index={i}
-            active={i === active}
+            active={i === active && !suspended}
             now={now}
             playback={props.playback}
             canFavorite={props.canFavorite}
             onFavorite={onFavorite}
-            onPlayFrom={onPlayFrom}
+            onPlayFrom={artist ? undefined : onPlayFrom}
+            onArtist={props.onArtist}
             hold={hold}
           />
         ))}

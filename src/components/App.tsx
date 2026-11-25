@@ -92,6 +92,16 @@ interface Active {
   serial: number;
 }
 
+/** One artist's posts, opened from the scroll view over the feed it was opened from. */
+interface ArtistFeed {
+  id: number;
+  artist: string;
+  queue: PostQueue;
+  /** the show it was opened from: a new search leaves it behind */
+  serial: number;
+  needMore: () => void;
+}
+
 /** A share link's settings on top of the visitor's own blacklist and preload. Not saved. */
 function sharedSearch(shared: SharedShow): SearchSettings {
   return { ...DEFAULT_SEARCH, ...shared.search, blacklist: storage.loadSearch().blacklist };
@@ -156,7 +166,15 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(false);
   /** A browsable view of the results over the show: the grid, or the scrolling feed. */
-  const [browse, setBrowse] = useState<"grid" | "feed" | null>(null);
+  const [browse, setBrowseState] = useState<"grid" | "feed" | null>(null);
+  /** Artists' feeds opened from the scroll view, innermost last; each covers the one below. */
+  const [artistFeeds, setArtistFeeds] = useState<ArtistFeed[]>([]);
+  const artistFeedId = useRef(0);
+  /** Leaving the scroll view (or switching views) closes any artist feeds over it. */
+  const setBrowse = (view: "grid" | "feed" | null) => {
+    setBrowseState(view);
+    setArtistFeeds([]);
+  };
   /** Where the open grid or feed was opened from, so closing it goes back there. */
   const browseFrom = useRef<"panel" | "show">("show");
   /** The feed's last place (post in view and scroll offset), so closing it doesn't lose it. */
@@ -169,6 +187,7 @@ export default function App() {
   const [waiting, setWaiting] = useState<SearchSettings | null>(null);
 
   const browsing = browse !== null;
+  const openArtists = browse === "feed" && active ? artistFeeds.filter((f) => f.serial === active.serial) : [];
   const queue = active?.queue ?? null;
   const posts = queue?.posts ?? [];
   const current: Post | undefined = posts[Math.min(index, posts.length - 1)];
@@ -292,6 +311,7 @@ export default function App() {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);
     }
     setActive({ queue: q, key, search: s, serial: (active?.serial ?? 0) + 1 });
+    setArtistFeeds([]);
     setIndex(0);
     setTrail([]);
     setReady(null);
@@ -549,12 +569,17 @@ export default function App() {
     if (!queue || !post || !creds || !user) return;
     const { stats } = post;
     const was = stats.is_favorited;
-    queue.patch(post.id, { stats: { ...stats, is_favorited: !was, fav_count: stats.fav_count + (was ? -1 : 1) } });
+    // The post may be in the main results and in any artist feeds open over them.
+    const patch = (p: Partial<Post>) => {
+      queue.patch(post.id, p);
+      for (const f of artistFeeds) f.queue.patch(post.id, p);
+    };
+    patch({ stats: { ...stats, is_favorited: !was, fav_count: stats.fav_count + (was ? -1 : 1) } });
     try {
       if (was) await removeFavorite(post.id, creds);
       else await addFavorite(post.id, creds);
     } catch (e) {
-      queue.patch(post.id, { stats });
+      patch({ stats });
       showToast(`Favorite failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
@@ -611,7 +636,9 @@ export default function App() {
     const before = active.queue.posts.length;
     const keep = current?.id;
     const s: SearchSettings = { ...active.search, blacklist };
-    active.queue.setRules(buildFor(s).rules);
+    const rules = buildFor(s).rules;
+    active.queue.setRules(rules);
+    for (const f of artistFeeds) f.queue.setRules(rules);
     // Same show, new blacklist: keep it current so Play doesn't restart it.
     setActive({ ...active, search: s, key: keyFor(s, buildFor(s)) });
     const at = active.queue.posts.findIndex((p) => p.id === keep);
@@ -619,6 +646,39 @@ export default function App() {
     const hid = before - active.queue.posts.length;
     showToast(`Blacklisted ${tag}${hid ? `: hid ${hid} post${hid === 1 ? "" : "s"}` : ""}`);
   };
+
+  // ---- artist feeds ----------------------------------------------------------
+  /** Open a scrolling feed of one artist's posts over the feed, which keeps its place underneath. */
+  const openArtist = (artist: string) => {
+    if (!active || openArtists.at(-1)?.artist === artist) return;
+    // The artist's posts, newest first, with the show's ratings, media and blacklist.
+    const s: SearchSettings = {
+      ...DEFAULT_SEARCH,
+      tags: artist,
+      ratings: active.search.ratings,
+      media: active.search.media,
+      blacklist: active.search.blacklist,
+    };
+    const q = new PostQueue(
+      buildQuery(s, tagLimit),
+      s.media,
+      (tags, page, limit) => searchPosts(tags, page, limit, creds),
+      { username: user?.name },
+      () => setVersion((v) => v + 1),
+    );
+    void q.ensure(0);
+    const feed: ArtistFeed = {
+      id: ++artistFeedId.current,
+      artist,
+      queue: q,
+      serial: active.serial,
+      needMore: () => void q.ensure(q.posts.length - 1),
+    };
+    setArtistFeeds([...openArtists, feed]);
+  };
+
+  /** Back out of the innermost artist feed, to the feed under it. */
+  const closeArtist = () => setArtistFeeds(openArtists.slice(0, -1));
 
   // ---- controls auto-hide -------------------------------------------------
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -677,6 +737,13 @@ export default function App() {
     if (browsing) {
       // Leave arrows/space alone so they scroll the grid or feed.
       const key = e.key.toLowerCase();
+      // In an artist's feed, Esc goes back a level; the other keys belong to the main search.
+      if (openArtists.length) {
+        if (key !== "escape") return;
+        e.preventDefault();
+        closeArtist();
+        return;
+      }
       if (key === "escape") closeBrowse();
       // G / T switch between the grid and the feed, or close the one already open.
       else if (key === "g" || key === "t") {
@@ -926,8 +993,43 @@ export default function App() {
           onPlace={(id, top) => (feedPlace.current = { serial: active.serial, id, top })}
           recommended={isRec(search)}
           onTag={(tag, action) => (action === "search" ? searchTag(tag) : blacklistTag(tag))}
+          onArtist={openArtist}
+          suspended={openArtists.length > 0}
         />
       )}
+
+      {openArtists.map((f, i) => (
+        <Feed
+          key={f.id}
+          artist={f.artist}
+          posts={f.queue.posts}
+          currentIndex={0}
+          loading={f.queue.loading}
+          exhausted={f.queue.exhausted}
+          error={f.queue.error}
+          stats={f.queue.stats}
+          signedIn={!!user}
+          playback={playback}
+          canFavorite={!!user && !!creds}
+          onFavorite={(p) => void toggleFavorite(p)}
+          onPlayFrom={() => {}}
+          onNeedMore={f.needMore}
+          loader={<Loader step={null} label="Searching e621" detail={f.artist} testId="artist-feed-loading" />}
+          onRetry={() => {
+            f.queue.retry();
+            f.needMore();
+          }}
+          onClose={closeArtist}
+          onGrid={() => {}}
+          onEditSearch={() => {}}
+          savedScroll={() => null}
+          onPlace={() => {}}
+          recommended={isRec(search)}
+          onTag={(tag, action) => (action === "search" ? searchTag(tag) : blacklistTag(tag))}
+          onArtist={openArtist}
+          suspended={i < openArtists.length - 1}
+        />
+      ))}
 
       {browse === "grid" && queue && (
         <Gallery
