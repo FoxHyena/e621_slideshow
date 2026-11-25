@@ -21,11 +21,10 @@ pnpm dev            # http://localhost:3000
   until you change a setting. Not available in Recommended mode.
   Turn on **Include my sign-in in share links** (e621 account section) to add your username and
   API key to the link's `#` fragment; the visitor is signed in for that tab only, nothing is saved.
-- Launch links start a show from a URL with your own saved settings (ratings, media, blacklist,
-  style…). Only what the link names changes, and it's saved like a search you typed:
-  - `/?tags=wolf+solo` plays those tags.
-  - `/?mode=recommended` plays Recommended from your favorites once they've synced (needs sign-in).
-- The [userscript](#userscript) adds Slideshow and Recommended buttons to e621 itself.
+- Launch links (`/?tags=wolf+solo`) play an e621 search straight away, exactly as e621 runs it:
+  default filters (all ratings and media, newest first), so you see the same posts. Your own
+  blacklist and playback settings (style, speed…) still apply, and nothing is saved.
+- The [userscript](#userscript) adds a Slideshow button to e621 itself.
 - Sign in with your e621 username + API key (Account → Manage API Access) to see posts hidden from
   anonymous users and to favorite with the heart.
 
@@ -42,9 +41,9 @@ pnpm dev            # http://localhost:3000
 
 ## Userscript
 
-Adds **▶ Slideshow** and **★ Recommended** buttons under the search box on e621.net and e926.net.
-Slideshow plays what's in the search box (or the pool you're on) with your saved settings;
-Recommended plays from your favorites (sign in on the slideshow site first).
+Adds a **▶ Slideshow** button under the search box on e621.net and e926.net. It plays what's in
+the search box (or the pool you're on): the same posts e621 shows, in your saved slideshow style
+and speed.
 
 ### Install
 
@@ -62,14 +61,14 @@ Recommended plays from your favorites (sign in on the slideshow site first).
 
 The manager checks that same URL for updates.
 
-**No buttons?** Click the manager's toolbar icon on an e621 page. The script should be listed and
+**No button?** Click the manager's toolbar icon on an e621 page. The script should be listed and
 switched on. If the list is empty, recheck step 2 and that the manager is allowed on e621.net.
 
 ### Developing it
 
 Source: [`public/e621-slideshow.user.js`](public/e621-slideshow.user.js), served from the site root.
-Bump `@version` whenever you change it, or installed copies won't update. The buttons open
-[launch links](#use) (`/?tags=…`, `/?mode=recommended`).
+Bump `@version` whenever you change it, or installed copies won't update. The button opens
+[launch links](#use) (`/?tags=…`).
 
 ## How the query is built
 
