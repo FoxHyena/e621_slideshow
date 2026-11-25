@@ -272,6 +272,7 @@ export default function App() {
         { media: s.media, rules: b.rules, ctx },
         new Set(rec.overrides.muted),
         onChange,
+        rec.learned,
       );
     } else {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);

@@ -1,6 +1,7 @@
 import { allTags, type Post } from "../e621/types";
 import { acceptPost, type PostFilter, type QueueStats, type SearchProgress, type SlideQueue } from "../slideshow/queue";
-import { rankAll, scorePost, type Ranked } from "./rank";
+import { learnedScore } from "./learn";
+import { QUALITY_WEIGHT, rankAll, scorePost, type Ranked } from "./rank";
 
 /** Most pages of candidates to fetch (8,000 posts). The search usually ends sooner, on a short page. */
 export const REC_PAGE_BUDGET = 25;
@@ -26,10 +27,11 @@ export type RecFetch = (query: string, page: number, limit: number) => Promise<P
 
 /**
  * A slideshow source that fetches every candidate page in the background, then
- * shows the whole set ranked by taste and quality (see `rankAll`), leaving out
- * posts already in the user's favorites. Nothing is shown until the search
- * ends: results arrive in e621-score order, so the best match for this profile
- * can be on the last page, and showing early would play worse posts first.
+ * shows the whole set ranked by taste (learned weights when given) and quality
+ * (see `rankAll`), leaving out posts already in the user's favorites. Nothing
+ * is shown until the search ends: results arrive in e621-score order, so the
+ * best match for this profile can be on the last page, and showing early would
+ * play worse posts first.
  *
  * Takes a list of queries, fetched round by round, each until a short page or
  * its page budget; the app passes the OR query of profile tags and the
@@ -62,6 +64,11 @@ export class RecommendedQueue implements SlideQueue {
     /** muted profile tags: posts carrying any of them are left out, like a blacklist */
     private muted: ReadonlySet<string>,
     private onChange: () => void = () => {},
+    /**
+     * Learned tag weights (learn.ts) to rank by in place of `weights`. `weights`
+     * still decides which posts match at all and the "Recommended because" tags.
+     */
+    private learned: Map<string, number> | null = null,
   ) {
     this.filter = { ...filter, seen: new Set(), stats: this.stats };
     void this.run();
@@ -147,7 +154,8 @@ export class RecommendedQueue implements SlideQueue {
       this.running = false;
       this.loading = false;
       if (!this.disposed) {
-        this.ranked = rankAll(this.ranked);
+        const learned = this.learned;
+        this.ranked = rankAll(this.ranked, QUALITY_WEIGHT, learned ? (r) => learnedScore(r.post, learned) : undefined);
         this.changed();
       }
     }

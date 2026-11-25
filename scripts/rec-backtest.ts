@@ -13,6 +13,14 @@
 //   BACKTEST_BLACKLIST        extra blacklist lines for the run (newline-separated)
 //   BACKTEST_PLANS            comma-separated subset of the plans below (signature always runs)
 //   BACKTEST_CACHE            folder for cached favorites and tag counts (default: the OS temp folder)
+//   BACKTEST_LR               comma-separated C values for learned (logistic regression) rankings (default: 0.05,0.5)
+//   BACKTEST_NEG_PAGES        pages of random pre-window posts used as the learner's negatives (default: 10)
+//
+// Rankings, all over the same candidates:
+//   taste          lift weights, top-5 sum (the app before quality)
+//   app            lift taste + cohort quality (rankAll, today's app)
+//   lr C           learned weights (learn.ts) in place of lift, + cohort quality
+//   lr C taste     learned weights alone
 //
 // Plans, so search strategies are compared at the same request cost:
 //   signature      today's plan: the highest-weight tags
@@ -40,6 +48,7 @@ import {
 import { allTags, type Post } from "../src/lib/e621/types";
 import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "../src/lib/query/build";
 import { coverTags } from "../src/lib/recommend/cover";
+import { features, learnedScore, learnWeights } from "../src/lib/recommend/learn";
 import { addFavorites, emptyProfile } from "../src/lib/recommend/profile";
 import { byRank, rankAll, scorePost, type Ranked } from "../src/lib/recommend/rank";
 import { REC_PAGE_BUDGET, REC_PAGE_SIZE } from "../src/lib/recommend/stream";
@@ -78,6 +87,8 @@ const PLANS = [
 type Plan = (typeof PLANS)[number];
 const DEFAULT_PLANS = PLANS.filter((p) => p !== "cover-max"); // cover-max: 25 uncacheable pages per account
 const plans = ["signature", ...((process.env.BACKTEST_PLANS?.split(",") ?? DEFAULT_PLANS) as Plan[]).filter((p) => p !== "signature")] as Plan[];
+const lrCs = (process.env.BACKTEST_LR ?? "0.05,0.5").split(",").map(Number).filter((c) => c > 0);
+const negPages = Number(process.env.BACKTEST_NEG_PAGES ?? 10);
 const cacheDir = process.env.BACKTEST_CACHE ?? join(tmpdir(), "e621-rec-backtest");
 mkdirSync(cacheDir, { recursive: true });
 const tagCacheFile = join(cacheDir, "tags.json");
@@ -162,8 +173,7 @@ interface Row {
   candidates: number;
   pages: number;
   found: number;
-  old: Scores;
-  new: Scores;
+  ranks: Record<string, Scores>;
 }
 
 function scores(order: Ranked[], hidden: Set<number>): Scores {
@@ -197,6 +207,15 @@ async function runUser(name: string, share: number): Promise<Row[]> {
   const counts = countsOf(tagCache);
   const weights = computeWeights(profile, counts, tagCache.site?.n ?? 0);
   const favTags = train.map(allTags);
+  // Negatives for the learner: random posts uploaded before the window, minus the training favorites.
+  const trainIds = new Set(train.map((p) => p.id));
+  const negatives = (await fetchQuery(`date:<${days}_days_ago order:random`, negPages)).posts.filter((p) => !trainIds.has(p.id));
+  const learned = lrCs.map((C) => {
+    const t = Date.now();
+    const w = learnWeights(train.map(features), negatives.map(features), { C });
+    log(`  lr C=${C}: ${w.size} weights from ${train.length} favorites and ${negatives.length} random posts in ${Date.now() - t} ms`);
+    return [C, w] as const;
+  });
   const settings = {
     ...DEFAULT_SEARCH,
     source: "recommended" as const,
@@ -255,9 +274,16 @@ async function runUser(name: string, share: number): Promise<Row[]> {
       candidates: ranked.length,
       pages,
       found: ranked.filter((r) => hidden.has(r.post.id)).length,
-      old: scores([...ranked].sort(byRank), hidden),
-      new: scores(rankAll(ranked), hidden),
+      ranks: {
+        taste: scores([...ranked].sort(byRank), hidden),
+        app: scores(rankAll(ranked), hidden),
+      },
     };
+    for (const [C, w] of learned) {
+      const relearned = ranked.map((r) => ({ ...r, score: learnedScore(r.post, w) }));
+      row.ranks[`lr ${C}`] = scores(rankAll(relearned), hidden);
+      row.ranks[`lr ${C} taste`] = scores(rankAll(relearned, 0), hidden);
+    }
     log(`  ${plan}: ${row.candidates} candidates in ${pages} pages, found ${row.found}`);
     rows.push(row);
   }
@@ -276,7 +302,8 @@ for (const name of users) {
 }
 
 const pct = (a: number, b: number) => (b ? `${((a / b) * 100).toFixed(1)}%` : "-");
-console.log(`\nLast ${days} days, breadth ${breadth}. Per account: hidden favorites found by the search, and in the top 100 / 200 of each ranking.`);
+const rankings = [...new Set(rows.flatMap((r) => Object.keys(r.ranks)))];
+console.log(`\nLast ${days} days, breadth ${breadth}. Per account: hidden favorites found by the search, and in the top 200 of each ranking.`);
 console.table(
   rows.map((r) => ({
     account: r.user,
@@ -285,30 +312,25 @@ console.table(
     candidates: r.candidates,
     pages: r.pages,
     found: r.found,
-    "old top100": r.old.top100,
-    "new top100": r.new.top100,
-    "old top200": r.old.top200,
-    "new top200": r.new.top200,
+    ...Object.fromEntries(rankings.map((k) => [k, r.ranks[k]?.top200 ?? "-"])),
   })),
 );
-console.log("Totals over all accounts (share of all hidden favorites):");
-console.table(
-  plans.map((plan) => {
-    const rs = rows.filter((r) => r.plan === plan);
-    const sum = (f: (r: Row) => number) => rs.reduce((s, r) => s + f(r), 0);
-    const hidden = sum((r) => r.hidden);
-    return {
-      plan,
-      accounts: rs.length,
-      "avg candidates": Math.round(sum((r) => r.candidates) / Math.max(1, rs.length)),
-      "avg pages": (sum((r) => r.pages) / Math.max(1, rs.length)).toFixed(1),
-      found: pct(sum((r) => r.found), hidden),
-      "old top20": pct(sum((r) => r.old.top20), hidden),
-      "new top20": pct(sum((r) => r.new.top20), hidden),
-      "old top100": pct(sum((r) => r.old.top100), hidden),
-      "new top100": pct(sum((r) => r.new.top100), hidden),
-      "old top200": pct(sum((r) => r.old.top200), hidden),
-      "new top200": pct(sum((r) => r.new.top200), hidden),
-    };
-  }),
-);
+for (const plan of plans) {
+  const rs = rows.filter((r) => r.plan === plan);
+  const hidden = rs.reduce((s, r) => s + r.hidden, 0);
+  const found = rs.reduce((s, r) => s + r.found, 0);
+  const pages = rs.reduce((s, r) => s + r.pages, 0) / Math.max(1, rs.length);
+  console.log(`\n${plan}: ${rs.length} accounts, ${hidden} hidden favorites, ${pct(found, hidden)} found, ${pages.toFixed(1)} pages on average`);
+  console.table(
+    rankings.map((k) => {
+      const sum = (f: (s: Scores) => number) => rs.reduce((t, r) => t + (r.ranks[k] ? f(r.ranks[k]) : 0), 0);
+      return {
+        ranking: k,
+        top20: pct(sum((s) => s.top20), hidden),
+        top100: pct(sum((s) => s.top100), hidden),
+        top200: pct(sum((s) => s.top200), hidden),
+        "accounts better / worse (top200 vs app)": `${rs.filter((r) => r.ranks[k] && r.ranks[k].top200 > r.ranks.app.top200).length} / ${rs.filter((r) => r.ranks[k] && r.ranks[k].top200 < r.ranks.app.top200).length}`,
+      };
+    }),
+  );
+}

@@ -596,11 +596,42 @@ test("recommended keeps the profile across reloads and only reads new favorites"
   const mock = await startRecommended(page);
   await expect(page.getByTestId("rec-tags")).toContainText("pawpads");
   const lookups = mock.tagLookups.length;
+  // the learned ranking sampled random posts to compare the favorites against
+  await expect.poll(() => mock.searches.filter((s) => s.tags === "order:random").length).toBeGreaterThan(0);
+  const samples = mock.searches.filter((s) => s.tags === "order:random").length;
   mock.favoritePages.length = 0;
   await page.reload();
   await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
   await expect.poll(() => mock.favoritePages).toEqual([1]);
   expect(mock.tagLookups).toHaveLength(lookups); // counts cached
+  // sample and each favorite's tags kept in IndexedDB: nothing re-read
+  expect(mock.searches.filter((s) => s.tags === "order:random")).toHaveLength(samples);
+});
+
+test("an older profile without stored favorite tags reads every favorite once", async ({ page }) => {
+  const mock = await startRecommended(page);
+  await expect.poll(() => mock.searches.filter((s) => s.tags === "order:random").length).toBeGreaterThan(0);
+  await page.evaluate(() => new Promise((resolve) => {
+    const req = indexedDB.deleteDatabase("e6ss");
+    req.onsuccess = req.onerror = req.onblocked = () => resolve(null);
+  }));
+  await page.reload();
+  await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
+  // every favorite's tags are back (an incremental read would have found no new favorites to store)
+  const stored = () =>
+    page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          const open = indexedDB.open("e6ss");
+          open.onsuccess = () => {
+            const get = open.result.transaction("kv").objectStore("kv").get("favFeatures:tester");
+            get.onsuccess = () => resolve(Object.keys(get.result?.feats ?? {}).length);
+            get.onerror = () => resolve(-1);
+          };
+          open.onerror = () => resolve(-1);
+        }),
+    );
+  await expect.poll(stored).toBe(10);
 });
 
 test("muting the only profile tag leaves nothing to recommend", async ({ page }) => {

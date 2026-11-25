@@ -52,6 +52,23 @@ describe("RecommendedQueue", () => {
     expect(ids(q)).toEqual([best.id, good.id, plain.id]);
   });
 
+  it("ranks by learned weights when given, while lift still decides what matches", async () => {
+    const api = controlled();
+    const learned = new Map([
+      ["a", 3],
+      ["best", -1],
+    ]);
+    const q = new RecommendedQueue([tq("or")], api.fetch, weights, filter, none, undefined, learned);
+    const plain = makePost({ tagList: ["a"] });
+    const best = makePost({ tagList: ["best"] });
+    const unmatched = makePost({ tagList: ["filler"] }); // no lift weight: left out whatever the learner says
+    await flush();
+    api.calls[0].resolve([best, plain, unmatched]);
+    await q.ensure();
+    expect(ids(q)).toEqual([plain.id, best.id]);
+    expect(q.matchFor(best.id)?.reasons).toEqual(["best"]);
+  });
+
   it("fetches several queries round by round, each until a short page or its budget", async () => {
     const api = controlled();
     new RecommendedQueue([tq("a", 3), tq("b", 2), tq("c", 1)], api.fetch, weights, filter, none);
