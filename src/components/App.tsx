@@ -40,7 +40,6 @@ import {
   decodeShareCreds,
   encodeShare,
   encodeShareCreds,
-  type Launch,
   type SharedShow,
 } from "@/lib/share";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
@@ -96,23 +95,23 @@ function sharedPlayback(shared: SharedShow): PlaybackSettings {
   return { ...DEFAULT_PLAYBACK, ...shared.playback, preloadCount: storage.loadPlayback().preloadCount, videoMuted: true };
 }
 
-/** The visitor's own search with only what the launch link names swapped in. */
-function launchedSearch(own: SearchSettings, launch: Launch): SearchSettings {
-  if (launch.recommended) return { ...own, source: "recommended" };
-  return { ...own, source: "search", tags: launch.tags ?? own.tags };
+/**
+ * A launch link's tags with default filters, so the show matches the e621 search it came
+ * from; only the visitor's blacklist carries over (e621 hides the same posts). Not saved.
+ */
+function launchedSearch(tags: string): SearchSettings {
+  return { ...DEFAULT_SEARCH, tags, blacklist: storage.loadSearch().blacklist };
 }
 
 export default function App() {
   // ---- persisted settings -------------------------------------------------
   // A share link's settings apply for this visit; they're saved only once the visitor edits something.
   const [shared] = useState(() => decodeShare(new URLSearchParams(location.search)));
-  // A launch link (the userscript's button) is the visitor's own: it changes only what it names, and is saved.
+  // A launch link (the userscript's button) plays an e621 search with the visitor's own playback.
   const [launch] = useState(() => (shared ? null : decodeLaunch(new URLSearchParams(location.search))));
-  const [search, setSearchState] = useState<SearchSettings>(() => {
-    if (shared) return sharedSearch(shared);
-    const own = storage.loadSearch();
-    return launch ? launchedSearch(own, launch) : own;
-  });
+  const [search, setSearchState] = useState<SearchSettings>(() =>
+    shared ? sharedSearch(shared) : launch ? launchedSearch(launch) : storage.loadSearch(),
+  );
   const [playback, setPlaybackState] = useState<PlaybackSettings>(() =>
     shared ? sharedPlayback(shared) : storage.loadPlayback(),
   );
@@ -324,9 +323,7 @@ export default function App() {
     // Also drops a sign-in fragment, so the key doesn't sit in the address bar or history.
     window.history.replaceState(null, "", location.pathname);
     if (launch) {
-      storage.saveSearch(search);
-      // Recommended waits for the sign-in and favorites to load; see onLaunchRec.
-      if (!launch.recommended) apply(true);
+      apply(true);
       return;
     }
     if (!shared) return;
@@ -335,36 +332,6 @@ export default function App() {
   // Starting the show is the point of the link, so this one effect sets state on mount.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => onShared(), []);
-
-  // A Recommended launch can only start once e621 has confirmed the sign-in and the
-  // favorites profile has candidates. If it can't (signed out, sync failed, too few
-  // favorites), say why and leave the panel open.
-  const recLaunch = useRef<"waiting" | "syncing" | "done">(launch?.recommended ? "waiting" : "done");
-  const onLaunchRec = useEffectEvent(() => {
-    if (recLaunch.current === "done") return;
-    // Pressing Play while waiting already did the job.
-    if (active) {
-      recLaunch.current = "done";
-      return;
-    }
-    const finish = (start: boolean) => {
-      recLaunch.current = "done";
-      if (start) apply(true);
-      else showToast(recBlocker() ?? "Couldn't start Recommended");
-    };
-    // A borrowed sign-in never reads favorites, so it can't recommend.
-    if (!creds || linkSession) return finish(false);
-    if (!user) return; // still checking the key; a failure already toasts
-    if (recCandidates.length > 0) return finish(true);
-    if (rec.syncing) {
-      recLaunch.current = "syncing";
-      return;
-    }
-    // Before the first sync starts, "not syncing" says nothing yet.
-    if (recLaunch.current === "syncing" || rec.error) finish(false);
-  });
-  // Starts the show when the profile is ready, the same as pressing Play.
-  useEffect(() => onLaunchRec(), [user, recCandidates.length, rec.syncing, rec.error]);
 
   const shareLink = async () => {
     if (!active) return;

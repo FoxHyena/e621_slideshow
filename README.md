@@ -159,8 +159,9 @@ It opens straight into the show. Their own blacklist still applies.
 
 ```text
 https://e621.cumdump.dog/?tags=fox+solo+score:>100
-https://e621.cumdump.dog/?mode=recommended
 ```
+
+It plays the same posts e621 would show for that search, in your own style and speed.
 
 ## Keyboard shortcuts
 
@@ -204,17 +205,16 @@ The blacklist and everything Recommended-specific are never shared.
 link's `#` fragment. Browsers never send the fragment to a server; the visitor is signed in for that tab
 only and nothing is saved. Only share these with people you trust with your key.
 
-**Launch links** start a show with the visitor's *own* saved settings (ratings, media, blacklist, style)
-and change only what the link names. The search is saved like one you typed:
-
-- `/?tags=wolf+solo` plays those tags.
-- `/?mode=recommended` plays Recommended once your favorites have synced (needs sign-in).
+**Launch links** (`/?tags=wolf+solo`) play an e621 search straight away, exactly as e621 runs it:
+default filters (all ratings and media, newest first), so you see the same posts. Your own blacklist
+and playback settings (style, speed…) still apply, and nothing is saved. The [userscript](#userscript)
+uses these.
 
 ## Userscript
 
-Adds **▶ Slideshow** and **★ Recommended** buttons under the search box on e621.net and e926.net.
-Slideshow plays what's in the search box (or the pool you're on) with your saved settings;
-Recommended plays from your favorites (sign in on the slideshow site first).
+Adds a **▶ Slideshow** button under the search box on e621.net and e926.net. It plays what's in
+the search box (or the pool you're on): the same posts e621 shows, in your saved slideshow style
+and speed.
 
 ### Install
 
@@ -223,16 +223,24 @@ Recommended plays from your favorites (sign in on the slideshow site first).
      [Tampermonkey](https://www.tampermonkey.net/)
    - Safari (Mac, iPhone, iPad): the free **Userscripts** app from the App Store, then turn it on in
      Safari → Settings → Extensions
-2. Open <https://e621.cumdump.dog/e621-slideshow.user.js>. The manager shows an install page.
-3. Click **Install**, then reload any e621 page.
+2. **Chrome, Edge, Brave only:** let the manager run scripts. Open `chrome://extensions`, click
+   **Details** on Violentmonkey/Tampermonkey, and turn on **Allow User Scripts**. (Older versions
+   have no such toggle: turn on **Developer mode** at the top right of the Extensions page instead.)
+   Without this the script installs but never runs.
+3. Open <https://e621.cumdump.dog/e621-slideshow.user.js>. The manager shows an install page.
+4. Click **Install**, then reload any e621 page.
 
-The manager checks that same URL for updates.
+The manager checks that same URL for updates. The same steps, with an **Install userscript** button,
+are in the slideshow's own settings under **e621 button**.
+
+**No button?** Click the manager's toolbar icon on an e621 page. The script should be listed and
+switched on. If the list is empty, recheck step 2 and that the manager is allowed on e621.net.
 
 ### Developing it
 
 Source: [`public/e621-slideshow.user.js`](public/e621-slideshow.user.js), served from the site root.
-Bump `@version` whenever you change it, or installed copies won't update. The buttons open
-[launch links](#share-links-and-launch-links).
+Bump `@version` whenever you change it, or installed copies won't update. The button opens
+[launch links](#share-links-and-launch-links) (`/?tags=…`).
 
 ## How it works
 

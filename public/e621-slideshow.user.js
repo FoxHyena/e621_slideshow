@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         e621 Slideshow button
 // @namespace    https://e621.cumdump.dog/
-// @version      1.0.0
-// @description  Adds Slideshow and Recommended buttons under the e621 search box that open e621.cumdump.dog.
+// @version      1.1.0
+// @description  Adds a Slideshow button under the e621 search box that plays the search on e621.cumdump.dog.
 // @match        https://e621.net/*
 // @match        https://e926.net/*
 // @grant        none
@@ -18,14 +18,19 @@
  *        or Tampermonkey (https://www.tampermonkey.net/)
  *      - Safari (Mac, iPhone, iPad): the free "Userscripts" app from the App Store,
  *        then turn it on in Safari > Settings > Extensions
- *   2. Open https://e621.cumdump.dog/e621-slideshow.user.js; the manager shows an install page.
- *   3. Click Install, then reload any e621 page.
+ *   2. Chrome, Edge, Brave only: open chrome://extensions, click Details on the manager,
+ *      and turn on "Allow User Scripts" (older versions: turn on Developer mode instead).
+ *      Without this the script installs but never runs.
+ *   3. Open https://e621.cumdump.dog/e621-slideshow.user.js; the manager shows an install page.
+ *   4. Click Install, then reload any e621 page.
  *   The manager checks that same URL for updates.
  *
+ *   No button? Click the manager's toolbar icon on an e621 page: this script should be
+ *   listed and switched on. If the list is empty, recheck step 2.
+ *
  * Use
- *   ▶ Slideshow plays what's in the search box (or the pool you're on) with your saved
- *   slideshow settings. ★ Recommended plays from your favorites; sign in on the
- *   slideshow site first.
+ *   ▶ Slideshow plays what's in the search box (or the pool you're on), the same posts
+ *   e621 shows, in your saved slideshow style and speed.
  *
  * Editing: bump @version on every change, or installed copies won't update.
  */
@@ -34,7 +39,7 @@
   "use strict";
 
   const SITE = "https://e621.cumdump.dog/";
-  const ID = "e6ss-buttons";
+  const ID = "e6ss-slideshow";
   if (document.getElementById(ID)) return;
 
   const input =
@@ -59,30 +64,23 @@
     return tags ? `${SITE}?${new URLSearchParams({ tags })}` : SITE;
   }
 
-  function button(label, title) {
-    const a = document.createElement("a");
-    a.textContent = label;
-    a.title = title;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    Object.assign(a.style, {
-      flex: "1",
-      padding: "4px 8px",
-      borderRadius: "4px",
-      background: "#fcb328",
-      color: "#152f56",
-      fontWeight: "bold",
-      textAlign: "center",
-      textDecoration: "none",
-    });
-    return a;
-  }
-
-  const row = document.createElement("div");
-  row.id = ID;
-  Object.assign(row.style, { display: "flex", gap: "6px", margin: "6px 0" });
-
-  const play = button("▶ Slideshow", "Play this search as a slideshow");
+  const play = document.createElement("a");
+  play.id = ID;
+  play.textContent = "▶ Slideshow";
+  play.title = "Play this search as a slideshow";
+  play.target = "_blank";
+  play.rel = "noopener noreferrer";
+  Object.assign(play.style, {
+    display: "block",
+    margin: "6px 0",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    background: "#fcb328",
+    color: "#152f56",
+    fontWeight: "bold",
+    textAlign: "center",
+    textDecoration: "none",
+  });
   play.href = slideshowUrl();
   // Keep the link in step with the box, so middle-click and copy-link work too.
   const refresh = () => (play.href = slideshowUrl());
@@ -90,12 +88,7 @@
   play.addEventListener("mousedown", refresh);
   play.addEventListener("focus", refresh);
 
-  const rec = button("★ Recommended", "Recommended posts from your favorites (sign in on the slideshow site)");
-  rec.href = `${SITE}?mode=recommended`;
-  rec.style.flex = "0 0 auto";
-
-  row.append(play, rec);
   const form = input.closest("form");
   const anchor = (form && form.closest("section.post-search, #search-box")) || form || input;
-  anchor.insertAdjacentElement("afterend", row);
+  anchor.insertAdjacentElement("afterend", play);
 })();

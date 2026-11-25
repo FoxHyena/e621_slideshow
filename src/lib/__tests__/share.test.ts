@@ -89,25 +89,20 @@ describe("launch links", () => {
   const launch = (qs: string) => decodeLaunch(new URLSearchParams(qs));
 
   it("reads tags and tidies the whitespace", () => {
-    expect(launch("tags=wolf+solo")).toEqual({ tags: "wolf solo" });
-    expect(launch("tags=%20wolf%09%0Asolo%20%20-fox%20")).toEqual({ tags: "wolf solo -fox" });
+    expect(launch("tags=wolf+solo")).toBe("wolf solo");
+    expect(launch("tags=%20wolf%09%0Asolo%20%20-fox%20")).toBe("wolf solo -fox");
   });
 
-  it("reads recommended mode", () => {
-    expect(launch("mode=recommended")).toEqual({ recommended: true });
-    expect(launch("mode=recommended&tags=wolf")).toEqual({ recommended: true });
-  });
-
-  it("ignores share links, empty tags, unknown modes and plain visits", () => {
+  it("ignores share links, empty tags and plain visits", () => {
     expect(launch("v=1&tags=wolf")).toBeNull();
     expect(launch("tags=")).toBeNull();
     expect(launch("tags=%20%20")).toBeNull();
-    expect(launch("mode=whatever")).toBeNull();
+    expect(launch("mode=recommended")).toBeNull();
     expect(launch("")).toBeNull();
     expect(launch(`tags=${"a".repeat(2001)}`)).toBeNull();
   });
 
-  it("a share link isn't a launch, and a launch isn't a share link", () => {
+  it("isn't read as a share link", () => {
     expect(decodeShare(new URLSearchParams("tags=wolf"))).toBeNull();
   });
 });

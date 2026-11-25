@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useId, useState } from "react";
-import { Bookmark, Check, ChevronDown, Dices, ExternalLink, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
+import { Bookmark, Check, ChevronDown, Dices, Download, ExternalLink, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
 import type { Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORY_COLORS, type CurrentUser } from "@/lib/e621/types";
 import { REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
@@ -715,6 +715,49 @@ function SavedSection({
   );
 }
 
+/** How to add the Slideshow button to e621 (public/e621-slideshow.user.js). */
+function UserscriptSection() {
+  const link = "text-neutral-200 underline hover:text-white";
+  return (
+    <>
+      <p className="text-xs text-neutral-400">
+        Adds a <span className="font-semibold text-neutral-200">▶ Slideshow</span> button under e621&rsquo;s search
+        box. It opens the search here: the same posts e621 shows, in your style and speed, with your blacklist.
+      </p>
+      <ol className="list-decimal space-y-1.5 pl-4 text-xs text-neutral-300">
+        <li>
+          Add a userscript manager:{" "}
+          <a href="https://violentmonkey.github.io/" target="_blank" rel="noreferrer" className={link}>
+            Violentmonkey
+          </a>{" "}
+          or{" "}
+          <a href="https://www.tampermonkey.net/" target="_blank" rel="noreferrer" className={link}>
+            Tampermonkey
+          </a>
+          . On Safari, use the free Userscripts app from the App Store.
+        </li>
+        <li>
+          Chrome, Edge, Brave: open <code className="font-mono text-neutral-200">chrome://extensions</code>, click{" "}
+          Details on the manager, and turn on <span className="font-semibold text-neutral-200">Allow User Scripts</span>.
+          Without it the script installs but never runs.
+        </li>
+        <li>Install the script below, then reload any e621 page.</li>
+      </ol>
+      <a
+        href="/e621-slideshow.user.js"
+        className="flex items-center justify-center gap-2 rounded-md border border-line py-2 text-sm font-semibold text-neutral-200 hover:border-accent hover:text-accent"
+        data-testid="userscript-install"
+      >
+        <Download className="size-4" aria-hidden /> Install userscript
+      </a>
+      <p className="text-xs text-neutral-500">
+        No button on e621? Click the manager&rsquo;s toolbar icon there: the script should be listed and on. It
+        updates itself.
+      </p>
+    </>
+  );
+}
+
 export default function SettingsPanel(props: SettingsPanelProps) {
   const { open, onClose, onPlay, onPreview, playLabel, search, setSearch, playback, setPlayback, built, creds } = props;
   const [importMsg, setImportMsg] = useState<string | null>(null);
@@ -1096,6 +1139,10 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 </div>
               ))}
             </dl>
+          </Section>
+
+          <Section title="e621 button" testId="section-userscript" collapse={collapse("userscript", "userscript")}>
+            <UserscriptSection />
           </Section>
         </div>
 
