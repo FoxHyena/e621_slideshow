@@ -553,6 +553,181 @@ test("G opens the gallery mid-show on the current post and freezes the timer", a
   expect(await slideId(page)).toBe(1148);
 });
 
+// ---- scroll view -----------------------------------------------------------
+
+const cards = (page: Page) => page.getByTestId("feed-card");
+const activeCard = (page: Page) => page.locator("[data-testid=feed-card][aria-current]");
+
+test("scroll shows results as a timeline that loads more as it scrolls", async ({ page }) => {
+  const mock = await start(page, defaultSpecs(150));
+  await page.getByTestId("scroll-button").click();
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
+  await expect(cards(page)).toHaveCount(100);
+  await expect(page.getByTestId("feed-count")).toHaveText("100+ posts");
+  await expect(slide(page)).toHaveCount(0);
+  await expect(cards(page).first()).toContainText("mock artist");
+  await expect(cards(page).first().getByTestId("feed-tags")).toContainText("wolf");
+  await expect(cards(page).first().getByTestId("feed-image")).toHaveAttribute("src", /\/mock\/1150\./);
+  await cards(page).last().scrollIntoViewIfNeeded();
+  await expect(cards(page)).toHaveCount(150);
+  expect(mock.searches.map((s) => s.page)).toEqual([null, "b1051"]);
+});
+
+test("J / K step through the feed and Play starts the show at the post in view", async ({ page }) => {
+  await start(page);
+  await page.getByTestId("scroll-button").click();
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1150");
+  await page.keyboard.press("j");
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1149");
+  await page.keyboard.press("j");
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1148");
+  await page.keyboard.press("k");
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1149");
+  await page.getByTestId("feed-play").click();
+  await expect(page.getByTestId("feed")).toHaveCount(0);
+  expect(await slideId(page)).toBe(1149);
+  await expect(page.getByTestId("counter")).toHaveText(/^2 \//);
+});
+
+test("T opens the feed mid-show on the current post; G and T switch views", async ({ page }) => {
+  await start(page, undefined, { playback: { intervalSec: 60 } });
+  await play(page);
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  expect(await slideId(page)).toBe(1148);
+  await page.keyboard.press("t");
+  await expect(activeCard(page)).toHaveAttribute("data-post-id", "1148");
+  await page.keyboard.press("g");
+  await expect(page.getByTestId("gallery")).toBeVisible();
+  await expect(page.getByTestId("feed")).toHaveCount(0);
+  await page.getByTestId("gallery-feed").click();
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await page.getByTestId("feed-grid").click();
+  await expect(page.getByTestId("gallery")).toBeVisible();
+  await page.keyboard.press("t");
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("feed")).toHaveCount(0);
+  expect(await slideId(page)).toBe(1148);
+  await page.getByTestId("feed-button").click();
+  await cards(page).nth(3).getByTestId("feed-play-from").click();
+  expect(await slideId(page)).toBe(1147);
+});
+
+test("the feed favorites by heart, by L, and by double-tap", async ({ page }) => {
+  const specs = defaultSpecs(10);
+  specs[1].is_favorited = true; // 1009
+  const mock = await start(page, specs, { creds: { username: "tester", apiKey: "goodkey" } });
+  await expect(page.getByTestId("signed-in")).toContainText("tester");
+  await page.getByTestId("scroll-button").click();
+  const first = cards(page).first().getByTestId("feed-favorite");
+  await expect(first).toHaveAttribute("aria-pressed", "false");
+  await first.click();
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => mock.favorites).toEqual([{ method: "POST", postId: 1010 }]);
+  await page.keyboard.press("l");
+  await expect(first).toHaveAttribute("aria-pressed", "false");
+  await expect.poll(() => mock.favorites.at(-1)).toEqual({ method: "DELETE", postId: 1010 });
+
+  // double-tap only ever favorites
+  await expect(cards(page).nth(1).getByTestId("feed-favorite")).toHaveAttribute("aria-pressed", "true");
+  await cards(page).nth(2).getByTestId("feed-media").dblclick();
+  await expect(cards(page).nth(2).getByTestId("feed-favorite")).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => mock.favorites.at(-1)).toEqual({ method: "POST", postId: 1008 });
+  await cards(page).nth(2).getByTestId("feed-media").dblclick();
+  await page.waitForTimeout(300);
+  expect(mock.favorites).toHaveLength(3);
+});
+
+test("anonymous feed shows counts but no heart button", async ({ page }) => {
+  await start(page, defaultSpecs(5));
+  await page.getByTestId("scroll-button").click();
+  await expect(cards(page)).toHaveCount(5);
+  await expect(page.getByTestId("feed-favorite")).toHaveCount(0);
+});
+
+const tag = (page: Page, card: number, name: string) => cards(page).nth(card).locator(`[data-testid=feed-tag][data-tag="${name}"]`);
+
+/** Press and hold a tag until its targets show, then drag to `target` (or nowhere) and let go. */
+async function holdTag(page: Page, card: number, name: string, target: "search" | "blacklist" | null) {
+  await tag(page, card, name).scrollIntoViewIfNeeded();
+  const box = (await tag(page, card, name).boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await expect(page.getByTestId("tag-actions")).toBeVisible();
+  const dest = target ? (await page.getByTestId(`tag-action-${target}`).boundingBox())! : { x: 20, y: 400, width: 0, height: 0 };
+  await page.mouse.move(dest.x + dest.width / 2, dest.y + dest.height / 2, { steps: 8 });
+  if (target) await expect(page.getByTestId(`tag-action-${target}`)).toHaveAttribute("data-hot", "true");
+  await page.mouse.up();
+}
+
+test("a post's tags scroll sideways in one row", async ({ page }) => {
+  const specs = defaultSpecs(3);
+  specs[0].tags = Array.from({ length: 40 }, (_, i) => `long_tag_number_${i}`);
+  await start(page, specs);
+  await page.getByTestId("scroll-button").click();
+  const strip = cards(page).first().getByTestId("feed-tags");
+  const box = await strip.evaluate((el) => ({ sw: el.scrollWidth, cw: el.clientWidth, h: el.clientHeight }));
+  expect(box.sw).toBeGreaterThan(box.cw * 3);
+  expect(box.h).toBeLessThan(50);
+  await strip.evaluate((el) => (el.scrollLeft = 400));
+  expect(await strip.evaluate((el) => el.scrollLeft)).toBe(400);
+});
+
+test("hold a tag and drag it to Search to narrow the search", async ({ page }) => {
+  const mock = await start(page, defaultSpecs(10));
+  await page.getByTestId("scroll-button").click();
+  await expect(cards(page)).toHaveCount(10);
+  await holdTag(page, 0, "wolf", "search");
+  await expect(page.getByTestId("tag-actions")).toHaveCount(0);
+  await expect.poll(() => mock.searches.at(-1)?.tags).toContain("wolf");
+  expect(mock.searches).toHaveLength(2);
+  await expect(page.getByTestId("toast")).toContainText("Search: wolf");
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await page.keyboard.press("s");
+  await expect(page.getByTestId("search-input")).toHaveValue(/wolf/);
+});
+
+test("hold a tag and drag it to Blacklist to hide it in place", async ({ page }) => {
+  const specs = defaultSpecs(10);
+  specs[2].tags = ["solo", "fluffy"]; // 1008
+  specs[5].tags = ["fluffy"]; // 1005
+  const mock = await start(page, specs);
+  await page.getByTestId("scroll-button").click();
+  await expect(cards(page)).toHaveCount(10);
+  await holdTag(page, 2, "fluffy", "blacklist");
+  await expect(cards(page)).toHaveCount(8);
+  await expect(page.locator("[data-testid=feed-card][data-post-id='1008']")).toHaveCount(0);
+  await expect(page.getByTestId("toast")).toContainText("Blacklisted fluffy: hid 2 posts");
+  await expect(page.getByTestId("feed")).toContainText("2 blacklisted");
+  expect(mock.searches).toHaveLength(1);
+
+  // the show it belongs to carries on rather than restarting
+  await page.getByTestId("feed-close").click();
+  await page.keyboard.press("s");
+  await expect(page.getByTestId("blacklist-input")).toHaveValue(/fluffy/);
+  await expect(page.getByTestId("play-button")).toHaveText(/Resume/);
+});
+
+test("a held tag let go elsewhere does nothing; a tap leaves the targets open", async ({ page }) => {
+  const mock = await start(page, defaultSpecs(5));
+  await page.getByTestId("scroll-button").click();
+  await holdTag(page, 0, "wolf", null);
+  await expect(page.getByTestId("tag-actions")).toHaveCount(0);
+  await expect(cards(page)).toHaveCount(5);
+
+  await tag(page, 0, "solo").click();
+  await expect(page.getByTestId("tag-actions")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("tag-actions")).toHaveCount(0);
+  await expect(page.getByTestId("feed")).toBeVisible();
+
+  await tag(page, 0, "solo").click();
+  await page.getByTestId("tag-action-blacklist").click();
+  await expect(page.getByTestId("feed-empty")).toBeVisible();
+  expect(mock.searches).toHaveLength(1);
+});
+
 // ---- Recommended ----------------------------------------------------------
 
 /** 10 favorites tagged `pawpads` (rare on the site) and `solo` (common). */

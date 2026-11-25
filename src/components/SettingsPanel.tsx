@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useId, useState, type ReactNode } from "react";
-import { Bookmark, Check, ChevronDown, Dices, Download, ExternalLink, Heart, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
+import { Bookmark, Check, ChevronDown, Dices, Download, ExternalLink, GalleryVerticalEnd, Heart, History, LayoutGrid, Loader2, Pin, Play, RefreshCw, Trash2, VolumeX, X } from "lucide-react";
 import type { Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORY_COLORS, type CurrentUser } from "@/lib/e621/types";
 import { favoritesTags, REC_DEFAULT_WINDOW, type BuiltQuery, type RecommendedQuery } from "@/lib/query/build";
@@ -20,6 +20,8 @@ export interface SettingsPanelProps {
   onPlay: () => void;
   /** Open the results as a grid without starting the show. */
   onPreview: () => void;
+  /** Browse the search as a scrolling feed. */
+  onScroll: () => void;
   playLabel: string;
   search: SearchSettings;
   setSearch: (s: SearchSettings) => void;
@@ -794,7 +796,7 @@ function UserscriptSection() {
 }
 
 export default function SettingsPanel(props: SettingsPanelProps) {
-  const { open, onClose, onPlay, onPreview, playLabel, search, setSearch, playback, setPlayback, built, creds } = props;
+  const { open, onClose, onPlay, onPreview, onScroll, playLabel, search, setSearch, playback, setPlayback, built, creds } = props;
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [sections, setSections] = useState(storage.loadSections);
   const collapse = (id: string, summary?: string) => ({
@@ -1162,6 +1164,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
                 ["I", "Post info"],
                 ["L", "Favorite"],
                 ["G", "Gallery"],
+                ["T", "Scroll view (J / K to step)"],
                 ["O", "Open on e621"],
                 ["C", "Copy share link"],
                 ["S / Esc", "Settings"],
@@ -1190,6 +1193,15 @@ export default function SettingsPanel(props: SettingsPanelProps) {
             data-testid="preview-button"
           >
             <LayoutGrid className="size-4" aria-hidden /> Preview
+          </button>
+          <button
+            type="button"
+            onClick={onScroll}
+            disabled={built.overLimit}
+            className="flex items-center justify-center gap-2 rounded-md border border-line px-4 py-2.5 font-semibold text-neutral-200 hover:bg-white/5 disabled:opacity-40"
+            data-testid="scroll-button"
+          >
+            <GalleryVerticalEnd className="size-4" aria-hidden /> Scroll
           </button>
           <button
             type="button"

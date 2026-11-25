@@ -4,6 +4,7 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import {
   ChevronLeft,
   ChevronRight,
+  GalleryVerticalEnd,
   Heart,
   Info,
   LayoutGrid,
@@ -24,11 +25,12 @@ import {
   type Credentials,
 } from "@/lib/e621/client";
 import { allTags, mediaKind, type CurrentUser, type Post } from "@/lib/e621/types";
-import { DEFAULT_BLACKLIST, mergeBlacklists, syncAccountBlacklist } from "@/lib/query/blacklist";
+import { DEFAULT_BLACKLIST, mergeBlacklists, parseBlacklist, syncAccountBlacklist } from "@/lib/query/blacklist";
 import {
   buildQuery,
   buildRecommendedQuery,
   favoritesTags,
+  tokenize,
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
@@ -46,6 +48,7 @@ import {
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
+import Feed from "./Feed";
 import Gallery from "./Gallery";
 import InfoOverlay from "./InfoOverlay";
 import SettingsPanel from "./SettingsPanel";
@@ -85,6 +88,8 @@ interface Active {
   key: string;
   /** what the show was started with, so a share link describes what's playing */
   search: SearchSettings;
+  /** counts up per new queue, to remount views that should start over */
+  serial: number;
 }
 
 /** A share link's settings on top of the visitor's own blacklist and preload. Not saved. */
@@ -150,12 +155,14 @@ export default function App() {
   const [paused, setPaused] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [infoOpen, setInfoOpen] = useState(false);
-  const [galleryOpen, setGalleryOpen] = useState(false);
+  /** A browsable view of the results over the show: the grid, or the scrolling feed. */
+  const [browse, setBrowse] = useState<"grid" | "feed" | null>(null);
   const [ready, setReady] = useState<{ id: number; durationSec?: number } | null>(null);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  const browsing = browse !== null;
   const queue = active?.queue ?? null;
   const posts = queue?.posts ?? [];
   const current: Post | undefined = posts[Math.min(index, posts.length - 1)];
@@ -276,7 +283,7 @@ export default function App() {
     } else {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);
     }
-    setActive({ queue: q, key, search: s });
+    setActive({ queue: q, key, search: s, serial: (active?.serial ?? 0) + 1 });
     setIndex(0);
     setTrail([]);
     setReady(null);
@@ -315,14 +322,14 @@ export default function App() {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     if (resume) {
       setPaused(false);
-      setGalleryOpen(false);
+      setBrowse(null);
     }
     return true;
   };
 
-  /** Show the current search as a grid instead of starting the show. */
-  const openPreview = () => {
-    if (apply(false)) setGalleryOpen(true);
+  /** Browse the current search (grid or scrolling feed) instead of starting the show. */
+  const openPreview = (view: "grid" | "feed") => {
+    if (apply(false)) setBrowse(view);
   };
 
   // A share link plays straight away, then leaves the address bar so a reload is a plain visit.
@@ -389,7 +396,7 @@ export default function App() {
   /** Start the show at a post picked from the gallery. */
   const pick = (i: number) => {
     if (i !== currentIndex) goTo(i);
-    setGalleryOpen(false);
+    setBrowse(null);
     setPaused(false);
   };
 
@@ -447,7 +454,7 @@ export default function App() {
     return Math.max(base, Math.min(len, cap) * 1000);
   }, [current, ready, playback.intervalSec, playback.videoMaxSec]);
 
-  const running = isReady && !paused && !panelOpen && !infoOpen && !galleryOpen;
+  const running = isReady && !paused && !panelOpen && !infoOpen && !browsing;
   const timer = useRef<{ key: string; remaining: number }>({ key: "", remaining: 0 });
   const timerKey = `${current?.id}:${durationMs}`;
   const onTimerDone = useEffectEvent(() => void next());
@@ -468,7 +475,7 @@ export default function App() {
     showToast(`Post #${id} didn't load, skipped`);
     void next();
   });
-  const stallWatch = !!current && !isReady && !paused && !panelOpen && !galleryOpen;
+  const stallWatch = !!current && !isReady && !paused && !panelOpen && !browsing;
   useEffect(() => {
     if (!stallWatch || !current) return;
     const id = current.id;
@@ -477,9 +484,8 @@ export default function App() {
   }, [stallWatch, current?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- favorites ----------------------------------------------------------
-  const toggleFavorite = async () => {
-    if (!queue || !current || !creds || !user) return;
-    const post = current;
+  const toggleFavorite = async (post: Post | undefined = current) => {
+    if (!queue || !post || !creds || !user) return;
     const { stats } = post;
     const was = stats.is_favorited;
     queue.patch(post.id, { stats: { ...stats, is_favorited: !was, fav_count: stats.fav_count + (was ? -1 : 1) } });
@@ -519,6 +525,40 @@ export default function App() {
     showToast(`Search: ${tags}`);
   };
 
+  // ---- feed tag actions ------------------------------------------------------
+  /** A tag dropped on the feed's Search target: narrow the search (Recommended pins it). */
+  const searchTag = (tag: string) => {
+    if (isRec(search)) {
+      if (rec.overrides.pinned.includes(tag)) return showToast(`${tag} is already pinned`);
+      rec.togglePin(tag);
+      showToast(`Pinned ${tag}. Press Play in settings to re-rank`);
+      return;
+    }
+    const tags = effective(search).tags;
+    if (tokenize(tags).includes(tag)) return showToast(`${tag} is already in the search`);
+    const s: SearchSettings = { ...search, source: "search", tags: `${tags} ${tag}`.trim() };
+    setSearch(s);
+    if (apply(false, s)) showToast(`Search: ${s.tags}`);
+  };
+
+  /** A tag dropped on the feed's Blacklist target: hide it here and from now on, keeping the scroll. */
+  const blacklistTag = (tag: string) => {
+    if (parseBlacklist(search.blacklist).some((r) => r.line === tag)) return showToast(`${tag} is already blacklisted`);
+    const blacklist = mergeBlacklists(search.blacklist, tag);
+    setSearch({ ...search, blacklist });
+    if (!active) return showToast(`Blacklisted ${tag}`);
+    const before = active.queue.posts.length;
+    const keep = current?.id;
+    const s: SearchSettings = { ...active.search, blacklist };
+    active.queue.setRules(buildFor(s).rules);
+    // Same show, new blacklist: keep it current so Play doesn't restart it.
+    setActive({ ...active, search: s, key: keyFor(s, buildFor(s)) });
+    const at = active.queue.posts.findIndex((p) => p.id === keep);
+    if (at >= 0) setIndex(at);
+    const hid = before - active.queue.posts.length;
+    showToast(`Blacklisted ${tag}${hid ? `: hid ${hid} post${hid === 1 ? "" : "s"}` : ""}`);
+  };
+
   // ---- controls auto-hide -------------------------------------------------
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const hovering = useRef(false);
@@ -533,7 +573,7 @@ export default function App() {
   // ---- swipe --------------------------------------------------------------
   // Classic 1:1 is excluded: a sideways drag there pans the overflowing image.
   const swipeStart = useRef<{ x: number; y: number; id: number } | null>(null);
-  const swipeable = !galleryOpen && !panelOpen && !(playback.style === "classic" && playback.fit === "original");
+  const swipeable = !browsing && !panelOpen && !(playback.style === "classic" && playback.fit === "original");
   const onPointerDown = (e: React.PointerEvent) => {
     swipeStart.current = null;
     if (e.pointerType !== "touch" || !swipeable) return;
@@ -573,12 +613,16 @@ export default function App() {
       return;
     }
     if (isTyping(e.target)) return;
-    if (galleryOpen) {
-      // Leave arrows/space alone so they scroll the grid.
-      if (["Escape", "g", "G"].includes(e.key)) {
-        e.preventDefault();
-        setGalleryOpen(false);
-      } else if (e.key === "s" || e.key === "S") setPanelOpen(true);
+    if (browsing) {
+      // Leave arrows/space alone so they scroll the grid or feed.
+      const key = e.key.toLowerCase();
+      if (key === "escape") setBrowse(null);
+      // G / T switch between the grid and the feed, or close the one already open.
+      else if (key === "g") setBrowse(browse === "grid" ? null : "grid");
+      else if (key === "t") setBrowse(browse === "feed" ? null : "feed");
+      else if (key === "s") setPanelOpen(true);
+      else return;
+      e.preventDefault();
       return;
     }
     switch (e.key) {
@@ -610,7 +654,14 @@ export default function App() {
       case "G":
         if (queue) {
           setInfoOpen(false);
-          setGalleryOpen(true);
+          setBrowse("grid");
+        }
+        break;
+      case "t":
+      case "T":
+        if (queue) {
+          setInfoOpen(false);
+          setBrowse("feed");
         }
         break;
       case "c":
@@ -720,7 +771,7 @@ export default function App() {
       onPointerCancel={() => (swipeStart.current = null)}
       data-testid="app"
     >
-      {current && !galleryOpen && (
+      {current && !browsing && (
         <Stage
           post={current}
           trail={trail}
@@ -734,7 +785,7 @@ export default function App() {
         />
       )}
 
-      {current && !isReady && !galleryOpen && (
+      {current && !isReady && !browsing && (
         <div className="delayed-show pointer-events-none absolute inset-0 flex items-center justify-center" data-testid="slide-loading">
           <Loader2 className="size-10 animate-spin text-white/50" aria-label="Loading" />
         </div>
@@ -750,7 +801,34 @@ export default function App() {
         </div>
       )}
 
-      {galleryOpen && queue && (
+      {browse === "feed" && queue && active && (
+        <Feed
+          // A new search starts the feed over at the top.
+          key={active.serial}
+          posts={posts}
+          currentIndex={currentIndex}
+          loading={queue.loading}
+          exhausted={queue.exhausted}
+          error={queue.error}
+          stats={queue.stats}
+          signedIn={!!user}
+          playback={playback}
+          canFavorite={!!user && !!creds}
+          onFavorite={(p) => void toggleFavorite(p)}
+          onPlayFrom={pick}
+          onNeedMore={needMore}
+          onRetry={() => {
+            queue.retry();
+            needMore();
+          }}
+          onClose={() => setBrowse(null)}
+          onGrid={() => setBrowse("grid")}
+          recommended={isRec(search)}
+          onTag={(tag, action) => (action === "search" ? searchTag(tag) : blacklistTag(tag))}
+        />
+      )}
+
+      {browse === "grid" && queue && (
         <Gallery
           posts={posts}
           currentIndex={currentIndex}
@@ -765,7 +843,8 @@ export default function App() {
             queue.retry();
             needMore();
           }}
-          onClose={() => setGalleryOpen(false)}
+          onClose={() => setBrowse(null)}
+          onFeed={() => setBrowse("feed")}
           onPlay={() => pick(currentIndex)}
         />
       )}
@@ -782,7 +861,7 @@ export default function App() {
       )}
 
       {/* search progress (Recommended): the show starts once every page is in and ranked */}
-      {queue?.progress && !queue.exhausted && !queue.error && !galleryOpen && (
+      {queue?.progress && !queue.exhausted && !queue.error && !browsing && (
         <div
           className={`pointer-events-none absolute bottom-6 left-4 z-10 w-48 rounded-md bg-black/75 px-3 py-2 backdrop-blur transition-opacity duration-300 ${
             showControls ? "opacity-100" : "opacity-80"
@@ -806,7 +885,7 @@ export default function App() {
       )}
 
       {/* controls */}
-      {!galleryOpen && <div
+      {!browsing && <div
         className={`pointer-events-none absolute inset-0 z-10 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
@@ -839,12 +918,26 @@ export default function App() {
               className={iconBtn}
               onClick={() => {
                 setInfoOpen(false);
-                setGalleryOpen(true);
+                setBrowse("grid");
               }}
               aria-label="Gallery"
               data-testid="gallery-button"
             >
               <LayoutGrid className="size-5" aria-hidden />
+            </button>
+          )}
+          {queue && (
+            <button
+              type="button"
+              className={iconBtn}
+              onClick={() => {
+                setInfoOpen(false);
+                setBrowse("feed");
+              }}
+              aria-label="Scroll view"
+              data-testid="feed-button"
+            >
+              <GalleryVerticalEnd className="size-5" aria-hidden />
             </button>
           )}
           {active && !isRec(active.search) && (
@@ -938,7 +1031,7 @@ export default function App() {
         )}
       </div>}
 
-      {current && isReady && !galleryOpen && (
+      {current && isReady && !browsing && (
         <div className="absolute inset-x-0 bottom-0 z-10 h-0.5 bg-white/10">
           <div
             key={timerKey}
@@ -963,7 +1056,8 @@ export default function App() {
         open={panelOpen}
         onClose={() => apply(false)}
         onPlay={() => apply(true)}
-        onPreview={openPreview}
+        onPreview={() => openPreview("grid")}
+        onScroll={() => openPreview("feed")}
         playLabel={playLabel}
         search={search}
         setSearch={setSearch}

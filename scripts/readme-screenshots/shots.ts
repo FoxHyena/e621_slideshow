@@ -211,6 +211,37 @@ test("gallery", async ({ page }) => {
   await shot(page, "gallery");
 });
 
+test("scroll view", async ({ page }) => {
+  await setup(page, { search: { tags: "wolf" }, creds: { username: "wolfie", apiKey: "goodkey" } });
+  await page.goto("/");
+  await page.getByTestId("scroll-button").click();
+  // the heart shows once the remembered sign-in is verified
+  await expect(page.getByTestId("feed-favorite").first()).toBeVisible();
+  await page.waitForTimeout(1500);
+  await shot(page, "scroll");
+});
+
+test("scroll view tag actions", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setup(page, { search: { tags: "wolf" } });
+  await page.goto("/");
+  await page.getByTestId("scroll-button").click();
+  const chip = page.getByTestId("feed-card").first().getByTestId("feed-tag").nth(3);
+  await expect(chip).toBeVisible();
+  await page.waitForTimeout(1200);
+  const b = (await chip.boundingBox())!;
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down();
+  await expect(page.getByTestId("tag-actions")).toBeVisible();
+  const t = (await page.getByTestId("tag-action-search").boundingBox())!;
+  await page.mouse.move(t.x + t.width / 2, t.y + 20, { steps: 6 });
+  await expect(page.getByTestId("tag-action-search")).toHaveAttribute("data-hot", "true");
+  await page.waitForTimeout(300);
+  await shot(page, "scroll-tags");
+  await page.mouse.move(10, 10);
+  await page.mouse.up();
+});
+
 for (const style of ["prints", "kenburns", "collage", "reflections"] as const) {
   test(`style ${style}`, async ({ page }) => {
     await setup(page, { search: { tags: "wolf" }, playback: { style } });

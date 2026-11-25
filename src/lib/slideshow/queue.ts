@@ -36,6 +36,8 @@ export interface SlideQueue {
   remove(id: number): void;
   patch(id: number, patch: Partial<Post>): void;
   retry(): void;
+  /** Swap the blacklist mid-show: drops loaded posts it now hides and filters later pages. */
+  setRules(rules: BlacklistRule[]): void;
   /** ranked sources: how well a post matched the profile, and the tags that drove it */
   matchFor?(id: number): { score: number; reasons: string[] } | undefined;
   /** stop any background fetching */
@@ -134,6 +136,14 @@ export class PostQueue implements SlideQueue {
 
   retry() {
     this.error = null;
+    this.onChange();
+  }
+
+  setRules(rules: BlacklistRule[]) {
+    this.rules = rules;
+    const kept = this.posts.filter((p) => !blacklistedBy(rules, p, this.ctx));
+    this.stats.blacklisted += this.posts.length - kept.length;
+    this.posts = kept;
     this.onChange();
   }
 

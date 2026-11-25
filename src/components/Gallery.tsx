@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ImageOff, Loader2, Play, X } from "lucide-react";
+import { GalleryVerticalEnd, ImageOff, Loader2, Play, X } from "lucide-react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import type { QueueStats } from "@/lib/slideshow/queue";
 
@@ -19,6 +19,8 @@ interface GalleryProps {
   onNeedMore: () => void;
   onRetry: () => void;
   onClose: () => void;
+  /** Switch to the scrolling feed. */
+  onFeed: () => void;
   onPlay: () => void;
 }
 
@@ -129,6 +131,15 @@ export default function Gallery(props: GalleryProps) {
             </p>
           )}
         </div>
+        <button
+          type="button"
+          onClick={props.onFeed}
+          className="flex size-10 items-center justify-center rounded-md text-neutral-300 hover:bg-white/10"
+          aria-label="Switch to scroll view"
+          data-testid="gallery-feed"
+        >
+          <GalleryVerticalEnd className="size-5" aria-hidden />
+        </button>
         <button
           type="button"
           onClick={props.onPlay}

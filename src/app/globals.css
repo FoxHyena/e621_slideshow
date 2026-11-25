@@ -123,3 +123,88 @@ body {
     transition: opacity 300ms ease;
   }
 }
+
+/* ---- scroll view --------------------------------------------------------- */
+
+/* The heart that pops over a post double-tapped to favorite. */
+@keyframes heart-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  15% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  70% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+.heart-burst {
+  opacity: 0;
+  animation: heart-burst 800ms ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .heart-burst {
+    animation-duration: 600ms;
+    animation-name: appear-fade;
+  }
+}
+@keyframes appear-fade {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+  30%,
+  70% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* A post's tags: one row that scrolls sideways, fading out at the right edge. */
+.tag-strip {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.tag-strip::-webkit-scrollbar {
+  display: none;
+}
+.tag-chip {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@keyframes tag-actions-in {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+.tag-actions {
+  animation: tag-actions-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tag-actions {
+    animation-duration: 1ms;
+  }
+}
+@keyframes tag-actions-dim-in {
+  from {
+    opacity: 0;
+  }
+}
+.tag-actions-dim {
+  animation: tag-actions-dim-in 160ms ease-out;
+}

@@ -1,7 +1,7 @@
 # e621 Slideshow
 
-A full-screen slideshow for e621 searches, with four extra display styles, a grid gallery, share links,
-and a **Recommended** mode that learns your taste from your favorites.
+A full-screen slideshow for e621 searches, with four extra display styles, a grid gallery, a scrolling
+timeline, share links, and a **Recommended** mode that learns your taste from your favorites.
 
 Live at **<https://e621.cumdump.dog>**. Everything runs in your browser and talks to `e621.net` directly
 (the API allows CORS), so your API key never touches a server.
@@ -50,7 +50,8 @@ Move the mouse to show the controls; they hide after 2.5 s idle.
 - **Query sent to e621** shows the exact tag string and how many of e621's 40 tag slots it uses.
   It warns before you go over.
 - **Saved searches** keep a named search; **Recent** lists the last ones you played.
-- **Preview** opens the results as a grid instead of starting the show.
+- **Preview** opens the results as a grid instead of starting the show; **Scroll** opens them as a
+  [timeline](#scroll-view).
 
 Reopening settings pauses the show and keeps your place. Only changing the search restarts it;
 playback settings apply live.
@@ -96,6 +97,26 @@ Other playback settings:
 |---|---|
 | ![Post info overlay](docs/screenshots/info.png) | ![Gallery grid](docs/screenshots/gallery.png) |
 | Tags by category, score, favorites, size, date. **+** adds a tag to your search, **−** excludes it. | Every loaded post as a grid. Click one to play from there; more load as you scroll. |
+
+### Scroll view
+
+| Timeline (**T**) | Hold a tag |
+|---|---|
+| ![Scroll view](docs/screenshots/scroll.png) | ![Dragging a tag onto Search](docs/screenshots/scroll-tags.png) |
+| The results as a social-media-style feed, one post per card, loading more as you scroll. | Hold a tag, then drag it onto **Search** or **Blacklist** and let go. |
+
+Open it with **Scroll** in settings, the scroll button in the controls or the gallery header, or **T**.
+
+- Each card shows the artist, post age, rating, favorites and score, and the post's tags in a row you
+  can swipe sideways.
+- Only the post in the middle of the screen plays; videos pause as you scroll past.
+- Signed in, favorite with the heart, **L**, or a double-tap on the image (double-tap never
+  un-favorites).
+- **Hold a tag** for half a second and two targets pop up over it. Drag onto **Search** to add the tag
+  to your search (the feed reloads from the top; in Recommended it pins the tag instead), or onto
+  **Blacklist** to add it to your blacklist and hide matching posts without losing your place. Let go
+  anywhere else to cancel. A tap on a tag opens the same targets to tap.
+- **Play** starts the slideshow at the post in view; each card also has **Play from here**.
 
 ### Recommended
 
@@ -176,11 +197,14 @@ It plays the same posts e621 would show for that search, in your own style and s
 | I | Post info (add / exclude tags) |
 | L | Favorite (signed in) |
 | G | Gallery |
+| T | Scroll view |
 | O | Open the post on e621 |
 | C | Copy share link (not in Recommended) |
 | S / Esc | Settings |
 
-In the gallery, **G** or **Esc** closes it and arrows scroll the grid.
+In the gallery, **G** or **Esc** closes it and arrows scroll the grid. In the scroll view, **J / K** step
+one post at a time, **L** favorites the post in view, **Enter** plays from it, **G / T** switch between the
+grid and the feed, and **Esc** closes it.
 
 ## Share links and launch links
 
@@ -277,6 +301,7 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
 | `src/components/SettingsPanel.tsx` | The settings drawer |
 | `src/components/stages/` | One component per slideshow style |
 | `src/components/Gallery.tsx`, `InfoOverlay.tsx` | Grid view and post info |
+| `src/components/Feed.tsx`, `TagActions.tsx` | Scroll view, and its hold-and-drag tag targets |
 | `src/lib/e621/` | API client and response types |
 | `src/lib/query/`, `src/lib/recommend/`, `src/lib/slideshow/` | Query building, recommendations, queue and layouts |
 | `src/lib/share.ts` | Share-link and launch-link encoding |
