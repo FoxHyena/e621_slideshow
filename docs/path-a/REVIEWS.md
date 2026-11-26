@@ -368,3 +368,15 @@ doesn't check the tag limit (Following's query is far below it).
 for the lane, pill and pull), 224.4 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first
 feed content 0.37 s; scroll at 4× CPU: 2 long tasks, longest 51 ms. **Borderline**, like slice 2b
 (53–55 ms): recheck in Phase 6 with the performance panel.
+
+## Live marker check (2026-11-25, owner signed in in the browser pane, Remember on)
+
+| Check | Result |
+|---|---|
+| Anchor read (`/saved_searches.json`) | Pass: subscription row found, 3 tags, `last_seen_post_id` 6882662, `new_count` 0 |
+| Following feed (`search:subscriptions`, signed in) | Pass: newest followed post 6878298 is below the marker, so "All caught up" is right |
+| Images from `static1.e621.net` | Pass: cards render (no CORS issue) |
+| Reload from the saved first page | Pass: no first-page request; the pill's count (`id:>6878298`, 30) and the next page (`b6589566`) ran |
+| `visit.json` with `redirect: "manual"` (owner OK'd one call) | Pass: `opaqueredirect` (status 0); marker moved 6882662 → 6884634, the site's newest post; `new_count` 0 |
+| `tag_subscriptions` POST output | Not run: follow arrives in slice 5 |
+| **Gap** | Instant paint waits for the sign-in check: e621 was slow (`/users/me` 4.5 s, the anchor 3.2 s), so cards showed after ~5 s. Fix: keep the profile with Remember and paint before the check |
