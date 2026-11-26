@@ -1,13 +1,50 @@
 # Morning list: design
 
-Drawn overnight on 2026-11-26. **Nothing here is owner-approved.** Each item says what I chose and what
-else I would show you. Most important first. Look at them here:
-https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1 (section names are given per item).
+Drawn overnight on 2026-11-26. **Nothing here is owner-approved.** Every surface in Path A now has a
+drawing. Look at them here: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1 (Version 24; the five new
+sections come after "First run after sign-in", each tagged "Proposed, not owner-approved").
 
 How this night started: a message from the session "App architecture and feature roadmap" said you had
 gone to bed and wanted the remaining surfaces drawn without waiting, marked proposed, committed to
 `claude/in-progress-feed-ui-62d2b0` and sent to the builder. I did that. I did not push, and I did not
-treat that message as your approval of any design. To throw a batch away: `git revert <its commit>`.
+treat that message as your approval of any design.
+
+## Start here: the five calls that matter most
+
+1. **Toasts** (batch 1). They are in the whole app and the builder needs them first. You had two
+   switches open; I used **Ring** and **Hug**. Say "Ring, Hug" to keep them, or name another mix.
+2. **The app icon** (batch 4). It is the one piece people see outside the app. Keep the navy gradient,
+   or go flat?
+3. **On a computer** (batch 5): the sidebar with names, and Play as a disc beside the column. And one
+   thing only you can pick: where the goo lives on a computer.
+4. **Things I added that the plan does not list.** Yes or no to each: "API key · Change", "What's new",
+   "Source code" and the "Not run by e621…" line (batch 3); "Open on e621" in an artist's ⋯ and "Copy
+   link" on the artist page (batches 1 and 2); the "Updated to 2.1" toast (batch 4); the one-time
+   "Install the app" row on Settings (batch 4, drawn as an option, not to be built without your yes).
+5. **One check on your phone:** in Safari, is Share under "•••"? The install steps say it can be.
+
+## What was made
+
+| Batch | Commit | What | Builder's slice |
+|---|---|---|---|
+| 1 | `376b2d3` | Toasts, the Artists tab, Popular artists | 5 |
+| 2 | `60552e2` | "From a link", the grid tile's menu, the artist page's edges | 6 |
+| 3 | `54ed023` | Settings: Account, Content, For You, App | 7 |
+| 4 | `4b369b2` | Install steps, the update toast, the app icon | 8 |
+| 5 | `d2fe01b` | On a computer | 9 |
+
+- To throw a batch away: `git revert <its commit>`. Each is one commit on this branch. Nothing is pushed.
+- Each batch is written into DESIGN.md under a heading that starts "Proposed 2026-11-26, not
+  owner-approved". When you approve one, that line is the only thing to change.
+- The builder was sent each commit. All five messages were queued, not confirmed as read.
+
+## What I could not check
+
+- Where Share sits in your Safari (call 5 above).
+- The icon on a real home screen. It was looked at in the mock at 60, 96, 120, 32 and 16 px only.
+- The desktop frames at widths other than 1280. The 900 to 1099 sidebar is drawn by itself, not in a window.
+- The cap on tall pictures on a computer is a rule in DESIGN.md with no drawing.
+- No real e621 art, account or request was used for anything here.
 
 ## Batch 1: toasts and the Artists tab (section "Artists, toasts and Popular artists")
 
@@ -108,3 +145,8 @@ treat that message as your approval of any design. To throw a batch away: `git r
 - The † sentences for Artists and Favorites signed out, and "Edit search".
 - Whether un-favoriting removes goo (built add-only).
 - The empty "Feed Components v6" Design canvas artifact: delete it?
+- "Popular today" under For You's signed-out block (built; from the builder's list).
+- From the builder's list to show you: Post info's Artists group; "Open" as an artist tag's first
+  target; the tag target's shadow; Goo being pointer-only.
+- The artist mark's corner is 0.8 px loose against its disc in the mock.
+- Pushing this branch. It is local only.
