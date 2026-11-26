@@ -8,7 +8,20 @@
 import { Link2, MoreHorizontal, Search, Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { decodeFilters, decodeResults, encodeFilters, encodeResults, filtersOn, isDefaultFilters, type Filters, type ResultsParams } from "@/lib/feed/filters";
+import {
+  dateLabel,
+  decodeFilters,
+  decodeResults,
+  encodeFilters,
+  encodeResults,
+  filtersOn,
+  isDefaultFilters,
+  mediaLabel,
+  scoreLabel,
+  sortLabel,
+  type Filters,
+  type ResultsParams,
+} from "@/lib/feed/filters";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import { noMatchSentence, StateBlock } from "@/components/State";
 import { DEFAULT_SEARCH } from "@/lib/settings";
@@ -23,7 +36,8 @@ import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { TagText, tagText } from "@/components/TagText";
 import { useStore } from "@/state/store";
-import { blacklistLine, copyText, onFeedTag, openArtist } from "./actions";
+import { blacklistLine, copyText, defaultFilters, onFeedTag, openArtist } from "./actions";
+import { NotSignedIn } from "@/components/NotSignedIn";
 import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import type { Route } from "@/nav/routes";
@@ -60,6 +74,8 @@ export function ResultsScreen({ params }: { params: string }) {
   const saved = useStore(getPrefs().store, (p) => p.saved);
   const savedOne = saved.find((s) => s.tags === r.tags);
   const route = entry.route;
+  // a link visit on a browser with no account: its blacklist isn't applied, so say so
+  const nobody = useStore(getSession().store, (s) => s.ready && s.user === null && s.creds === null);
 
   const go = (next: ResultsParams) => void replaceScreen({ screen: { kind: "results", params: encodeResults(next) }, play: null }, sheet !== null);
   /** A new search here is yours: a link's settings (its ratings, the From a link chip) end with it. */
@@ -150,7 +166,13 @@ export function ResultsScreen({ params }: { params: string }) {
           <MoreHorizontal aria-hidden />
         </button>
       </Toolbar>
-      <ChipsRow filters={r.filters} chips={RESULTS_CHIPS} onChange={(f) => go({ ...r, filters: f })} link={r.link ? "From a link" : null} />
+      <ChipsRow
+        filters={r.filters}
+        chips={RESULTS_CHIPS}
+        onChange={(f) => go({ ...r, filters: f })}
+        onLink={r.link ? () => getNav().openSheet(LINK_SHEET) : null}
+      />
+      {r.link && nobody && <NotSignedIn />}
       <FeedBody feed={feed} grid={grid} route={route} empty={empty} onTag={onTag} follow />
       <PlayFab feed={feed} route={route} />
       <FilterSheet sheet={sheet} filters={r.filters} apply={(f) => go({ ...r, filters: f })} />
@@ -160,8 +182,56 @@ export function ResultsScreen({ params }: { params: string }) {
         </Sheet>
       )}
       {sheet === "menu" && <ResultsMenu />}
+      {sheet === LINK_SHEET && r.link && <FromALink r={r} onMine={() => go({ ...r, link: null, filters: defaultFilters() })} />}
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </div>
+  );
+}
+
+const LINK_SHEET = "from-link";
+const FITS = { contain: "Fit", cover: "Fill", original: "1:1" } as const;
+
+/** What the link set, for this visit only, and the way back to your own settings (DESIGN.md). */
+function FromALink({ r, onMine }: { r: ResultsParams; onMine: () => void }) {
+  const link = r.link!;
+  const f = r.filters;
+  const ratings =
+    link.kind === "share"
+      ? (["s", "q", "e"] as const)
+          .filter((k) => link.ratings[k])
+          .map((k) => ({ s: "Safe", q: "Questionable", e: "Explicit" })[k])
+          .join(", ") || "None"
+      : "All";
+  const rows: [string, string][] = [
+    ["Ratings", ratings === "Safe, Questionable, Explicit" ? "All" : ratings],
+    ["Media", mediaLabel(f.media) ?? "All"],
+    ["Sort", sortLabel(f.order) ?? "Newest"],
+    ["Date", dateLabel(f.date) ?? "Any time"],
+    ["Score", scoreLabel(f.minScore) ?? "Any"],
+  ];
+  if (link.kind === "share") {
+    const p = link.playback;
+    const style = p.style === "classic" ? `${FITS[p.fit]}, ` : "";
+    rows.push(["Slideshow", `${style}${p.intervalSec} s a slide${p.loop ? ", loops" : ""}`]);
+  }
+  return (
+    <Sheet title="From a link" testId="sheet-link">
+      <p className="link-lede">This link came with its own settings.</p>
+      <div className="sheet-rows">
+        {rows.map(([name, value]) => (
+          <div key={name} className="list-row link-row">
+            <span className="row-text">
+              <b>{name}</b>
+              <small>{value}</small>
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="link-note">For this visit only. Nothing of yours is changed.</p>
+      <button type="button" className="btn-tonal link-mine" onClick={onMine} data-testid="use-my-settings">
+        Use my settings
+      </button>
+    </Sheet>
   );
 }
 

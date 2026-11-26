@@ -2057,8 +2057,138 @@ html {
   margin: 0 0 0 -4px;
   color: var(--color-link);
 }
-.chip-static {
+/* "From a link": on (the gold ring), a link glyph in Link Blue */
+.chip.chip-link .chip-link-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 -2px;
+  color: var(--color-link);
+}
+.link-lede {
+  margin: 0 0 8px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
   color: var(--color-muted);
+}
+.link-row small {
+  display: block;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.link-note {
+  margin: 8px 0 16px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.link-mine {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: var(--spacing-control);
+}
+/* Not signed in on this browser: the sunk banner grown to two lines */
+.nobody-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  margin: 0 0 12px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 22px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+}
+.nobody-banner > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-muted);
+}
+.nobody-banner > span {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.nobody-banner b {
+  font-weight: 700;
+  color: #fff;
+}
+.nobody-banner small {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-link);
+}
+.nobody-sign-in {
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: 0 2px 0 var(--color-lip-navy);
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  color: #fff;
+}
+.nobody-sign-in:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+.nobody-sign-in:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* over the player: the same shape in the player's glass */
+.player-nobody {
+  position: absolute;
+  z-index: 11;
+  top: calc(env(safe-area-inset-top) + 68px);
+  left: var(--spacing-inset);
+  right: var(--spacing-inset);
+  pointer-events: none;
+  animation: nobody-out 300ms ease-in 3.7s both;
+}
+.player-nobody .nobody-banner {
+  pointer-events: auto;
+}
+@media (min-width: 900px) {
+  .player-nobody {
+    top: 84px;
+  }
+  .player[data-info] .player-nobody {
+    right: 376px;
+  }
+}
+@keyframes nobody-out {
+  to {
+    opacity: 0;
+  }
+}
+.nobody-banner[data-glass] {
+  margin: 0 auto;
+  max-width: 420px;
+  background: rgba(2, 15, 35, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+.nobody-banner[data-glass] > svg,
+.nobody-banner[data-glass] small {
+  color: rgba(255, 255, 255, 0.78);
+}
+.nobody-banner[data-glass] .nobody-sign-in {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .player-nobody {
+    animation: none;
+  }
 }
 .chip:focus-visible,
 .fav-pill:focus-visible,

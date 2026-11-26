@@ -88,6 +88,13 @@ at the top once Phase 7 hands over.
    - Post info on a computer is a panel beside the picture, not a dialog: Tab reaches the player's buttons
      while it is open. The show still pauses while it is open, as on a phone.
 
+14. **A visit from a link (slice 9c)** follows the proposed batch 2. My calls:
+   - The sheet's Slideshow row reads like "Fill, 7 s a slide, loops" (fit only for the classic style).
+   - Unset values read "All", "Newest", "Any time", "Any".
+   - "Use my settings" also ends the link's ratings and slideshow settings, not only its filters.
+   - The player's banner fades out over its last 300 ms (none with reduced motion). The show starts
+     right away under it, and Sign in pauses it like any sheet.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)

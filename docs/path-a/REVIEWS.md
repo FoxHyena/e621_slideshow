@@ -816,3 +816,39 @@ Full e2e: 218 passed, 3 skipped. Service worker test passes.
 
 **Budgets** (production build, mock e621): JS cold load **198.6 KB** at 375 (≤ 200; the sidebar is its
 own chunk, so a phone never loads it); 301.5 KB with idle prefetch; CLS 0.0000; 0 long tasks.
+
+## Slice 9c — a visit from a link (2026-11-26)
+
+Built from DESIGN.md batch 2 (proposed): the "From a link" chip (on, first in the row) opens a sheet of
+what the link set with "Use my settings"; "Not signed in on this browser" on Results for a link visit
+with no account, and in the player's glass for the show's first 4 s.
+
+**Code-review (high), 3 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The chip's link glyph touched its label (`.chip svg`'s −4 px) | Nit | Own margin |
+| 2 | The sheet's text was indented twice | Nit | Fixed |
+| 3 | The player banner's 4 s started before the session settled | Nit | Fixed with reviewer #3 |
+
+**Fresh reviewer, 9 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The link glyph was gold (`.chip[data-on] svg` won), not Link Blue | Med | Higher specificity |
+| 2 | A saved key that couldn't be checked (offline, 5xx) showed "Not signed in" | Med | Banner only with no saved key |
+| 3 | The player banner's 4 s counted from the player opening | Med | Counts from when it shows |
+| 4 | The banner's full-width wrapper blocked taps on the picture | Med | Wrapper passes taps through |
+| 5 | On a computer the banner touched the count pill and ran under Post info | Low | 84 from the top; clears the panel |
+| 6 | The chip wasn't first in the row (Reset came before it) | Low | First |
+| 7 | "Use my settings" keeps a borrowed sign-in's visit blacklist | Low | No change: that is the sign-in the link brought, not a setting; ends with the tab |
+| 8 | The player's Sign in is reachable for 4 s only | Low | No change: Results keeps the banner; noted for Phase 6 |
+| 9 | Test gaps: launch link, timing | Low | Launch-link test added |
+
+**Gates:** typecheck and lint clean; unit 308 pass. New e2e: e2e/link-visit.spec.ts (5 tests: the chip
+and its sheet, Use my settings, the banner on Results and over the player with Sign in, a launch link,
+signed in, a search of your own). Full e2e after the fixes: 223 passed, 3 skipped. Service worker test
+passes.
+
+**Budgets** (production build, mock e621): JS cold load **198.7 KB** (≤ 200); 302.3 KB with idle
+prefetch; CLS 0.0000; 0 long tasks.

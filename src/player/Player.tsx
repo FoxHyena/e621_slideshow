@@ -28,6 +28,7 @@ import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { copyText, sharePost } from "@/screens/actions";
+import { NotSignedIn } from "@/components/NotSignedIn";
 import { takePaused } from "./intent";
 import { PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
 import { shareUrlFor } from "./share";
@@ -91,6 +92,16 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   const current: Post | undefined = found >= 0 ? posts[index] : undefined;
 
   const [paused, setPaused] = useState(takePaused);
+  // a link visit on a browser with no account says so for the show's first 4 s
+  const fromLink = base.route.screen.kind === "results" && decodeResults(base.route.screen.params).link !== null;
+  const nobody = useStore(getSession().store, (s) => s.ready && s.user === null && s.creds === null);
+  const [nobodyUp, setNobodyUp] = useState(true);
+  const nobodyShown = fromLink && nobody;
+  useEffect(() => {
+    if (!nobodyShown) return;
+    const t = setTimeout(() => setNobodyUp(false), 4000);
+    return () => clearTimeout(t);
+  }, [nobodyShown]);
   const [trail, setTrail] = useState<Post[]>([]);
   const [ready, setReady] = useState<{ id: number; durationSec?: number } | null>(null);
   const [controls, setControls] = useState(true);
@@ -455,6 +466,11 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
       )}
       {burst > 0 && <Heart key={burst} className="heart-burst player-burst" aria-hidden />}
 
+      {nobodyShown && nobodyUp && (
+        <div className="player-nobody">
+          <NotSignedIn glass />
+        </div>
+      )}
       <div className="player-chrome" aria-hidden={!showControls || undefined} data-testid="controls" data-visible={showControls}>
         <div className="player-top">
           <button type="button" className="art-circle" aria-label="Close" onClick={close} data-testid="player-close">
