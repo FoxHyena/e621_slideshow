@@ -968,7 +968,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dmain6.wide > .dcol6 { padding-top: 0; }
 .dmain6.wide > .dcol6 .chips6 { margin: 0; padding-left: 0; padding-right: 0; }
 
-/* ---------- A chip drops its panel under itself (proposed) ---------- */
+/* ---------- A chip drops its panel under itself (owner-picked 2026-11-26, "Dropdown") ---------- */
 .chip6.open:not([aria-pressed="true"]) { background: linear-gradient(var(--raised-a), var(--raised-b)); }
 .chip6.open > .ic:last-child { transform: rotate(180deg); }
 .chip6.open:not([aria-pressed="true"]) > .ic:last-child { color: var(--text); }
@@ -1337,7 +1337,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   <section id="samehead" aria-label="One head">
     <h2 class="pg-h2" style="margin-top:40px">The head stays one size</h2>
-    <p class="pg-p dimtxt"><span class="prop6">Your rule, my drawing</span>You asked that the area above the feed and the grid keep one size. On a computer the head of a screen (Back and the tools, the title or the artist's hero, the stats, Follow, the chips) now always sits in the 600 column. Only the tiles go wide. Before, switching to the grid stretched the head across the window, so Back, the stats and the grid button itself all jumped away from the pointer. My first desktop drawing had that mistake.</p>
+    <p class="pg-p dimtxt"><span class="prop6">Your rule. Drawing approved by you</span>You asked that the area above the feed and the grid keep one size. On a computer the head of a screen (Back and the tools, the title or the artist's hero, the stats, Follow, the chips) now always sits in the 600 column. Only the tiles go wide. Before, switching to the grid stretched the head across the window, so Back, the stats and the grid button itself all jumped away from the pointer. My first desktop drawing had that mistake.</p>
     <div class="dframes6" style="margin-top:24px">
       <figure class="dfig6"><figcaption><h2 class="pg-h3">1. An artist, as a feed</h2><p>The head in the 600 column, posts under it.</p></figcaption><div class="desk-holder" id="d-sh1"></div></figure>
       <figure class="dfig6"><figcaption><h2 class="pg-h3">2. The same artist, as a grid</h2><p>The same head in the same place. The tiles use the full width, 24 from each side. The grid button has not moved, so a second click switches back.</p></figcaption><div class="desk-holder" id="d-sh2"></div></figure>
@@ -2492,7 +2492,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   dfit(); addEventListener('resize', dfit);
 
 
-  /* ================= The head stays one size; chips drop down (proposed) ================= */
+  /* ================= The head stays one size; chips drop down (owner-approved 2026-11-26) ================= */
   const aTools = `<div class="tools6"><button type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
   const aHead = `<div class="head6"><div class="titlerow">${back()}${aTools}</div></div>
     <div class="hero6">${avatar('inkwell fox', 'x')}<h3 class="title6">inkwell fox</h3><span class="handle">inkwell_fox</span>
@@ -2513,7 +2513,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   ].join('');
   dfit();
 
-  /* ================= The top bar after you scroll (proposed) ================= */
+  /* ================= The top bar after you scroll (owner-picked 2026-11-26, "Capsule") ================= */
   const tbRoot = cbar('show');
   const tbWho = `<div class="cbar6 who show"><div class="in">${back('bare')}${avatar('inkwell fox', 's')}<b>inkwell fox</b>${follow(true)}</div></div>`;
   const PA = { ...P1, isNew: false, time: '3d ago', ar: '4/3', v: 3 }, PB = { ...P1, isNew: false, time: '5d ago', ar: '1/1', v: 5, favs: '804', score: '212' }, PC = { ...P1, isNew: false, time: '1w ago', ar: '3/2', v: 7, favs: '301', score: '96' };

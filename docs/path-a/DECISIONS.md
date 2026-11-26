@@ -452,3 +452,13 @@ Format: date — decision. Why. Rejected alternatives.
 - The wash is 5% white (it was 4%); this is what the owner saw when picking.
 - Not verified: live hover was tested by script on one Settings row only.
 
+## 2026-11-26 — The one-head drawing approved
+
+- I asked: "do you approve that drawing", after saying that on Following's grid the left-aligned
+  title in the centred column does not line up with the full-width tiles. Owner's word: "Approve".
+- **Approved: the drawing of the owner's one-head rule.** On a computer the head stays in the 600
+  column in feed view and in grid view; only the tiles use the full width, 24 at each side.
+- Accepted with it: in grid view the head's left edge and the tiles' left edge do not line up.
+- With this, everything in DESIGN.md's "The top bar, the pointer, grid loading, one head, chip
+  dropdowns" is owner-picked or owner-approved. The chip dropdown's measurements are still mine.
+

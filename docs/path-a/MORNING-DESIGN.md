@@ -20,7 +20,7 @@ treat that message as your approval of any design.
    top bar is a floating capsule ("Capsule"), and a button with a lip rises under the pointer ("Lift").
    **Approved by you on 2026-11-26 ("Approve both"):** the rest of the hover pass and the grid loading
    skeleton. **Picked by you after that:** a row's wash is "Inset", with its corner radius matched to
-   its container. Still yours to check there: my drawing of the head staying in the 600 column in grid view. **Also picked by you:** chips open a dropdown, on a phone too
+   its container. **Approved by you ("Approve"):** my drawing of the head staying in the 600 column in grid view. **Also picked by you:** chips open a dropdown, on a phone too
    ("Dropdown").
 4. **Things I added that the plan does not list.** Yes or no to each: "API key · Change", "What's new",
    "Source code" and the "Not run by e621…" line (batch 3); "Open on e621" in an artist's ⋯ and "Copy
