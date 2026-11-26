@@ -256,3 +256,32 @@ Format: date — decision. Why. Rejected alternatives.
   place on a post that has folded since lands on its "+N more" row.
 - **Esc on Settings › Account stays with the legacy app** (it opens and closes its own panel with Esc);
   back is the browser's Back or the tab bar. Interim until slice 7 replaces the account screen.
+
+## 2026-11-25 — Slice 3b build (refresh, pill, lanes, instant paint)
+
+- **The request lane is a priority scheduler**, still strictly one request at a time, 550 ms apart:
+  `user` (the screen on show, a tap, a feed's first page) > `page` (later pages read ahead) > `bg`
+  (marker checks and visits, the favorites sync and its negatives). A waiting task gains a level every
+  3 s. A 429 or 503 pauses the whole lane 5 s. A waiting task whose signal aborts leaves the line.
+- **Evicting a feed cancels its waiting requests** (`PostQueue.cancel`), but doesn't end the queue: a
+  hidden screen may still hold it, and its next `ensure` asks again. A cancel is never an error.
+- **The new-posts count runs as `user`**: it's asked for the screen on show, and as `bg` it waited
+  behind a hidden For You's ranking until aging let it through (about 6 s). It counts up to 30
+  ("30+ new posts") with the feed's own query and today's blacklist and media.
+- **Coming back is detected by effects re-attaching**: a hidden `<Activity>` runs no effects, so a
+  `visible` flip is never seen. Plus `visibilitychange` (app foreground). At most once every 15 s,
+  counted from a request actually sent.
+- **The pill never inserts on its own** (UX "Nothing jumps"). A tap smooth-scrolls to the top (instant
+  with reduced motion), then starts the feed over. No slide-down animation yet (Phase 6 polish).
+- **Instant paint covers Following only.** Its first 24 posts are saved per user (`feedHead:<user>`,
+  localStorage, Remember on only, 10 min, keyed by feed key; refresh and sign-out remove it). A reload
+  seeds the queue from them, pages on below the last one, and asks for newer posts behind the pill. For
+  You already restores its saved ranked list in one request, so it has no head of its own.
+- **A same-session reload skips the anchor round trip**: the marker record keeps the anchor row, so
+  Following is ready at once with the session's threshold and re-reads the row in the background (`bg`).
+  After a mark the next load waits for e621, as before.
+- **Pull to refresh** follows UX §4 (10 px axis lock, half travel, 144 px arms, 48 px hold ≥ 400 ms;
+  touchmove listened to passively and only during a pull). Following re-reads the anchor row and starts
+  the feed over; the spinner waits for the first page. For You says "Already fresh, ranked N min ago"
+  under 10 minutes, otherwise ranks again behind the Update ranking pill. Results and Favorites get it
+  with their own slices.

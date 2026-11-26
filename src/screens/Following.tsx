@@ -14,12 +14,15 @@ import type { Post } from "@/lib/e621/types";
 import { dividerIndex, feedRows, isNew, newCountLabel } from "@/lib/following/feed";
 import { scrolledPast, SEEN_IDLE_MS, shouldMarkSeen } from "@/lib/following/marker";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
+import { PullToRefresh } from "@/feed/PullToRefresh";
 import { getNav } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
 import { Sheet } from "@/shell/Sheet";
 import { getFeeds, feedQuery, type Feed, type FeedSpec } from "@/state/feeds";
 import { getFollowing, RETRY_FAILED_MS, type FollowingState } from "@/state/following";
+import { FEED_HEAD_POSTS, storage } from "@/lib/storage";
+import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { shallow, useStore } from "@/state/store";
@@ -67,6 +70,29 @@ function toTop(visible: boolean) {
   if (isLocked()) setLockedY(0);
   else window.scrollTo(0, 0);
 }
+
+/** Smooth-scroll to the top (instant with reduced motion), then run `then`. */
+function scrollUpThen(then: () => void) {
+  if (isLocked() || window.scrollY <= 0) return then();
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  const started = performance.now();
+  const wait = () => {
+    if (window.scrollY <= 1 || performance.now() - started > 900) then();
+    else requestAnimationFrame(wait);
+  };
+  requestAnimationFrame(wait);
+}
+
+/** The new-posts pill's label: "↑ 6 new posts", "↑ 30+ new posts", or just "New posts" before a count. */
+export function newPostsLabel(n: { count: number; more: boolean } | null): string {
+  if (!n || n.count === 0) return "New posts";
+  return `${n.count}${n.more ? "+" : ""} new post${n.count === 1 && !n.more ? "" : "s"}`;
+}
+/** A screen coming back checks for new posts at most this often. */
+const RECHECK_MS = 15_000;
+/** Feeds already started from their saved first page (once each). */
+const seededFeeds = new WeakSet<object>();
 
 export function FollowingScreen() {
   const { sheet } = useScreen();
@@ -136,8 +162,79 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
   const threshold = fs.threshold;
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(() => new Set(readRuns()));
   const route = entry.route;
+  const session = useStore(getSession().store, (s) => s);
 
   const q = feed?.queue ?? null;
+
+  // ---- the new-posts pill: checked on coming back to the screen (UX §4), never inserted unasked ----
+  // Kept with the queue it counted for: a new feed starts without a pill.
+  const [counted, setCounted] = useState<{ q: object; n: { count: number; more: boolean } } | null>(null);
+  const newer = counted && counted.q === q ? counted.n : null;
+  const lastCheck = useRef(0);
+  const checkNewer = useRef<(now: boolean) => Promise<void>>(async () => {});
+  useLayoutEffect(() => {
+    checkNewer.current = async (force: boolean) => {
+      if (!q?.countNewer || !q.rawMax || (!force && Date.now() - lastCheck.current < RECHECK_MS)) return;
+      lastCheck.current = Date.now();
+      try {
+        const n = await q.countNewer();
+        if (n.count > 0) setCounted({ q, n });
+      } catch {
+        // offline or busy: the next return asks again
+      }
+    };
+  });
+  // ---- instant paint: start from the first posts saved last time (Remember only, 10 min) ----
+  /** when the first posts on show came from e621 (for the queue they belong to) */
+  const headAt = useRef<{ q: object; at: number } | null>(null);
+  const headSig = useRef("");
+  useLayoutEffect(() => {
+    if (!feed || !session.user || !session.remember || seededFeeds.has(feed)) return;
+    seededFeeds.add(feed);
+    const head = storage.loadFeedHead(session.user.name, feed.key, Date.now());
+    if (head && feed.queue.seed?.(head.posts, head.rawMax)) {
+      headAt.current = { q: feed.queue, at: head.at };
+      void checkNewer.current(true);
+    }
+  }, [feed, session.user, session.remember]);
+  // Save the first posts once e621 sent them, and again when they change (a heart, a hidden post),
+  // keeping when they came from e621: a seeded copy still ages out on time. Hearts given since are
+  // folded in (cards read them from the favorites overlay, not the post).
+  const favState = useStore(getFavs().store, (s) => s);
+  useEffect(() => {
+    if (!feed || !q || q.posts.length === 0 || !session.user) return;
+    if (q.posts.length < FEED_HEAD_POSTS && !q.exhausted) return;
+    if (headAt.current?.q !== q) {
+      if (q.seeded) return;
+      headAt.current = { q, at: Date.now() };
+      headSig.current = "";
+    }
+    const posts = q.posts.slice(0, FEED_HEAD_POSTS).map((p) =>
+      favState.overlay.has(p.id) ? { ...p, stats: { ...p.stats, is_favorited: favedOf(favState, p), fav_count: favCountOf(favState, p) } } : p,
+    );
+    const sig = posts.map((p) => `${p.id}${p.stats.is_favorited ? "f" : ""}`).join();
+    if (sig === headSig.current) return;
+    headSig.current = sig;
+    storage.saveFeedHead(session.user.name, { key: feed.key, at: headAt.current.at, posts, rawMax: q.rawMax }, session.remember);
+  });
+
+  // Coming back: a hidden <Activity> runs no effects, so its effects coming back is the sign.
+  const shownBefore = useRef(false);
+  useEffect(() => {
+    if (shownBefore.current && visible) void checkNewer.current(false);
+    shownBefore.current = true;
+  }, [visible]);
+  useEffect(() => {
+    const onShow = () => {
+      if (document.visibilityState === "visible" && visible) void checkNewer.current(false);
+    };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+  }, [visible]);
+  // The mark's own check found newer posts: count them for the pill.
+  useEffect(() => {
+    if (fs.newer) void checkNewer.current(true);
+  }, [fs.newer]);
   const posts = q?.posts ?? NO_POSTS;
   const newCount = useMemo(() => posts.filter((p) => isNew(p, threshold)).length, [posts, posts.length, threshold]); // eslint-disable-line react-hooks/exhaustive-deps -- the queue grows in place
   const last = posts[posts.length - 1];
@@ -212,8 +309,21 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
   const refresh = () => {
     if (!feed) return;
     following.clearNewer();
+    setCounted(null);
+    lastCheck.current = 0;
+    // The saved first page is now old: the new feed starts from e621, not from it.
+    if (session.user) storage.saveFeedHead(session.user.name, null, session.remember);
     getFeeds().drop(feed.key);
     toTop(visible);
+  };
+  const showNewer = () => scrollUpThen(refresh);
+  // Pull to refresh: what you follow, and the feed from its first page; the spinner waits for it.
+  const pull = async () => {
+    if (!feed) return;
+    void following.reread();
+    refresh();
+    const env = { ratings: getPrefs().store.get().search.ratings, creds: session.creds, user: session.user };
+    await getFeeds().get(spec, env).queue.ensure(0);
   };
 
   const caughtNote = fs.marked === "e621" ? "Marked as seen on e621" : fs.marked === "local" ? "Marked as seen on this device" : undefined;
@@ -221,6 +331,7 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
 
   return (
     <>
+      <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />
       <p className="screen-sub" aria-live="polite" data-testid="following-status">
         {label && newCount > 0 ? (
           <>
@@ -231,10 +342,10 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         )}
       </p>
       <ChipsRow filters={filters} chips={CHIPS} onChange={change} />
-      {fs.newer && (
+      {(fs.newer || newer) && (
         <div className="top-pill-row">
-          <button type="button" className="top-pill" onClick={refresh} data-testid="new-posts-pill">
-            <ArrowUp aria-hidden /> New posts
+          <button type="button" className="top-pill" onClick={showNewer} data-testid="new-posts-pill">
+            <ArrowUp aria-hidden /> {newPostsLabel(newer)}
           </button>
         </div>
       )}

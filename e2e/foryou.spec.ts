@@ -201,3 +201,28 @@ test("too few favorites for a profile says what's needed", async ({ page }) => {
   await page.goto("/for-you");
   await expect(page.getByTestId("for-you-too-few")).toContainText("A tag needs 3 favorites");
 });
+
+test.describe("pull to refresh", () => {
+  test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
+
+  test("a pull on a ranking under 10 minutes old says it's fresh, and doesn't rank again", async ({ page }) => {
+    const mock = await withFavorites(page);
+    await page.goto("/for-you");
+    await firstRanked(page);
+    await expect(page.getByTestId("for-you-status")).toHaveText("Ranked just now");
+    await page.evaluate(async () => {
+      const t = (y: number) => new Touch({ identifier: 1, target: document.body, clientX: 180, clientY: y });
+      const fire = (type: string, touches: Touch[]) =>
+        document.body.dispatchEvent(new TouchEvent(type, { touches, changedTouches: touches, bubbles: true }));
+      fire("touchstart", [t(200)]);
+      for (let i = 1; i <= 10; i++) {
+        fire("touchmove", [t(200 + 20 * i)]);
+        await new Promise((r) => requestAnimationFrame(r));
+      }
+      fire("touchend", []);
+    });
+    await expect(page.getByText("Already fresh, ranked 1 min ago")).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(ranked(mock)).toBe(1);
+  });
+});

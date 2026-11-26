@@ -228,6 +228,31 @@ describe("feed registry", () => {
     expect(r.size()).toBe(1);
   });
 
+  it("cancels an evicted feed's waiting request without an error, and pages it again on asking", async () => {
+    let t = 0;
+    const signals: AbortSignal[] = [];
+    const r = createRegistry(
+      () =>
+        vi.fn((_tags, _page, _limit, opts?: { signal?: AbortSignal }) => {
+          signals.push(opts!.signal!);
+          return signals.length === 1
+            ? new Promise<never>((_, reject) => opts!.signal!.addEventListener("abort", () => reject(new DOMException("x", "AbortError"))))
+            : Promise.resolve([makePost({ id: 1 })]);
+        }),
+      () => t,
+    );
+    const f = r.get(spec("old"), env);
+    const loading = f.queue.ensure(0);
+    t += IDLE_MS + 1;
+    r.get(spec("new"), env);
+    expect(r.peek(f.key)).toBeUndefined();
+    await loading;
+    expect(signals[0].aborted).toBe(true);
+    expect(f.queue.error).toBeNull();
+    await f.queue.ensure(0);
+    expect(f.queue.posts.map((p) => p.id)).toEqual([1]);
+  });
+
   it("never evicts a kept feed; its owner drops it", () => {
     let t = 0;
     const r = createRegistry(() => vi.fn().mockResolvedValue([]), () => t);

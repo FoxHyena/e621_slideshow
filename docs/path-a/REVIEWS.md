@@ -332,3 +332,39 @@ Not covered: the real e621 marker (needs the owner signed in in the browser pane
 | Layout shift | 0 | 0.0000 |
 | First feed content | < 1.5 s | 0.38 s |
 | Scroll, 4× CPU | no task > 50 ms | 0 long tasks |
+
+## Slice 3b review (2026-11-25): refresh, pill, lanes, instant paint
+
+**code-review skill (high), 4 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A seeded queue's `rawMax` ignored the newest post the filters hid, so a "New posts" pill brought nothing | High | The head keeps e621's `rawMax`; `seed(posts, rawMax)`; unit test |
+| 2 | The saved head kept hearts as they were, so a re-tap after reload hit "already favorited" | High | Hearts from the favorites overlay are folded in, and the head is saved again when they change (keeping its age); e2e |
+| 3 | For You's ranking ran as `user`, holding up Following's next page | Low | Ranking runs as `page`; a restored list stays `user` |
+| 4 | No test for eviction cancel or a pull below the top | Low | Registry unit test; e2e |
+
+**Fresh reviewer, 10 findings: 8 fixed, 2 no change**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | `cancel()` left a stale `inflight`, so an `ensure` in the same tick got the aborted refill: an empty queue that never refetched (StrictMode remount of the legacy home) | High | `cancel` forgets the refill; a cancelled refill never touches the queue again; `inflight` cleared only by its own promise |
+| 2 | Any `touchend` let go and a second finger didn't cancel | Med | A second finger cancels; only the last finger up lets go |
+| 3 | A hung refresh kept the spinner and blocked pulls | Med | The spinner stops after 10 s whatever happens |
+| 4 | The head wasn't saved again after a refresh that loaded the same ids | Med | The signature is kept per queue |
+| 5 | The head wasn't dropped when what you follow changed | Low | A re-read that finds another tag count (or no row) drops it |
+| 6 | The marker record now holds the anchor row in sessionStorage without Remember | Low | **No change**: same rule as the marker (DECISIONS 3a); the row has counts and ids, no key; a sign-in without Remember purges |
+| 7 | A fetch that never answers holds the lane forever | Med | Every request times out after 20 s ("e621 took too long to answer") |
+| 8 | Priority isn't tied to visibility | Low | **No change**: ranking moved to `page` (code-review #3); unbounded aging is intended so nothing waits forever |
+| 9 | `reread` couldn't clear a deleted anchor | Low | A missing row now means you follow nothing; the saved row goes too |
+| 10 | Small: the check gate shared across queues; the spinner left out when a sheet opens mid-pull; tests | Low | Gate resets on refresh; cleanup puts the spinner away; unit tests for the same-session reload, re-read and the head's rules |
+
+Not covered: a lane test for the 20 s timeout (`AbortSignal.timeout` runs on real timers); `countNewer`
+doesn't check the tag limit (Following's query is far below it).
+
+**Gates:** 244 unit tests, 128 e2e passed (2 skipped), typecheck and lint clean.
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` 190.4 KB (≤ 200; +2.6 KB
+for the lane, pill and pull), 224.4 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first
+feed content 0.37 s; scroll at 4× CPU: 2 long tasks, longest 51 ms. **Borderline**, like slice 2b
+(53–55 ms): recheck in Phase 6 with the performance panel.

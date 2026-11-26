@@ -10,12 +10,11 @@
  * 5 minutes, or sooner when over either limit (least recently used first).
  */
 import { searchPosts, type Credentials } from "@/lib/e621/client";
-import type { Post } from "@/lib/e621/types";
 import { searchFor, type Filters } from "@/lib/feed/filters";
 import { parseBlacklist, type BlacklistRule } from "@/lib/query/blacklist";
 import { buildQuery, DEFAULT_TAG_LIMIT, favoritesTags } from "@/lib/query/build";
 import type { SearchSettings } from "@/lib/settings";
-import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
+import { PostQueue, type PageFetcher, type SlideQueue } from "@/lib/slideshow/queue";
 import { blacklistOf, getPrefs } from "./prefs";
 import { createStore, type Store } from "./store";
 
@@ -72,7 +71,7 @@ export function feedKey(spec: FeedSpec, env: FeedEnv): string {
   return JSON.stringify([spec.kind, b.query, spec.filters.media, env.user?.name ?? null, env.creds?.username ?? null]);
 }
 
-type Fetcher = (creds: Credentials | null) => (tags: string, page: string | number, limit: number) => Promise<Post[]>;
+type Fetcher = (creds: Credentials | null) => PageFetcher;
 
 export interface Registry {
   /** The live feed for this spec, made on first ask. Doesn't fetch. */
@@ -98,7 +97,7 @@ export interface Registry {
 }
 
 export function createRegistry(
-  fetcher: Fetcher = (creds) => (tags, page, limit) => searchPosts(tags, page, limit, creds),
+  fetcher: Fetcher = (creds) => (tags, page, limit, opts) => searchPosts(tags, page, limit, creds, opts?.signal, opts?.lane),
   now: () => number = Date.now,
   blacklist = "",
 ): Registry {
@@ -112,8 +111,11 @@ export function createRegistry(
   let rules = parseBlacklist(blacklist);
 
   // Dropping only forgets the feed: a hidden screen (and its player) may still hold and page it.
+  // Its waiting requests go, though; paging it again asks afresh.
   const drop = (f: Feed) => {
-    if (feeds.get(f.key) === f) feeds.delete(f.key);
+    if (feeds.get(f.key) !== f) return;
+    feeds.delete(f.key);
+    f.queue.cancel?.();
   };
   const add = (key: string, spec: FeedSpec | null, make: (onChange: () => void) => SlideQueue, keep = false): Feed => {
     let f = feeds.get(key);

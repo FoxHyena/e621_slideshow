@@ -19,6 +19,7 @@ import { DEFAULT_SEARCH, type SearchSettings } from "@/lib/settings";
 import type { SlideQueue } from "@/lib/slideshow/queue";
 import { storage, type RankedList } from "@/lib/storage";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
+import { PullToRefresh } from "@/feed/PullToRefresh";
 import { getNav } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
@@ -57,6 +58,8 @@ let nonces = 0;
 const nextNonce = () => ++nonces;
 
 /** When each ranking finished, for "Ranked 3 min ago". */
+/** Pull to refresh ranks again only after this long (UX §5). */
+const FRESH_MS = 10 * 60_000;
 const rankedAt = new WeakMap<SlideQueue, number>();
 export const rankedAtOf = (q: SlideQueue): number | null =>
   q instanceof IdListQueue ? q.savedAt : (rankedAt.get(q) ?? null);
@@ -84,7 +87,7 @@ function useMinute(on: boolean): number {
 }
 
 export function ForYouScreen() {
-  const { entry, visible, sheet } = useScreen();
+  const { entry, visible, sheet, play } = useScreen();
   const session = useStore(getSession().store, (s) => s);
   const rec = getRec();
   // Everything but the sync's progress, which ticks many times a second (only the loader reads it).
@@ -164,7 +167,9 @@ export function ForYouScreen() {
   const make = (c: Choice | null): Feed | null => {
     if (!c || !canRank || c.filterKey !== filterKey || !session.creds) return null;
     const creds = session.creds;
+    // A restored list is what's on screen; a ranking run reads ahead of it (ENGINEERING §3 lanes).
     const fetch = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds);
+    const rankFetch = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds, undefined, "page");
     const ctx = { username: name ?? undefined };
     if (c.restore) {
       const saved = c.restore;
@@ -186,7 +191,7 @@ export function ForYouScreen() {
             { tag: "candidates", query: rq.query, pages: REC_PAGE_BUDGET },
             { tag: "popular", query: rq.popular, pages: REC_POPULAR_PAGES },
           ],
-          fetch,
+          rankFetch,
           weights,
           { media: applied.media, rules, ctx },
           new Set(r.overrides.muted),
@@ -260,6 +265,17 @@ export function ForYouScreen() {
     if (choice) setRefresh({ ...choice, inputs: inputsRef.current, nonce: nextNonce(), restore: null });
   };
 
+  // Pull to refresh (UX §5): ranks again only once the ranking is 10 minutes old; the old list
+  // stays until the Update ranking pill swaps the new one in. ⋯ › Refresh always ranks again.
+  const pull = () => {
+    if (!choice || busy) return;
+    if (at !== null && Date.now() - at < FRESH_MS) {
+      const m = Math.max(1, Math.round((Date.now() - at) / 60_000));
+      toast(`Already fresh, ranked ${m} min ago`);
+      return;
+    }
+    setRefresh({ ...choice, inputs: inputsRef.current, nonce: nextNonce(), restore: null });
+  };
   const subtitle = !signedIn
     ? null
     : nextFailed
@@ -282,6 +298,7 @@ export function ForYouScreen() {
 
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
+      {signedIn && <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />}
       <div className="screen-toolbar">
         <div className="flex-1" />
         {signedIn && (

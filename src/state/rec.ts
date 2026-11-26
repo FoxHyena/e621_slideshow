@@ -55,10 +55,11 @@ export interface Rec {
 
 function recApi(userId: number, creds: Credentials): RecApi {
   return {
-    favoriteCount: async () => (await getUser(userId, creds)).favorite_count ?? 0,
-    favorites: (page, limit) => getFavorites(userId, page, limit, creds),
-    tagCounts: (names) => getTags(names, creds),
-    newestPostId: () => newestPostId(creds),
+    // The favorites sync runs behind whatever is on screen.
+    favoriteCount: async () => (await getUser(userId, creds, "bg")).favorite_count ?? 0,
+    favorites: (page, limit) => getFavorites(userId, page, limit, creds, "bg"),
+    tagCounts: (names) => getTags(names, creds, "bg"),
+    newestPostId: () => newestPostId(creds, "bg"),
   };
 }
 
@@ -138,7 +139,7 @@ export function createRec(warn: (msg: string) => void, now: () => number = Date.
           try {
             const feats = mergeFeatures(storedFeats, p, read);
             await bigStorage.set(featKey(name), feats);
-            const search = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds);
+            const search = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds, undefined, "bg");
             const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), search, now(), onProgress);
             await bigStorage.set(NEG_KEY, neg);
             onProgress({ phase: "learn", done: 0 });

@@ -51,6 +51,8 @@ export interface Following {
    */
   /** `force`: Mark all as seen, which says why when it can't. */
   markSeen(rawMax: number, query: (above: number) => string, force?: boolean): Promise<MarkResult>;
+  /** Read e621's anchor row again (pull to refresh): what you follow may have changed. The threshold stays. */
+  reread(): Promise<void>;
   /** The new-posts pill was used, or the feed started over: the next check runs fresh. */
   clearNewer(): void;
   setAccount(creds: Credentials | null, user: string | null, remember: boolean): void;
@@ -74,6 +76,14 @@ export function createFollowing(
     const mine = epoch;
     const user = s.user;
     const c = creds;
+    // A reload in the same session: paint from what was read then, and refresh the row behind it
+    // (the threshold stays, as it would anyway).
+    const kept = storage.loadMarker(user);
+    if (kept?.anchor && !kept.marked && now() - kept.at < MARKER_TTL) {
+      store.set((x) => ({ ...x, status: "ready", error: null, anchor: kept.anchor!, threshold: kept.threshold }));
+      void reread();
+      return Promise.resolve();
+    }
     store.set((x) => ({ ...x, status: "loading", error: null }));
     loading = api
       .getAnchor(c)
@@ -87,7 +97,7 @@ export function createFollowing(
         const reuse = saved && !saved.marked && now() - saved.at < MARKER_TTL;
         // e621's marker, or this device's when e621 didn't take a mark (whichever is further on).
         const threshold = reuse ? saved.threshold : Math.max(anchor.last_seen_post_id ?? 0, storage.loadLocalSeen(user));
-        if (!reuse) storage.saveMarker(user, { threshold, at: now(), marked: false }, remember);
+        storage.saveMarker(user, reuse ? { ...saved, anchor } : { threshold, at: now(), marked: false, anchor }, remember);
         store.set((x) => ({ ...x, status: "ready", anchor, threshold }));
       })
       .catch((e: Error) => {
@@ -98,6 +108,27 @@ export function createFollowing(
         if (mine === epoch) loading = null;
       });
     return loading;
+  };
+
+  const reread = async (): Promise<void> => {
+    const s = store.get();
+    if (!creds || !s.user || s.status !== "ready") return;
+    const mine = epoch;
+    const user = s.user;
+    try {
+      const anchor = await api.getAnchor(creds, undefined, "bg");
+      // A mark under way reads its own row back.
+      if (mine !== epoch || store.get().marking || store.get().marked) return;
+      const before = store.get().anchor;
+      // What you follow changed (on e621.net, say): the saved first posts are of the old list.
+      if (!anchor || anchor.tag_count !== before?.tag_count) storage.saveFeedHead(user, null, remember);
+      // No row now: you follow nothing any more.
+      store.set((x) => ({ ...x, anchor }));
+      const rec = storage.loadMarker(user);
+      if (rec && !rec.marked) storage.saveMarker(user, { ...rec, anchor: anchor ?? undefined }, remember);
+    } catch {
+      // keep the row we have
+    }
   };
 
   const markSeen = async (rawMax: number, query: (above: number) => string, force = false): Promise<MarkResult> => {
@@ -125,7 +156,7 @@ export function createFollowing(
         await api.visitAnchor(anchor.id, c);
         visited = true;
         // Read it back; once more if that read fails (a 429 right after the visit, say).
-        const after = await api.getAnchor(c).catch(() => api.getAnchor(c));
+        const after = await api.getAnchor(c, undefined, "bg").catch(() => api.getAnchor(c, undefined, "bg"));
         moved = !!after && (after.last_seen_post_id ?? 0) > (anchor.last_seen_post_id ?? 0);
         if (!moved) why = "e621's marker didn't move";
         else if (mine === epoch) store.set((x) => ({ ...x, anchor: after }));
@@ -157,6 +188,7 @@ export function createFollowing(
   return {
     store,
     load,
+    reread,
     markSeen,
     clearNewer: () => store.set((x) => (x.newer ? { ...x, newer: false } : x)),
     setAccount(c, user, keep) {

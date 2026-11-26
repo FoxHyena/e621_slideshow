@@ -152,6 +152,42 @@ describe("following marker", () => {
     expect([...ls.keys(), ...ss.keys()].some((k) => /(marker|seen):fox/.test(k))).toBe(false);
   });
 
+  it("a reload in the same session is ready at once from the saved row, then re-reads it", async () => {
+    const t = { now: 1_000_000 };
+    const a = setup({ t });
+    await a.f.load();
+    const b = setup({ seen: 300, t });
+    const p = b.f.load();
+    // Ready before any answer from e621, with the session's threshold.
+    expect(b.f.store.get()).toMatchObject({ status: "ready", threshold: 100 });
+    await p;
+    await vi.waitFor(() => expect(b.api.getAnchor).toHaveBeenCalledWith(KEY, undefined, "bg"));
+    await vi.waitFor(() => expect(b.f.store.get().anchor?.last_seen_post_id).toBe(300));
+    expect(b.f.store.get().threshold).toBe(100);
+  });
+
+  it("re-reading finds you follow nothing now, and forgets the saved first posts", async () => {
+    const { f, api } = setup();
+    await f.load();
+    storage.saveFeedHead("fox", { key: "k", at: 1_000_000, posts: [] }, true);
+    api.getAnchor.mockResolvedValueOnce(null);
+    await f.reread();
+    expect(f.store.get().anchor).toBeNull();
+    expect([...ls.keys()].some((k) => k.includes("feedHead:fox"))).toBe(false);
+  });
+
+  it("keeps saved first posts only with Remember, for their own feed and 10 minutes", () => {
+    const post = { id: 5, files: { original: { url: "x" } } } as never;
+    storage.saveFeedHead("fox", { key: "k", at: 0, posts: [post] }, false);
+    expect([...ls.keys(), ...ss.keys()].some((k) => k.includes("feedHead"))).toBe(false);
+    storage.saveFeedHead("fox", { key: "k", at: 0, posts: [post] }, true);
+    expect(storage.loadFeedHead("fox", "k", 60_000)?.posts).toHaveLength(1);
+    expect(storage.loadFeedHead("fox", "other", 60_000)).toBeNull();
+    expect(storage.loadFeedHead("fox", "k", 10 * 60_000 + 1)).toBeNull();
+    storage.purgeAccount("fox");
+    expect(storage.loadFeedHead("fox", "k", 60_000)).toBeNull();
+  });
+
   it("drops a late answer for an account that signed out", async () => {
     const { f } = setup();
     const p = f.load();

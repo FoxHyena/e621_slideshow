@@ -54,7 +54,7 @@ export function mockPost(spec: MockPostSpec) {
 
 export interface E621Mock {
   /** every /posts.json request: tags + page */
-  searches: { tags: string; page: string | null; auth: string | null }[];
+  searches: { tags: string; page: string | null; auth: string | null; limit: number }[];
   favorites: { method: string; postId: number }[];
   autocompleteQueries: string[];
   /** media URLs the browser actually requested */
@@ -145,7 +145,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const tags = url.searchParams.get("tags") ?? "";
       const pageParam = url.searchParams.get("page");
       const limit = Number(url.searchParams.get("limit") ?? 75);
-      state.searches.push({ tags, page: pageParam, auth });
+      state.searches.push({ tags, page: pageParam, auth, limit });
       if (tags.includes("nothing_matches")) return postList([]);
       if (tags.includes("server_error") || state.searchFails(tags)) return json(route, { success: false, message: "Mock search failure" }, 422);
       let list = state.posts;

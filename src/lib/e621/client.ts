@@ -18,23 +18,120 @@ export class E621Error extends Error {
 }
 
 /**
- * e621 hard-limits at 2 req/s. Bursts are rare (page refills, debounced autocomplete), so a 550ms gap keeps us under it while typing stays responsive.
- * Every API call goes through this single-file queue.
+ * The request lane (ENGINEERING §3). e621 hard-limits at 2 req/s, so every API call waits its turn
+ * here: one at a time, 550 ms apart. Waiting tasks go by priority, `user` (what's on screen, a tap)
+ * before `page` (the next page ahead) before `bg` (marker checks, the favorites sync), and gain a
+ * level every 3 s so nothing waits forever. A 429 or 503 pauses the whole lane for 5 s. A task whose
+ * signal aborts while it waits leaves the line and rejects with an AbortError.
  */
+export type Lane = "user" | "page" | "bg";
+const RANK: Record<Lane, number> = { user: 0, page: 1, bg: 2 };
 const MIN_GAP_MS = 550;
-let lastStart = 0;
-let chain: Promise<unknown> = Promise.resolve();
+export const AGE_MS = 3000;
+export const BACKOFF_MS = 5000;
 
-function throttle<T>(fn: () => Promise<T>): Promise<T> {
-  const run = async () => {
-    const wait = lastStart + MIN_GAP_MS - Date.now();
-    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-    lastStart = Date.now();
-    return fn();
-  };
-  const next = chain.then(run, run);
-  chain = next.catch(() => undefined);
-  return next;
+interface Task {
+  rank: number;
+  at: number;
+  seq: number;
+  start: () => Promise<void>;
+}
+const waiting: Task[] = [];
+let lastStart = 0;
+let pausedUntil = 0;
+let busy = false;
+let seq = 0;
+
+const effectiveRank = (t: Task, now: number) => t.rank - Math.floor((now - t.at) / AGE_MS);
+function next(now: number): Task {
+  let best = waiting[0];
+  for (const t of waiting) {
+    const d = effectiveRank(t, now) - effectiveRank(best, now);
+    if (d < 0 || (d === 0 && t.seq < best.seq)) best = t;
+  }
+  return best;
+}
+
+async function pump() {
+  if (busy) return;
+  busy = true;
+  try {
+    while (waiting.length) {
+      const wait = Math.max(lastStart + MIN_GAP_MS, pausedUntil) - Date.now();
+      // Wait first, then choose: a more urgent task may arrive meanwhile.
+      if (wait > 0) {
+        await new Promise((r) => setTimeout(r, wait));
+        continue;
+      }
+      const t = next(Date.now());
+      waiting.splice(waiting.indexOf(t), 1);
+      lastStart = Date.now();
+      await t.start();
+    }
+  } finally {
+    busy = false;
+  }
+}
+
+/** The whole lane waits after e621 says it's busy. */
+function backOff() {
+  pausedUntil = Math.max(pausedUntil, Date.now() + BACKOFF_MS);
+}
+
+const abortError = () => new DOMException("The request was cancelled", "AbortError");
+
+/** No request holds the lane longer than this: a fetch that never answers would stop every screen. */
+export const REQUEST_TIMEOUT_MS = 20_000;
+function timed(signal?: AbortSignal): AbortSignal | undefined {
+  if (typeof AbortSignal === "undefined" || !("timeout" in AbortSignal)) return signal;
+  const t = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  if (!signal) return t;
+  return "any" in AbortSignal ? AbortSignal.any([signal, t]) : signal;
+}
+/** A timed-out fetch reads as e621 being slow, not as a cancel. */
+async function fetchTimed(url: URL, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, signal: timed(init.signal ?? undefined) });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "TimeoutError") throw new E621Error("e621 took too long to answer", 0);
+    throw e;
+  }
+}
+export const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortError";
+
+function throttle<T>(fn: () => Promise<T>, lane: Lane = "user", signal?: AbortSignal): Promise<T> {
+  if (signal?.aborted) return Promise.reject(abortError());
+  return new Promise<T>((resolve, reject) => {
+    const task: Task = {
+      rank: RANK[lane],
+      at: Date.now(),
+      seq: seq++,
+      start: async () => {
+        signal?.removeEventListener("abort", drop);
+        try {
+          resolve(await fn());
+        } catch (e) {
+          reject(e);
+        }
+      },
+    };
+    function drop() {
+      const i = waiting.indexOf(task);
+      if (i < 0) return;
+      waiting.splice(i, 1);
+      reject(abortError());
+    }
+    signal?.addEventListener("abort", drop, { once: true });
+    waiting.push(task);
+    void pump();
+  });
+}
+
+/** Tests: an empty lane with no pause. */
+export function resetLane() {
+  waiting.length = 0;
+  lastStart = 0;
+  pausedUntil = 0;
 }
 
 function clientParam(creds: Credentials | null): string {
@@ -63,6 +160,7 @@ interface RequestOpts {
   signal?: AbortSignal;
   /** Skip the Authorization header. Some public endpoints reject the CORS preflight it triggers. */
   anonymous?: boolean;
+  lane?: Lane;
 }
 
 async function request<T>(path: string, opts: RequestOpts): Promise<T> {
@@ -77,18 +175,23 @@ async function request<T>(path: string, opts: RequestOpts): Promise<T> {
     headers.Authorization = "Basic " + btoa(`${opts.creds.username}:${opts.creds.apiKey}`);
   }
 
-  return throttle(async () => {
-    const res = await fetch(url, {
-      method: opts.method ?? "GET",
-      headers,
-      body: opts.body,
-      signal: opts.signal,
-    });
-    if (!res.ok) throw new E621Error(await errorMessage(res), res.status);
-    if (res.status === 204) return undefined as T;
-    const text = await res.text();
-    return (text ? JSON.parse(text) : undefined) as T;
-  });
+  return throttle(
+    async () => {
+      const res = await fetchTimed(url, {
+        method: opts.method ?? "GET",
+        headers,
+        body: opts.body,
+        signal: opts.signal,
+      });
+      if (res.status === 429 || res.status === 503) backOff();
+      if (!res.ok) throw new E621Error(await errorMessage(res), res.status);
+      if (res.status === 204) return undefined as T;
+      const text = await res.text();
+      return (text ? JSON.parse(text) : undefined) as T;
+    },
+    opts.lane,
+    opts.signal,
+  );
 }
 
 /**
@@ -110,11 +213,13 @@ export async function searchPosts(
   limit: number,
   creds: Credentials | null,
   signal?: AbortSignal,
+  lane: Lane = "user",
 ): Promise<Post[]> {
   const res = await request<unknown>("/posts.json", {
     params: { tags, page, limit, ...POSTS_FORMAT },
     creds,
     signal,
+    lane,
   });
   return postList(res);
 }
@@ -138,8 +243,8 @@ export function getCurrentUser(creds: Credentials): Promise<CurrentUser> {
   return request<CurrentUser>("/users/me.json", { creds });
 }
 
-export function getUser(id: number, creds: Credentials | null): Promise<UserProfile> {
-  return request<UserProfile>(`/users/${id}.json`, { creds });
+export function getUser(id: number, creds: Credentials | null, lane: Lane = "user"): Promise<UserProfile> {
+  return request<UserProfile>(`/users/${id}.json`, { creds, lane });
 }
 
 /** A user's favorites, most recently favorited first (unlike `fav:name`, which sorts by post id). */
@@ -148,27 +253,30 @@ export async function getFavorites(
   page: number,
   limit: number,
   creds: Credentials | null,
+  lane: Lane = "user",
 ): Promise<Post[]> {
   const res = await request<unknown>("/favorites.json", {
     params: { user_id: userId, page, limit, ...POSTS_FORMAT },
     creds,
+    lane,
   });
   return postList(res);
 }
 
 /** Post counts for exact tag names. Names e621 doesn't know are simply absent. */
-export async function getTags(names: string[], creds: Credentials | null): Promise<TagInfo[]> {
+export async function getTags(names: string[], creds: Credentials | null, lane: Lane = "user"): Promise<TagInfo[]> {
   if (names.length === 0) return [];
   const res = await request<TagInfo[] | Record<string, unknown>>("/tags.json", {
     params: { "search[name]": names.join(","), limit: 320 },
     creds,
+    lane,
   });
   return Array.isArray(res) ? res : [];
 }
 
 /** Id of the newest post, a close stand-in for the site's total post count. */
-export async function newestPostId(creds: Credentials | null): Promise<number> {
-  const [post] = await searchPosts("", 1, 1, creds);
+export async function newestPostId(creds: Credentials | null, lane: Lane = "user"): Promise<number> {
+  const [post] = await searchPosts("", 1, 1, creds, undefined, lane);
   return post?.id ?? 0;
 }
 
@@ -196,15 +304,15 @@ export async function getSubscriptions(creds: Credentials, signal?: AbortSignal)
  * Your saved searches, the followed-tags anchor first. Its `last_seen_post_id` is the "new since
  * last visit" marker; the anchor doesn't exist until you first follow a tag.
  */
-export async function getSavedSearches(creds: Credentials, signal?: AbortSignal): Promise<SavedSearchRow[]> {
-  const res = await request<unknown>("/saved_searches.json", { creds, signal });
+export async function getSavedSearches(creds: Credentials, signal?: AbortSignal, lane: Lane = "user"): Promise<SavedSearchRow[]> {
+  const res = await request<unknown>("/saved_searches.json", { creds, signal, lane });
   if (Array.isArray(res)) return res as SavedSearchRow[];
   throw new E621Error("e621 sent saved searches in a format this app doesn't understand", 200);
 }
 
 /** The followed-tags anchor, or null when you follow nothing yet. */
-export async function getAnchor(creds: Credentials, signal?: AbortSignal): Promise<SavedSearchRow | null> {
-  return (await getSavedSearches(creds, signal)).find((r) => r.is_subscription) ?? null;
+export async function getAnchor(creds: Credentials, signal?: AbortSignal, lane: Lane = "user"): Promise<SavedSearchRow | null> {
+  return (await getSavedSearches(creds, signal, lane)).find((r) => r.is_subscription) ?? null;
 }
 
 /**
@@ -216,13 +324,14 @@ export async function visitAnchor(anchorId: number, creds: Credentials): Promise
   const url = new URL(`/saved_searches/${anchorId}/visit.json`, E621_BASE);
   url.searchParams.set("_client", clientParam(creds));
   await throttle(async () => {
-    const res = await fetch(url, {
+    const res = await fetchTimed(url, {
       headers: { Authorization: "Basic " + btoa(`${creds.username}:${creds.apiKey}`) },
       redirect: "manual",
     });
     if (res.type === "opaqueredirect" || (res.status >= 200 && res.status < 400)) return;
+    if (res.status === 429 || res.status === 503) backOff();
     throw new E621Error(await errorMessage(res), res.status);
-  });
+  }, "bg");
 }
 
 /**
@@ -230,7 +339,7 @@ export async function visitAnchor(anchorId: number, creds: Credentials): Promise
  * its own feed's query with `id:>N` in the tag box, so ratings and blacklist apply the same way.
  */
 export async function anyPost(query: string, creds: Credentials | null): Promise<boolean> {
-  const posts = await searchPosts(query, 1, 1, creds);
+  const posts = await searchPosts(query, 1, 1, creds, undefined, "bg");
   return posts.length > 0;
 }
 

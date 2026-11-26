@@ -231,3 +231,103 @@ test("opening an old post straight away isn't playing past the new ones", async 
   await page.waitForTimeout(2000);
   expect(mock.visits).toBe(0);
 });
+
+const tab = (page: Page, name: string) => page.getByRole("navigation", { name: "Tabs" }).getByRole("link", { name, exact: true });
+
+test("coming back to Following counts newer posts in the pill, and they go in only on a tap", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  mock.setPosts([{ id: 1152, artist: "fox_artist" }, { id: 1151, artist: "fox_artist" }, ...specs()]);
+  await tab(page, "For You").click();
+  await tab(page, "Following").click();
+  await expect(page.getByTestId("new-posts-pill")).toHaveText("2 new posts");
+  expect(mock.searches.some((s) => s.tags === "search:subscriptions id:>1150" && s.limit === 30)).toBe(true);
+  // Nothing went in on its own.
+  expect((await ids(page))[0]).toBe(1150);
+  await page.getByTestId("new-posts-pill").click();
+  await expect.poll(async () => (await ids(page))[0]).toBe(1152);
+  await expect(page.getByTestId("new-posts-pill")).toHaveCount(0);
+});
+
+test("a reload paints the first posts saved last time before e621 answers, then offers what's newer", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await expect(page.locator('[data-post-id="1150"]')).toBeVisible();
+  const before = mock.searches.length;
+  // e621 is slow to answer the feed's first page now, and one more post came in.
+  mock.setPosts([{ id: 1151, artist: "fox_artist" }, ...specs()]);
+  mock.searchDelay = (tags, p) => (tags === "search:subscriptions" && p === 1 ? 5000 : 0);
+  await page.reload();
+  await expect(page.locator('[data-post-id="1150"]')).toBeVisible({ timeout: 1500 });
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  // Revalidated behind the pill, not shifted in.
+  await expect(page.getByTestId("new-posts-pill")).toHaveText("1 new post");
+  expect((await ids(page))[0]).toBe(1150);
+  // No first page asked for: paging goes on below the saved posts.
+  expect(mock.searches.slice(before).some((s) => s.tags === "search:subscriptions" && s.page === null)).toBe(false);
+});
+
+test.describe("pull to refresh", () => {
+  test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
+
+  /** One finger from (x, 200) down by `dy`, in steps, then let go. */
+  async function pull(page: Page, dy: number, dx = 0) {
+    await page.evaluate(
+      async ([dy, dx]) => {
+        const t = (y: number, x = 180) => new Touch({ identifier: 1, target: document.body, clientX: x, clientY: y });
+        const fire = (type: string, touches: Touch[]) =>
+          document.body.dispatchEvent(new TouchEvent(type, { touches, changedTouches: touches, bubbles: true, cancelable: true }));
+        fire("touchstart", [t(200)]);
+        for (let i = 1; i <= 10; i++) {
+          fire("touchmove", [t(200 + (dy * i) / 10, 180 + (dx * i) / 10)]);
+          await new Promise((r) => requestAnimationFrame(r));
+        }
+        fire("touchend", []);
+      },
+      [dy, dx],
+    );
+  }
+
+  test("a pull past 144 px refreshes Following from the top; a short or sideways one does nothing", async ({ page }) => {
+    const mock = await followingSignedIn(page);
+    await page.goto("/following");
+    await expect(status(page)).toHaveText("10 new since your last visit");
+    mock.setPosts([{ id: 1151, artist: "fox_artist" }, ...specs()]);
+    const firstPages = () => mock.searches.filter((s) => s.tags === "search:subscriptions").length;
+    const n = firstPages();
+    await pull(page, 100);
+    await pull(page, 200, 300);
+    await page.waitForTimeout(300);
+    expect(firstPages()).toBe(n);
+    await pull(page, 200);
+    await expect(page.getByTestId("ptr")).toHaveAttribute("data-busy", "true");
+    await expect.poll(firstPages).toBe(n + 1);
+    await expect.poll(async () => (await ids(page))[0]).toBe(1151);
+    await expect(page.getByTestId("ptr")).not.toHaveAttribute("data-busy", "true");
+  });
+
+  test("a pull that starts below the top of the page does nothing", async ({ page }) => {
+    const mock = await followingSignedIn(page);
+    await page.goto("/following");
+    await expect(status(page)).toHaveText("10 new since your last visit");
+    await page.evaluate(() => window.scrollTo(0, 300));
+    const n = mock.searches.length;
+    await pull(page, 250);
+    await page.waitForTimeout(500);
+    expect(mock.searches.length).toBe(n);
+    await expect(page.getByTestId("ptr")).not.toHaveAttribute("data-busy", "true");
+  });
+});
+
+test("the saved first posts keep a heart given since, so a reload shows it filled", async ({ page }) => {
+  await followingSignedIn(page);
+  await page.goto("/following");
+  const heart = page.locator('[data-post-id="1150"] [data-testid=card-fav]');
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await page.waitForTimeout(300);
+  await page.reload();
+  await expect(page.locator('[data-post-id="1150"] [data-testid=card-fav]')).toHaveAttribute("aria-pressed", "true");
+});

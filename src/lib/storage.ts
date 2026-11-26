@@ -1,4 +1,5 @@
 import type { Credentials } from "./e621/client";
+import type { Post, SavedSearchRow } from "./e621/types";
 import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
 import type { Profile } from "./recommend/profile";
@@ -72,7 +73,20 @@ export interface MarkerRecord {
   at: number;
   /** marked seen since: the next load starts a new session from e621's marker */
   marked: boolean;
+  /** e621's anchor row as last read, so a reload in the same session paints before asking again */
+  anchor?: SavedSearchRow;
 }
+
+/** Following's first posts as last loaded (instant paint), for one feed key. Remember only. */
+export interface FeedHead {
+  key: string;
+  at: number;
+  posts: Post[];
+  /** the highest id e621 sent for that page, before the blacklist and filters */
+  rawMax?: number;
+}
+export const FEED_HEAD_TTL = 10 * 60_000;
+export const FEED_HEAD_POSTS = 24;
 
 /**
  * Per-account records that persist only with Remember on (DECISIONS: signed-in data at rest):
@@ -178,8 +192,18 @@ export const storage = {
     return Number.isInteger(n) && (n as number) > 0 ? (n as number) : 0;
   },
   saveLocalSeen: (username: string, id: number | null, remember: boolean) => writeAccount(`seen:${username}`, id, remember),
+  loadFeedHead: (username: string, key: string, now: number): FeedHead | null => {
+    const h = readAccount<FeedHead>(`feedHead:${username}`);
+    if (!h || h.key !== key || typeof h.at !== "number" || now - h.at > FEED_HEAD_TTL || !Array.isArray(h.posts)) return null;
+    const posts = h.posts.filter((p) => p && Number.isInteger(p.id) && p.id > 0 && p.files?.original);
+    return posts.length ? { ...h, posts } : null;
+  },
+  /** Kept only with Remember on: a this-tab sign-in keeps nothing about its feed on disk. */
+  saveFeedHead: (username: string, head: FeedHead | null, remember: boolean) =>
+    writeAccount(`feedHead:${username}`, remember ? head : null, remember),
   /** Everything kept for an account (sign-out, or a sign-in without Remember). */
   purgeAccount: (username: string) => {
+    writeAccount(`feedHead:${username}`, null, false);
     write(`ranked:${username}`, null);
     writeAccount(`marker:${username}`, null, false);
     writeAccount(`seen:${username}`, null, false);

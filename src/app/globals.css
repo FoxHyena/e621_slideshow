@@ -2258,3 +2258,48 @@ html {
   opacity: 0.45;
   cursor: default;
 }
+
+/* Pull to refresh (UX §4): a round spinner under the header, following the finger at half travel. */
+.ptr {
+  position: fixed;
+  z-index: 35;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  box-shadow: 0 6px 16px rgba(2, 15, 35, 0.5);
+  opacity: 0;
+  transform: translate(-50%, -48px);
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1.2),
+    opacity 200ms ease-out;
+  pointer-events: none;
+}
+.ptr svg {
+  width: 20px;
+  height: 20px;
+}
+.ptr[data-armed="true"] svg {
+  scale: 1.15;
+}
+.ptr[data-busy] svg {
+  animation: ptr-spin 700ms linear infinite;
+}
+@keyframes ptr-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ptr {
+    transition: opacity 200ms ease-out;
+  }
+  .ptr[data-busy] svg {
+    animation-duration: 2s;
+  }
+}
