@@ -970,3 +970,15 @@ round buttons: the list now carries `transform`, and it stands aside under reduc
 **Gates:** typecheck and lint clean; e2e 235 passed, 3 skipped, 1 failed under full-suite load ("Tapping
 Goo spurts…", passes 3 of 3 alone; untouched by this change); the affected specs pass after the fixes;
 budgets JS cold load **199.9 KB** (0.1 KB left), CLS 0, 0 long tasks.
+
+## The hexagon app icon and app mark (2026-11-26)
+
+Built from design 4dfc62b, c1d8dfa and 57f7323: icons rendered from docs/path-a/icons, `AppMark` as the
+navy hexagon with gold Play, the pop at caught-up (once per visit) and in Settings. Self-review only
+(a small, contained change): found that the windowed list could mount the caught-up row again and pop
+it a second time; fixed with a per-entry memory and an e2e that scrolls away and back.
+
+**Gates:** typecheck, lint and unit tests clean; e2e 237 passed, 3 skipped, 1 failed under full-suite
+load (the Goo drops test: its 5 s wait for idle-loaded code was short twice; now 10 s); the mark's e2e
+(caught-up pop once, Settings press pop, unique gradient ids) pass; budgets JS cold load **198.8 KB**,
+CLS 0, 0 long tasks.

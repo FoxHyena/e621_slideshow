@@ -178,8 +178,9 @@ Approved:
 
 ## Decide (open questions, with my default)
 
-0. **The first-load JS budget is full** (199.9 of 200 KB with the grid skeleton; Following's ⋯ menu and
-   the tag targets already moved out for the top bar and "+N"). Default: the next feature that adds to
+0. **The first-load JS budget is nearly full** (198.8 of 200 KB: the grid skeleton added, the
+   kaleidoscope's code left with the new app mark; Following's ⋯ menu and the tag targets already moved
+   out for the top bar and "+N"). Default: the next feature that adds to
    the first load moves something out of it (the sign-in check, or Following's signed-in feed, into a
    lazy chunk).
 
