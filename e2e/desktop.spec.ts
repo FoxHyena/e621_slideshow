@@ -111,6 +111,18 @@ test("a grid uses the full width; a titled sheet is a 420 dialog", async ({ page
   await expect(tiles.first()).toHaveAccessibleName(/favorited/);
 });
 
+test("grid loading on a computer: three full rows of skeleton tiles across the wide grid", async ({ page }) => {
+  const mock = await following(page);
+  mock.searchDelay = () => 2500;
+  await page.goto("/following");
+  await page.getByTestId("grid-toggle").click();
+  const sk = page.getByTestId("feed-loading");
+  await expect(sk.locator(".sk-tile").first()).toBeVisible();
+  const cols = await sk.evaluate((e) => getComputedStyle(e).gridTemplateColumns.split(" ").length);
+  expect(cols).toBeGreaterThan(3);
+  await expect(sk.locator(".sk-tile")).toHaveCount(cols * 3);
+});
+
 test("one head: the toolbar, hero and chips stay in the 600 column when the grid goes wide", async ({ page }) => {
   await mockE621(page, specs());
   await page.goto("/artist/fox_artist");
@@ -140,6 +152,53 @@ test("Lift: a button with a lip rises 1 under the pointer and its lip grows by 1
     await el.hover();
     await expect.poll(look).toEqual(["matrix(1, 0, 0, 1, 0, -1)", String(Number(lip) + 1), bg]);
   }
+});
+
+test("under the pointer: a bare icon gets a wash and turns white, a tag's well washes", async ({ page }) => {
+  await mockE621(page, specs());
+  await page.goto("/artist/fox_artist");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  const style = (sel: string, props: string[]) =>
+    page.locator(sel).first().evaluate((e, ps) => ps.map((p) => getComputedStyle(e).getPropertyValue(p)), props);
+  await page.mouse.move(600, 790);
+  const menu = await style(".post-menu", ["background-color", "color"]);
+  await page.locator(".post-menu").first().hover();
+  await expect.poll(() => style(".post-menu", ["background-color", "color"])).toEqual(["rgba(255, 255, 255, 0.06)", "rgb(255, 255, 255)"]);
+  expect(menu[0]).not.toBe("rgba(255, 255, 255, 0.06)");
+  await page.mouse.move(600, 790);
+  const tag = await style(".post-tag:not(.post-tag-more)", ["background-color"]);
+  await page.locator(".post-tag:not(.post-tag-more)").first().hover();
+  await expect.poll(async () => (await style(".post-tag:not(.post-tag-more)", ["background-color"]))[0]).not.toBe(tag[0]);
+  // a press still sinks it to the dark well
+  await page.mouse.down();
+  await expect.poll(async () => (await style(".post-tag:not(.post-tag-more)", ["background-color"]))[0]).toBe("rgb(7, 22, 49)");
+  await page.mouse.up();
+  await shot(page, "desktop-hover-tag");
+  // a row in a well: the wash's corners are the well's 16 less 4
+  await page.keyboard.press("Escape");
+  await page.locator(".post-menu").first().click();
+  const row = page.locator(".well-row").first();
+  await row.hover();
+  await expect.poll(() => row.evaluate((e) => [getComputedStyle(e, "::after").opacity, getComputedStyle(e, "::after").borderTopLeftRadius])).toEqual(["1", "12px"]);
+});
+
+test("under the pointer a row gets the Inset wash, 4 inside it with the panel's corners, and its dividers fade", async ({ page }) => {
+  await following(page);
+  await page.goto("/settings");
+  const rows = page.locator(".list-group > label.list-row:not(:has(input:disabled)):has(+ label.list-row)");
+  await expect(rows.first()).toBeVisible();
+  const row = rows.first();
+  const wash = () =>
+    row.evaluate((e) => {
+      const a = getComputedStyle(e, "::after");
+      const next = e.nextElementSibling!;
+      return [a.opacity, a.top, a.left, a.borderTopLeftRadius, getComputedStyle(e, "::before").opacity, getComputedStyle(next, "::before").opacity];
+    });
+  await page.mouse.move(1270, 790);
+  await expect.poll(async () => (await wash())[0]).toBe("0");
+  await row.hover();
+  await expect.poll(wash).toEqual(["1", "4px", "4px", "20px", "0", "0"]);
+  await shot(page, "desktop-row-wash");
 });
 
 test("on a phone, holding a tile opens the same menu; a tap still opens the post", async ({ page }) => {

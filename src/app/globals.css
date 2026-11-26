@@ -777,7 +777,7 @@ html {
 .side-account {
   margin-top: auto;
   padding: 6px 8px 6px 4px;
-  border-radius: 18px;
+  border-radius: 12px;
   color: var(--color-fg);
 }
 .side-avatar {
@@ -862,10 +862,17 @@ html {
     border-radius: 999px;
   }
 }
-@media (hover: hover) {
+.side-tab,
+.side-account,
+.side-search {
+  transition:
+    background-color 100ms ease-out,
+    color 100ms ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
   .side-tab:hover,
   .side-account:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
   }
   .side-tab:hover {
     color: var(--color-fg);
@@ -1936,6 +1943,53 @@ html {
   }
 }
 
+/* The grid's skeleton tiles (DESIGN.md "Grid loading"): the same columns and gaps as the tiles */
+.tile-skeletons {
+  display: grid;
+  gap: 12px 8px;
+  pointer-events: none;
+}
+.tile-skeletons[data-more] {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+.sk-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.sk-tile > .sk-band {
+  aspect-ratio: 1;
+  border-radius: var(--radius-art);
+}
+.sk-tile .tile-nums {
+  align-items: center;
+}
+.sk-tile .tile-nums > .sk-band {
+  height: 10px;
+  border-radius: 999px;
+}
+.sk-band {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-well);
+}
+.sk-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(180, 199, 217, 0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: sk-band 1.4s ease-in-out infinite;
+}
+@keyframes sk-band {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .feed-foot {
   display: flex;
   justify-content: center;
@@ -2413,9 +2467,6 @@ html {
   left: var(--div);
   border-top: 1px solid rgba(180, 199, 217, 0.1);
 }
-.sheet-rows > .list-row:active {
-  background: none;
-}
 .list-row:disabled {
   opacity: 0.45;
 }
@@ -2486,9 +2537,6 @@ html {
   right: 0;
   left: 46px;
   border-top: 1px solid rgba(180, 199, 217, 0.1);
-}
-.well-row:active {
-  background: rgba(255, 255, 255, 0.04);
 }
 .well-row:focus-visible {
   outline: 2px solid var(--color-gold);
@@ -2802,7 +2850,8 @@ html {
   .sk-dot,
   .sk-line,
   .sk-block,
-  .sk-pill {
+  .sk-pill,
+  .sk-band::after {
     animation: none;
   }
   .fav-pill,
@@ -3499,10 +3548,6 @@ html {
   left: var(--div);
   border-top: 1px solid rgba(180, 199, 217, 0.1);
 }
-button.list-row:active,
-a.list-row:active {
-  background: rgba(255, 255, 255, 0.04);
-}
 .list-row:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: -2px;
@@ -3729,8 +3774,26 @@ button.field6:focus-visible {
   right: 0;
   border-top: 1px solid rgba(180, 199, 217, 0.1);
 }
-.suggest > li[aria-selected="true"] {
-  background: rgba(255, 255, 255, 0.04);
+/* the row under the pointer or the arrow keys: the Inset wash, 4 inside, the panel's 24 less 4 */
+.suggest > li::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+  pointer-events: none;
+}
+.suggest > li::before {
+  transition: opacity 100ms ease-out;
+}
+.suggest > li[aria-selected="true"]::after {
+  opacity: 1;
+}
+.suggest > li[aria-selected="true"]::before,
+.suggest > li[aria-selected="true"] + li::before {
+  opacity: 0;
 }
 .suggest-tag {
   overflow: hidden;
@@ -3742,6 +3805,25 @@ button.field6:focus-visible {
 }
 .suggest-was {
   color: var(--color-muted);
+}
+.suggest-artist {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.suggest-mark {
+  flex: none;
+  width: var(--spacing-avatar-s);
+  height: var(--spacing-avatar-s);
+}
+.suggest-artist .suggest-tag {
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
 }
 
 /* Segmented control: a sunk track; the chosen segment rides a capsule that slides to it. */
@@ -4869,9 +4951,6 @@ li[data-state="done"] .first-step-n svg,
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: var(--color-ground);
 }
-.pick-row:active {
-  background: rgba(255, 255, 255, 0.04);
-}
 .first-cta {
   position: fixed;
   z-index: 40;
@@ -5066,15 +5145,12 @@ li[data-state="done"] .first-step-n svg,
   border-radius: 0;
   background: none;
   box-shadow: none;
+  /* (the row wash runs 8 past the rows) */
+  overflow: visible;
 }
 .first-pick-sheet .pick-row {
   min-height: 60px;
   padding-inline: 0;
-}
-/* rows with no side padding get no wash (it would be a box cut at the avatar's edge), as in every
-   sheet: the check well answers the tap */
-.first-pick-sheet .pick-row:active {
-  background: none;
 }
 .sheet-body:has(> .first-pick-sheet) {
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
@@ -5922,25 +5998,40 @@ li[data-state="done"] .first-step-n svg,
   fill: currentColor;
 }
 
-/* Under the pointer (DESIGN.md "On a computer"): a row gets the wash it has when pressed, a raised
-   control steps up one; gold and pictures don't change */
+/* Under the pointer (DESIGN.md "Under the pointer", owner-approved 2026-11-26): only with a mouse or
+   trackpad, 100 ms ease-out, never after a tap. Three rules by what a thing is made of: a lip rises 1,
+   raised without a lip goes one material lighter, flat or sunk gets a 6% wash inside its container.
+   Pictures don't change. Rows are "Inset" (the row wash below). The press's own shrink keeps its
+   timing; with reduced motion the earlier rules stand. */
+@media (prefers-reduced-motion: no-preference) {
+  .chip,
+  .toolbar-circle,
+  .post-menu,
+  .compact-back,
+  .btn-quiet,
+  .field-clear,
+  .sheet-x,
+  .bl-remove,
+  .toast6-undo,
+  button.field6,
+  .art-circle {
+    transition:
+      background-color 100ms ease-out,
+      color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 100ms ease-out;
+  }
+  .post-tag {
+    transition:
+      background-color 100ms ease-out,
+      color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 150ms ease-out;
+  }
+}
 @media (hover: hover) and (pointer: fine) {
-  button.list-row:hover,
-  a.list-row:hover,
-  label.list-row:hover,
-  .well-row:hover {
-    background: rgba(255, 255, 255, 0.04);
-  }
-  .sheet-rows > .list-row:hover,
-  .first-pick-sheet .pick-row:hover {
-    background: none;
-  }
-  /* the empty check well lifts under the pointer instead */
-  .first-pick-sheet .pick-row[aria-checked="false"]:hover .pick-check {
-    background: var(--color-raised);
-  }
-  /* Lift (owner-picked 2026-11-26): a button with a lip rises 1 and its lip grows by 1. No colour
-     change. A press still sinks it (:active wins by being left out here). */
+  /* Lift (owner-picked): a button with a lip rises 1 and its lip grows by 1. No colour change. A press
+     still sinks it (:active wins by being left out here). */
   :is(.fav-pill, .follow-pill:not([aria-pressed="true"], .follow-pill-art), .btn-tonal:not(.follow-button[aria-pressed="true"]), .btn-gold, .stepper > button):not(:disabled, :active):hover {
     transform: translateY(-1px);
     box-shadow:
@@ -5968,18 +6059,115 @@ li[data-state="done"] .first-step-n svg,
       var(--inset-shadow-lit-gold),
       0 5px 0 var(--lip-c);
   }
-  .toolbar-circle:hover {
+
+  /* Raised, no lip: one step lighter. A chip that is on doesn't change. */
+  .chip:not([data-on]):hover,
+  .toolbar-circle:not(.tools .toolbar-circle, .compact-back):hover {
     background: var(--color-raised);
+    color: var(--color-fg);
   }
-  /* proposed 2026-11-26 (not owner-approved): the wash is 40 by 36, 4 from the capsule on every side */
+  .field-clear:hover {
+    background: var(--color-raised-hi);
+    color: var(--color-fg);
+  }
+  .post-head:has(.post-by:hover) .post-avatar .mark svg {
+    background: var(--color-raised-hi);
+  }
+
+  /* An icon or words with no body: a 6% wash the size of the control, and it turns white. In the tools
+     capsule the wash is 40 by 36, 4 from the capsule on every side. A link only turns white. */
   .tools .toolbar-circle:not([aria-pressed="true"]):hover {
     padding-block: 4px;
     background: rgba(255, 255, 255, 0.06) content-box;
+    color: var(--color-fg);
   }
-  .chip:not([data-on]):hover {
+  .post-menu:not(:active):hover,
+  .compact-back:not(:active):hover,
+  .btn-quiet:not(:disabled, :active):hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-fg);
+  }
+  .signin-link:hover {
+    color: var(--color-fg);
+  }
+
+  /* A well: the same wash over the well; an icon turns white. A tag keeps its e621 colour. */
+  /* (the well's colour mixed with 6% white: the same as a wash over it, and it fades) */
+  :is(.sheet-x, .bl-remove, .toast6-undo, .post-tag:not(.post-tag-more)):not(:active, [data-picked]):hover {
+    background-color: color-mix(in srgb, #fff 6%, var(--color-well));
+  }
+  :is(.sheet-x, .bl-remove, .toast6-undo):hover {
+    color: var(--color-fg);
+  }
+  .post-tag-more:hover {
+    box-shadow: inset 0 0 0 1.5px rgba(180, 199, 217, 0.32);
+    color: var(--color-link);
+  }
+  button.field6:hover {
+    background-color: color-mix(in srgb, #fff 6%, var(--color-well));
+    color: var(--color-link);
+  }
+
+  /* One of several: the words turn white, no wash (the capsule already marks the current one). */
+  .seg > button:not([aria-checked="true"]):hover,
+  .menu-row:not([aria-checked="true"]):hover,
+  .tube-tab:not([aria-current="page"]):hover {
+    color: var(--color-fg);
+  }
+
+  /* Glass on a picture: only its rim gets brighter. */
+  .art-circle:not(:disabled):hover {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  }
+}
+/* The row wash, "Inset" (DESIGN.md "Under the pointer", owner-approved 2026-11-26): 5% white,
+   floating 4 inside the row on every side, its corners the container's less 4 (20 in a panel, 12 in a
+   well). On a sheet or a dropdown the row has no side padding, so the wash is 8 wider than it on each
+   side with 16 corners. The same wash under a press and, with a mouse, under the pointer; the
+   dividers above and below it fade out. */
+:where(button.list-row, a.list-row, label.list-row, .well-row)::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+  pointer-events: none;
+}
+.well-row::after {
+  border-radius: 12px;
+}
+:is(.sheet-rows > .list-row, .first-pick-sheet .pick-row)::after {
+  inset: 4px -8px;
+  border-radius: 16px;
+}
+:is(.list-row, .well-row)::before {
+  transition: opacity 100ms ease-out;
+}
+:is(button.list-row, a.list-row, label.list-row, .well-row):not(:disabled, :has(input:disabled)):active::after {
+  opacity: 1;
+}
+:is(button.list-row, a.list-row, label.list-row, .well-row):active::before,
+:is(button.list-row, a.list-row, label.list-row, .well-row):active + :is(.list-row, .well-row)::before,
+li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-row::before {
+  opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(button.list-row, a.list-row, label.list-row, .well-row):not(:disabled, :has(input:disabled)):hover::after {
+    opacity: 1;
+  }
+  :is(button.list-row, a.list-row, label.list-row, .well-row):hover::before,
+  :is(button.list-row, a.list-row, label.list-row, .well-row):hover + :is(.list-row, .well-row)::before,
+  li:has(> :is(button.list-row, a.list-row, label.list-row):hover) + li > .list-row::before {
+    opacity: 0;
+  }
+  /* the empty check well also lifts */
+  .first-pick-sheet .pick-row[aria-checked="false"]:hover .pick-check {
     background: var(--color-raised);
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .tile-art {
     transition: none;

@@ -169,6 +169,35 @@ test("The end of a feed says That's everything, with what was left out", async (
   await expect(end.locator("small")).toHaveText("1 hidden by your blacklist");
 });
 
+test("Grid loading: twelve skeleton tiles first, then one row of three after the last real row", async ({ page }) => {
+  const mock = await mockE621(page);
+  mock.searchDelay = () => 2500;
+  await page.goto("/search?tags=wolf");
+  await page.getByTestId("grid-toggle").click();
+  const first = page.getByTestId("feed-loading");
+  await expect(first.locator(".sk-tile")).toHaveCount(12);
+  // a tile's own shapes: the square with the picture's radius, two bars in the 18 number line
+  const [sq, bar] = await first.locator(".sk-tile").first().evaluate((e) => {
+    const [a, n] = [e.children[0] as HTMLElement, e.children[1].children[0] as HTMLElement];
+    return [[a.offsetWidth === a.offsetHeight, getComputedStyle(a).borderRadius], [n.offsetHeight, (e.children[1] as HTMLElement).offsetHeight]];
+  });
+  expect(sq).toEqual([true, "16px"]);
+  expect(bar).toEqual([10, 18]);
+  await shot(page, "v6-grid-first-load");
+  await expect(page.getByTestId("grid-tile").first()).toBeVisible({ timeout: 10_000 });
+  await expect(first).toHaveCount(0);
+  await page.mouse.wheel(0, 40000);
+  const more = page.getByTestId("grid-loading-more");
+  await expect(more.locator(".sk-tile")).toHaveCount(3);
+  const tiles = page.getByTestId("grid-tile");
+  const last = (await tiles.last().boundingBox())!;
+  const row = (await more.boundingBox())!;
+  expect(Math.round(row.y - (last.y + last.height))).toBe(12);
+  const sk = (await more.locator(".sk-tile").first().boundingBox())!;
+  expect(Math.round(sk.width)).toBe(Math.round(last.width));
+  await shot(page, "v6-grid-loading-more");
+});
+
 test("Loading more failed: one row at the end with Try again", async ({ page }) => {
   const mock = await mockE621(page);
   await page.goto("/search?tags=wolf");

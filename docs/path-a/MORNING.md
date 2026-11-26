@@ -24,8 +24,8 @@ New since then, from your notes:
 - **A grid tile opens the feed at that post** (12 from the top), not the slideshow. Hold or right-click
   a tile for "Play from here". Back doesn't return to the grid (the grid isn't a place in history); the
   grid button does.
-- **Follow from favorites: no hover box on a row** (rows there have no side padding, so the wash was a box
-  cut at the avatar). The empty check well lifts instead, as rows in other sheets have no wash either.
+- **Follow from favorites: rows now get the Inset wash** you picked (8 wider than the row, 16 corners),
+  so it no longer looks cut at the avatar. The empty check well still lifts under the pointer.
 - Fixed in passing: a tile tapped in the first 0.6 s after the page loaded did nothing.
 - On Following, a tile for a post folded into "+N more" opens that run first, then lands on the post.
 - **← in the slideshow no longer looks like a reload.** It faded out the wrong picture (the one before
@@ -49,8 +49,21 @@ Built from your picks on the design session's sheet (2026-11-26):
 - **"+N" on a post's tags** (your screenshot) now opens the rest of the tags in the same row; scroll it
   sideways. The card keeps its height, so the feed doesn't jump.
 - **Toast "Ring, hug"** was already in: the ring around Undo, and the toast is as wide as its words.
-- *Proposed, not picked:* the tools capsule's hover is now 40 by 36, 4 inside the capsule (your
-  screenshot of the box touching its edges). Say if you'd rather have the old box.
+- **The tools capsule's hover** is 40 by 36, 4 inside the capsule (approved with the hover pass).
+
+Built from the hover pass, Inset rows and grid loading you approved:
+
+- **Under a mouse:** chips that are off, round Back and the field's ✕ go one step lighter; the post ⋯,
+  bare Back and "Skip for now" get a 6% wash and turn white; wells (sheet ✕, Undo, tags, the Search
+  field) wash too; menu rows, segmented parts and tabs only turn white; the player's glass rim brightens.
+  Pictures don't change.
+- **Rows: Inset.** The wash floats 4 inside the row with the container's corners less the gap (20 in a
+  panel, 12 in a well, 16 on a sheet or dropdown, 8 wider there). The lines next to it fade. Same for a
+  press on a phone. Try Settings with a mouse.
+- **Grid loading:** skeleton tiles on the first load (12 on a phone, 3 rows on a computer) and one row
+  under the last tiles while more load, instead of the spinner.
+- **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
+  the name in white, "artist" at the right.
 
 Approved:
 
@@ -160,9 +173,10 @@ Approved:
 
 ## Decide (open questions, with my default)
 
-0. **The first-load JS budget is full** (199.6 of 200 KB, after moving Following's ⋯ menu and the tag
-   targets out to make room for the top bar and "+N"). Default: the next feature that adds to the first load moves something out of
-   it (the sign-in check, or Following's signed-in feed, into a lazy chunk).
+0. **The first-load JS budget is full** (199.9 of 200 KB with the grid skeleton; Following's ⋯ menu and
+   the tag targets already moved out for the top bar and "+N"). Default: the next feature that adds to
+   the first load moves something out of it (the sign-in check, or Following's signed-in feed, into a
+   lazy chunk).
 
 1. **Does un-favoriting remove goo?** Default: no, goo only ever adds.
 2. **The first-run step names** ("Read your favorites", "Count your artists", "See who still posts") were

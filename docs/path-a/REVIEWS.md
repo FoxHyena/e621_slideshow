@@ -945,3 +945,28 @@ label: now a button that shows the rest in the same row, the card keeps its heig
 
 **Gates:** typecheck and lint clean; e2e 232 passed, 3 skipped (after every fix, `E6_PORT=3000`); budgets JS cold load **199.6 KB** (the top bar and +N pushed it to 200.8: Following's ⋯ sheets
 and the tag targets moved to their own chunks), CLS 0, 0 long tasks.
+
+## Hover pass, Inset rows, grid loading, search suggestions (2026-11-26)
+
+Built from design 78f134c and 10d2cff (owner-approved): the "Under the pointer" table, the Inset row
+wash with fading dividers, the grid loading skeleton; the search suggestions checked against DESIGN.md
+(already a flat group of 48 rows; an artist suggestion now has its 24 mark and the name in callout).
+Self-check found the hover transitions overriding the press's shrink timing on chips, tags, glass and
+round buttons: the list now carries `transform`, and it stands aside under reduced motion.
+
+**Fresh reviewer, 8 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Hover beat the pressed and held states (a held tag, a pressed ⋯ or "Skip for now" looked like hover) | Med | Hover rules leave out `:active` (and a held tag); e2e presses a tag under the pointer |
+| 2 | `.well-row::after` lost to the shared `:is(...)` rule's weight, so wells got 20 corners, not 12 | Med | Shared rule is `:where(...)`; e2e measures 12 in the ⋯ sheet |
+| 3 | The wells' wash was a gradient layer, which snaps instead of fading | Low | Now `color-mix` of the well and 6% white, the same colour, as a background-color that fades |
+| 4 | Sidebar and row fades not behind reduced motion | Low | No change: they fade opacity and colour, nothing moves (DECISIONS) |
+| 5 | The loading-more row's extra height goes away if the load fails or ends | Low | No change: the failed row or "That's everything" takes its place in the foot |
+| 6 | `aria-label` on a status region isn't spoken | Low | No change: same as the spinner it replaces |
+| 7 | The row wash paints over the row's content | Low | No change: drawn that way in the mock (a 5% veil) |
+| 8 | The artist suggestion's mark could shrink beside a long name | Low | `flex: none` on the mark, the name takes the rest and ellipsizes |
+
+**Gates:** typecheck and lint clean; e2e 235 passed, 3 skipped, 1 failed under full-suite load ("Tapping
+Goo spurts…", passes 3 of 3 alone; untouched by this change); the affected specs pass after the fixes;
+budgets JS cold load **199.9 KB** (0.1 KB left), CLS 0, 0 long tasks.

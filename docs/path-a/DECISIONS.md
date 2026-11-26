@@ -969,3 +969,29 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - With this, everything in DESIGN.md's "The top bar, the pointer, grid loading, one head, chip
   dropdowns" is owner-picked or owner-approved. The chip dropdown's measurements are still mine.
 
+
+## 2026-11-26 — Building the hover pass, the Inset rows, grid loading and the suggestions check
+
+- Built from the design session's 78f134c and 10d2cff (owner: "Approve both", "Inset, just gotta make
+  sure the corner radius matches the outer container as well", "Approve"); the owner said "Yes, build
+  it".
+- **Under the pointer** (mouse or trackpad only, 100 ms): Raised with no lip goes one step lighter (an
+  off chip, round Back, the post header's mark when you point at the artist, the field's ✕). An icon or
+  words with no body get a 6% wash and turn white (the post ⋯, bare Back, "Skip for now"); a link only
+  turns white. A well gets the 6% wash and its icon turns white (sheet ✕, the blacklist's remove, Undo,
+  a tag keeps its e621 colour); the Search field's words turn link-blue; "+N" gets a rim. One of
+  several only turns white. Glass's rim goes from 16% to 32%. Pictures don't change.
+- **Rows: Inset**, for a press and the pointer: 5% white, 4 inside the row, 20 corners in a panel, 12
+  in a well; on a sheet or a dropdown 8 wider than the row with 16 corners. The lines above and below
+  fade. Search suggestions get it too (the row the arrow keys or pointer are on). The sidebar's tabs
+  and account row keep their own shape with a 5% wash; the account row's corners are 12.
+- **Follow from favorites now has the wash** (it had none because a square box looked cut at the
+  avatar); Inset's 8 wider rounded wash is what the owner picked for rows on a sheet.
+- **Grid loading:** skeleton tiles are wells (16 corners) with a light band crossing them, and two
+  10-tall bars in the 18 number line. First load: 12 on a phone, 3 full rows on a computer. Loading
+  more: one row 12 under the last real row, in place of the spinner. Nothing to press.
+- **Search suggestions, checked against DESIGN.md "While typing":** the app's group was already flat
+  with 48 rows (the class mix-up was only in the mock). One gap fixed: an artist suggestion is now a 24
+  mark and the name in callout, with "artist" as the value.
+- My choice, not drawn: with reduced motion on, a control's hover colour changes at once (no 100 ms
+  fade), so the earlier no-transition rules stand; the row wash still fades, as it moves nothing.

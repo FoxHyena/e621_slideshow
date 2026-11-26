@@ -9,7 +9,7 @@
 import { ArrowUp, ChevronDown, Heart, Play } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
-import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tallCap, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
+import { GRID, gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tallCap, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
 import { tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
 import { tagTargetsChunk } from "@/shell/lazy";
 import type { Feed } from "@/state/feeds";
@@ -400,11 +400,20 @@ export function FeedView({
   const stats = q.stats;
   const hidden = stats.blacklisted + stats.hidden;
   const firstLoad = posts.length === 0 && !q.error && !q.exhausted;
+  // Loading more in the grid: one row of skeleton tiles after the last real row (in the list, so it
+  // lines up with the tiles), not the spinner.
+  const moreTiles = grid && q.loading && posts.length > 0 && !q.error;
 
   return (
     <>
-      <div ref={list} className="feed-list" style={{ height: firstLoad ? undefined : total }} data-testid={grid ? "feed-grid" : "feed"}>
-        {firstLoad && <Skeletons />}
+      <div
+        ref={list}
+        className="feed-list"
+        style={{ height: firstLoad ? undefined : moreTiles ? total + GRID.rowGap + tiles.cell : total }}
+        data-testid={grid ? "feed-grid" : "feed"}
+      >
+        {firstLoad && (grid ? <TileSkeletons cols={tiles.cols} count={Number.isFinite(cap) ? tiles.cols * 3 : 12} /> : <Skeletons />)}
+        {moreTiles && <TileSkeletons cols={tiles.cols} count={tiles.cols} top={total + GRID.rowGap} />}
         {grid
           ? posts.slice(start, end).map((p, k) => {
               const i = start + k;
@@ -497,7 +506,7 @@ export function FeedView({
             <b>That&rsquo;s everything</b>
             {hidden > 0 && <small>{hiddenNote(stats)}</small>}
           </div>
-        ) : q.loading && posts.length > 0 ? (
+        ) : q.loading && posts.length > 0 && !grid ? (
           <span className="feed-spinner" role="status" aria-label="Loading more" />
         ) : null}
       </div>
@@ -530,6 +539,32 @@ function Skeletons() {
           <div className="post-foot">
             <span className="sk-pill" />
           </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** The grid loading (DESIGN.md "Grid loading"): a tile's own shapes as wells, the square and two short
+ * bars where the score and favorites go, with a light band crossing them. Nothing to press. First
+ * load: 12 on a phone (four rows of three), three full rows on a computer; loading more: one row. */
+function TileSkeletons({ cols, count, top }: { cols: number; count: number; top?: number }) {
+  return (
+    <div
+      className="tile-skeletons"
+      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, top }}
+      data-more={top !== undefined || undefined}
+      role="status"
+      aria-label={top === undefined ? "Loading posts" : "Loading more"}
+      data-testid={top === undefined ? "feed-loading" : "grid-loading-more"}
+    >
+      {Array.from({ length: count }, (_, k) => (
+        <div key={k} className="sk-tile" aria-hidden>
+          <span className="sk-band" />
+          <span className="tile-nums">
+            <span className="sk-band" style={{ width: [28, 22, 32][k % 3] }} />
+            <span className="sk-band" style={{ width: [34, 28, 24][(k + 1) % 3] }} />
+          </span>
         </div>
       ))}
     </div>

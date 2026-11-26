@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import Avatar from "@/components/Avatar";
 import { autocompleteTags, type Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORIES, TAG_CATEGORY_COLORS, type AutocompleteTag } from "@/lib/e621/types";
 
@@ -208,10 +209,21 @@ export default function TagInput({
                   }}
                   onMouseEnter={() => setActive(i)}
                 >
-                  <span className="suggest-tag" style={{ color: TAG_CATEGORY_COLORS[cat] }}>
-                    {tag.antecedent_name && <span className="suggest-was">{tag.antecedent_name.replaceAll("_", " ")} → </span>}
-                    {tag.name.replaceAll("_", " ")}
-                  </span>
+                  {/* an artist is a 24 mark and the name in callout; any other tag is in its kind's colour */}
+                  {cat === "artist" ? (
+                    <span className="suggest-artist">
+                      <Avatar seed={tag.name} className="suggest-mark" />
+                      <span className="suggest-tag">
+                        {tag.antecedent_name && <span className="suggest-was">{tag.antecedent_name.replaceAll("_", " ")} → </span>}
+                        {tag.name.replaceAll("_", " ")}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="suggest-tag" style={{ color: TAG_CATEGORY_COLORS[cat] }}>
+                      {tag.antecedent_name && <span className="suggest-was">{tag.antecedent_name.replaceAll("_", " ")} → </span>}
+                      {tag.name.replaceAll("_", " ")}
+                    </span>
+                  )}
                   <span className="row-value">{cat === "artist" ? "artist" : formatCount(tag.post_count)}</span>
                 </li>
               );

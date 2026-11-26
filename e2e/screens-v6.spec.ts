@@ -92,6 +92,29 @@ test("Search: back and the field share the top row; recent and saved show tags w
   await shot(page, "v6-results");
 });
 
+test("Search suggestions: a flat group of 48 rows; an artist is a 24 mark and the name, 'artist' as the value", async ({ page }) => {
+  await mockE621(page);
+  await page.goto("/search");
+  const field = page.getByTestId("search-tags");
+  await field.pressSequentially("wol", { delay: 30 });
+  const list = page.getByTestId("autocomplete");
+  const rows = list.getByRole("option");
+  await expect(rows).toHaveCount(3);
+  const f = await box(page.locator(".field6").first());
+  const l = await box(list);
+  expect([l.x, l.width]).toEqual([f.x, f.width]);
+  for (let i = 0; i < 3; i++) {
+    const r = await box(rows.nth(i));
+    expect(r.height).toBe(48);
+    expect(r.width).toBe(l.width);
+  }
+  const artist = rows.nth(1);
+  expect((await box(artist.locator(".suggest-mark"))).width).toBe(24);
+  await expect(artist.locator(".row-value")).toHaveText("artist");
+  await expect(rows.first().locator(".suggest-mark")).toHaveCount(0);
+  await shot(page, "v6-search-suggest");
+});
+
 test("Search opened from Following keeps focus in its field once its code is loaded", async ({ page }) => {
   await mockE621(page);
   await page.goto("/following");
