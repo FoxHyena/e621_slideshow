@@ -57,7 +57,7 @@ test("following no one: reads favorites, offers the artists you favorite a lot, 
   await shot(page, "first-run-read");
 
   await expect(page.getByTestId("first-run-pick")).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText("You've favorited these artists a lot. Follow them?")).toBeVisible();
+  await expect(page.getByText("You’ve favorited these artists a lot. Follow them?")).toBeVisible();
   await expect(rows(page)).toHaveCount(12);
   await expect(rows(page).first()).toContainText("artist 01");
   await expect(rows(page).first()).toContainText("you faved 15 · 200 posts");
@@ -105,12 +105,48 @@ test("Skip for now folds the list into a row over Popular today, kept across a r
   await expect(page.getByTestId("first-run-pick")).toBeVisible();
 });
 
-test("no favorites: nothing to suggest from, so it sends you to Search", async ({ page }) => {
-  await setup(page, []);
+test("no favorites: Search, and Popular artists to follow in place", async ({ page }) => {
+  const mock = await setup(page, []);
+  mock.popularArtists = [
+    { name: "big_artist", post_count: 18_200 },
+    { name: "conditional_dnp", post_count: 90_000 },
+    { name: "mid_artist", post_count: 9_400 },
+  ];
   await page.goto("/following");
   const none = page.getByTestId("first-run-none");
   await expect(none).toContainText("Find artists to follow", { timeout: 15_000 });
   await expect(none).toContainText("You have no favorites yet");
+  const popular = page.getByTestId("popular-row");
+  await expect(popular).toHaveCount(2);
+  await expect(popular.first()).toContainText("big artist");
+  await expect(popular.first()).toContainText("18.2K posts");
+  await expect(page.getByText("The artists with the most posts on e621")).toBeVisible();
+  await shot(page, "first-run-popular");
+
+  // following one keeps the list (to follow more), then Show my feed
+  await popular.first().getByTestId("follow-pill").click();
+  await expect(popular.first().getByTestId("follow-pill")).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => mock.followWrites.length).toBe(1);
+  await expect(page.locator("[data-sonner-toast]")).toContainText("Following big artist");
+  await expect(popular).toHaveCount(2);
+  await page.getByTestId("popular-done").click();
+  await expect(page.getByTestId("popular-artists")).toHaveCount(0);
+
+  await page.goto("/following");
+  await expect(page.getByTestId("first-run-none")).toHaveCount(0);
+});
+
+test("no favorites and Popular artists unreachable: Search, then Popular today", async ({ page }) => {
+  await setup(page, []);
+  await page.route("https://e621.net/tags.json**", (route) =>
+    new URL(route.request().url()).searchParams.get("search[order]") === "count"
+      ? route.fulfill({ status: 500, headers: { "access-control-allow-origin": "*" }, contentType: "application/json", body: "{}" })
+      : route.fallback(),
+  );
+  await page.goto("/following");
+  const none = page.getByTestId("first-run-none");
+  await expect(none).toContainText("Find artists to follow", { timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "Popular today" })).toBeVisible();
   await none.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search/);
 });

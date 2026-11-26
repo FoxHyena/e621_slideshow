@@ -25,7 +25,7 @@ export const LIST_TOP = 30;
 export const PICKED = 10;
 
 /** Artist tags that name no one (e621's placeholders), never suggested. */
-const NOBODY = new Set(["unknown_artist", "anonymous_artist", "unknown_artist_signature", "third-party_edit", "sketch_artist", "artist_request"]);
+export const NOBODY = new Set(["unknown_artist", "anonymous_artist", "unknown_artist_signature", "third-party_edit", "sketch_artist", "artist_request"]);
 
 export interface ArtistCandidate {
   name: string;

@@ -1,3 +1,4 @@
+import { skippedLine } from "../feed/format";
 import { describe, expect, it } from "vitest";
 import { affinity, groupByArtist, rankCandidates, rankWithRecency, recency, tileQueries, tileQuery } from "../recommend/artists";
 import { artistRecall } from "../recommend/artistBacktest";
@@ -97,5 +98,13 @@ describe("artist suggestions", () => {
     // the loved, modest ones are the top: well over a third of what was hidden is theirs
     expect(a.score / a.hidden).toBeGreaterThan(0.35);
     expect(a.baseline).toBeLessThanOrEqual(a.hidden);
+  });
+});
+
+describe("skippedLine", () => {
+  it("names up to two, then counts the rest", () => {
+    expect(skippedLine(["saffron_hare"])).toBe("1 skipped: saffron hare");
+    expect(skippedLine(["saffron_hare", "harbor_seal"])).toBe("2 skipped: saffron hare, harbor seal");
+    expect(skippedLine(["saffron_hare", "harbor_seal", "a", "b", "c"])).toBe("5 skipped: saffron hare, harbor seal and 3 more");
   });
 });

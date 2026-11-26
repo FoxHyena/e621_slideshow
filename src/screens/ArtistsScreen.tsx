@@ -5,7 +5,7 @@
  * and who has something new; and Suggested, the artists you favorite a lot and don't follow yet,
  * each as an artist card with three of their newest posts.
  */
-import { ChevronDown, ChevronRight, ExternalLink, Heart, MoreHorizontal, Search, Share, UserMinus, UserX } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, EyeOff, Heart, CircleMinus, MoreHorizontal, Search, Share } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
@@ -14,6 +14,7 @@ import { StateBlock } from "@/components/State";
 import { TryAgain } from "@/components/StatePanels";
 import { Field, Seg } from "@/components/v6";
 import { FollowPill } from "@/feed/FollowPill";
+import { artistPageUrl } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
 import { ago, compact } from "@/lib/feed/format";
 import { LIST_TOP } from "@/lib/recommend/artists";
@@ -207,7 +208,7 @@ function FollowingList({ sort }: { sort: Sort }) {
       </div>
       {rows.length === 0 ? (
         <p className="list-foot" data-testid="artists-no-match">
-          No one you follow matches &ldquo;{filter.trim()}&rdquo;.
+          No artist you follow matches &ldquo;{filter.trim()}&rdquo;.
         </p>
       ) : (
         <ul className="list-group" data-testid="artists-list">
@@ -235,7 +236,7 @@ function FollowingList({ sort }: { sort: Sort }) {
         </ul>
       )}
       <p className="list-foot" data-testid="artists-count">
-        {f.followed.size} of {FOLLOW_LIMIT} follows
+        {filter.trim() ? `${rows.length} of ${f.followed.size}` : `${f.followed.size} of ${FOLLOW_LIMIT} follows`}
       </p>
     </>
   );
@@ -263,9 +264,19 @@ function SortSheet({ sort, setSort }: { sort: Sort; setSort: (s: Sort) => void }
   );
 }
 
-/** ⋯ on an artist: open, share, and Unfollow (a followed one) or Not interested (a suggestion). */
+/**
+ * ⋯ on an artist (DESIGN.md "the row menus"): a followed one offers Share artist, Open on e621 and
+ * Unfollow (not Danger: it has Undo); a suggestion offers Not interested and Open on e621.
+ */
 function ArtistSheet({ name, followed }: { name: string; followed: boolean }) {
   const close = () => getNav().back();
+  const onE621 = (
+    <a className="well-row" href={artistPageUrl(name)} target="_blank" rel="noopener noreferrer" onClick={() => void close()} data-testid="artist-e621">
+      <ExternalLink aria-hidden />
+      <span>Open on e621</span>
+      <small>e621.net</small>
+    </a>
+  );
   return (
     <Sheet
       title={label(name)}
@@ -281,49 +292,43 @@ function ArtistSheet({ name, followed }: { name: string; followed: boolean }) {
       }
     >
       <div className="well-group">
-        <button
-          type="button"
-          className="well-row"
-          onClick={async () => {
-            await close();
-            openArtist(name);
-          }}
-        >
-          <ExternalLink aria-hidden />
-          <span>Open artist</span>
-        </button>
-        <button type="button" className="well-row" onClick={() => void shareArtist(name)}>
-          <Share aria-hidden />
-          <span>Share</span>
-        </button>
         {followed ? (
-          <button
-            type="button"
-            className="well-row"
-            data-danger
-            onClick={async () => {
-              await close();
-              getFollows().setFollowed(name, false);
-            }}
-            data-testid="artist-unfollow"
-          >
-            <UserMinus aria-hidden />
-            <span>Unfollow</span>
-          </button>
+          <>
+            <button type="button" className="well-row" onClick={() => void shareArtist(name)} data-testid="artist-share">
+              <Share aria-hidden />
+              <span>Share artist</span>
+            </button>
+            {onE621}
+            <button
+              type="button"
+              className="well-row"
+              onClick={async () => {
+                await close();
+                getFollows().setFollowed(name, false);
+              }}
+              data-testid="artist-unfollow"
+            >
+              <CircleMinus aria-hidden />
+              <span>Unfollow</span>
+            </button>
+          </>
         ) : (
-          <button
-            type="button"
-            className="well-row"
-            onClick={async () => {
-              await close();
-              getArtists().hide(name);
-              toast(`Won't suggest ${label(name)}`, { id: `hide:${name}`, action: { label: "Undo", onClick: () => getArtists().unhide(name) } });
-            }}
-            data-testid="artist-hide"
-          >
-            <UserX aria-hidden />
-            <span>Not interested</span>
-          </button>
+          <>
+            <button
+              type="button"
+              className="well-row"
+              onClick={async () => {
+                await close();
+                getArtists().hide(name);
+                toast("Hidden from suggestions", { id: `hide:${name}`, action: { label: "Undo", onClick: () => getArtists().unhide(name) } });
+              }}
+              data-testid="artist-hide"
+            >
+              <EyeOff aria-hidden />
+              <span>Not interested</span>
+            </button>
+            {onE621}
+          </>
         )}
       </div>
     </Sheet>
@@ -355,8 +360,12 @@ function Suggested() {
     return (
       <StateBlock
         mood="look"
-        head="Find artists to follow"
-        text={a.favorites === 0 ? "You have no favorites yet, so there is nothing to suggest from." : "No one new to suggest. Favorite more and check back."}
+        head={a.all.length === 0 ? "Not enough favorites yet" : "No one new to suggest"}
+        text={
+          a.all.length === 0
+            ? "Suggestions come from the artists you favorite. Favorite a few more posts, or look for artists yourself."
+            : "You follow every artist you favorite a lot. Favorite more and check back."
+        }
         actions={
           <button type="button" className="btn-tonal" onClick={search}>
             <Search aria-hidden className="state-icon" />

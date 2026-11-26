@@ -13,8 +13,11 @@ import Avatar from "@/components/Avatar";
 import { Goo } from "@/components/Goo";
 import { StateBlock } from "@/components/State";
 import { TryAgain } from "@/components/StatePanels";
-import { compact } from "@/lib/feed/format";
-import { LIST_TOP, PICKED, type ArtistSuggestion } from "@/lib/recommend/artists";
+import { FollowPill } from "@/feed/FollowPill";
+import { popularArtists } from "@/lib/e621/client";
+import type { TagInfo } from "@/lib/e621/types";
+import { compact, NOT_ARTISTS, skippedLine } from "@/lib/feed/format";
+import { LIST_TOP, NOBODY, PICKED, type ArtistSuggestion } from "@/lib/recommend/artists";
 import { storage } from "@/lib/storage";
 import { getNav } from "@/nav/history";
 import { Sheet } from "@/shell/Sheet";
@@ -28,6 +31,10 @@ export interface FirstRunProps {
   head: (right?: ReactNode) => ReactNode;
   /** Popular today, under the skipped row */
   popular: ReactNode;
+  /** You followed someone from Popular artists: Following keeps this list up until `false`. */
+  browsing?: (on: boolean) => void;
+  /** Following now has someone (followed from Popular artists): offer the feed */
+  hasFollows?: boolean;
 }
 
 const STEPS: [ReadStep, string][] = [
@@ -38,7 +45,7 @@ const STEPS: [ReadStep, string][] = [
 
 const name = (n: string) => n.replaceAll("_", " ");
 
-export function FirstRun({ head, popular }: FirstRunProps) {
+export function FirstRun({ head, popular, browsing, hasFollows = false }: FirstRunProps) {
   const session = useStore(getSession().store, (s) => ({ user: s.user?.name ?? null, remember: s.remember }), shallow);
   const artists = getArtists();
   const a = useStore(artists.store, (s) => s);
@@ -131,7 +138,7 @@ export function FirstRun({ head, popular }: FirstRunProps) {
           }
           testId="first-run-none"
         />
-        {popular}
+        <PopularArtists onFollowed={() => browsing?.(true)} done={hasFollows ? () => browsing?.(false) : undefined} fallback={popular} />
       </>
     );
 
@@ -194,6 +201,57 @@ export function Reading({ a, skip }: { a: ArtistsState; skip?: ReactNode }) {
   );
 }
 
+/** e621's biggest artists, asked once a visit; an extra, so a failure shows Popular today instead. */
+let popularAsk: Promise<TagInfo[]> | null = null;
+const POPULAR_ROWS = 20;
+
+function PopularArtists({ onFollowed, done, fallback }: { onFollowed: () => void; done?: () => void; fallback: ReactNode }) {
+  const [rows, setRows] = useState<TagInfo[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    popularAsk ??= popularArtists(POPULAR_ROWS * 2, getSession().store.get().creds).catch((e: unknown) => {
+      popularAsk = null;
+      throw e;
+    });
+    popularAsk.then(
+      (r) => live && setRows(r.filter((t) => !NOT_ARTISTS.has(t.name) && !NOBODY.has(t.name)).slice(0, POPULAR_ROWS)),
+      () => live && setRows([]),
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (rows === null) return <div className="popular-wait" data-testid="popular-artists-wait" />;
+  if (rows.length === 0) return fallback;
+  return (
+    <section className="popular-artists" aria-labelledby="popular-artists-h" data-testid="popular-artists">
+      <h2 className="section-title" id="popular-artists-h">
+        Popular artists
+      </h2>
+      <ul className="list-group">
+        {rows.map((t) => (
+          <li key={t.name} className="list-row popular-row" data-testid="popular-row" data-artist={t.name}>
+            <Avatar seed={t.name} className="row-mark" />
+            <span className="row-text">
+              <b>{name(t.name)}</b>
+              <small>{compact(t.post_count)} posts</small>
+            </span>
+            <FollowPill name={t.name} onFollowed={onFollowed} />
+          </li>
+        ))}
+      </ul>
+      <p className="list-foot">The artists with the most posts on e621</p>
+      {done && (
+        <div className="state-acts popular-done">
+          <button type="button" className="btn-tonal" onClick={done} data-testid="popular-done">
+            Show my feed
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 /**
  * The list is the screen: a row is a checkbox, the top ten start picked, one gold button follows
  * them. In a sheet (Artists › Suggested), the button is the sheet's footer and following closes it.
@@ -228,7 +286,7 @@ export function Pick({ list, head, inSheet = false }: { list: ArtistSuggestion[]
     const done = res.added.length;
     toast(done ? `Following ${done} artist${done === 1 ? "" : "s"}` : "No one was followed", {
       id: "follow:many",
-      description: k ? `${k} skipped: ${res.skipped.map((x) => `${name(x.name)} (${x.reason})`).join(", ")}` : undefined,
+      description: k ? skippedLine(res.skipped.map((x) => x.name)) : undefined,
     });
     // The list goes (Following turns into the feed): focus lands on the title, not nowhere.
     if (!inSheet) requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-screen="following"] h1')?.focus({ preventScroll: true }));
@@ -245,7 +303,7 @@ export function Pick({ list, head, inSheet = false }: { list: ArtistSuggestion[]
   );
   const body = (
     <>
-      <p className="screen-sub first-sub">You&apos;ve favorited these artists a lot. Follow them?</p>
+      <p className="screen-sub first-sub">{inSheet ? "You\u2019ve favorited these artists a lot." : "You\u2019ve favorited these artists a lot. Follow them?"}</p>
       <div className="list-label">
         <span>Top {list.length}</span>
         <span className="list-label-two">

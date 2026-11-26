@@ -289,6 +289,16 @@ export async function getTags(names: string[], creds: Credentials | null, lane: 
   return Array.isArray(res) ? res : [];
 }
 
+/** e621's artist tags with the most posts, most first (Popular artists). */
+export async function popularArtists(limit: number, creds: Credentials | null, lane: Lane = "page"): Promise<TagInfo[]> {
+  const res = await request<TagInfo[] | Record<string, unknown>>("/tags.json", {
+    params: { "search[category]": 1, "search[order]": "count", limit },
+    creds,
+    lane,
+  });
+  return Array.isArray(res) ? res : [];
+}
+
 /** Id of the newest post, a close stand-in for the site's total post count. */
 export async function newestPostId(creds: Credentials | null, lane: Lane = "user"): Promise<number> {
   const [post] = await searchPosts("", 1, 1, creds, undefined, lane);
@@ -379,4 +389,9 @@ export async function anyPost(query: string, creds: Credentials | null): Promise
 
 export function postPageUrl(id: number): string {
   return `${E621_BASE}/posts/${id}`;
+}
+
+/** An artist's posts on e621. */
+export function artistPageUrl(name: string): string {
+  return `${E621_BASE}/posts?tags=${encodeURIComponent(name)}`;
 }

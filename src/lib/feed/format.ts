@@ -35,3 +35,12 @@ export function compact(n: number): string {
 export function cardTags(post: Pick<Post, "tags">): (readonly [TagCategoryName, string])[] {
   return TAG_ORDER.flatMap((c) => (post.tags[c] ?? []).map((t) => [c, t] as const));
 }
+
+/** The follow toast's second line: "2 skipped: saffron hare, harbor seal"; past two, "5 skipped: saffron hare, harbor seal and 3 more". */
+export function skippedLine(names: string[]): string {
+  const shown = names
+    .slice(0, 2)
+    .map((n) => n.replaceAll("_", " "))
+    .join(", ");
+  return `${names.length} skipped: ${shown}${names.length > 2 ? ` and ${names.length - 2} more` : ""}`;
+}

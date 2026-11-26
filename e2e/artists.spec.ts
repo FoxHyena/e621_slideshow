@@ -80,6 +80,9 @@ test("Following lists who you follow: newest poster first, a dot for new, filter
   await page.getByTestId("artists-filter").fill("ott");
   await expect(rows(page)).toHaveCount(1);
   await expect(rows(page).first()).toHaveAttribute("data-artist", "otter_artist");
+  await expect(page.getByTestId("artists-count")).toHaveText("1 of 3");
+  await page.getByTestId("artists-filter").fill("zz");
+  await expect(page.getByTestId("artists-no-match")).toHaveText("No artist you follow matches \u201czz\u201d.");
   await page.getByTestId("artists-filter").fill("");
 
   await page.getByTestId("artists-sort").click();
@@ -95,6 +98,11 @@ test("Following lists who you follow: newest poster first, a dot for new, filter
   await expect(rows(page).nth(0).locator(".mark")).not.toHaveAttribute("data-new", "true");
 
   await rows(page).nth(1).getByTestId("artist-more").click();
+  const menu = page.getByTestId("sheet-artist");
+  await expect(menu.locator(".well-row")).toHaveText(["Share artist", "Open on e621e621.net", "Unfollow"]);
+  await expect(menu.getByTestId("artist-e621")).toHaveAttribute("href", "https://e621.net/posts?tags=otter_artist");
+  await expect(menu.getByTestId("artist-unfollow")).not.toHaveAttribute("data-danger");
+  await shot(page, "artists-row-menu");
   await page.getByTestId("artist-unfollow").click();
   await expect(rows(page)).toHaveCount(2);
   await expect.poll(() => mock.followWrites.filter((w) => w.method === "DELETE").length).toBe(1);
@@ -121,11 +129,24 @@ test("Suggested: artist cards with their newest posts; Follow keeps the card; No
   await expect.poll(() => mock.followWrites.length).toBe(1);
 
   await cards.nth(1).getByTestId("sugg-more").click();
+  await expect(page.getByTestId("sheet-artist").locator(".well-row")).toHaveText(["Not interested", "Open on e621e621.net"]);
   await page.getByTestId("artist-hide").click();
   await expect(cards).toHaveCount(3);
   await expect(page.locator('[data-testid="sugg-card"][data-artist="sugg_b"]')).toHaveCount(0);
-  await page.locator("[data-sonner-toast]").filter({ hasText: "Won't suggest" }).getByRole("button", { name: "Undo" }).click();
+  await page.locator("[data-sonner-toast]").filter({ hasText: "Hidden from suggestions" }).getByRole("button", { name: "Undo" }).click();
   await expect(cards).toHaveCount(4);
+});
+
+test("Suggested with too few favorites says so, with Search", async ({ page }) => {
+  const mock = await setup(page);
+  mock.setFavorites([{ id: 5000, artist: "fox_artist" }]);
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const none = page.getByTestId("suggested-none");
+  await expect(none).toContainText("Not enough favorites yet", { timeout: 15_000 });
+  await expect(none).toContainText("Suggestions come from the artists you favorite.");
+  await none.getByRole("button", { name: "Search" }).click();
+  await expect(page).toHaveURL(/\/search/);
 });
 
 test("Follow from favorites opens as a sheet and follows the picked ones in one request", async ({ page }) => {
@@ -137,6 +158,7 @@ test("Follow from favorites opens as a sheet and follows the picked ones in one 
   const sheet = page.getByTestId("sheet-follow-favorites");
   await expect(sheet.getByTestId("pick-row")).toHaveCount(4);
   await expect(sheet.getByTestId("first-run-follow")).toHaveText("Follow 4 artists");
+  await expect(sheet.getByText("You\u2019ve favorited these artists a lot.", { exact: true })).toBeVisible();
   await shot(page, "artists-follow-favs");
   await sheet.getByTestId("first-run-follow").click();
   await expect(sheet).toHaveCount(0);

@@ -139,10 +139,13 @@ export function FollowingScreen() {
     </div>
   );
   const noOne = session.ready && signedIn && fs.status === "ready" && !follows;
+  // followed someone from Popular artists: the list stays up (to follow more) until "Show my feed"
+  const [browsing, setBrowsing] = useState(false);
+  const first = noOne || (browsing && signedIn);
 
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
-      {noOne ? (
+      {first ? (
         <Suspense
           fallback={
             <>
@@ -151,7 +154,7 @@ export function FollowingScreen() {
             </>
           }
         >
-          <FirstRun key={session.user?.name} head={head} popular={<Popular grid={grid} />} />
+          <FirstRun key={session.user?.name} head={head} popular={<Popular grid={grid} />} browsing={setBrowsing} hasFollows={browsing && !noOne} />
         </Suspense>
       ) : (
         <>

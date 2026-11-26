@@ -20,21 +20,23 @@ at the top once Phase 7 hands over.
 4. **"Edit search"** as the way out of "No posts match" when no filter is on.
 5. **From R2b:** Post info's Artists group (only with 2+ artists), "Open" as an artist tag's first
    target, the tag targets' blurred shadow.
-6. **Built without a mock (slice 5):**
-   - Follow from favorites as a sheet from Artists › Suggested: the first run's pick list in a titled
-     sheet, the gold button as its footer; following closes it.
-   - The toast after a bulk follow: "Following 10 artists", and under it "2 skipped: name (why), …"
-     when e621 skipped some.
-   - Suggested's "Not interested" (in the card's ⋯): the card goes, toast "Won't suggest X" with Undo.
-   - The Artists row ⋯ sheet: Open artist, Share (a link to the artist page here), Unfollow.
+6. **Slice 5 now follows the design session's proposed Artists mock** (DESIGN.md "Artists: Suggested, the
+   sheet, the row menus, Popular artists", itself not owner-approved): the row ⋯ menus (Share artist, Open
+   on e621, Unfollow not in red; Not interested, Open on e621), "Hidden from suggestions" with Undo,
+   "Not enough favorites yet", the filter's "1 of 3" count, the skipped toast ("2 skipped: a, b and 3
+   more", no reasons), and Popular artists under "Find artists to follow".
+7. **Built without a mock (slice 5):**
+   - Popular artists: after you follow one, the list stays up so you can follow more, and a tonal "Show my
+     feed" appears under it. The mock shows only the toast. If e621's tag list doesn't answer, Popular
+     today shows instead.
    - Following › Artists with no one followed: "You don't follow anyone yet" / "Suggested has artists you
      favorite a lot."
-7. **Copy I wrote (slice 5):** "No artist turns up often enough in your favorites to suggest yet." (first run,
-   favorites but no artist with 3+); "No one new to suggest. Favorite more and check back." (Suggested
-   empty); "Couldn't read who you follow" (Artists error); the read's sub line "640 of 1,284 · about 2 s"
-   (estimated from 320 favorites a page, about a second each); Suggested cards say "You faved 8 of 140"
-   (DESIGN.md's card line; UX.md's longer "of their 140 posts · posted 4d ago" didn't fit next to Follow on
-   a phone).
+   - Suggested when you already follow everyone it would suggest: "No one new to suggest" / "You follow
+     every artist you favorite a lot. Favorite more and check back."
+8. **Copy I wrote (slice 5):** "No artist turns up often enough in your favorites to suggest yet." (first run,
+   favorites but no artist with 3+); "Couldn't read who you follow" (Artists error); the read's sub line
+   "640 of 1,284 · about 2 s" (estimated from 320 favorites a page, about a second each); post counts read
+   "18.2K" (the app's existing number format) where the mock says "18.2k".
 
 ## Try in the app (steps)
 

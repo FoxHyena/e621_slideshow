@@ -70,6 +70,8 @@ export interface E621Mock {
   tagCounts: Record<string, number>;
   /** names asked for in each /tags.json request */
   tagLookups: string[][];
+  /** e621's biggest artist tags (/tags.json by category and count), most posts first */
+  popularArtists: { name: string; post_count: number }[];
   /** page numbers of each GET /favorites.json request */
   favoritePages: number[];
   /** when set, plain tags in /posts.json queries must match (off by default: older tests search freely) */
@@ -128,6 +130,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     },
     tagCounts: {},
     tagLookups: [],
+    popularArtists: [],
     favoritePages: [],
     filterPositive: false,
     searchDelay: () => 0,
@@ -316,6 +319,11 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       state.favoritePages.push(n);
       if (state.favoritesDelay) await new Promise((r) => setTimeout(r, state.favoritesDelay));
       return postList(state.favPosts.slice((n - 1) * limit, n * limit));
+    }
+
+    if (url.pathname === "/tags.json" && url.searchParams.get("search[order]") === "count") {
+      const limit = Number(url.searchParams.get("limit") ?? 75);
+      return json(route, state.popularArtists.slice(0, limit).map((t, i) => ({ id: 9000 + i, ...t, category: 1 })));
     }
 
     if (url.pathname === "/tags.json") {

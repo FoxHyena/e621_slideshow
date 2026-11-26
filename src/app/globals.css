@@ -4602,3 +4602,40 @@ li[data-state="done"] .first-step-n svg,
 .first-pick-sheet .first-sub {
   margin-top: 0;
 }
+
+/* Popular artists (DESIGN.md "Popular artists"): Following, signed in, nothing to suggest from. */
+.popular-artists {
+  margin-top: 24px;
+}
+.popular-row {
+  min-height: 60px;
+}
+.popular-row .row-text > small {
+  font-variant-numeric: tabular-nums;
+}
+.popular-row .follow-pill {
+  flex: none;
+}
+.popular-wait {
+  min-height: 120px;
+}
+.popular-done {
+  justify-content: center;
+}
+
+/* Follow from favorites as a sheet: sheet rows (no side padding), 60 tall, divided from 48; the
+   list fades out over its last 24 as it scrolls. */
+.first-pick-sheet .list-group {
+  --div: 48px;
+  margin-bottom: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.first-pick-sheet .pick-row {
+  min-height: 60px;
+  padding-inline: 0;
+}
+.sheet-body:has(> .first-pick-sheet) {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}
