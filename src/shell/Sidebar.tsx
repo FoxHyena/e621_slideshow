@@ -52,7 +52,8 @@ export interface SidebarProps {
 export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarProps) {
   const narrow = useNarrow();
   const fresh = useStore(newOnFollowing, (n) => n);
-  const user = useStore(getSession().store, (s) => s.user?.name ?? null);
+  // a link's borrowed sign-in isn't this browser's account
+  const user = useStore(getSession().store, (s) => (s.link ? null : (s.user?.name ?? null)));
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
   const followsUser = useStore(getFollows().store, (f) => f.user);
   const idx = Math.max(0, TABS.findIndex((t) => t.tab === current));

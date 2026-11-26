@@ -52,8 +52,15 @@ export function createGoo(load: () => number = () => 0, save: (n: number) => voi
 }
 
 let instance: GooApi | null = null;
+/** How the signed-in records are kept right now; the session sets it (session.ts). */
+const keep = { remember: false, link: false };
+export function setGooKeep(remember: boolean, link: boolean): void {
+  keep.remember = remember;
+  keep.link = link;
+}
 export function getGoo(): GooApi {
-  if (!instance) instance = createGoo(loadGoo, saveGoo);
+  // a link's borrowed sign-in leaves the goo of this browser alone
+  if (!instance) instance = createGoo(loadGoo, (n) => !keep.link && saveGoo(n, keep.remember));
   return instance;
 }
 

@@ -23,12 +23,18 @@ import { applyTuck } from "./tuck";
 import { AppMark } from "@/components/Avatar";
 import { PostCard } from "./PostCard";
 import { RAIL_QUERY } from "@/shell/rail";
+import { ANCHOR_PREFIX } from "@/lib/storage";
+import { getSession } from "@/state/session";
 
 /** Start the next page this far before the end (UX §5). */
 const PREFETCH_PX = 1500;
 /** Rate limited: try again after this long. */
 const RETRY_MS = 5000;
-const ANCHOR_PREFIX = "e6ss:anchor:";
+/** A place names the account's feed: on the device only with Remember (or signed out). */
+function anchorStore(): Storage {
+  const s = getSession().store.get();
+  return !s.creds || (s.remember && !s.link) ? localStorage : sessionStorage;
+}
 const ANCHOR_TTL_MS = 24 * 60 * 60_000;
 /** Load this many posts at most looking for a saved place after a reload. */
 const ANCHOR_SEARCH_MAX = 600;
@@ -43,7 +49,7 @@ interface Anchor {
 
 function readAnchor(key: string): Anchor | null {
   try {
-    const a = JSON.parse(localStorage.getItem(ANCHOR_PREFIX + key) ?? "null") as Anchor | null;
+    const a = JSON.parse(sessionStorage.getItem(ANCHOR_PREFIX + key) ?? localStorage.getItem(ANCHOR_PREFIX + key) ?? "null") as Anchor | null;
     return a && Date.now() - a.at < ANCHOR_TTL_MS ? a : null;
   } catch {
     return null;
@@ -51,8 +57,11 @@ function readAnchor(key: string): Anchor | null {
 }
 function writeAnchor(key: string, a: Anchor | null) {
   try {
-    if (a) localStorage.setItem(ANCHOR_PREFIX + key, JSON.stringify(a));
-    else localStorage.removeItem(ANCHOR_PREFIX + key);
+    const keep = anchorStore();
+    for (const s of [localStorage, sessionStorage]) {
+      if (a && s === keep) s.setItem(ANCHOR_PREFIX + key, JSON.stringify(a));
+      else s.removeItem(ANCHOR_PREFIX + key);
+    }
   } catch {
     // storage full or off: the place just isn't kept across a reload
   }

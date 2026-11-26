@@ -238,6 +238,8 @@ export function getFollowing(): Following {
       const s = session.store.get();
       const mine = !s.link && s.creds && s.user;
       f.setAccount(mine ? s.creds : null, mine ? s.user!.name : null, s.remember);
+      // the sidebar's badge forgets the account that left (Following sets it again when it shows)
+      if (!mine && newOnFollowing.get().user !== null) newOnFollowing.set({ user: null, count: 0, more: false });
     };
     session.store.subscribe(follow);
     follow();

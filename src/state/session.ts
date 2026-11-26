@@ -6,8 +6,8 @@
 import { E621Error, getCurrentUser, type Credentials } from "@/lib/e621/client";
 import type { CurrentUser } from "@/lib/e621/types";
 import { decodeShareCreds } from "@/lib/share";
-import { storage } from "@/lib/storage";
-import { getGoo } from "./goo";
+import { SIGNIN_DRAFT, storage } from "@/lib/storage";
+import { getGoo, setGooKeep } from "./goo";
 import { getPrefs, type PrefsApi } from "./prefs";
 import { createStore, type Store } from "./store";
 
@@ -51,6 +51,10 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
     shareSignIn: storage.loadShareSignIn(),
     ready: (linkCreds ?? saved) === null || profile !== null,
   });
+  // the goo is kept like the other signed-in records, and never from a link's tab
+  const keepGoo = () => setGooKeep(store.get().remember, store.get().link);
+  keepGoo();
+  store.subscribe(keepGoo);
   let verified = (linkCreds ?? saved) === null;
   const adopt = (u: CurrentUser) => {
     store.set((s) => ({ ...s, user: u }));
@@ -73,11 +77,19 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
           // A sign-out or another sign-in while this was in flight wins.
           if (store.get().creds !== creds) return;
           if (u.id === null) {
-            // Signed in from the saved profile: not any more.
+            // Signed in from the saved profile: not any more. The key stops being sent (e621 refuses
+            // a bad key even where no key is needed); its username waits in the sign-in sheet.
             const s = store.get();
             if (s.user) storage.saveAccount(s.user.name, null);
-            store.set((x) => ({ ...x, user: null }));
-            throw new Error("e621 didn't accept the saved username and API key");
+            if (!s.link) storage.saveCredentials(null);
+            try {
+              sessionStorage.setItem(SIGNIN_DRAFT, creds.username);
+            } catch {
+              /* the draft is a convenience */
+            }
+            verified = true;
+            store.set((x) => ({ ...x, creds: null, user: null, link: false, ready: true }));
+            throw new Error(s.link ? "e621 didn't accept the link's sign-in" : "e621 didn't accept the saved username and API key");
           }
           verified = true;
           adopt(u);
@@ -95,7 +107,10 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
       // Another account through "Change": the one before leaves nothing behind, as on a sign-out.
       const before = store.get();
       const prev = before.link ? null : (before.user?.name ?? before.creds?.username ?? null);
-      if (prev && prev.toLowerCase() !== u.name.toLowerCase()) storage.purgeAccount(prev);
+      if (prev && prev.toLowerCase() !== u.name.toLowerCase()) {
+        storage.purgeAccount(prev);
+        if (getGoo().store.get().count > 0) getGoo().wipe();
+      }
       prefs.endVisit();
       store.set((s) => ({ ...s, creds: c, user: u, remember, link: false, ready: true }));
       verified = true;
@@ -138,7 +153,11 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
 
 let instance: SessionApi | null = null;
 export function getSession(): SessionApi {
-  if (!instance) instance = createSession(window.__e6link ?? location.hash);
+  if (!instance) {
+    instance = createSession(window.__e6link ?? location.hash);
+    // The inline script scrubs a link's key from the address bar first thing; if it didn't run, do it here.
+    if (new URLSearchParams(location.hash.slice(1)).has("k")) history.replaceState(history.state, "", location.pathname + location.search);
+  }
   return instance;
 }
 /** Tests only. */

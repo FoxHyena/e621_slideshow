@@ -72,6 +72,9 @@ function readE6(state: unknown): EntryState | null {
  * updates its router (canonicalUrl, usePathname) when the data has no `__NA`, and copies
  * its own keys back in either way, so state we write must never carry them.
  */
+/** The same screen, whatever post the player is on. */
+const sameScreenUrl = (a: Route, b: Route) => routeUrl({ screen: a.screen, play: null }) === routeUrl({ screen: b.screen, play: null });
+
 export function ownState(state: unknown = history.state): Record<string, unknown> {
   const rest = { ...((state ?? {}) as Record<string, unknown>) };
   delete rest.__NA;
@@ -159,12 +162,19 @@ export function createNav(win: Win): Nav {
   /** Bring the store in line with the address bar and history.state (popstate, pageshow, timeout). */
   function sync() {
     const e6 = readE6(win.history.state);
-    const route = here();
-    const { stack } = store.get();
+    let route = here();
+    const { stack, index } = store.get();
+    const was = stack[index];
     const cause = pending && !pending.gesture ? "back" : "pop";
     if (e6) {
       const at = stack.findIndex((x) => x.key === e6.key);
       if (at >= 0) {
+        // Closing a sheet the player moved on under: the entry beneath takes the post it moved to,
+        // so Back doesn't land on the one it left.
+        if (was?.sheet && at === index - 1 && sameScreenUrl(was.route, route) && routeUrl(was.route) !== routeUrl(route)) {
+          route = was.route;
+          write("replace", { ...stack[at], route });
+        }
         const next = stack.slice();
         next[at] = { ...stack[at], route };
         store.set({ stack: next, index: at, cause });
@@ -215,7 +225,9 @@ export function createNav(win: Win): Nav {
     replace(route, opts) {
       if (pending) return;
       const cur = current();
-      const e: Entry = { ...cur, route, from: opts?.from !== undefined ? opts.from : cur.from, sheet: null };
+      // The player moving on under Post info (next, a blacklisted post): the sheet stays open.
+      const sheet = cur.sheet && sameScreenUrl(route, cur.route) ? cur.sheet : null;
+      const e: Entry = { ...cur, route, from: opts?.from !== undefined ? opts.from : cur.from, sheet };
       write("replace", e);
       // Entries above stay: replaceState leaves the browser's Forward entries in place.
       const { stack, index } = store.get();

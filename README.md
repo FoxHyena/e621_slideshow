@@ -1,12 +1,17 @@
 # e621 Slideshow
 
-A full-screen slideshow for e621 searches, with four extra display styles, a grid gallery, a scrolling
-timeline, share links, and a **Recommended** mode that learns your taste from your favorites.
+A scroll-first e621 client: a feed of the artists you follow, a **For You** feed that learns your taste
+from your favorites, artist pages, and a full-screen slideshow with five styles. It works on a phone
+(installable as an app) and on a computer.
 
 Live at **<https://e621.cumdump.dog>**. Everything runs in your browser and talks to `e621.net` directly
 (the API allows CORS), so your API key never touches a server.
 
-![Slideshow playing, with the controls showing](docs/screenshots/classic.png)
+| Following on a phone | An artist | The slideshow |
+|---|---|---|
+| ![Following](docs/screenshots/phone-following.png) | ![Artist page](docs/screenshots/phone-artist.png) | ![Player](docs/screenshots/phone-player.png) |
+
+![On a computer: the sidebar and the 600 column](docs/screenshots/desktop-following.png)
 
 > Screenshots use generated, blurred placeholder characters against a mocked e621, never real posts.
 > See [Regenerating the screenshots](#regenerating-the-screenshots).
@@ -18,16 +23,17 @@ pnpm install
 pnpm dev            # http://localhost:3000
 ```
 
-1. The settings panel opens on load. Type tags into **Search tags** (autocomplete helps).
-2. Pick ratings and media types under **Filters**.
-3. Hit **Play**.
+1. Open **Settings › Account** and sign in with your e621 username and
+   [API key](https://e621.net/users/home) (tick **Remember** to keep it on this device).
+2. **Following** shows new posts from the artists you follow on e621. Follow more from any card,
+   artist page, or **Artists › Suggested**.
+3. Press **Play** (the round gold button) to watch any feed as a slideshow.
 
-Move the mouse to show the controls; they hide after 2.5 s idle.
+Signed out, **For You** shows what's popular and Search works as usual.
 
 ## Contents
 
 - [Features](#features)
-- [Usage examples](#usage-examples)
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [Share links and launch links](#share-links-and-launch-links)
 - [Userscript](#userscript)
@@ -37,38 +43,50 @@ Move the mouse to show the controls; they hide after 2.5 s idle.
 
 ## Features
 
-### Search and filter
+### The tabs
 
-![Settings panel](docs/screenshots/settings.png)
+- **Following**: posts from the tags you follow on e621 (its `search:subscriptions`), newest first.
+  New posts since your last visit are marked, with a "caught up" divider where the new ones end.
+  e621's own visit marker keeps this in step with the site. Pull down to refresh.
+- **For You**: posts ranked by how well they match your favorites (see [Recommended](#recommended)).
+  **Tune** pins or mutes tags.
+- **Artists**: who you follow, with a dot for new posts, filter and sort; **Suggested** lists artists you
+  favorite a lot but don't follow yet, and **Follow from favorites** follows several at once.
+- **Settings**: Account, Content (ratings and blacklist), Slideshow, For You, and App (install, data,
+  about). On a computer it is one page.
 
-- **Search tags** with e621 autocomplete. Any e621 syntax works: `-tag`, `~a ~b`, `score:>50`, `pool:123`.
-  The **Search cheatsheet** link opens e621's own syntax guide.
-- **Order**: Newest, Oldest, Score, Favorites, Random (with **Reshuffle**), Hot, Most comments, Largest.
-- **Filters**: ratings (Safe / Questionable / Explicit), media (Images / GIFs / Videos), and **Min score**
-  (skipped if your tags already have a `score:` term).
-- **Upload date**: **Quick** (today, yesterday, past week / month / year), **Last…** N days / weeks /
-  months / years, or **On**, **After**, **Before**, **Between** dates.
-- **Query sent to e621** shows the exact tag string and how many of e621's 40 tag slots it uses.
-  It warns before you go over.
-- **Saved searches** keep a named search; **Recent** lists the last ones you played.
-- **Preview** opens the results as a grid instead of starting the show; **Scroll** opens them as a
-  [timeline](#scroll-view).
+### Feeds
 
-Reopening settings pauses the show and keeps your place. Only changing the search restarts it;
-playback settings apply live.
+![The grid on a computer](docs/screenshots/desktop-grid.png)
 
-### Blacklist
+- Every feed is a column of cards or a **grid** (the grid button). Each card shows the artist, the
+  picture, its tags and score, a heart, and **Follow** for artists you don't follow.
+- **Chips** filter a feed: media, hide favorited, sort, upload date, minimum score. They live in the URL,
+  so Back and a copied link agree.
+- **Hold a tag** for half a second and targets pop up over it: drag onto **Search** to add it to the
+  search, onto **Blacklist** to hide it (with Undo), or onto **Open** for an artist's page.
+- **Hold a grid tile** (or right-click it on a computer) for Favorite, Open artist, Play from here and
+  Open on e621.
+- **Search** with e621 autocomplete; any e621 syntax works. Searches can be saved with the star.
+- Your place in each feed is kept across Back, tab switches and reloads.
 
-One rule per line, same syntax as e621's: `tag1 tag2` hides posts with both, `-tag` exempts,
-`~a ~b` means either, `#` starts a comment.
+### Artist pages
 
-- Filtering happens in your browser, so rules cost no tag slots, and wildcards and `fav:me` work.
-- Signed out: **Import e621 defaults** adds e621's default blacklist.
-- Signed in: your account blacklist syncs on sign-in. Lines you add here stay local.
+A big mark, the name, stats (posts, how many you faved, the last post), one wide **Follow** (with Undo),
+then the artist's posts with the same chips. **Share** copies a link to the page.
+
+### The slideshow
+
+![Post info beside the picture on a computer](docs/screenshots/desktop-player-info.png)
+
+**Play** on any feed, or **Play from here** on a card, starts the show at that post. Controls: previous,
+pause, next, a progress bar with time left, favorite, Post info (stats and tags, each tag with the same
+targets), Quick settings (style, seconds, fit, mute, quality) and Share. Closing it returns to the post
+you were on.
 
 ### Slideshow styles
 
-Pick one under **Playback → Style**.
+Pick one in **Settings › Slideshow**, or for this show only from the player's sliders button.
 
 | Vintage Prints | Ken Burns |
 |---|---|
@@ -92,38 +110,9 @@ Other playback settings:
 | Mute videos | on | |
 | Start over after the last post | on | Loop the search |
 
-### Post info and gallery
-
-| Post info (**I**) | Gallery (**G**) |
-|---|---|
-| ![Post info overlay](docs/screenshots/info.png) | ![Gallery grid](docs/screenshots/gallery.png) |
-| Tags by category, score, favorites, size, date. **+** adds a tag to your search, **−** excludes it. | Every loaded post as a grid. Click one to play from there; more load as you scroll. |
-
-### Scroll view
-
-| Timeline (**T**) | Hold a tag |
-|---|---|
-| ![Scroll view](docs/screenshots/scroll.png) | ![Dragging a tag onto Search](docs/screenshots/scroll-tags.png) |
-| The results as a social-media-style feed, one post per card, loading more as you scroll. | Hold a tag, then drag it onto **Search** or **Blacklist** and let go. |
-
-Open it with **Scroll** in settings, the scroll button in the controls or the gallery header, or **T**.
-
-- Each card shows the artist, post age, rating, favorites and score, and the post's tags in a row you
-  can swipe sideways.
-- Only the post in the middle of the screen plays; videos pause as you scroll past.
-- Signed in, favorite with the heart, **L**, or a double-tap on the image (double-tap never
-  un-favorites).
-- **Hold a tag** for half a second and two targets pop up over it. Drag onto **Search** to add the tag
-  to your search (the feed reloads from the top; in Recommended it pins the tag instead), or onto
-  **Blacklist** to add it to your blacklist and hide matching posts without losing your place. Let go
-  anywhere else to cancel. A tap on a tag opens the same targets to tap.
-- **Play** starts the slideshow at the post in view; each card also has **Play from here**.
-
 ### Recommended
 
-![Recommended mode with the taste profile](docs/screenshots/recommended.png)
-
-Switch **Source** to **Recommended** (needs sign-in). The app reads your favorites, finds the tags you
+**For You** (needs sign-in) is the Recommended feed. The app reads your favorites, finds the tags you
 favorite far more often than e621 does overall, and ranks recent posts by how well they match and how
 well liked they are for their age. Posts you've already favorited are left out.
 
@@ -133,86 +122,55 @@ well liked they are for their age. Posts you've already favorited are left out.
   and the sample is retaken once a month.
 - Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
   so a well-liked post with only some of your tags still gets ranked.
-- **Breadth** sets how many of your top tags are searched together: lower stays close to your strongest
+- **Tune** (the sliders on For You) holds the rest. **Breadth** sets how many of your top tags are searched together: lower stays close to your strongest
   interests, higher brings more variety.
 - **Pin** a profile tag to always search it. **Mute** a tag to hide posts carrying it.
-- The window defaults to the last 7 days; change it under **Upload date**.
-- **Rebuild** re-reads every favorite. Otherwise only new favorites are read.
-- In the info overlay, "Recommended because" lists the tags that ranked the post, and **+ / −** pin and
-  mute instead of editing a search.
-- Nothing plays until every candidate page is ranked, so the best post shows first.
+- The window defaults to the last 7 days; change it with the date chip.
+- Only new favorites are read on each visit. Nothing re-ranks on its own: **Update ranking** appears when
+  there is something new to rank, and **⋯ › Refresh** ranks again.
+- Nothing shows until every candidate page is ranked, so the best post comes first.
 
 Every part of this was tested against real favorites first: see
 [Recommendation research](#recommendation-research).
 
 ### e621 account
 
-Sign in under **e621 account** with your username and an API key
-(e621 → Account → **Manage API Access**). Signing in:
+- Sign in with your username and API key. **Remember** keeps the key on this device; without it,
+  nothing about your account stays after the tab closes.
+- Signing out removes everything kept for the account: follows, the Following marker's copy, the
+  favorites profile, feed places and the goo.
+- Your e621 blacklist syncs on sign-in; edit the local list in **Settings › Content**.
+- **Sign-in links** (off by default) put your key in a share link's `#` fragment so a friend's tab is
+  signed in as you for that tab only. Only share those with people you trust with your key.
 
-- shows posts e621 hides from anonymous users,
-- lets you favorite with the heart (**L**),
-- syncs your account blacklist,
-- unlocks Recommended.
+### Install
 
-Tick **Remember on this device** to keep the key in this browser's `localStorage`; otherwise it lasts until
-you reload or close the tab. It is only ever sent to e621.
+On a phone, **Settings › App › Install** walks through adding it to the home screen. It works offline
+for what it has already loaded, and offers **Reload** when a new version is out.
 
-## Usage examples
+### On a computer
 
-**Play one artist's best work, largest first, no videos:**
-
-1. Search tags: `artist_name score:>100`
-2. Order: **Largest**
-3. Filters: untick **Videos**, then **Play**
-
-**Shuffle a pool:**
-
-1. Search tags: `pool:12345`
-2. Order: **Random (shuffle)**. Hit **Reshuffle** for a new order.
-
-**This week's hot posts, SFW only:**
-
-1. Order: **Hot**
-2. Filters: untick **Questionable** and **Explicit**
-3. Upload date: **Quick** → **Past week**
-
-**Hide a tag everywhere, except on one artist:**
-
-```text
-# blacklist
-feral -artist_name
-```
-
-**Send a friend your current show:** press **C** (or the link button) and paste the link.
-It opens straight into the show. Their own blacklist still applies.
-
-**Start a show from a bookmark:**
-
-```text
-https://e621.cumdump.dog/?tags=fox+solo+score:>100
-```
-
-It plays the same posts e621 would show for that search, in your own style and speed.
+From 900 px wide: a sidebar with the tabs, Search (**/**) and your account; feeds in a 600 px column;
+grids at full width; sheets as dialogs; Post info as a panel beside the picture.
 
 ## Keyboard shortcuts
 
-| Key | Action |
-|---|---|
-| ← → | Previous / next |
-| Space | Pause / play |
-| F | Fullscreen |
-| I | Post info (add / exclude tags) |
-| L | Favorite (signed in) |
-| G | Gallery |
-| T | Scroll view |
-| O | Open the post on e621 |
-| C | Copy share link (not in Recommended) |
-| S / Esc | Settings |
+| Key | Where | Action |
+|---|---|---|
+| / | Anywhere on a computer | Search |
+| Esc | Anywhere | Back (closes a sheet, the player, or a pushed screen) |
+| ← → | Player | Previous / next |
+| Space | Player | Pause / play |
+| F | Player | Fullscreen |
+| I | Player | Post info |
+| L | Player | Favorite (signed in) |
+| C | Player | Copy share link |
+| O | Player | Open the post on e621 |
+| S | Player | Quick settings |
+| G / T | Player | Close the player (back to the feed) |
 
-In the gallery, **G** or **Esc** closes it and arrows scroll the grid. In the scroll view, **J / K** step
-one post at a time, **L** favorites the post in view, **Enter** plays from it, **G / T** switch between the
-grid and the feed, and **Esc** closes it.
+The previous one-page app is still there for now: **Settings › App › Classic slideshow** (its gallery,
+scroll view and settings drawer, with their own keys).
 
 ## Share links and launch links
 
@@ -279,8 +237,16 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
 
 ## How it works
 
-- **Stack**: Next.js 16 (App Router), React 19, Tailwind CSS 4, deployed on Vercel. The page is a
-  single client component; there is no backend.
+- **Stack**: Next.js 16 (App Router), React 19, Tailwind CSS 4, deployed on Vercel. There is no backend:
+  every route renders the same client shell.
+- **Navigation** ([`src/nav/`](src/nav)): the app keeps its own stack of screens in the browser's
+  history (tabs, pushed screens, sheets, the player as `?play=`), so Back, the edge swipe and reloads
+  all agree, and switching tabs never asks the server for anything.
+- **Stores** ([`src/state/`](src/state)): small subscribable stores for the session, follows, Following,
+  favorites, For You, preferences and feeds. Requests go through one lane with priorities, a shared
+  back-off when e621 says slow down, and timeouts.
+- **Installed app** ([`public/sw.js`](public/sw.js)): a service worker caches the app's own files only,
+  never e621's API or your key.
 - **Query** ([`src/lib/query/build.ts`](src/lib/query/build.ts)): your tags, then rating / type / date /
   score / order metatags, up to e621's 40-tag limit. The blacklist never goes into the query.
 - **Blacklist** ([`src/lib/query/blacklist.ts`](src/lib/query/blacklist.ts)): e621's rule semantics,
@@ -301,22 +267,27 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
     then plays the rest best first.
   - [`scripts/rec-backtest.ts`](scripts/rec-backtest.ts) tests search and ranking changes on live data: it
     hides accounts' recent favorites and counts how many the recommendations would show.
-- **Storage** ([`src/lib/storage.ts`](src/lib/storage.ts)): settings, saved searches, history,
-  credentials and the taste profile live in `localStorage`. Each favorite's tags, the sample and
-  the learned weights are bigger, so they go to IndexedDB ([`src/lib/bigStorage.ts`](src/lib/bigStorage.ts)).
+- **Storage** ([`src/lib/storage.ts`](src/lib/storage.ts)): settings, saved searches and history live in
+  `localStorage`. Account data (the key, follows, the favorites profile, feed places) is kept on the
+  device only with **Remember**, and only for the tab otherwise; sign-out removes it. Each favorite's
+  tags, the sample and the learned weights are bigger, so they go to IndexedDB
+  ([`src/lib/bigStorage.ts`](src/lib/bigStorage.ts)).
 
 ### Project layout
 
 | Path | What's there |
 |---|---|
-| `src/components/App.tsx` | Show state, keyboard, controls, share / launch handling |
-| `src/components/SettingsPanel.tsx` | The settings drawer |
-| `src/components/stages/` | One component per slideshow style |
-| `src/components/Gallery.tsx`, `InfoOverlay.tsx` | Grid view and post info |
-| `src/components/Feed.tsx`, `TagActions.tsx` | Scroll view, and its hold-and-drag tag targets |
+| `src/shell/` | The app shell: tabs, the sidebar on a computer, sheets, lazy screens, the service worker hookup |
+| `src/nav/` | Routes and the history-driven screen stack |
+| `src/screens/` | Following, For You, Artists, the artist page, Search and Results, Settings, sign-in |
+| `src/feed/` | Feed and grid, post cards, chips and their menus, pull to refresh |
+| `src/player/` | The slideshow player and its sheets |
+| `src/state/` | Stores (session, follows, Following, favorites, For You, prefs, goo) |
+| `src/components/` | Shared parts (v6 parts, Goo, states, tag targets) and the classic app (`App.tsx`, `stages/`) |
 | `src/lib/e621/` | API client and response types |
 | `src/lib/query/`, `src/lib/recommend/`, `src/lib/slideshow/` | Query building, recommendations, queue and layouts |
 | `src/lib/share.ts` | Share-link and launch-link encoding |
+| `docs/path-a/` | The rebuild's goal, UX, design, engineering notes, decisions, reviews and testing log |
 | `e2e/` | Playwright tests against a mocked e621 |
 | `scripts/` | Live smoke test, test-video generator, README screenshots, recommendation backtest |
 

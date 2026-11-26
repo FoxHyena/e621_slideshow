@@ -14,10 +14,11 @@ import { SIGN_IN_SHEET } from "@/nav/routes";
 import { Sheet } from "@/shell/Sheet";
 import { getFollows } from "@/state/follows";
 import { getSession } from "@/state/session";
+import { SIGNIN_DRAFT } from "@/lib/storage";
 
 /** e621's account page, where "Manage API access" makes a key. */
 export const API_KEY_PAGE = "https://e621.net/users/home";
-const DRAFT = "e6ss:signin-username";
+const DRAFT = SIGNIN_DRAFT;
 
 const readDraft = (): string => {
   try {

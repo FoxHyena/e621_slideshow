@@ -147,144 +147,93 @@ async function setup(page: Page, seed: Record<string, unknown> = {}): Promise<E6
   return mock;
 }
 
-const slide = (page: Page) => page.locator("[data-testid=slide-image],[data-testid=slide-video]").first();
+const WOLFIE = { username: "wolfie", apiKey: "goodkey" };
 
-async function play(page: Page) {
-  await page.getByTestId("play-button").click();
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(slide(page)).toBeVisible();
-  await page.waitForTimeout(1200); // fades and Ken Burns settle
+/** Signed in as wolfie, following the three placeholder artists. */
+async function signedIn(page: Page, seed: Record<string, unknown> = {}) {
+  const mock = await setup(page, { creds: WOLFIE, ...seed });
+  mock.subscriptions = ["pawprint_studio", "fluffbutt_doodles", "tailwag_art"];
+  mock.lastSeen = 5058;
+  return mock;
 }
 
-const showControls = async (page: Page) => {
-  await page.mouse.move(640, 420);
-  await page.mouse.move(650, 430);
-  await expect(page.getByTestId("controls")).toHaveAttribute("data-visible", "true");
-};
-
-const hideControls = async (page: Page) => {
-  await page.mouse.move(640, 420);
-  await expect(page.getByTestId("controls")).toHaveAttribute("data-visible", "false", { timeout: 6000 });
-};
+const phone = (page: Page) => page.setViewportSize({ width: 390, height: 844 });
+const settle = (page: Page, ms = 1200) => page.waitForTimeout(ms);
 
 // ---- shots --------------------------------------------------------------------
 
-test("settings panel", async ({ page }) => {
-  await setup(page, {
-    search: { tags: "wolf", blacklist: "gore\nscat" },
-    playback: { intervalSec: 8 },
-    sections: { filters: true, date: false, saved: false, blacklist: false, playback: false },
-  });
-  await page.goto("/");
-  await play(page);
-  await page.keyboard.press("s");
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
-  await page.waitForTimeout(500);
-  await shot(page, "settings");
+test("following on a phone", async ({ page }) => {
+  await phone(page);
+  await signedIn(page);
+  await page.goto("/following");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  await settle(page);
+  await shot(page, "phone-following");
 });
 
-test("classic slideshow with controls", async ({ page }) => {
-  await setup(page, { search: { tags: "wolf" }, creds: { username: "wolfie", apiKey: "goodkey" } });
-  await page.goto("/");
-  await play(page);
-  await showControls(page);
-  await shot(page, "classic");
+test("artist page on a phone", async ({ page }) => {
+  await phone(page);
+  await signedIn(page);
+  await page.goto("/artist/pawprint_studio");
+  await expect(page.getByTestId("artist-stats")).toBeVisible();
+  await settle(page, 1500);
+  await shot(page, "phone-artist");
 });
 
-test("info overlay", async ({ page }) => {
-  await setup(page, { search: { tags: "wolf" } });
-  await page.goto("/");
-  await play(page);
-  await page.keyboard.press("i");
-  await expect(page.getByTestId("info-overlay")).toBeVisible();
-  await page.waitForTimeout(400);
-  await shot(page, "info");
+test("player on a phone", async ({ page }) => {
+  await phone(page);
+  await signedIn(page, { playback: { intervalSec: 600 } });
+  await page.goto("/following");
+  await page.getByTestId("play-fab").click();
+  await expect(page.getByTestId("player")).toBeVisible();
+  await settle(page, 1500);
+  await shot(page, "phone-player");
 });
 
-test("gallery", async ({ page }) => {
-  await setup(page, { search: { tags: "wolf" } });
-  await page.goto("/");
-  await play(page);
-  await page.keyboard.press("g");
-  await expect(page.getByTestId("gallery")).toBeVisible();
-  await page.waitForTimeout(1500);
-  await shot(page, "gallery");
+test("grid on a computer", async ({ page }) => {
+  await signedIn(page);
+  await page.goto("/following");
+  await page.getByTestId("grid-toggle").click();
+  await expect(page.getByTestId("grid-tile").first()).toBeVisible();
+  await settle(page, 1500);
+  await shot(page, "desktop-grid");
 });
 
-test("scroll view", async ({ page }) => {
-  await setup(page, { search: { tags: "wolf" }, creds: { username: "wolfie", apiKey: "goodkey" } });
-  await page.goto("/");
-  await page.getByTestId("scroll-button").click();
-  // the heart shows once the remembered sign-in is verified
-  await expect(page.getByTestId("feed-favorite").first()).toBeVisible();
-  await page.waitForTimeout(1500);
-  await shot(page, "scroll");
+test("following on a computer", async ({ page }) => {
+  await signedIn(page);
+  await page.goto("/following");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  await settle(page);
+  await shot(page, "desktop-following");
 });
 
-test("scroll view tag actions", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await setup(page, { search: { tags: "wolf" } });
-  await page.goto("/");
-  await page.getByTestId("scroll-button").click();
-  const chip = page.getByTestId("feed-card").first().getByTestId("feed-tag").nth(3);
-  await expect(chip).toBeVisible();
-  await page.waitForTimeout(1200);
-  const b = (await chip.boundingBox())!;
-  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
-  await page.mouse.down();
-  await expect(page.getByTestId("tag-actions")).toBeVisible();
-  const t = (await page.getByTestId("tag-action-search").boundingBox())!;
-  await page.mouse.move(t.x + t.width / 2, t.y + 20, { steps: 6 });
-  await expect(page.getByTestId("tag-action-search")).toHaveAttribute("data-hot", "true");
-  await page.waitForTimeout(300);
-  await shot(page, "scroll-tags");
-  await page.mouse.move(10, 10);
-  await page.mouse.up();
+test("player with Post info on a computer", async ({ page }) => {
+  await signedIn(page);
+  await page.goto("/following");
+  await page.getByTestId("play-fab").click();
+  await expect(page.getByTestId("player")).toBeVisible();
+  await page.getByTestId("info-button").click();
+  await expect(page.getByTestId("sheet-info")).toBeVisible();
+  await settle(page, 1200);
+  await shot(page, "desktop-player-info");
 });
 
 for (const style of ["prints", "kenburns", "collage", "reflections"] as const) {
   test(`style ${style}`, async ({ page }) => {
-    await setup(page, { search: { tags: "wolf" }, playback: { style } });
-    await page.goto("/");
-    await play(page);
+    await signedIn(page, { playback: { style, intervalSec: 600 } });
+    await page.goto("/following");
+    await page.getByTestId("play-fab").click();
+    await expect(page.getByTestId("player")).toBeVisible();
     if (style === "collage") {
       // The collage keeps the last three posts.
       await page.keyboard.press("ArrowRight");
       await page.waitForTimeout(800);
       await page.keyboard.press("ArrowRight");
     }
-    await page.waitForTimeout(1500);
-    await hideControls(page);
+    await settle(page, 1500);
+    // the controls fade when the pointer rests
+    await page.mouse.move(640, 420);
+    await expect(page.getByTestId("controls")).toHaveAttribute("data-visible", "false", { timeout: 6000 });
     await shot(page, `style-${style}`);
   });
 }
-
-test("recommended", async ({ page }) => {
-  const mock = await setup(page, {
-    creds: { username: "wolfie", apiKey: "goodkey" },
-    playback: { intervalSec: 8 },
-    sections: { filters: false, date: false, account: true },
-  });
-  // Favorites lean on foxes and fluffy tails; the mock site has few of those, so they lift.
-  mock.setFavorites(
-    Array.from({ length: 24 }, (_, i) => ({
-      id: 9000 + i,
-      tags: [
-        ["fox", "fluffy_tail", "smile"],
-        ["fox", "scarf", "winter"],
-        ["wolf", "moon", "night"],
-        ["fox", "fluffy", "happy"],
-      ][i % 4],
-    })),
-  );
-  mock.tagCounts = { fox: 900, fluffy_tail: 1200, smile: 9000, scarf: 2000, winter: 5000, wolf: 2500, moon: 3000, night: 8000, fluffy: 4000, happy: 7000 };
-  await page.goto("/");
-  await expect(page.getByTestId("signed-in")).toBeVisible();
-  await page.getByRole("radio", { name: "Recommended" }).click();
-  await expect(page.getByTestId("rec-status")).toContainText("24 favorites");
-  await play(page);
-  await page.keyboard.press("s");
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
-  await page.waitForTimeout(500);
-  await shot(page, "recommended");
-});

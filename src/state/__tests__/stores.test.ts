@@ -89,11 +89,11 @@ describe("session", () => {
     getCurrentUser.mockResolvedValue(user());
     const s = createSession(null, createPrefs());
     await s.signIn(KEY, false);
-    saveGoo(3);
+    saveGoo(3, false);
     expect(saved("goo")).toBeNull(); // this tab only (sessionStorage)
     await s.signIn(KEY, true);
     expect(storage.loadCredentials()).toEqual(KEY);
-    saveGoo(4);
+    saveGoo(4, true);
     expect(saved("goo")).toBe(4);
     expect(loadGoo()).toBe(4);
     getGoo().add(2);
@@ -115,6 +115,26 @@ describe("session", () => {
     s.signOut();
     expect(saved("creds")).toEqual({ username: "me", apiKey: "mine" });
     expect(prefs.store.get().visitBlacklist).toBeNull();
+  });
+
+  it("a link's tab never writes this browser's goo", async () => {
+    const { getGoo } = await import("../goo");
+    ls.set("e6ss:v1:creds", JSON.stringify({ username: "me", apiKey: "mine" }));
+    ls.set("e6ss:v1:goo", "5");
+    getCurrentUser.mockResolvedValue(user());
+    const s = createSession("#u=fox&k=k123", createPrefs());
+    await s.verify();
+    getGoo().add(3);
+    expect(saved("goo")).toBe(5);
+  });
+
+  it("sign-out takes For You's read of the favorites with it", async () => {
+    getCurrentUser.mockResolvedValue(user());
+    const s = createSession(null, createPrefs());
+    await s.signIn(KEY, true);
+    ls.set("e6ss:v1:profile:fox", JSON.stringify({ username: "fox" }));
+    s.signOut();
+    expect(saved("profile:fox")).toBeNull();
   });
 
   it("ignores a verify that a sign-out overtook", async () => {
@@ -338,5 +358,9 @@ describe("feed registry", () => {
     expect(r.peek("ranked")).toBe(kept);
     r.drop("ranked");
     expect(r.peek("ranked")).toBeUndefined();
+    // a refresh of a feed already evicted still moves the screens holding it on
+    const g = r.generation.get();
+    r.drop("ranked");
+    expect(r.generation.get()).toBe(g + 1);
   });
 });

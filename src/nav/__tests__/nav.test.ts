@@ -153,6 +153,24 @@ describe("nav", () => {
     expect(nav.current().route.screen).toEqual({ kind: "search" });
   });
 
+  it("the player moving on under a sheet keeps it open, and closing it lands on the new post", async () => {
+    const w = fakeWin("/following");
+    const nav = createNav(w);
+    nav.push({ screen: { kind: "tab", tab: "following" }, play: "1" });
+    nav.openSheet("player-info");
+    nav.replace({ screen: { kind: "tab", tab: "following" }, play: "2" });
+    expect(nav.current().sheet).toBe("player-info");
+    expect(nav.current().route.play).toBe("2");
+    await nav.back();
+    expect(nav.current().sheet).toBeNull();
+    expect(nav.current().route.play).toBe("2");
+    expect(w.entries[w.at()].url).toBe("/following?play=2");
+    // a different screen still closes the sheet
+    nav.openSheet("player-info");
+    nav.replace({ screen: { kind: "search" }, play: null });
+    expect(nav.current().sheet).toBeNull();
+  });
+
   it("push goes deeper and back pops through history", async () => {
     const w = fakeWin();
     const nav = createNav(w);

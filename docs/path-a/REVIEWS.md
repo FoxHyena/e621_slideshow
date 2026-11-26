@@ -852,3 +852,47 @@ passes.
 
 **Budgets** (production build, mock e621): JS cold load **198.7 KB** (≤ 200); 302.3 KB with idle
 prefetch; CLS 0.0000; 0 long tasks.
+
+## Phase 7 — final review (2026-11-26)
+
+Two fresh reviewers over the whole branch: one on the security rules (GOAL.md), one on how the slices
+fit together.
+
+**Security reviewer, 7 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Feed scroll anchors stayed in localStorage without Remember and after sign-out | Important | Anchors follow the storage rule (session-only without Remember or in a link's tab); sign-out drops them |
+| 2 | For You's favorites profile and learned weights were saved without Remember and outlived sign-out | Important | Saved only with Remember; `purgeAccount` clears `profile:`, IndexedDB `favFeatures:` and `learned:` |
+| 3 | A link's tab wrote this browser's goo | Important | The goo is kept only with Remember and never from a link's tab (`setGooKeep`) |
+| 4 | Session-only data uses sessionStorage, not memory | Nit | No change: sessionStorage is per tab and ends with it, as DECISIONS says |
+| 5 | `accountBlacklist` isn't purged on sign-out | Nit | No change: the visit blacklist ends with the tab already; noted |
+| 6 | If the inline fragment scrub didn't run, the link's key stayed in the address bar | Nit | `getSession` scrubs it too |
+| 7 | `_client` carries the username | Nit | No change: e621 asks for it |
+
+All other rules hold: the key goes only to e621, the service worker caches no key and no signed-in
+answer, the CSP, no real art committed, the share link's sign-in never touches the owner's marker or follows.
+
+**Integration reviewer, 10 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A saved key that couldn't be checked (offline, 429) was never checked again | Important | Checked again when the network or the tab comes back |
+| 2 | A refused saved key kept being sent with every request | Important | Dropped (and forgotten on this device); its username waits in the sign-in sheet |
+| 3 | Pull to refresh did nothing after a hidden tab's feed was evicted | Important | `drop(key)` moves screens on even when the feed is gone |
+| 4 | The player's replace closed Post info and left a stale entry under it | Important | A replace that changes only the post keeps the sheet; closing it carries the post down |
+| 5 | Favorites profile left on disk after sign-out | Important | Fixed with security #2 (overrides and hidden artists stay by design, MORNING Decide 5) |
+| 6 | A hidden For You keeps ranking for an account that signed out | Important | Deferred: MORNING known gaps |
+| 7 | "Change" to another account kept the old account's goo | Nit | Wiped |
+| 8 | A tap during a Back that closes a sheet is dropped | Nit | Deferred: MORNING known gaps |
+| 9 | The sidebar showed a link's borrowed user as the account | Nit | Shows signed out |
+| 10 | Following's badge kept an old count after sign-out | Nit | Reset when the account leaves |
+
+**Gates:** typecheck and lint clean; unit 311 pass (new: a link's tab never writes goo, sign-out takes
+For You's read with it, an evicted feed's refresh, the player moving on under a sheet).
+Full e2e after the fixes: 223 passed, 3 skipped (one earlier run had the Goo drops test time out under
+load; it passes 4 of 4 alone). Service worker test passes. README screenshots regenerated from the
+placeholder fixtures.
+
+**Budgets** (production build, mock e621): JS cold load **199.5 KB** (≤ 200; 0.5 KB headroom); 301.9 KB
+with idle prefetch; CLS 0.0000; 0 long tasks.

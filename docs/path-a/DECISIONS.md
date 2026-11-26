@@ -805,3 +805,15 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The account row opens Settings (Account is its first section on one page). `/settings/account` and the
   other sub-page URLs still open the single sub-page on a computer.
 - Settings › Goo's row isn't on the one page (the goo isn't on a computer).
+
+## 2026-11-26 — Phase 7 (final review)
+
+- **The storage rule now covers every per-account record.** For You's favorites profile, the learned
+  weights, feed scroll anchors and the goo are kept only with Remember (sessionStorage otherwise),
+  never written from a link's tab, and cleared on sign-out. Tune's pins and mutes and hidden suggestions
+  stay device-wide (MORNING Decide 5).
+- **A refused saved key is dropped**, not kept and resent: e621 answers a bad key with 401 even where
+  none is needed. The username stays in the sign-in sheet for this tab.
+- **A key that couldn't be checked is checked again** on `online` and when the tab is shown again.
+- **A sheet over the player stays open when the player moves to another post**; closing it lands on that
+  post (history.ts carries the route down).

@@ -1,4 +1,5 @@
 import type { Credentials } from "./e621/client";
+import { bigStorage } from "./bigStorage";
 import type { CurrentUser, Post, SavedSearchRow } from "./e621/types";
 import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
@@ -249,8 +250,33 @@ export const storage = {
     writeAccount(`marker:${username}`, null, false);
     writeAccount(`seen:${username}`, null, false);
     writeAccount(`firstRunSkipped:${username}`, null, false);
+    // For You's read of the favorites, and what it learned from them (IndexedDB)
+    write(`profile:${username}`, null);
+    void bigStorage.del(`favFeatures:${username}`);
+    void bigStorage.del(`learned:${username}`);
+    // feed places name the account's queries (feeds.ts feedKey)
+    dropAnchors();
   },
 };
+
+/** Where each feed was scrolled to (FeedView), kept a day. */
+/** The sign-in sheet's username, for this tab (a convenience, never the key). */
+export const SIGNIN_DRAFT = "e6ss:signin-username";
+
+export const ANCHOR_PREFIX = "e6ss:anchor:";
+export function dropAnchors(): void {
+  for (const s of [() => localStorage, () => sessionStorage]) {
+    try {
+      const store = s();
+      for (let i = store.length - 1; i >= 0; i--) {
+        const k = store.key(i);
+        if (k?.startsWith(ANCHOR_PREFIX)) store.removeItem(k);
+      }
+    } catch {
+      // storage off: nothing kept
+    }
+  }
+}
 
 export function pushHistory(history: HistoryEntry[], tags: string, now: number): HistoryEntry[] {
   const t = tags.trim();
@@ -270,6 +296,6 @@ export function loadGoo(): number {
   return typeof n === "number" && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
-export function saveGoo(n: number): void {
-  writeAccount("goo", n > 0 ? n : null, storage.loadCredentials() !== null);
+export function saveGoo(n: number, remember: boolean): void {
+  writeAccount("goo", n > 0 ? n : null, remember);
 }

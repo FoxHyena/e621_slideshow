@@ -107,6 +107,25 @@ export default function Shell() {
     };
   }, [nav]);
 
+  // A saved key that couldn't be checked (offline, e621 busy) is checked again when the network
+  // or the tab comes back; a no-op once e621 has answered.
+  useEffect(() => {
+    const again = () => {
+      if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      const session = getSession();
+      session.verify().catch((e: Error) => {
+        // only a refused key is news: a second network failure stays quiet
+        if (!session.store.get().creds) toast.error(`e621 sign-in failed: ${e.message}`, { id: "sign-in-failed" });
+      });
+    };
+    window.addEventListener("online", again);
+    document.addEventListener("visibilitychange", again);
+    return () => {
+      window.removeEventListener("online", again);
+      document.removeEventListener("visibilitychange", again);
+    };
+  }, []);
+
   useEffect(() => installEdgeSwipe(() => void nav.back({ gesture: true })), [nav]);
   useEffect(() => prefetchScreens(), []);
   // The service worker, the update toast and the install offer: once the page is idle, in their own

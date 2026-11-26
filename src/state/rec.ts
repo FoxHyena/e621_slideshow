@@ -122,15 +122,17 @@ export function createRec(warn: (msg: string) => void, now: () => number = Date.
       try {
         // The learned ranking needs each favorite's tags, which older profiles never kept:
         // read every favorite once to fill them in.
+        // only with Remember: otherwise they live in memory and go with the tab (ENGINEERING.md)
+        const keep = getSession().store.get().remember;
         const canLearn = await bigStorage.available();
-        const storedFeats = canLearn ? await bigStorage.get<FavFeatures>(featKey(name)) : undefined;
-        const loaded = full ? null : storage.loadProfile(name);
+        const storedFeats = canLearn && keep ? await bigStorage.get<FavFeatures>(featKey(name)) : undefined;
+        const loaded = full || !keep ? null : storage.loadProfile(name);
         const start = loaded && canLearn && !covers(storedFeats, loaded) ? null : loaded;
         const read: Post[] = [];
         const p = await syncProfile(start, name, api, now(), onProgress, (posts) => read.push(...posts));
         if (cancelled) return;
         patch({ profile: p });
-        if (!storage.saveProfile(p)) warn("Favorites profile is too big to save on this device; it will be rebuilt next visit");
+        if (keep && !storage.saveProfile(p)) warn("Favorites profile is too big to save on this device; it will be rebuilt next visit");
         const c = await refreshTagCache(storage.loadTagCache(), tagsToLookUp(p), api, now(), onProgress);
         if (cancelled) return;
         patch({ cache: c });
@@ -138,15 +140,15 @@ export function createRec(warn: (msg: string) => void, now: () => number = Date.
         if (canLearn) {
           try {
             const feats = mergeFeatures(storedFeats, p, read);
-            await bigStorage.set(featKey(name), feats);
+            if (keep) await bigStorage.set(featKey(name), feats);
             const search = (q: string, page: number, limit: number) => searchPosts(q, page, limit, creds, undefined, "bg");
             const neg = await refreshNegatives(await bigStorage.get<Negatives>(NEG_KEY), search, now(), onProgress);
             await bigStorage.set(NEG_KEY, neg);
             onProgress({ phase: "learn", done: 0 });
-            const l = await fitLearned(await bigStorage.get<Learned>(learnedKey(name)), p, feats, neg, () => cancelled, onProgress);
+            const l = await fitLearned(keep ? await bigStorage.get<Learned>(learnedKey(name)) : undefined, p, feats, neg, () => cancelled, onProgress);
             if (cancelled || !l) return;
             patch({ fit: l });
-            await bigStorage.set(learnedKey(name), l);
+            if (keep) await bigStorage.set(learnedKey(name), l);
           } catch (e) {
             // Ranking falls back to tag match; the profile itself is fine.
             if (!cancelled) warn(`Couldn't learn your taste: ${e instanceof Error ? e.message : String(e)}`);

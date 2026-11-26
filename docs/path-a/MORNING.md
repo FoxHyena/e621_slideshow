@@ -95,6 +95,11 @@ at the top once Phase 7 hands over.
    - The player's banner fades out over its last 300 ms (none with reduced motion). The show starts
      right away under it, and Sign in pauses it like any sheet.
 
+15. **Final review fixes (Phase 7).** My calls:
+   - A saved key e621 refuses is dropped from this device; the sign-in sheet keeps the username.
+   - Post info stays open when the show moves to the next post (it shows the new one).
+   - For You's read of your favorites and the feed scroll places are kept only with Remember.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -121,6 +126,12 @@ at the top once Phase 7 hands over.
    built; every sheet is a centred dialog. Building them means each opener passes its position.
 10. **The goo on a computer** isn't designed (the design session's suggestion: along the sidebar's top edge,
    dripping down its face; the secret tab as a row under Settings). Default: no goo on a computer.
+
+11. **Known gap: a hidden For You keeps ranking after you sign out**, with the old account's key, until
+   you open For You again. Default: fix after this PR (drop For You's feeds on sign-out from the session,
+   not from the screen).
+12. **Known gap: a second tap while a sheet is closing is dropped** (e.g. tapping a chip twice fast).
+   Default: fix after this PR (queue it, as tab taps already are).
 
 ## Needs you (things I held)
 

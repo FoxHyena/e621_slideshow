@@ -48,6 +48,13 @@ export const bigStorage = {
       return undefined;
     }
   },
+  async del(key: string): Promise<void> {
+    try {
+      await run("readwrite", (s) => s.delete(key));
+    } catch {
+      // nothing kept, or nothing to drop
+    }
+  },
   async set(key: string, value: unknown): Promise<boolean> {
     try {
       await run("readwrite", (s) => s.put(value, key));

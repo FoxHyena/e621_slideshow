@@ -164,9 +164,9 @@ export function createRegistry(
       };
     },
     drop(key) {
+      // An evicted feed (a hidden tab's) is gone already: screens still holding it move on all the same.
       const f = feeds.get(key);
-      if (!f) return;
-      drop(f);
+      if (f) drop(f);
       generation.set((g) => g + 1);
     },
     peek: (key) => feeds.get(key),
