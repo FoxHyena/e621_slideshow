@@ -39,7 +39,7 @@ function GooRow() {
 }
 
 /** What each Settings group holds, in a muted line under its name (DESIGN.md "Settings"). */
-const SECTION_ROW: Record<Exclude<SettingsSection, "account">, { icon: LucideIcon; line: string }> = {
+const SECTION_ROW: Record<Exclude<SettingsSection, "account" | "classic">, { icon: LucideIcon; line: string }> = {
   content: { icon: Shield, line: "Ratings and blacklist" },
   slideshow: { icon: Play, line: "Style, timing and videos" },
   "for-you": { icon: Sparkles, line: "What For You searches" },
@@ -108,7 +108,7 @@ export function SettingsHome({ onSection }: { onSection: (s: SettingsSection) =>
       <AccountRow open={go("account")} />
       <ul className="list-group" aria-label="Settings">
         {SETTINGS_SECTIONS.filter((s) => s !== "account").map((s) => {
-          const { icon: Icon, line } = SECTION_ROW[s as Exclude<SettingsSection, "account">];
+          const { icon: Icon, line } = SECTION_ROW[s as Exclude<SettingsSection, "account" | "classic">];
           return (
             <li key={s}>
               <a href={`/settings/${s}`} className="list-row" onClick={go(s)}>

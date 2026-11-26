@@ -721,3 +721,22 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - "you faved" reads the For You profile when it's there; the page doesn't read favorites for it.
 - Chips: Results' five. The mock's row shows "New" where UX.md has Sort; UX.md wins.
 
+
+## 2026-11-26 (night) — Slice 7 build: Settings' pages and the sign-in sheet
+
+- No owner decision in this entry. Built from UX.md "Settings" and "Sign-in sheet", DESIGN.md "Sign-in
+  sheet" (approved) and the proposed "Settings: Account, Content, For You, App" (batch 3).
+- Sign-in is a sheet (`sign-in`) over whatever asked, not a screen: a signed-out Follow, heart or
+  Settings opens it, and the Follow you tapped goes through once you're in. Closing it without signing in
+  drops that Follow.
+- The old one-page app moved from `/settings/account` to `/settings/classic`, reached from Settings › App ›
+  "Classic slideshow", until its 66 e2e flows are ported. Account is now the new page.
+- Remember starts on (as drawn); changing the key of a session kept without Remember starts from off.
+- Content's "Your e621 blacklist" is a Sync button, not the mock's "Use my e621 blacklist" switch: the
+  app already merges e621's list at every sign-in, so a switch would have nothing to turn off.
+- "Your favorites" shows a count only once your favorites have been read (by For You or Artists); e621's
+  /users/me has no favorite count.
+- Slideshow's choices (Transition, Quality, Longest video, Load ahead) open a titled sheet with a Menu;
+  Fit and Transition show only for Classic, as in Quick settings.
+- Not built: "What's new" (no changelog to show yet); the one-time "Install the app" row (batch 4, held
+  for the owner's yes).

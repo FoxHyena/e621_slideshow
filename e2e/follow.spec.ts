@@ -138,7 +138,7 @@ test("signed out, Follow opens sign-in", async ({ page }) => {
   await page.goto("/search?tags=wolf");
   await expect(pill(page, 1150)).toBeVisible();
   await pill(page, 1149).click();
-  await expect(page).toHaveURL(/\/settings/);
+  await expect(page.getByTestId("sheet-sign-in")).toBeVisible();
   expect(mock.followWrites).toEqual([]);
   expect(mock.subscriptionReads).toBe(0);
 });
@@ -170,7 +170,7 @@ test("a share link's borrowed sign-in never reads or writes follows: Follow open
   await page.goto("/search?tags=wolf#u=tester&k=goodkey");
   await expect(pill(page, 1150)).toBeVisible();
   await pill(page, 1149).click();
-  await expect(page).toHaveURL(/\/settings/);
+  await expect(page.getByTestId("sheet-sign-in")).toBeVisible();
   // The link's key was in use (the search went out signed in), yet follows never were.
   expect(mock.searches.some((x) => x.auth)).toBe(true);
   expect(mock.subscriptionReads).toBe(0);

@@ -142,8 +142,7 @@ test("signing out wipes the goo off the bar and off the device", async ({ page }
   await page.getByTestId("tab-settings").click();
   await expect(count(page)).toHaveText("1 favorite");
   await page.getByTestId("settings-account").click();
-  await page.getByRole("button", { name: /^e621 account/ }).click();
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.getByTestId("sign-out").click();
   await page.getByTestId("tab-settings").click();
   await expect(count(page)).toHaveText("0 favorites");
   await expect(bar(page)).not.toHaveAttribute("data-goo", "", { timeout: 4000 });

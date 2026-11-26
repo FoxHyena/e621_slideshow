@@ -59,6 +59,8 @@ export interface FollowsApi {
    */
   followMany(names: string[]): Promise<{ added: string[]; skipped: { name: string; reason: string }[] } | null>;
   setAccount(creds: Credentials | null, user: string | null, remember: boolean, checking?: boolean): void;
+  /** The sign-in sheet closed without a sign-in: a Follow tapped while signed out is dropped. */
+  dropPending(): void;
 }
 
 export const isFollowed = (s: FollowsState, name: string) => s.followed.has(name.toLowerCase());
@@ -320,6 +322,9 @@ export function createFollows(
     ensure,
     setFollowed,
     followMany,
+    dropPending() {
+      pending = null;
+    },
     setAccount(c, user, keep, checking = false) {
       remember = keep;
       if (store.get().checking !== checking) store.set((s) => ({ ...s, checking }));

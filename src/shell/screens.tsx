@@ -15,6 +15,7 @@ export const SECTION_LABEL: Record<SettingsSection, string> = {
   slideshow: "Slideshow",
   "for-you": "For You",
   app: "App",
+  classic: "Classic slideshow",
 };
 
 export function Frame({ title, onBack, children }: { title: string; onBack?: () => void; children?: ReactNode }) {

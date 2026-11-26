@@ -47,6 +47,17 @@ at the top once Phase 7 hands over.
    - The compact bar on a tag that isn't an artist shows a small tag well where the mark would be.
    - The posts well holds its place (blank) while e621's count loads, so the wells don't jump.
 
+10. **Settings' pages and the sign-in sheet (slice 7)** follow the proposed batch 3 and the approved
+   sign-in sheet. My calls:
+   - Remember starts on, as drawn (off when you change the key of a session kept without it).
+   - Content's "Your e621 blacklist" is a **Sync** button, not the mock's switch: your e621 list is
+     already merged at every sign-in, so a switch would have nothing to turn off.
+   - "Your favorites" shows a count only once your favorites have been read; otherwise "On e621".
+   - Slideshow: "Reset to defaults" at the bottom; Fit and Transition only for Classic, as in Quick
+     settings. App: the shortcut list and the userscript note are my words.
+   - **Built without a mock:** Settings › App › "Classic slideshow" opens the old one-page app (now at
+     `/settings/classic`) until its flows are ported.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -66,6 +77,9 @@ at the top once Phase 7 hands over.
 6. **"you faved" on the artist page shows only once your favorites have been read** (by For You or Artists ›
    Suggested). A cold visit to `/artist/x` doesn't read your favorites just for that number. Default: keep
    it that way (reading can take a minute on a big account).
+7. **Delete the classic one-page app** once its 66 e2e flows are ported to the new screens. Default:
+   keep it behind Settings › App › Classic slideshow until then.
+8. **"What's new"** in Settings › App isn't built (no changelog yet). Default: leave it out.
 ## Needs you (things I held)
 
 1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested

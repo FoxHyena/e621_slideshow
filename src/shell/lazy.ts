@@ -15,6 +15,8 @@ const player = () => import("@/player/Player");
 const settingsHome = () => import("@/screens/SettingsHome");
 const artists = () => import("@/screens/ArtistsScreen");
 const artistPage = () => import("@/screens/ArtistPage");
+const settingsPages = () => import("@/screens/SettingsPages");
+const signIn = () => import("@/screens/SignIn");
 const filterSheets = () => import("@/feed/FilterSheets");
 /** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
 export const motionFx = () => import("@/feed/motionFx");
@@ -30,6 +32,8 @@ export const SearchScreen = lazy(() => searchScreen().then((m) => ({ default: m.
 export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYouScreen })));
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));
 export const ArtistsScreen = lazy(() => artists().then((m) => ({ default: m.ArtistsScreen })));
+export const SettingsPage = lazy(() => settingsPages().then((m) => ({ default: m.SettingsPage })));
+export const SignInSheet = lazy(() => signIn().then((m) => ({ default: m.SignInSheet })));
 export const SettingsHome = lazy(() => settingsHome().then((m) => ({ default: m.SettingsHome })));
 export const PlaceholderScreen = lazy(() => shellScreens().then((m) => ({ default: m.PlaceholderScreen })));
 export const NotFoundScreen = lazy(() => shellScreens().then((m) => ({ default: m.NotFoundScreen })));
@@ -38,7 +42,7 @@ export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, artistPage, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, artistPage, settingsPages, signIn, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

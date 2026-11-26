@@ -50,7 +50,7 @@ test("a pasted /artist/x signed out: the hero, its stats, the posts; Follow asks
   await expect(page.getByTestId("play-fab")).toBeVisible();
   await shot(page, "artist-page-signed-out");
   await follow(page).click();
-  await expect(page).toHaveURL(/\/settings/);
+  await expect(page.getByTestId("sheet-sign-in")).toBeVisible();
   expect(mock.followWrites).toEqual([]);
 });
 

@@ -20,7 +20,8 @@ import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
+import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
@@ -30,8 +31,9 @@ const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.scr
  * It's one screen however many entries show it, kept mounted outside <Activity>: hiding there would
  * run its effect cleanups, which dispose a running show for good.
  */
-const isAccount = (e: Entry) => e.route.screen.kind === "settings" && e.route.screen.section === "account";
-const ACCOUNT_ID = "account";
+/** The old app (`/settings/classic`) while its flows are ported: kept mounted once opened. */
+const isAccount = (e: Entry) => e.route.screen.kind === "settings" && e.route.screen.section === "classic";
+const ACCOUNT_ID = "classic";
 
 /** The entry whose screen is on show (under any player or sheet). */
 const baseOf = (s: NavState): Entry => s.stack[baseIndex(s.stack, s.index)];
@@ -225,10 +227,10 @@ export default function Shell() {
           ref={ref}
           data-id={ACCOUNT_ID}
           className="screen screen-legacy"
-          data-screen="account"
+          data-screen="classic"
           hidden={!onAccount}
           tabIndex={-1}
-          aria-label="Account"
+          aria-label="Classic slideshow"
         >
           <LegacyHome active={onAccount} immersive={barHidden} onImmersive={setImmersive} />
         </section>
@@ -262,6 +264,11 @@ export default function Shell() {
           </section>
         </Activity>
       ))}
+      {overlay?.sheet === SIGN_IN_SHEET && (
+        <Suspense fallback={null}>
+          <SignInSheet />
+        </Suspense>
+      )}
       {overlay?.route.play != null && (
         <Suspense fallback={null}>
           <Player key={cur.key} base={cur} top={overlay} />
@@ -288,6 +295,9 @@ function PushedScreen({ e }: { e: Entry }) {
       return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
     case "tune":
       return <TuneScreen />;
+    case "settings":
+      if (screen.section && screen.section !== "classic") return <SettingsPage section={screen.section} />;
+      return null;
     default:
       return <PlaceholderScreen screen={screen} onBack={() => void nav.back()} onSection={() => {}} />;
   }

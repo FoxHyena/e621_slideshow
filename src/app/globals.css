@@ -4805,3 +4805,234 @@ li[data-state="done"] .first-step-n svg,
     transition: none;
   }
 }
+
+/* The sign-in sheet (DESIGN.md "Sign-in sheet"). */
+.signin {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+.signin-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.signin-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 28px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.signin-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.signin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.signin-link svg {
+  width: 16px;
+  height: 16px;
+}
+.signin-label {
+  margin: 8px 0 6px 16px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+.signin-key input {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+.signin-paste.btn-tonal {
+  flex: none;
+  height: 32px;
+  padding: 0 14px;
+  margin-right: -6px;
+  font-size: var(--text-footnote);
+}
+.signin-hint,
+.signin-error {
+  margin: 8px 16px 0;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-danger);
+}
+.signin-hint {
+  color: var(--color-muted);
+}
+.signin-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 16px 4px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.signin-note svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--color-score);
+}
+.signin-remember {
+  padding-inline: 0 4px;
+}
+.signin-go {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Settings' sub-pages (DESIGN.md "Settings: Account, Content, For You, App"). */
+.settings-page .screen-title {
+  margin-bottom: 16px;
+}
+.group-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: -8px 16px 16px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.group-note svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--color-danger);
+}
+.settings-wide {
+  width: 100%;
+  margin-top: 8px;
+}
+.rating-letter {
+  font-family: var(--font-rounded);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.rating-letter[data-rating="s"] {
+  color: var(--color-score);
+}
+.rating-letter[data-rating="q"] {
+  color: var(--color-rating-q);
+}
+.rating-letter[data-rating="e"] {
+  color: var(--color-danger);
+}
+.bl-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.bl-add .field6 {
+  flex: 1;
+  min-width: 0;
+}
+.bl-add .btn-tonal {
+  flex: none;
+  padding: 0 18px;
+}
+.bl-line {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--color-tag-general);
+  overflow-wrap: anywhere;
+}
+.bl-sep,
+.bl-neg {
+  color: var(--color-muted);
+}
+.bl-remove {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+}
+.bl-remove::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+.bl-remove svg {
+  width: 16px;
+  height: 16px;
+}
+.hidden-row {
+  min-height: 60px;
+}
+.hidden-who {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.settings-reset {
+  display: block;
+  margin: 0 auto;
+}
+.keys {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+.keys-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  font-size: var(--text-callout);
+}
+.keys-row dd {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+}
+.keys kbd {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
+}

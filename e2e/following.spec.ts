@@ -67,8 +67,7 @@ test("signed out, Following says what it's for, and shows what's popular", async
   expect(mock.searches[0].tags).toContain("order:rank");
   await shot(page, "following-signed-out");
   await page.getByTestId("following-sign-in").click();
-  await expect(page).toHaveURL(/\/settings\/account$/);
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(page.getByTestId("sheet-sign-in")).toBeVisible();
 });
 
 test("following nobody and no favorites: the first run sends you to Search, over what's popular", async ({ page }) => {

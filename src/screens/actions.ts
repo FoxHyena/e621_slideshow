@@ -8,7 +8,7 @@ import type { Post } from "@/lib/e621/types";
 import { encodeResults, normTags, type Filters } from "@/lib/feed/filters";
 import type { SearchSettings } from "@/lib/settings";
 import { getNav } from "@/nav/history";
-import type { Route } from "@/nav/routes";
+import { SIGN_IN_SHEET, type Route } from "@/nav/routes";
 import { getPrefs } from "@/state/prefs";
 
 /**
@@ -23,12 +23,9 @@ export function resultsRoute(tags: string, filters: Filters = defaultFilters()):
   return { screen: { kind: "results", params: encodeResults({ tags: normTags(tags), filters, link: null }) }, play: null };
 }
 
-/**
- * Where you sign in: Settings › Account. Until slice 7 that's the legacy panel, which moved there
- * from the Following tab in slice 3.
- */
+/** Sign in, over whatever asked; what asked carries on once you are in. */
 export function openSignIn(): void {
-  getNav().push({ screen: { kind: "settings", section: "account" }, play: null }, { from: "settings" });
+  getNav().openSheet(SIGN_IN_SHEET);
 }
 
 /** Open Results for a search, and remember it as a recent search. */

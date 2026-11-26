@@ -2,11 +2,19 @@
  * URLs ⇄ routes (UX.md §2). Pure: no window access, so every rule here is unit-tested.
  */
 
+/** The sign-in sheet's name (nav.openSheet): the shell shows it over any screen. */
+export const SIGN_IN_SHEET = "sign-in";
+
 export type Tab = "following" | "for-you" | "artists" | "settings";
 export const TABS: Tab[] = ["following", "for-you", "artists", "settings"];
 
 export const SETTINGS_SECTIONS = ["account", "content", "slideshow", "for-you", "app"] as const;
-export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
+/**
+ * `classic`: the old settings-panel app, kept at `/settings/classic` (no row leads there) while its
+ * e2e flows are ported; the Settings list is SETTINGS_SECTIONS.
+ */
+export type SettingsSection = (typeof SETTINGS_SECTIONS)[number] | "classic";
+const ALL_SECTIONS: readonly string[] = [...SETTINGS_SECTIONS, "classic"];
 
 export type Screen =
   | { kind: "tab"; tab: Exclude<Tab, "settings"> }
@@ -51,7 +59,7 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
     case "settings": {
       if (parts.length === 1) return { kind: "settings", section: null };
       const section = parts[1] as SettingsSection;
-      return parts.length === 2 && SETTINGS_SECTIONS.includes(section) ? { kind: "settings", section } : notFound(path);
+      return parts.length === 2 && ALL_SECTIONS.includes(section) ? { kind: "settings", section } : notFound(path);
     }
     case "search":
       if (parts.length !== 1) return notFound(path);

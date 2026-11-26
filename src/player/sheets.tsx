@@ -15,7 +15,7 @@ import { postPageUrl } from "@/lib/e621/client";
 import { TAG_CATEGORY_COLORS, type Post, type Rating, type TagCategoryName } from "@/lib/e621/types";
 import { decodeResults } from "@/lib/feed/filters";
 import { ago, artists, compact } from "@/lib/feed/format";
-import { type PlaybackSettings, type SlideStyle } from "@/lib/settings";
+import type { PlaybackSettings } from "@/lib/settings";
 import { getNav, type Entry } from "@/nav/history";
 import { blacklistLine, openArtist, openResults } from "@/screens/actions";
 import { Sheet, SheetClose } from "@/shell/Sheet";
@@ -23,16 +23,9 @@ import { getPrefs } from "@/state/prefs";
 import { getRec, weightsOf } from "@/state/rec";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
+import { StyleRow } from "./styles";
 import { setVisitPlayback, visitTarget, type VisitTarget } from "./visit";
 
-/** The styles, in Settings' order, with the short names the previews carry. */
-const STYLES: { value: SlideStyle; label: string }[] = [
-  { value: "classic", label: "Classic" },
-  { value: "kenburns", label: "Ken Burns" },
-  { value: "collage", label: "Collage" },
-  { value: "prints", label: "Prints" },
-  { value: "reflections", label: "Reflections" },
-];
 const FITS: { value: PlaybackSettings["fit"]; label: string }[] = [
   { value: "contain", label: "Fit" },
   { value: "cover", label: "Fill" },
@@ -61,17 +54,6 @@ function usePlaybackSetter(base: Entry) {
   return { set, fromLink, target };
 }
 
-/** A tiny picture of what each style does, drawn in CSS (no posts in it). */
-function StylePreview({ style }: { style: SlideStyle }) {
-  return (
-    <i className="style-pic" data-style={style} aria-hidden>
-      <u />
-      {(style === "collage" || style === "reflections") && <u />}
-      {style === "collage" && <u />}
-    </i>
-  );
-}
-
 /** Style, speed, fit, mute and quality, straight on the sheet. */
 export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
   const { set, fromLink, target } = usePlaybackSetter(base);
@@ -89,36 +71,7 @@ export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: 
           testId="quick-target"
         />
       )}
-      <div
-        className="style-row"
-        role="radiogroup"
-        aria-label="Style"
-        data-testid="quick-style"
-        onKeyDown={(e) => {
-          const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-          if (!d) return;
-          e.preventDefault();
-          const i = Math.max(0, STYLES.findIndex((s) => s.value === p.style));
-          const n = (i + d + STYLES.length) % STYLES.length;
-          set({ style: STYLES[n].value });
-          e.currentTarget.querySelectorAll<HTMLButtonElement>(".style-pick")[n]?.focus();
-        }}
-      >
-        {STYLES.map((s) => (
-          <button
-            key={s.value}
-            type="button"
-            role="radio"
-            aria-checked={p.style === s.value}
-            tabIndex={p.style === s.value ? 0 : -1}
-            className="style-pick"
-            onClick={() => set({ style: s.value })}
-          >
-            <StylePreview style={s.value} />
-            {s.label}
-          </button>
-        ))}
-      </div>
+      <StyleRow value={p.style} onChange={(style) => set({ style })} testId="quick-style" />
       <div className="sheet-rows">
         <div className="list-row">
           <span className="row-text">

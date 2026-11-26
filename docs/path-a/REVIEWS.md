@@ -657,3 +657,42 @@ Visual check at 375×812: hero, compact bar, ⋯, a species tag, no such artist.
 **Budgets** (production build, mock e621): JS cold load of `/following` **196.1 KB** (≤ 200; slice 5
 197.1); 281.3 KB with the idle prefetch; CLS 0.0000; 0 long tasks at 4× CPU. The artist page is its own chunk.
 
+
+## Slice 7 review: Settings' pages and the sign-in sheet
+
+**Code review (high), 6 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A sign-in that answered after the sheet was closed still ran Back, leaving the screen under it | High | Back only while the sign-in sheet is still the current entry |
+| 2 | Closing the sheet kept a signed-out Follow armed for 5 min; a later sign-in followed by surprise | High | A real close drops it (StrictMode's practice unmount doesn't); e2e covers it, checked against a mutant |
+| 3 | "Change" API key started with Remember on even for a session kept without it | Low | Starts from the session's Remember |
+| 4 | On a shared link the sheet prefilled the sharer's username | Low | No prefill from a link's sign-in |
+| 5 | A blacklist line twice: duplicate keys, one Remove took both | Low | Shown once |
+| 6 | Stale doc comment on openSignIn | Low | Removed |
+
+**Fresh reviewer, 10 findings** (1–3 are #2, #1 and #4 above)
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 4 | Signing in as another account through "Change" left the first account's caches on the device | Med | The account before is purged, as on a sign-out |
+| 5 | Sign-out leaves `hiddenArtists:<user>` | Low | **No change**: kept on the device like Tune's pins (MORNING Decide 5) |
+| 6 | A hand-edited `choose:constructor` sheet name could throw | Low | Own-key check |
+| 7 | Sync said "Synced 0 lines" when you signed out during it | Low | `importBlacklist` returns null then; no toast |
+| 8 | A clipboard error marked the key field invalid; focus started on the external link | Low | The clipboard note is its own status line; focus starts on the first empty field |
+| 9 | Two quick rating taps could overwrite each other | Low | Built from the store, not the render |
+| 10 | Tests: no dismiss-then-sign-in case; Escape not asserted | Low | Both added |
+
+Also found while testing: "1 follows" → "1 follow".
+
+**Gates:** typecheck, lint clean; unit 304 pass. New e2e: e2e/settings.spec.ts (9: the sheet's flow with a
+wrong then a right key and no Remember; the username draft; a signed-out Follow followed once you're in;
+a backed-out Follow not followed; Account; Content; Slideshow; For You; App). Specs that reached the old
+panel for sign-in or sign-out now use the sheet or the new Account page; the old panel is at
+`/settings/classic`. Full e2e: 199 passed, 2 failed (both still walked the old panel; fixed), 2 skipped;
+the affected specs after the fixes: 66 passed. Visual check at 375×812: the sheet, Account, Content,
+Slideshow, the shortcuts sheet.
+
+**Budgets** (production build, mock e621): JS cold load of `/following` **197.2 KB** (≤ 200; slice 6
+196.1); 297.3 KB with the idle prefetch; CLS 0.0000; budgets test passes. The Settings pages and the sheet
+are their own chunks.

@@ -767,7 +767,7 @@ export default function App({
   };
   const importBlacklist = async () => {
     if (creds) {
-      const n = await session.importBlacklist();
+      const n = (await session.importBlacklist()) ?? 0;
       return `Synced ${n} rule${n === 1 ? "" : "s"} from your account.`;
     }
     const count = (t: string) => t.split("\n").filter((l) => l.trim()).length;

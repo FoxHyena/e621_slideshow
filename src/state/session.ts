@@ -34,8 +34,8 @@ export interface SessionApi {
   signIn(c: Credentials, remember: boolean): Promise<void>;
   signOut(): void;
   setShareSignIn(on: boolean): void;
-  /** Re-read the account's blacklist; returns its rule count. */
-  importBlacklist(): Promise<number>;
+  /** Re-read the account's blacklist; returns its rule count (null: signed out or switched meanwhile). */
+  importBlacklist(): Promise<number | null>;
 }
 
 export function createSession(linkFragment: string | null, prefs: PrefsApi = getPrefs()): SessionApi {
@@ -92,6 +92,10 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
     async signIn(c, remember) {
       const u = await getCurrentUser(c);
       if (u.id === null) throw new Error("e621 didn't accept that username and API key");
+      // Another account through "Change": the one before leaves nothing behind, as on a sign-out.
+      const before = store.get();
+      const prev = before.link ? null : (before.user?.name ?? before.creds?.username ?? null);
+      if (prev && prev.toLowerCase() !== u.name.toLowerCase()) storage.purgeAccount(prev);
       prefs.endVisit();
       store.set((s) => ({ ...s, creds: c, user: u, remember, link: false, ready: true }));
       verified = true;
@@ -124,9 +128,9 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
     },
     async importBlacklist() {
       const { creds } = store.get();
-      if (!creds) return 0;
+      if (!creds) return null;
       const u = await getCurrentUser(creds);
-      if (store.get().creds !== creds) return 0;
+      if (store.get().creds !== creds) return null;
       return adopt(u);
     },
   };

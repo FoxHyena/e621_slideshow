@@ -34,7 +34,8 @@ test.beforeEach(async ({ page }) => {
 test("every route serves the shell and opens its screen", async ({ page }) => {
   const cases: [string, string | null][] = [
     ["/following", "Following"],
-    ["/settings/account", null],
+    ["/settings/classic", null],
+    ["/settings/account", "Account"],
     ["/for-you", "For You"],
     ["/for-you/tune", "Tune"],
     ["/artists", "Artists"],
@@ -170,7 +171,7 @@ test("a share link's sign-in fragment is gone before the app starts, and is kept
 });
 
 test("Esc goes back on every screen, even after the legacy home has mounted", async ({ page }) => {
-  await page.goto("/settings/account");
+  await page.goto("/settings/classic");
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
   await tab(page, "Settings").click();
   await page.getByRole("link", { name: "Content" }).click();
@@ -200,13 +201,13 @@ test("an old profile keeps its settings and is stamped with the schema version",
     localStorage.setItem("e6ss:seeded", "1");
     localStorage.setItem("e6ss:v1:search", JSON.stringify({ tags: "old_profile_tag" }));
   });
-  await page.goto("/settings/account");
+  await page.goto("/settings/classic");
   await expect(page.getByTestId("search-input")).toHaveValue(/old_profile_tag/);
   expect(await page.evaluate(() => localStorage.getItem("e6ss:schema"))).toBe("1");
 });
 
 test("the tab bar steps aside while the show plays", async ({ page }) => {
-  await page.goto("/settings/account");
+  await page.goto("/settings/classic");
   const bar = page.getByRole("navigation", { name: "Tabs" });
   await expect(bar).toBeVisible();
   await page.getByTestId("play-button").click();
@@ -224,7 +225,7 @@ test("a pasted Settings page goes back to Settings, then home", async ({ page })
 });
 
 test("the legacy show keeps its place across a tab round-trip", async ({ page }) => {
-  await page.goto("/settings/account");
+  await page.goto("/settings/classic");
   await page.getByTestId("play-button").click();
   const slide = page.locator("[data-testid=slide-image],[data-testid=slide-video]");
   await expect(slide).toBeVisible();
@@ -235,7 +236,8 @@ test("the legacy show keeps its place across a tab round-trip", async ({ page })
   await tab(page, "Artists").click();
   await expect(heading(page, "Artists")).toBeVisible();
   await tab(page, "Settings").click();
-  await page.getByTestId("settings-account").click();
+  await page.getByRole("link", { name: "App" }).click();
+  await page.getByTestId("app-classic").click();
   await expect(page.getByTestId("play-button")).toHaveText(/Resume/);
   await page.getByTestId("play-button").click();
   await expect(slide).toHaveAttribute("data-post-id", id!);
