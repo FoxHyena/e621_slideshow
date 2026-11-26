@@ -836,6 +836,77 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .hgrid6 .bar { width: 34px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.2); margin: 4px 0; }
 .hdock6 { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 92px; border-radius: 34px; background: rgba(255,255,255,.13); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
 .hdock6 .ph { width: 60px; height: 60px; border-radius: 22.5%; background: rgba(255,255,255,.16); }
+
+/* ---------- Desktop, 900 px and wider (proposed) ---------- */
+.dframes6 { display: flex; flex-direction: column; gap: 48px; }
+.dfig6 { margin: 0; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.dfig6 figcaption p { color: var(--dim); font-size: 14px; margin: 2px 0 0; max-width: 70ch; }
+.desk-holder { width: 100%; }
+.desk6 { position: relative; width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px #3A3A3F; background: var(--ground); }
+
+/* the sidebar: the tab bar stood on its side. A floating panel, 8 from the window, with the same sliding capsule. */
+.side6 { position: absolute; z-index: 4; top: 8px; left: 8px; bottom: 8px; width: 232px; border-radius: var(--r-panel); background: linear-gradient(var(--panel-a), var(--panel-b) 220px); box-shadow: var(--lit), var(--lit-b); padding: 12px; display: flex; flex-direction: column; }
+.sbrand6 { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 4px; font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); }
+.stabs6 { position: relative; display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.sind6 { position: absolute; left: 0; right: 0; top: 0; height: var(--h); border-radius: 999px; background: var(--raised-hi-a); box-shadow: var(--lit); transform: translateY(calc(var(--k, 0) * 48px)); transition: transform .5s cubic-bezier(.3,1.35,.5,1); }
+.stab6 { position: relative; height: var(--h); display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 999px; color: var(--link); font: var(--w-s) 15px/20px var(--f-r); text-align: left; transition: color .2s ease-out; }
+.stab6.on { color: var(--gold); } .stab6.on .ic { stroke-width: 2.4; }
+.stab6 .badge { margin-left: auto; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: var(--w-v) 13px/20px var(--f-r); text-align: center; font-variant-numeric: tabular-nums; transition: transform .2s ease-out, opacity .2s ease-out; }
+.stab6.on .badge { transform: scale(0); opacity: 0; }
+.stab6:not(.on):hover, .stab6.hov, .sacct6:hover, .srow6.hov { background: rgba(255,255,255,.04); }
+.ssearch6 { margin-top: 12px; flex: none; padding-right: 8px; }
+.ssearch6 > span:first-of-type { flex: 1; }
+.sacct6 { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: var(--r-art); text-align: left; }
+.sacct6 b { display: block; font: var(--t-head); line-height: 20px; } .sacct6 small { font: var(--t-foot); color: var(--muted); }
+/* 900 to 1099: the same panel, icons only */
+.side6.rail { width: 68px; align-items: center; }
+.side6.rail .sbrand6 { padding: 0; } .side6.rail .sbrand6 > span:last-child, .side6.rail .stab6 > span, .side6.rail .ssearch6 > span { display: none; }
+.side6.rail .stabs6 { width: var(--h); } .side6.rail .stab6 { width: var(--h); padding: 0; justify-content: center; }
+.side6.rail .stab6 .badge { display: block; position: absolute; top: -2px; right: -4px; height: 16px; min-width: 16px; padding: 0 4px; font: var(--t-tab); line-height: 16px; box-shadow: 0 0 0 2px var(--panel-a); }
+.side6.rail .ssearch6 { width: var(--h); padding: 0; justify-content: center; flex: none; }
+.side6.rail .sacct6 { padding: 0; } .side6.rail .sacct6 > span:last-child { display: none; }
+.side6.still { position: relative; inset: auto; height: 420px; }
+@media (prefers-reduced-motion: reduce) { .sind6, .stab6, .stab6 .badge { transition: none; } }
+
+/* the content: a 600 column for feeds and lists, the full width for a grid */
+.dmain6 { position: absolute; inset: 0 0 0 248px; overflow: hidden; }
+.dcol6 { width: 600px; margin: 0 auto; padding-top: 18px; --inset: 0px; }
+.dmain6.wide { padding: 18px 24px 0; --inset: 0px; }
+.dmain6.wide .grid6 { grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); padding-bottom: 104px; }
+.dmain6 > .fab6 { left: 24px; bottom: 24px; }
+.dcol6 .group6.flat .srow6.acct { min-height: 72px; }
+.dcol6 .shead6 { margin: 8px 0 12px; padding: 0 16px; }
+
+/* a popover is the sheet, floating: no handle, no close button. A dialog is the sheet, centred, with the dim. */
+.sheet6.pop6 { position: absolute; z-index: 9; width: 300px; border-radius: 24px; padding: 16px; box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); }
+.sheet6.pop6 .grab, .sheet6.pop6 .x6 { display: none; }
+.sheet6.pop6 .shtop { margin-bottom: 4px; } .sheet6.pop6 .ctx { padding-top: 0; }
+.sheet6.pop6.still { position: relative; margin: 0 auto; }
+.sheet6.dlg6 { position: absolute; z-index: 21; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 420px; border-radius: 24px; padding: 16px; box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); }
+.sheet6.dlg6 .grab { display: none; }
+
+/* the player: the picture keeps the window, Post info stands beside it */
+.dplayer6 { background: #000; color: #fff; }
+.dplayer6 .stage { position: absolute; inset: 0 376px 0 0; display: grid; place-items: center; }
+.dplayer6 .stage i { display: block; height: 100%; aspect-ratio: 3 / 4; background: var(--art); }
+.dplayer6 .ts { position: absolute; inset: 0 376px auto 0; height: 110px; background: linear-gradient(rgba(0,0,0,.6), transparent); }
+.dplayer6 .bs { position: absolute; inset: auto 376px 0 0; height: 220px; background: linear-gradient(transparent, rgba(0,0,0,.78) 66%); }
+.dptop6 { position: absolute; z-index: 3; top: 16px; left: 16px; right: 392px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dptop6 .r { display: flex; align-items: center; gap: 12px; }
+.dpbot6 { position: absolute; z-index: 3; left: 24px; right: 400px; bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
+.dpctl6 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+.dpctl6 .acts { display: flex; gap: 12px; justify-content: flex-end; }
+.dpctl6 .pplay6 { width: 56px; height: 56px; }
+.gl6.ring { box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 0 2px var(--gold); }
+.ipanel6.sheet6 { position: absolute; z-index: 4; top: 8px; right: 8px; bottom: 8px; width: 360px; border-radius: 24px; padding: 16px; overflow: hidden; color: var(--text); }
+.ipanel6 .grab { display: none; }
+
+/* pointer hover: a raised control steps up one material */
+.btn6.hov:not(.gold) { background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); }
+.hovs6 { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.hovs6 .pairs { display: flex; gap: 12px; align-items: center; }
+.hovs6 .pairs > small { font: var(--t-foot); color: var(--muted); width: 56px; flex: none; }
+.hovs6 .group6 { margin: 0; flex: 1; }
 </style>
 
 <div class="wrap" id="root">
@@ -1086,6 +1157,35 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   </section>
 
 
+  <section id="desk" aria-label="Desktop">
+    <h2 class="pg-h2" style="margin-top:40px">On a computer (900 px and wider)</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The same screens with the tab bar stood on its side. Nothing new was made: the sidebar is the app's panel with the tab bar's sliding capsule, a popover and a dialog are the phone's sheet, and Post info is that sheet standing beside the picture. Each frame is a 1280 by 800 window, shrunk to fit this page. The sidebar's tabs slide.</p>
+    <div class="dframes6">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">1. Following</h2><p>The sidebar holds the app mark, the four tabs, Search and your account. The feed is a 600 column in the middle of what is left. Play stands beside the column, so it never covers a picture.</p></figcaption><div class="desk-holder" id="d-feed"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">2. Grid, with a chip's popover</h2><p>The grid takes the full width, as many 176 tiles as fit. A chip's sheet opens as a popover under the chip: the same panel, with no handle and no close button.</p></figcaption><div class="desk-holder" id="d-grid"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">3. The player, with Post info</h2><p>The sidebar leaves. Post info is a panel at the right and the picture moves over to make room, so nothing covers it. The controls are one row.</p></figcaption><div class="desk-holder" id="d-player"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">4. Settings</h2><p>All the sub-pages on one page in the 600 column, each under its name. Sign out sits on the account row.</p></figcaption><div class="desk-holder" id="d-settings"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">5. A dialog</h2><p>A titled sheet (shortcuts, Quick settings, sign-in, install steps) opens in the middle of the window, 420 wide, over the dim.</p></figcaption><div class="desk-holder" id="d-dialog"></div></figure>
+    </div>
+    <div class="cols" style="margin-top:48px" id="u-desk-cols"><section class="col" style="width:375px"><div class="under" id="u-desk"></div></section></div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The sidebar</th><td>Left sidebar: logo, 4 tabs, Search, account at the bottom</td><td>A floating panel, 232 wide, 8 from the window. Rows 44 tall with icon and name; the current tab wears the tab bar's raised capsule, which slides. From 900 to 1099 it shows icons only (68 wide).</td><td>It is the tab bar stood on its side, so the two feel like one part. Other option: icons only at every width (the builder's interim rail).</td></tr>
+        <tr><th>Search</th><td>Search in the sidebar; "/" opens it</td><td>A sunk field in the sidebar showing the "/" key. The header's search button is left out on a computer.</td><td>One way in is enough when it is always on screen.</td></tr>
+        <tr><th>Play</th><td>(not said)</td><td>The same gold disc, at the bottom left of the content, 24 from the sidebar and the bottom. Beside the column on a feed; over the tiles on a grid, as on the phone.</td><td>It keeps its shape and its corner. Other option: a gold "Play 12 new" button in the sidebar.</td></tr>
+        <tr><th>Popover or dialog</th><td>Sheets are popovers or centered dialogs</td><td>A sheet opened from a thing on screen (a chip, ⋯, a tile, a tag) is a popover at that thing, 300 wide, no dim. A titled sheet with a job of its own (Quick settings, shortcuts, sign-in, install) is a 420 dialog with the dim.</td><td>One rule decides it, so nobody has to choose each time.</td></tr>
+        <tr><th>The grid tile's menu</th><td>(not said)</td><td>Right-click, or the keyboard's menu key. No ⋯ appears on hover.</td><td>Nothing sits on top of art, on a computer too.</td></tr>
+        <tr><th>The player</th><td>Info is a right panel</td><td>A 360 panel, 8 from the window; the picture is centred in the rest. The four buttons move to the right end of one control row; a full-screen button joins the count at the top.</td><td>A wide window has the room, and one row keeps the controls off the middle of the picture.</td></tr>
+        <tr><th>Tall pictures</th><td>(not said)</td><td>In the feed a picture is never taller than the window less 160, shown whole on the well.</td><td>The phone's cap (1:2) would make a picture taller than the window here.</td></tr>
+        <tr><th>Hover</th><td>(not said)</td><td>Rows get the 4% white wash they already use when pressed. Raised controls step up to Raised Highlight. Gold and art do not change.</td><td>Two rules cover every control.</td></tr>
+        <tr><th>Goo</th><td>(not said)</td><td>Not designed. The sidebar is drawn clean.</td><td>The goo lies along the phone's bent bar. Where it goes on a straight sidebar, and how the secret tab is found, is yours to pick. My suggestion is in the morning list.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+
 
   <section id="new" aria-label="Menus and sheets">
     <h2 class="pg-h2" style="margin-top:40px">Filter menus, player sheets and tag targets</h2>
@@ -1175,7 +1275,8 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>Desktop layouts.</li>
+    <li>The goo and the secret tab on a computer (a question for the owner).</li>
+    <li>Search, Artists and the artist page on a computer. They follow the rules above: the 600 column, and the full width for a grid.</li>
   </ul>
 </div>
 
@@ -2117,6 +2218,67 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     strip('One colour', 'For Android\'s themed icons: the same mark in one colour on a clear ground. The phone picks the colours.',
       `<div class="strip p6 row"><div>${appIcon(72, 'mono', { mono: true })}<span>Monochrome</span></div></div>`),
   ].join('');
+
+  /* ================= Desktop, 900 px and wider (proposed) ================= */
+  Object.assign(P, { full: '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>' });
+  const desk = (inner, cls = '') => `<div class="desk6 p6 ${cls}">${inner}</div>`;
+  const side = (active, cls = '', n = 12) => `<nav class="side6 ${cls}" aria-label="Tabs"><div class="sbrand6">${mark('')}<span>Slideshow</span></div>
+    <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
+    <button type="button" class="field6 ssearch6" aria-label="Search">${ic('search', 18, 2.2)}<span>Search</span><span class="kbd6">/</span></button>
+    <button type="button" class="sacct6" aria-label="Account: wolfie">${avatar('wolfie')}<span><b>wolfie</b><small>42 follows</small></span></button></nav>`;
+  const dtools = `<div class="tools6"><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const dhead = () => head().replace(tools(), dtools);
+  const PD = { ...P1, ar: '3/2' };
+  const feedMain = `<div class="dmain6"><div class="dcol6">${dhead()}${post(PD)}${post(P2)}</div>${fab(12)}</div>`;
+
+  // 1. Following: the sidebar, the 600 column, Play beside it
+  $('d-feed').innerHTML = desk(side('Following') + feedMain);
+
+  // 2. Grid: the full width; a chip's sheet becomes a popover under the chip
+  $('d-grid').innerHTML = desk(side('Following', '', 5) + `<div class="dmain6 wide">${dhead().replace('<b>12 new</b> from 5 artists', '<b>5 new</b> from 2 artists')}
+    <div class="grid6">${tiles('mossy otter', 5, 0, 5)}<div class="gridrule6">${caught()}</div>${tiles('dune jackal', 15, 5, 0)}</div>${fab(5)}
+    <div class="sheet6 pop6" role="dialog" aria-label="Media" style="left:24px;top:162px"><div class="shtop"><b>Media</b></div><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div></div>`);
+
+  // 3. The player: Post info is a panel beside the picture, not a sheet over it
+  const sinfo = $('s-info').querySelector('.sheet6').innerHTML;
+  $('d-player').innerHTML = desk(`<div class="stage"><i style="--art:${art('mossy otter', 1)}"></i></div><div class="ts"></div><div class="bs"></div>
+    <div class="dptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="r"><span class="pcount6">12 / 300+</span><button class="gl6" type="button" aria-label="Full screen">${ic('full', 20, 2.2)}</button></span></div>
+    <div class="dpbot6"><div class="pbar6"><i></i><span>4 s</span></div>
+      <div class="dpctl6"><div class="pwho6">${avatar('mossy otter')}<div class="idn"><b>mossy otter</b><small>3h ago · #4512290</small></div></div>
+        <div class="ptrans6"><button class="gl6" type="button" aria-label="Previous">${ic('prev', 20, 2.2, 'solid')}</button><button class="pplay6 lip6" type="button" aria-label="Play" data-playing="0">${ic('play', 26, 0, 'solid')}</button><button class="gl6" type="button" aria-label="Next">${ic('next', 20, 2.2, 'solid')}</button></div>
+        <div class="acts"><button class="gl6 pfav" type="button" aria-pressed="false" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6 ring" type="button" aria-pressed="true" aria-label="Post info">${ic('info', 22, 2.2)}</button><button class="gl6" type="button" aria-label="Slideshow settings">${ic('sliders', 20, 2.2)}</button><button class="gl6" type="button" aria-label="Share">${ic('share', 20, 2.2)}</button></div></div></div>
+    <aside class="sheet6 ipanel6" aria-label="Post info" data-targets="foryou">${sinfo}</aside>`, 'dplayer6');
+
+  // 4. Settings: every sub-page on one page, in the 600 column
+  $('d-settings').innerHTML = desk(side('Settings') + `<div class="dmain6"><div class="dcol6">
+    <div class="head6"><div class="titlerow"><h3 class="title6">Settings</h3></div></div>
+    <div class="shead6" style="margin-top:16px"><b>Account</b></div>
+    <div class="group6 flat"><div class="srow6 acct">${avatar('wolfie', 'l')}<span class="lbl"><b>wolfie</b><small>Signed in to e621 · 42 follows</small></span><button class="btn6 lip6" type="button">${ic('out', 16, 2.4)}Sign out</button></div></div>
+    <div class="group6">${srow('heart', 'Your favorites', '1,284 posts', '', 'pink')}${swr('link', 'Sign-in links', 'Links can sign in as you', false)}${srow('key', 'API key', 'Saved on this device', 'Change')}</div>
+    <div class="shead6"><b>Content</b></div>
+    ${glab('Ratings')}
+    <div class="group6">${swr('S', 'Safe', '', true, 'letter s')}${swr('Q', 'Questionable', '', true, 'letter q')}${swr('E', 'Explicit', '', false, 'letter e')}</div>
+    ${glab('Blacklist', '3 lines')}
+    <div class="addrow6"><div class="field6"><span>Tags to hide</span></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div>
+  </div></div>`);
+
+  // 5. A titled sheet becomes a dialog in the middle of the window
+  $('d-dialog').innerHTML = desk(side('Following') + feedMain + `<div class="dim6"></div>
+    <div class="sheet6 dlg6" role="dialog" aria-label="Keyboard shortcuts">${shtop('Keyboard shortcuts')}<div class="qrows6">${kb1('J K', 'Next and previous post')}${kb1('L', 'Favorite')}${kb1('Enter', 'Play from this post')}${kb1('G', 'Grid view')}${kb1('/', 'Search')}${kb1('Esc', 'Back')}</div></div>`);
+
+  $('u-desk').innerHTML = [
+    strip('A tile\'s menu', 'Right-click a tile (or the menu key). The same rows as the phone\'s hold menu, as a popover at the pointer.', `<div class="strip p6" style="padding:20px 0"><div class="sheet6 pop6 still">${ctx('mossy otter', '#4512290').replace('<div class="grab"></div>', '')}${tileRows(false)}</div></div>`),
+    strip('Narrower windows, 900 to 1099', 'The same panel with icons only. The label shows as a tooltip. Under 900 it is the phone layout.', `<div class="strip p6" style="padding:8px;display:flex;justify-content:center">${side('Following', 'rail still')}</div>`),
+    strip('Under the pointer', 'A row gets a faint wash. A raised button steps up to the lighter navy. Gold and pictures do not change.',
+      `<div class="strip p6 hovs6"><div class="pairs"><small>Rest</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist')}</div></div><div class="pairs"><small>Hover</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist').replace('class="srow6"', 'class="srow6 hov"')}</div></div><div class="pairs"><small>Rest</small><button class="btn6 lip6" type="button">Import</button><small style="margin-left:24px">Hover</small><button class="btn6 lip6 hov" type="button">Import</button></div></div>`),
+  ].join('');
+
+  // the sidebar's capsule slides to the tab you pick
+  document.addEventListener('click', e => { const t = e.target.closest('[data-stab]'); if (!t) return; const box = t.parentElement;
+    [...box.querySelectorAll('.stab6')].forEach((b, k) => { const on = b === t; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); if (on) box.style.setProperty('--k', k); }); });
+  // a desktop frame is 1280 wide; it shrinks to fit the page
+  const dfit = () => document.querySelectorAll('.desk-holder').forEach(h => { const z = Math.min(1, h.clientWidth / 1280), el = h.firstElementChild; h.style.height = (800 * z) + 'px'; if (el) el.style.zoom = z; });
+  dfit(); addEventListener('resize', dfit);
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;

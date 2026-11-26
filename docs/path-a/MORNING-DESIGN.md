@@ -83,6 +83,25 @@ treat that message as your approval of any design. To throw a batch away: `git r
    ("This browser cannot install apps…" with "Copy link").
 7. **Name under the icon:** "Slideshow" ("e621 Slideshow" is cut off on an iPhone).
 
+## Batch 5: on a computer (section "On a computer (900 px and wider)")
+
+1. **The goo on a computer is not designed. Your call.** The goo lies along the phone's bent bar, and
+   the sidebar is straight. My suggestion: it lies along the top edge of the sidebar panel and drips
+   down its face, and the secret tab is one more row under Settings that shows when you scroll the tabs.
+2. **Sidebar:** a floating panel, 232 wide, with names; the current tab wears the tab bar's sliding
+   capsule. Icons only from 900 to 1099. Other option: icons only at every width.
+3. **Play** keeps its gold disc at the bottom left of the content, beside the feed column. Other
+   option: a gold "Play 12 new" button in the sidebar.
+4. **Popover or dialog:** opened from a thing on screen (chip, ⋯, tile, tag) = a popover at that thing;
+   a titled sheet with its own job (Quick settings, shortcuts, sign-in, install) = a dialog in the middle.
+5. **Player:** Post info is a panel at the right and the picture moves over. The controls are one row.
+6. **A grid tile's menu is right-click.** No ⋯ shows on hover, because nothing sits on art.
+7. **Settings is one page**, with Sign out on the account row.
+8. **Added:** tall pictures in the feed stop at the window's height less 160 (not drawn); hover rules
+   (a faint wash on rows; raised buttons go one step lighter).
+9. **No drawing of their own:** Search, Artists and the artist page on a computer. They follow the
+   column rule.
+
 ## Still open from before tonight
 
 - The checklist step names: "Read your favorites", "Count your artists", "See who still posts".

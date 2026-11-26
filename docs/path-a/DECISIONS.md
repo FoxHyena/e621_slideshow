@@ -354,3 +354,16 @@ Format: date — decision. Why. Rejected alternatives.
 - Drawn but NOT to be built without the owner's yes: the one-time "Install the app" row on Settings.
 - Not checked on a device: where Share sits in the owner's Safari (the "under •••" hint).
 
+## 2026-11-26 (night) — Overnight proposals, batch 5: on a computer
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "On a computer (900 px and wider)"; mocks/screens-v6.html, the section of that name.
+- Choices: the sidebar is a floating 232 panel with names and the tab bar's sliding capsule (68 with
+  icons only from 900 to 1099); Search is a field in the sidebar and leaves the header; Play keeps its
+  disc at the content's bottom left; a sheet opened from a thing on screen is a 300 popover, a titled
+  sheet with a job of its own is a 420 dialog; a tile's menu is right-click, never a hover button;
+  Post info is a 360 panel and the picture moves over; Settings is one page; two hover rules.
+- Added beyond UX.md: the feed's cap on tall pictures (the window less 160); the full-screen button's
+  place; the two hover rules.
+- Not designed, left for the owner: the goo and the secret tab on a computer.
+

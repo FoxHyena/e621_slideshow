@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-26T08:39:34+00:00",
+  "generatedAt": "2026-11-26T08:47:10+00:00",
   "title": "Design System: e621 Slideshow",
   "extensions": {
     "colorMeta": {
@@ -846,6 +846,11 @@
         "name": "toast-in-out",
         "value": "in: 320 ms cubic-bezier(.3,1.35,.5,1), rises 12 px and fades in; out: 200 ms ease-in, drops 8 px and fades. Stays 6 s with Undo, 4 s without; role=\"status\"",
         "purpose": "opacity, translateY. Spec (not in mock)."
+      },
+      {
+        "name": "sidebar-capsule",
+        "value": "500 ms · cubic-bezier(.3,1.35,.5,1), the tab bar's",
+        "purpose": "translateY. Spec (not in mock)."
       },
       {
         "name": "undo-ring",
