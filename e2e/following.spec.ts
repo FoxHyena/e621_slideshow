@@ -98,7 +98,19 @@ test("new posts are marked New, a long run folds, and the divider sits at e621's
   await expect(more).toHaveCount(0);
   await expect(await reveal(page, "caught-up")).toContainText("You’re caught up");
   await expect(page.locator('[data-post-id="1140"] [data-testid=card-new]')).toHaveCount(0);
+  // the app mark is the hexagon with Play, and it pops once as it comes into view
+  const mark = page.getByTestId("caught-up").getByTestId("app-mark");
+  await expect(mark).toHaveAttribute("data-pop", "");
+  expect(await mark.evaluate((m) => [m.querySelectorAll("clipPath").length, getComputedStyle(m.querySelector("svg")!).borderRadius])).toEqual([2, "0px"]);
   await shot(page, "following-caught-up");
+  // only the first time: scrolled far away (the row unmounts) and back, it stays still
+  const at = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.getByTestId("caught-up")).toHaveCount(0);
+  await page.evaluate((y) => window.scrollTo(0, y), at);
+  await expect(page.getByTestId("caught-up")).toBeVisible();
+  await page.waitForTimeout(400);
+  await expect(page.getByTestId("caught-up").getByTestId("app-mark")).not.toHaveAttribute("data-pop");
 });
 
 test("a grid tile of a post folded into \"+N more\" opens the run and lands on it", async ({ page }) => {

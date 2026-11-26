@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { APP_MARK_PARAMS, APP_MARK_SEED, avatarFor, type AvatarShape } from "@/lib/avatar";
+import { useEffect, useId, useMemo, useRef } from "react";
+import { popMark } from "@/feed/motion";
 import { arcPath, bendsFor, BENDS_GEOMETRY as G } from "@/lib/bends";
 
 /**
@@ -22,53 +22,66 @@ export default function Avatar({ seed, className, fresh = false }: { seed: strin
   );
 }
 
+/** The app mark's shapes (docs/path-a/icons/app-mark.svg): the rounded point-up hexagon and Play. */
+const HEX =
+  "M-.097-.914A.194.194 0 0 1 .097-.914L.743-.541A.194.194 0 0 1 .84-.373L.84.373A.194.194 0 0 1 .743.541L.097.914A.194.194 0 0 1-.097.914L-.743.541A.194.194 0 0 1-.84.373L-.84-.373A.194.194 0 0 1-.743-.541Z";
+const TRI = "M.332-.071A.082.082 0 0 1 .332.071L-.104.323A.082.082 0 0 1-.228.252L-.228-.252A.082.082 0 0 1-.104-.323Z";
+
 /**
- * The glow, as a few wider, fainter copies behind each mark (spread in multiples of the glow
- * radius, opacity as a share of the mark's): roughly a Gaussian falloff. It's drawn this way
- * instead of with an SVG blur filter because iOS Safari paints filtered content in this viewBox
- * (which starts at -1,-1) shifted down and right, off the circle.
+ * The app mark (DESIGN.md "Artist marks and the app mark", owner-picked "Inlay"): a point-up hexagon
+ * with a Raised face and its top light, Play set into it in gold. No lip, no shadow. Its ids are this
+ * mark's own: a gradient in a hidden screen's copy wouldn't paint for the others.
  */
-const HALOS: [spread: number, opacity: number][] = [
-  [1.2, 0.04],
-  [0.7, 0.07],
-  [0.3, 0.12],
-];
+/** The places whose mark has popped this visit (a windowed list can mount the same one again). */
+const popped = new Set<string>();
 
-function Dot({ s, grow = 0, fade = 1 }: { s: AvatarShape; grow?: number; fade?: number }) {
-  return s.kind === "dot" ? (
-    <circle cx={s.x} cy={s.y} r={s.r + grow} fill={s.color} opacity={s.opacity * fade} />
-  ) : (
-    <circle
-      cx={s.x}
-      cy={s.y}
-      r={s.r}
-      fill="none"
-      stroke={s.color}
-      strokeWidth={(s.width ?? 0) + 2 * grow}
-      opacity={s.opacity * fade}
-    />
-  );
-}
-
-/** One drawing everywhere: worked out once. */
-let appSpec: ReturnType<typeof avatarFor> | null = null;
-
-/** The app mark: the kaleidoscope, kept for the app alone (caught up, Settings, the app icon). */
-export function AppMark({ className }: { className?: string }) {
-  const spec = (appSpec ??= avatarFor(APP_MARK_SEED, APP_MARK_PARAMS));
+export function AppMark({ className, popInView }: { className?: string; /** pop once per visit, keyed by this */ popInView?: string }) {
+  const id = useId().replace(/[^\w-]/g, "");
+  const el = useRef<HTMLSpanElement>(null);
+  // "You're all caught up": it pops the first time it comes into view, not on later scrolls
+  useEffect(() => {
+    const m = el.current;
+    if (!popInView || popped.has(popInView) || !m || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        popped.add(popInView);
+        popMark(m);
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(m);
+    return () => io.disconnect();
+  }, [popInView]);
+  const [face, hex, tri] = [`${id}f`, `${id}h`, `${id}t`];
   return (
-    <span className={`mark mark-app ${className ?? ""}`} data-testid="app-mark" aria-hidden>
-      <svg viewBox="-1 -1 2 2" style={{ background: spec.background }}>
-        {HALOS.map(([spread, fade]) => (
-          <g key={spread}>
-            {spec.shapes.map((s, i) => (
-              <Dot key={i} s={s} grow={spec.glow * spread} fade={fade} />
-            ))}
+    <span ref={el} className={`mark mark-app ${className ?? ""}`} data-testid="app-mark" aria-hidden>
+      <svg viewBox="-1 -1 2 2">
+        <defs>
+          <linearGradient id={face} x2="0" y2="1">
+            <stop stopColor="#2B4D80" />
+            <stop offset="1" stopColor="#1F3C67" />
+          </linearGradient>
+          <clipPath id={hex}>
+            <path d={HEX} />
+          </clipPath>
+          <clipPath id={tri}>
+            <path d={TRI} />
+          </clipPath>
+        </defs>
+        <path d={HEX} fill={`url(#${face})`} />
+        <g clipPath={`url(#${hex})`}>
+          <path d={HEX} fill="rgba(255,255,255,.22)" />
+          <path d={HEX} transform="translate(0 .04)" fill={`url(#${face})`} />
+        </g>
+        <g transform="translate(.034 0)">
+          <path d={TRI} transform="translate(0 .04)" fill="rgba(255,255,255,.12)" />
+          <path d={TRI} fill="#A8871F" />
+          <g clipPath={`url(#${tri})`}>
+            <path d={TRI} transform="translate(0 .06)" fill="#E8C446" />
           </g>
-        ))}
-        {spec.shapes.map((s, i) => (
-          <Dot key={i} s={s} />
-        ))}
+        </g>
       </svg>
     </span>
   );

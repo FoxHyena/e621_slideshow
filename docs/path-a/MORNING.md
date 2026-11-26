@@ -62,6 +62,11 @@ Built from the hover pass, Inset rows and grid loading you approved:
   press on a phone. Try Settings with a mouse.
 - **Grid loading:** skeleton tiles on the first load (12 on a phone, 3 rows on a computer) and one row
   under the last tiles while more load, instead of the spinner.
+- **The app icon is the gold hexagon with Play** (install the app again, or look at the browser tab).
+  **Inside the app the mark is the navy hexagon with gold Play** (sidebar, "You're all caught up",
+  the foot of Settings). The kaleidoscope is gone.
+- **The hexagon pops** the first time "You're all caught up" scrolls into view, and when you tap it in
+  Settings (you approved it).
 - **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
   the name in white, "artist" at the right.
 

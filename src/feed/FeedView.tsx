@@ -439,7 +439,7 @@ export function FeedView({
                 return (
                   <div key="divider" className="feed-slot feed-caught" style={at} data-testid="caught-up">
                     {/* a seed that draws in gold and pale blue, the caught-up colours of the approved mock */}
-                    <AppMark className="feed-caught-mark" />
+                    <AppMark className="feed-caught-mark" popInView={entryKey} />
                     <b>You&rsquo;re caught up</b>
                     {caughtNote && <small data-testid="caught-note">{caughtNote}</small>}
                   </div>

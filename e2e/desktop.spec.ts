@@ -228,6 +228,10 @@ test("Settings is one page: every section in the column, Sign out on the account
     await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
   }
   await expect(page.getByTestId("sign-out")).toBeVisible();
+  // every app mark (the sidebar's, any in hidden screens) paints its own gradient
+  await expect(page.locator(".side .mark-app")).toBeVisible();
+  const ids = await page.locator(".mark-app linearGradient").evaluateAll((g) => g.map((e) => e.id));
+  expect(new Set(ids).size).toBe(ids.length);
   await shot(page, "desktop-settings");
   // a toast centres on the column, 24 from the bottom
   await page.getByTestId("rating-e").uncheck();

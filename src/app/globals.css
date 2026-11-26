@@ -1371,8 +1371,26 @@ html {
   box-shadow: var(--inset-shadow-lit), 0 0 0 1px rgba(2, 15, 35, 0.35);
   transition: transform 600ms var(--ease-spring);
 }
+/* The app mark is the hexagon itself: no disc, no ring (and no lip or shadow: it isn't a button). */
 .mark-app svg {
-  box-shadow: 0 0 0 1.5px rgba(180, 199, 217, 0.26);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+/* It pops (92% to 100%, 360 ms): at "You're all caught up" the first time it comes into view, and
+   in Settings when pressed (owner-approved 2026-11-26). */
+.mark-app[data-pop] svg {
+  animation: mark-pop 360ms cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+@keyframes mark-pop {
+  from {
+    transform: scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-app[data-pop] svg {
+    animation: none;
+  }
 }
 .mark[data-new]::after {
   content: "";

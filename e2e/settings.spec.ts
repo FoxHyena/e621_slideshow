@@ -191,3 +191,16 @@ test("App: the e621 button, keyboard shortcuts, About", async ({ page }) => {
   await expect(page.getByTestId("sheet-keys")).toContainText("Open on e621");
   await shot(page, "settings-keys");
 });
+
+test("the app mark at the foot of Settings is the hexagon with Play, and pops when pressed", async ({ page }) => {
+  // (the foot is the phone's Settings home; a computer shows Settings as one page)
+  await page.setViewportSize({ width: 375, height: 812 });
+  await mockE621(page);
+  await page.goto("/settings");
+  const foot = page.locator(".app-foot .mark-app");
+  await expect(foot).toBeVisible();
+  expect(await foot.evaluate((m) => m.querySelectorAll("clipPath").length)).toBe(2);
+  await expect(foot).not.toHaveAttribute("data-pop");
+  await page.getByRole("button", { name: "e621 Slideshow" }).click();
+  await expect(foot).toHaveAttribute("data-pop", "");
+});

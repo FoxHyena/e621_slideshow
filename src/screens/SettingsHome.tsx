@@ -7,7 +7,7 @@
 import { ChevronRight, Droplets, LogIn, Play, Shield, Smartphone, Sparkles, type LucideIcon } from "lucide-react";
 import { useRef } from "react";
 import Avatar, { AppMark } from "@/components/Avatar";
-import { turnMark } from "@/feed/motion";
+import { popMark } from "@/feed/motion";
 import { SETTINGS_SECTIONS, type SettingsSection } from "@/nav/routes";
 import { SECTION_LABEL } from "@/shell/screens";
 import { TitleRow } from "@/shell/TitleRow";
@@ -78,12 +78,12 @@ function AccountRow({ open }: { open: (e: React.MouseEvent) => void }) {
   );
 }
 
-/** The app mark, the name and the version; tapping the mark turns it one notch. */
+/** The app mark, the name and the version; tapping the mark pops it. */
 function AppFoot() {
   const ref = useRef<HTMLButtonElement>(null);
   return (
     <div className="app-foot">
-      <button type="button" ref={ref} aria-label="e621 Slideshow" onClick={() => turnMark(ref.current?.querySelector(".mark"))}>
+      <button type="button" ref={ref} aria-label="e621 Slideshow" onClick={() => popMark(ref.current?.querySelector(".mark"))}>
         <AppMark />
       </button>
       <b>e621 Slideshow</b>

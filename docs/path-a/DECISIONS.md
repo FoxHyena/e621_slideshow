@@ -1039,3 +1039,23 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   where the kaleidoscope turned one notch; the Settings mark pops when pressed. The caught-up pop is
   in the spec only, not in the mock.
 
+
+## 2026-11-26 — Building the hexagon app icon and app mark
+
+- Built from the design session's 4dfc62b and c1d8dfa (owner: "some kinda in-theme icon where we have a
+  similar hexagon but with an inset play icon", "Gold", "Use the hexagon", "Inlay").
+- **The app icon:** `scripts/make-icons.ts` now renders every PNG from the design session's SVGs in
+  `docs/path-a/icons` (app-icon for 512, 192 and the iPhone 180; app-icon-tab for 32 and 16; app-icon-mono
+  for Android's themed icon). The manifest and the page's icon links didn't change (same files).
+- **The app mark** (`AppMark`): the Raised hexagon with Play inlaid in gold, drawn from app-mark.svg, at
+  the sidebar (36), "You're all caught up" and "That's everything" (56), and the foot of Settings (56).
+  No disc, ring, lip or shadow. Each mark has its own gradient and clip ids: a hidden screen's copy
+  can't lend its gradient to a shown one.
+- The kaleidoscope's app-mark settings are gone; its generator (`avatarFor`) is no longer drawn
+  anywhere and leaves the bundle (only its tests and `hash`/`rng`, used by the tab bar, remain).
+- **The pop** (owner-approved after it was built, design 57f7323: "Approve"): the mark pops (92% to
+  100%, 360 ms) the first time "You're all caught up" comes into view on a visit, and when pressed in
+  Settings. It replaces the kaleidoscope's turn. Nothing with reduced motion. The list is windowed, so
+  the row can mount again after a long scroll: the pop is remembered per screen entry for the visit.
+- Test fix in passing: "Tapping Goo spurts…" waited 5 s for drops whose code loads when the page is
+  idle; under the full parallel run that was too short twice. It waits 10 s.

@@ -134,21 +134,6 @@ export const AVATAR_DEFAULTS: AvatarParams = {
   glow: 0.125,
 };
 
-/**
- * The app mark (DESIGN.md "Artist marks and the app mark"): the same generator held to 8-fold,
- * mirrored, three rings, in e621's gold, cream and link blues. One seed: it's one drawing everywhere,
- * the app icon included (scripts/make-icons.ts).
- */
-export const APP_MARK_SEED = "e621 slideshow";
-export const APP_MARK_PARAMS: AvatarParams = {
-  ...AVATAR_DEFAULTS,
-  symmetryWeights: { 8: 1 },
-  mirrorChance: 1,
-  layers: [3, 3],
-  themeColors: ["linkActive", "artistAlt", "code", "link", "linkHover"],
-  themePull: 1,
-};
-
 type Rgb = [number, number, number];
 
 /** FNV-1a: a quick, well-spread 32-bit hash. */

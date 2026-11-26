@@ -11,6 +11,14 @@ export function calm(): boolean {
 
 const turns = new WeakMap<Element, number>();
 
+/** The app mark pops once (92% to 100%; the animation and its reduced-motion rule live in CSS). */
+export function popMark(mark: Element | null | undefined) {
+  if (!mark) return;
+  mark.removeAttribute("data-pop");
+  void (mark as HTMLElement).offsetWidth;
+  mark.setAttribute("data-pop", "");
+}
+
 /** An artist's mark spins once (600 ms, springy; the transition lives in CSS). */
 export function turnMark(mark: Element | null | undefined) {
   const svg = mark?.querySelector("svg");

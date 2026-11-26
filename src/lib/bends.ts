@@ -2,7 +2,7 @@
  * Bends: an artist's mark (DESIGN.md "Avatars"). Two round-capped arcs around a centre dot, the tab
  * bar's own bent-tube shape, hashed from the name for colour, angle and length. The colours come
  * only from the app's palette and never include gold, which stays reserved for New and the main
- * action. The app mark keeps the kaleidoscope (`avatar.ts`).
+ * action. The app mark is the hexagon with Play (`AppMark` in `src/components/Avatar.tsx`).
  *
  * Ported from the approved mock (`docs/path-a/mocks/feed-v6.html`, `themedFor`): the same seed
  * draws the same mark there and here, including the draws it skips.
