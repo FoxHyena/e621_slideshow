@@ -696,3 +696,41 @@ Slideshow, the shortcuts sheet.
 **Budgets** (production build, mock e621): JS cold load of `/following` **197.2 KB** (≤ 200; slice 6
 196.1); 297.3 KB with the idle prefetch; CLS 0.0000; budgets test passes. The Settings pages and the sheet
 are their own chunks.
+
+## Slice 8 review: the installed app
+
+**Code review (high), 3 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Two local builds of different uncommitted edits shared one build id: no update offered between them | Low | A dirty build is named by a hash of its diff |
+| 2 | Facebook's FB_IAB, WhatsApp, LinkedIn and Pinterest browsers on an iPhone got Safari's steps | Low | Added to the in-app list |
+| 3 | (pre-existing) The app mark ignored its designed params; Settings and caught-up drew two random marks | Low | One seed, DESIGN.md's params, shared with the icons |
+
+**Fresh reviewer, 10 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Any navigation (the userscript, an icon) could overwrite the cached shell | High | Only HTML page navigations; the shell is kept only from a text/html answer |
+| 2 | The offline test swallowed a failed navigation and passed anyway | High | It asserts the URL and the screen, and reloads offline on another route |
+| 3 | Install cached the shell but none of its chunks, and swallowed a failed fetch | High | Install takes the shell and every chunk it names, or fails and the old worker stays |
+| 4 | An old shell served after a slow network re-registered the old worker over a waiting update | Med | No register while a version waits |
+| 5 | A 5xx answer was shown though a good shell was cached | Low | 5xx falls back to the cached shell |
+| 6 | `beforeinstallprompt` could fire before the app's code loaded; a second prompt() rejected unhandled | Med | Caught by an inline script in `<head>`; prompt() in try/catch |
+| 7 | Cache writes not awaited (worker killed mid-put; unhandled quota errors) | Low | `event.waitUntil(put.catch())` |
+| 8 | The fallback build id used `Date.now()` per config load | Med | The commit, plus a diff hash when dirty |
+| 9 | Reload's name out of context; the sheet blank if the install way changed while open | Low | "Reload to update"; the sheet says installed / use Install |
+| 10 | The CSP with `'unsafe-inline'` stops fetch exfiltration, not navigation; the test only read headers | Low | Written down in DECISIONS; the production worker test fails on any CSP violation |
+
+**Also found:** the install steps broke "Tap" and "Share" onto two lines (fixed); a skipped View
+Transition's unhandled `ready` rejection, the dev "1 Issue" badge (pre-existing, fixed).
+
+**Gates:** typecheck, lint clean; unit 308 pass (install-way detection). New e2e: e2e/pwa.spec.ts
+(manifest and icons, the CSP and sw.js headers, no install row on desktop Chrome before it offers, the
+iPhone steps, the in-app browser's Copy link; and against a production build, the worker: only this
+origin cached, never an e621 answer, `/settings/app` opens offline and after an offline reload, no CSP
+violation). Full e2e before the reviewer's fixes: 207 passed, 3 skipped.
+
+**Budgets** (production build, mock e621): JS cold load of `/following` **197.2 KB** (≤ 200; 198.5 KB
+while the PWA code loaded at boot, so it moved to idle); 300.8 KB with the idle prefetch; CLS 0.0000;
+0 long tasks at 4× CPU.

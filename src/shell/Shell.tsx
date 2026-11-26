@@ -108,6 +108,17 @@ export default function Shell() {
 
   useEffect(() => installEdgeSwipe(() => void nav.back({ gesture: true })), [nav]);
   useEffect(() => prefetchScreens(), []);
+  // The service worker, the update toast and the install offer: once the page is idle, in their own
+  // chunk (the browser's install offer is held from the first moment by an inline script).
+  useEffect(() => {
+    const go = () => void import("./pwa").then((m) => m.startPwa());
+    if (typeof requestIdleCallback === "function") {
+      const id = requestIdleCallback(go, { timeout: 4000 });
+      return () => cancelIdleCallback(id);
+    }
+    const t = setTimeout(go, 1500);
+    return () => clearTimeout(t);
+  }, []);
 
   // Desktop: Esc goes back (UX §8). The legacy home handles its own keys.
   useEffect(() => {

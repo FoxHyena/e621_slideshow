@@ -83,7 +83,7 @@ function AppFoot() {
   return (
     <div className="app-foot">
       <button type="button" ref={ref} aria-label="e621 Slideshow" onClick={() => turnMark(ref.current?.querySelector(".mark"))}>
-        <AppMark seed="e621-slideshow" />
+        <AppMark />
       </button>
       <b>e621 Slideshow</b>
       <small>Version {process.env.APP_VERSION}</small>

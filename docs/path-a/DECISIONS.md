@@ -740,3 +740,40 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   Fit and Transition show only for Classic, as in Quick settings.
 - Not built: "What's new" (no changelog to show yet); the one-time "Install the app" row (batch 4, held
   for the owner's yes).
+
+## 2026-11-26 (night) — Slice 8 build: the installed app
+
+- No owner decision in this entry. Built from ENGINEERING.md §7 and §9 and the proposed DESIGN.md
+  "Install, update and the app icon" (batch 4).
+- **The app mark now follows DESIGN.md everywhere:** 8-fold, mirrored, three rings, e621's gold, cream
+  and link blues, one seed (`APP_MARK_PARAMS` in src/lib/avatar.ts). Before, Settings and the caught-up
+  divider drew two different random kaleidoscopes. The icons are drawn from it by
+  `scripts/make-icons.ts` (Playwright renders the SVG), so the icon and the in-app mark are one drawing.
+- One 512 file serves "any" and "maskable" (the mark and glow stay inside the 80% circle, as designed);
+  `mono-512.png` is Android's themed icon. The tab icon is 32/16 with 22% corners. Next's default
+  `favicon.ico` is gone.
+- `theme-color` is Ground (#020F23), as designed, not the old black.
+- **CSP without nonces:** `script-src 'self' 'unsafe-inline'`. Nonces would make every page dynamic, and
+  the protection that matters, `connect-src 'self' https://e621.net`, holds either way: an injected
+  script can't send the key anywhere but e621.
+- **The worker registers only in production builds** (dev serves changing chunks under one name).
+  Navigations are network-first with a 3 s timeout, falling back to the last good shell; every route
+  serves the same shell, so one cached copy opens any route offline.
+- The build id is `VERCEL_GIT_COMMIT_SHA`, or the version plus build time elsewhere, so every deploy is
+  a new worker. "Updated to x" shows after a Reload into a new build.
+- **Settings › App's update row** reads "A new version is ready" with Reload. The design's "2.1 is ready"
+  needs the new version's number, which the old page doesn't know.
+- The browser's own install offer is held back (`beforeinstallprompt` is kept), so Settings › App's row
+  is the only way in, as designed. Not built: the one-time "Install the app" row on Settings (held for
+  the owner's yes).
+- The install sheet reuses the sign-in sheet's numbered steps (the same 28 number wells).
+- Found while testing: a skipped View Transition left an unhandled `ready` rejection (the dev "1 Issue"
+  badge). Caught in src/nav/transition.ts.
+- **What the CSP does and doesn't stop** (fresh reviewer): with `'unsafe-inline'` scripts it blocks
+  fetch, XHR, WebSocket and beacon to anywhere but e621, and images or media from other hosts; it does
+  not stop an injected script from navigating the page away with the key in the URL. Nonces would close
+  that only for injected `<script>` tags, not for code already running. The real guard stays: no
+  third-party scripts at all.
+- The install offer is caught by a tiny inline script in `<head>` (it can fire before the app's code
+  loads); the worker registers once the page is idle, off the first load.
+- The build id is the commit (Vercel's or git's), plus a hash of the diff for an uncommitted local build.

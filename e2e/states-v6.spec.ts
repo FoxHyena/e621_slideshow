@@ -65,6 +65,8 @@ test("Tapping Goo spurts one to three drops onto the bar's goo count", async ({ 
   await expect(goo).toBeVisible();
   await goo.click();
   await expect(goo).toHaveClass(/goo-pop/);
+  // the drops count once they land on the bar (leaving first can lose them mid-flight)
+  await expect(page.getByRole("navigation", { name: "Tabs" })).toHaveAttribute("data-goo", "", { timeout: 5000 });
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(page.getByTestId("goo-count")).toHaveText(/^[123] favorites?$/);
 });

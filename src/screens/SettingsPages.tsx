@@ -4,7 +4,7 @@
  * Settings' sub-pages (UX.md "Settings", DESIGN.md "Settings" and "Settings: Account, Content, For
  * You, App"): each a pushed screen with Back, the large title, then groups. Their own chunk.
  */
-import { AlertTriangle, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, SlidersHorizontal } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, RefreshCw, Share, SlidersHorizontal, SquarePlus, Smartphone } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
@@ -23,8 +23,9 @@ import { getArtists } from "@/state/artists";
 import { getFollows } from "@/state/follows";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
+import { promptInstall, pwa, reloadToUpdate, type InstallWay } from "@/shell/pwa";
 import { shallow, useStore } from "@/state/store";
-import { openArtist, openSignIn } from "./actions";
+import { copyText, openArtist, openSignIn } from "./actions";
 
 const SOURCE = "https://github.com/FoxHyena/e621_slideshow";
 const label = (n: string) => n.replaceAll("_", " ");
@@ -508,11 +509,145 @@ const KEYS: [string[], string][] = [
   [["Esc"], "Close the player"],
 ];
 
+/** Install the app (DESIGN.md "Install, update and the app icon"): what this browser can do, or nothing. */
+function InstallRow({ way }: { way: InstallWay }) {
+  if (!way) return null;
+  const well = (
+    <span className="row-well" data-tone={way === "installed" ? "green" : undefined} aria-hidden>
+      {way === "installed" ? <Check /> : <Smartphone />}
+    </span>
+  );
+  if (way === "installed")
+    return (
+      <li className="list-row" data-testid="install-row" data-way={way}>
+        {well}
+        <span className="row-text">
+          <b>Installed</b>
+          <small>You&rsquo;re in the app</small>
+        </span>
+      </li>
+    );
+  if (way === "prompt")
+    return (
+      <li className="list-row" data-testid="install-row" data-way={way}>
+        {well}
+        <span className="row-text">
+          <b>Install the app</b>
+          <small>Add it to your home screen</small>
+        </span>
+        <button type="button" className="btn-tonal" data-size="compact" onClick={() => void promptInstall()} data-testid="install-prompt">
+          Install
+        </button>
+      </li>
+    );
+  return (
+    <li>
+      <button type="button" className="list-row" onClick={() => getNav().openSheet("install")} aria-haspopup="dialog" data-testid="install-row" data-way={way}>
+        {well}
+        <span className="row-text">
+          <b>Install the app</b>
+          <small>Full screen, on your home screen</small>
+        </span>
+        <ChevronRight aria-hidden className="row-chev" />
+      </button>
+    </li>
+  );
+}
+
+const STEPS: Record<"ios" | "mac", { text: ReactNode; sub?: string; glyph?: ReactNode }[]> = {
+  ios: [
+    {
+      text: (
+        <>
+          Tap <b>Share</b>
+        </>
+      ),
+      sub: "In Safari it can be under •••",
+      glyph: <Share />,
+    },
+    {
+      text: (
+        <>
+          Choose <b>Add to Home Screen</b>
+        </>
+      ),
+      glyph: <SquarePlus />,
+    },
+    {
+      text: (
+        <>
+          Tap <b>Add</b>
+        </>
+      ),
+    },
+  ],
+  mac: [
+    {
+      text: (
+        <>
+          Open the <b>File</b> menu
+        </>
+      ),
+    },
+    {
+      text: (
+        <>
+          Choose <b>Add to Dock</b>
+        </>
+      ),
+    },
+  ],
+};
+
+function InstallSheet({ way }: { way: InstallWay }) {
+  return (
+    <Sheet title="Install the app" testId="sheet-install">
+      {way === "installed" || way === "prompt" || way === null ? (
+        // (the way changed while the sheet was open: installed meanwhile, or the browser now offers)
+        <p className="install-lead">{way === "installed" ? "The app is installed." : "Close this and use Install in Settings › App."}</p>
+      ) : way === "in-app" ? (
+        <div className="install">
+          <p className="install-lead">This browser cannot install apps. Open the page in Safari, then come back to Settings.</p>
+          <button type="button" className="btn-tonal install-copy" onClick={() => void copyText(location.href, "Link copied")} data-testid="install-copy">
+            <Link2 aria-hidden className="state-icon" />
+            Copy link
+          </button>
+        </div>
+      ) : (
+        <div className="install">
+          <p className="install-lead">Slideshow on your home screen, full screen, without the browser&rsquo;s bars.</p>
+          <ol className="signin-steps install-steps">
+            {STEPS[way === "mac" ? "mac" : "ios"].map((s, i) => (
+              <li key={i}>
+                <span className="signin-n" aria-hidden>
+                  {i + 1}
+                </span>
+                <span className="install-step">
+                  {s.text}
+                  {s.sub && <small>{s.sub}</small>}
+                </span>
+                {s.glyph && (
+                  <span className="install-glyph" aria-hidden>
+                    {s.glyph}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+          <p className="install-note">The installed app keeps its own sign-in, so you sign in once more there.</p>
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
 function AppPage() {
   const { sheet } = useScreen();
+  const { install, updateReady } = useStore(pwa, (s) => s, shallow);
   return (
     <>
       <ul className="list-group">
+        <InstallRow way={install} />
         <li>
           <a className="list-row" href="/e621-slideshow.user.js" target="_blank" rel="noopener" data-testid="userscript-install">
             <span className="row-well" aria-hidden>
@@ -560,10 +695,19 @@ function AppPage() {
         <li className="list-row">
           <span className="row-text">
             <b>Version</b>
+            {/* (announced by the toast that offered it; the line keeps the version you're on in view) */}
+            {updateReady && <small data-testid="update-ready">You have {process.env.APP_VERSION}; a new version is ready</small>}
           </span>
-          <span className="row-value" data-testid="app-version">
-            {process.env.APP_VERSION}
-          </span>
+          {updateReady ? (
+            <button type="button" className="btn-tonal" data-size="compact" onClick={reloadToUpdate} aria-label="Reload to update" data-testid="update-reload">
+              <RefreshCw aria-hidden className="state-icon" />
+              Reload
+            </button>
+          ) : (
+            <span className="row-value" data-testid="app-version">
+              {process.env.APP_VERSION}
+            </span>
+          )}
         </li>
         <li>
           <a className="list-row" href={SOURCE} target="_blank" rel="noopener noreferrer">
@@ -575,6 +719,7 @@ function AppPage() {
         </li>
       </ul>
       <Note>Not run by e621. It reads e621 with your own account and key.</Note>
+      {sheet === "install" && <InstallSheet way={install} />}
       {sheet === "keys" && (
         <Sheet title="Keyboard shortcuts" testId="sheet-keys">
           <dl className="keys">

@@ -58,6 +58,15 @@ at the top once Phase 7 hands over.
    - **Built without a mock:** Settings › App › "Classic slideshow" opens the old one-page app (now at
      `/settings/classic`) until its flows are ported.
 
+11. **The installed app (slice 8)** follows the proposed batch 4. My calls:
+   - **The app mark changed** to what DESIGN.md describes (8-fold, gold, cream and link blue). Settings and
+     the caught-up divider showed two different random marks before. The app icon is the same drawing.
+   - Settings › App's update row reads "You have 0.1.0; a new version is ready" with Reload (the mock's
+     "2.1 is ready" needs a version number the old page can't know).
+   - The browser bar colour is now Ground (#020F23), as designed, not black.
+   - Built without a mock: the install sheet's text when the browser starts offering Install while it is
+     open ("Close this and use Install in Settings › App").
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -90,3 +99,5 @@ at the top once Phase 7 hands over.
    artists for the score against the raw favorite count. The synthetic run in the unit tests is the only
    one so far (score 49 of 115, raw count 50 of 115: even, as expected, since the score trades volume for
    share).
+3. **Install on your iPhone** (Phase 6 can't): the Share button's place in your Safari (the "under •••"
+   hint), the icon on your home screen, and that the installed app asks you to sign in once.

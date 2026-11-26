@@ -12,6 +12,8 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     ...devices["Desktop Chrome"],
     viewport: { width: 1280, height: 800 },
+    // page.route mocks must see every request; the one worker test (e2e/pwa.spec.ts) allows it
+    serviceWorkers: "block",
   },
   webServer: {
     command: `pnpm dev --port ${PORT}`,

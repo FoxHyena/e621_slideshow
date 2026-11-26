@@ -10,7 +10,7 @@ export type NavDirection = "push" | "back" | "tab" | "none";
 let token = 0;
 
 export function runTransition(dir: NavDirection, commit: () => void): void {
-  const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void>; ready: Promise<void> } };
   const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   if (dir === "none" || !doc.startViewTransition || reduce || document.visibilityState !== "visible") {
     commit();
@@ -20,9 +20,11 @@ export function runTransition(dir: NavDirection, commit: () => void): void {
   const mine = ++token;
   root.dataset.nav = dir;
   try {
-    doc
-      .startViewTransition(() => flushSync(commit))
-      .finished.catch(() => {})
+    const vt = doc.startViewTransition(() => flushSync(commit));
+    // A newer transition skips this one: `ready` rejects then too, and is nobody's error.
+    vt.ready.catch(() => {});
+    vt.finished
+      .catch(() => {})
       .finally(() => {
         // Only the latest transition clears the flag; an earlier one finishing mustn't cut it short.
         if (token === mine) delete root.dataset.nav;

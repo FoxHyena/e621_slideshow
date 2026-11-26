@@ -372,7 +372,7 @@ export function FeedView({
                 return (
                   <div key="divider" className="feed-slot feed-caught" style={at} data-testid="caught-up">
                     {/* a seed that draws in gold and pale blue, the caught-up colours of the approved mock */}
-                    <AppMark seed="caught-up-617" className="feed-caught-mark" />
+                    <AppMark className="feed-caught-mark" />
                     <b>You&rsquo;re caught up</b>
                     {caughtNote && <small data-testid="caught-note">{caughtNote}</small>}
                   </div>
@@ -435,7 +435,7 @@ export function FeedView({
           )
         ) : q.exhausted ? (
           <div className="feed-caught feed-end-moment" data-testid="feed-end">
-            <AppMark seed="caught-up-617" className="feed-caught-mark" />
+            <AppMark className="feed-caught-mark" />
             <b>That&rsquo;s everything</b>
             {hidden > 0 && <small>{hiddenNote(stats)}</small>}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { avatarFor, type AvatarShape } from "@/lib/avatar";
+import { APP_MARK_PARAMS, APP_MARK_SEED, avatarFor, type AvatarShape } from "@/lib/avatar";
 import { arcPath, bendsFor, BENDS_GEOMETRY as G } from "@/lib/bends";
 
 /**
@@ -50,11 +50,14 @@ function Dot({ s, grow = 0, fade = 1 }: { s: AvatarShape; grow?: number; fade?: 
   );
 }
 
-/** The app mark: the kaleidoscope, kept for the app alone (caught up, empty states, the mascot). */
-export function AppMark({ seed, className }: { seed: string; className?: string }) {
-  const spec = useMemo(() => avatarFor(seed), [seed]);
+/** One drawing everywhere: worked out once. */
+let appSpec: ReturnType<typeof avatarFor> | null = null;
+
+/** The app mark: the kaleidoscope, kept for the app alone (caught up, Settings, the app icon). */
+export function AppMark({ className }: { className?: string }) {
+  const spec = (appSpec ??= avatarFor(APP_MARK_SEED, APP_MARK_PARAMS));
   return (
-    <span className={`mark mark-app ${className ?? ""}`} data-testid="app-mark" data-seed={seed} aria-hidden>
+    <span className={`mark mark-app ${className ?? ""}`} data-testid="app-mark" aria-hidden>
       <svg viewBox="-1 -1 2 2" style={{ background: spec.background }}>
         {HALOS.map(([spread, fade]) => (
           <g key={spread}>
