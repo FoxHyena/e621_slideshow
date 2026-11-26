@@ -703,9 +703,9 @@
         "purpose": "opacity and translateY(24px). Mock."
       },
       {
-        "name": "compact-bar",
+        "name": "top-bar-capsule",
         "value": "150 ms ease-out, past 64 px of scroll",
-        "purpose": "opacity. Mock."
+        "purpose": "opacity and an 8 px drop (opacity only with reduced motion). Mock."
       },
       {
         "name": "tuck",

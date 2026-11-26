@@ -252,14 +252,18 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .newpill6 { height: var(--h-c); display: inline-flex; align-items: center; gap: 6px; padding: 0 16px 0 12px; border-radius: 999px; font: var(--t-count); background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); box-shadow: var(--lit), 0 var(--lip) 0 var(--lip-navy), 0 12px 24px rgba(0,0,0,.4); }
 .newpill6 .ic { color: var(--gold); }
 
-/* Compact bar once the title has scrolled away */
-.cbar6 { position: absolute; z-index: 7; inset: 0 0 auto; padding-top: 47px; background-color: var(--glass-base); background-image: linear-gradient(var(--glass), var(--glass));
-  -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); box-shadow: 0 1px 0 rgba(180,199,217,.12); opacity: 0; pointer-events: none; transition: opacity .15s ease-out; }
-.scrolled .cbar6, .cbar6.show { opacity: 1; pointer-events: auto; }
-.cbar6 .in { height: 48px; display: flex; align-items: center; gap: 12px; padding: 0 12px 4px var(--inset); }
-.cbar6 .in > b { font: var(--t-head); }
+/* The top bar once the title has scrolled away (owner-picked 2026-11-26, "Capsule"): a floating capsule, the tab bar's sibling.
+   .cbar6 is the dark fade behind the clock; .in is the capsule. */
+.cbar6 { position: absolute; z-index: 7; inset: 0 0 auto; height: 128px; padding: 51px 16px 0; background: linear-gradient(var(--ground) 40px, rgba(2,15,35,.8) 64px, transparent); opacity: 0; pointer-events: none; transition: opacity .15s ease-out; }
+.scrolled .cbar6, .cbar6.show { opacity: 1; }
+.cbar6 .in { height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 8px 0 20px; border-radius: 26px; background: linear-gradient(var(--raised-a), var(--raised-b)); box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); transform: translateY(-8px); transition: transform .15s ease-out; }
+.scrolled .cbar6 .in, .cbar6.show .in { transform: none; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .cbar6 .in { transform: none; transition: none; } }
+.cbar6 .in > b { font: var(--t-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .cbar6 .in > span { font: var(--t-foot-r); color: var(--gold); margin-right: auto; }
-.cbar6 .tools6 { background: none; box-shadow: none; padding: 0; }
+.cbar6 .tools6 { background: none; box-shadow: none; padding: 0; margin-right: -4px; }
+.cbar6.who .in { padding-left: 4px; gap: 8px; }
+.cbar6.who .back6.bare { margin: 0 -4px 0 0; }
 
 /* Bottom stack: ground fade, Play, glass tab bar */
 .scrim6 { position: absolute; z-index: 5; inset: auto 0 0; height: 150px; pointer-events: none; background: linear-gradient(transparent, rgba(2,15,35,.86) 62%, var(--ground)); }
@@ -338,7 +342,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .strip.row > div { display: flex; flex-direction: column; align-items: center; gap: 12px; font: var(--t-foot); color: var(--muted); }
 .strip .post6, .strip .burst6 { margin-bottom: 0; }
 .strip.art { height: 150px; background: var(--art); }
-.strip.art .cbar6 { padding-top: 0; }
+.strip.art .cbar6 { padding-top: 8px; height: 84px; background: linear-gradient(rgba(2,15,35,.8), transparent); }
 .strip.dimmed { background: linear-gradient(rgba(2,15,35,.6), rgba(2,15,35,.6)), var(--art); padding-top: 56px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -380,7 +384,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hfollow6.on:active { transform: none; }
 .hfollow6.on .ic { color: var(--score); }
 .hfollow6.wig { animation: wig6 .36s ease-out; }
-.cbar6.who .in > b { margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cbar6.who .in > b { flex: 1; }
 
 /* Grid view: square tiles sunk into the ground, the same rim as a picture in a panel */
 .grid6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px var(--edge); padding: 0 var(--inset) 24px; }
@@ -735,6 +739,9 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 @keyframes tout6 { to { opacity: 0; transform: translateY(8px); } }
 .toasts6 { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px 24px; }
 .toasts6 .toast6 { margin: 0; max-width: 100%; }
+.tchoice6 { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin: 48px 0 0; padding: 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
+.tchoice6 > b { font: 600 15px var(--f-page); }
+.tchoice6 label { display: inline-flex; align-items: center; gap: 10px; color: var(--dim); font: 14px var(--f-page); }
 
 /* Follow from favorites as a sheet: the list scrolls inside it, the button stays at its foot */
 .fsheet6.in { top: 76px; display: flex; flex-direction: column; padding-bottom: 0; }
@@ -902,11 +909,109 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .ipanel6 .grab { display: none; }
 
 /* pointer hover: a raised control steps up one material */
-.btn6.hov:not(.gold) { background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); }
 .hovs6 { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
 .hovs6 .pairs { display: flex; gap: 12px; align-items: center; }
 .hovs6 .pairs > small { font: var(--t-foot); color: var(--muted); width: 56px; flex: none; }
 .hovs6 .group6 { margin: 0; flex: 1; }
+
+/* ---------- Under the pointer (proposed). Three rules, by what a control is made of:
+   a lip rises 1; raised without a lip steps up one material; flat or sunk gets a wash that stays inside its container. ---------- */
+.p6 .tools6 button { position: relative; }
+.p6 .tools6 button::after { content: ""; position: absolute; inset: 4px 0; border-radius: 999px; background: rgba(255,255,255,.06); opacity: 0; transition: opacity .1s ease-out; pointer-events: none; }
+.p6 .tools6 button.hovbad { background: rgba(255,255,255,.06); color: var(--text); }
+.p6 :is(.chip6, .back6, .more6, .quiet6, .x6, .xwell6, .tag6, .tundo6, .row6, .srow6, .gl6, .link6) { transition: transform .1s ease-out, background-color .1s ease-out, color .1s ease-out, box-shadow .1s ease-out; }
+.p6 .lip6.hov:not(:active):not([disabled]) { transform: translateY(-1px); box-shadow: var(--lit), 0 calc(var(--lip) + 1px) 0 var(--lip-c, var(--lip-navy)); }
+.p6 .cta6 .btn6.lip6.hov:not(:active) { box-shadow: var(--lit-gold), 0 calc(var(--lip) + 1px) 0 var(--lip-gold), 0 15px 28px rgba(0,0,0,.45); }
+.p6 .fab6.hov:not(:active):not(.down) { transform: translateY(-1px); box-shadow: var(--lit-gold), 0 calc(var(--lip) + 1px) 0 var(--lip-gold), 0 15px 28px rgba(0,0,0,.45); }
+.p6 .chip6.hov:not([aria-pressed="true"]) { background: linear-gradient(var(--raised-a), var(--raised-b)); }
+.p6 .back6.hov:not(.bare) { background: linear-gradient(var(--raised-a), var(--raised-b)); color: var(--text); }
+.p6 .ph .who.hov .av6.t svg { background: var(--raised-hi-a); }
+.p6 .field6 .clr.hov { background: var(--raised-hi-a); color: var(--text); }
+.p6 .tools6 button.hov { color: var(--text); }
+.p6 .tools6 button.hov::after { opacity: 1; }
+.p6 :is(.more6, .back6.bare, .quiet6).hov { background: rgba(255,255,255,.06); color: var(--text); }
+.p6 :is(.link6, .glabel6 button).hov { color: var(--text); }
+.p6 :is(.x6, .xwell6, .blrow6 .rm, .tundo6).hov { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); color: var(--text); }
+.p6 .tag6.hov:not(.plus) { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); }
+.p6 .tag6.plus.hov { box-shadow: inset 0 0 0 1.5px rgba(180,199,217,.32); color: var(--link); }
+.p6 button.field6.hov { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); color: var(--link); }
+.p6 :is(.seg6 button:not([aria-pressed="true"]), .mrow6:not([aria-checked="true"]), .tab6:not(.on), .stab6:not(.on)).hov { color: var(--text); }
+.p6 :is(button.srow6, .row6).hov { background: rgba(255,255,255,.04); }
+.p6 .gl6.hov:not(.ring) { box-shadow: inset 0 0 0 1px rgba(255,255,255,.32); }
+.p6 .gl6.ring.hov { box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 0 0 2px var(--gold); }
+@media (hover: hover) and (pointer: fine) {
+  .p6 button:not([disabled]) { cursor: pointer; }
+  .p6 .lip6:hover:not(:active):not([disabled]) { transform: translateY(-1px); box-shadow: var(--lit), 0 calc(var(--lip) + 1px) 0 var(--lip-c, var(--lip-navy)); }
+  .p6 .cta6 .btn6.lip6:hover:not(:active) { box-shadow: var(--lit-gold), 0 calc(var(--lip) + 1px) 0 var(--lip-gold), 0 15px 28px rgba(0,0,0,.45); }
+  .p6 .fab6:hover:not(:active):not(.down) { transform: translateY(-1px); box-shadow: var(--lit-gold), 0 calc(var(--lip) + 1px) 0 var(--lip-gold), 0 15px 28px rgba(0,0,0,.45); }
+  .p6 .chip6:hover:not([aria-pressed="true"]) { background: linear-gradient(var(--raised-a), var(--raised-b)); }
+  .p6 .back6:hover:not(.bare) { background: linear-gradient(var(--raised-a), var(--raised-b)); color: var(--text); }
+  .p6 .ph .who:hover .av6.t svg { background: var(--raised-hi-a); }
+  .p6 .field6 .clr:hover { background: var(--raised-hi-a); color: var(--text); }
+  .p6 .tools6 button:hover { color: var(--text); }
+  .p6 .tools6 button:hover::after { opacity: 1; }
+  .p6 :is(.more6, .back6.bare, .quiet6):hover { background: rgba(255,255,255,.06); color: var(--text); }
+  .p6 :is(.link6, .glabel6 button):hover { color: var(--text); }
+  .p6 :is(.x6, .xwell6, .blrow6 .rm, .tundo6):hover { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); color: var(--text); }
+  .p6 .tag6:hover:not(.plus) { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); }
+  .p6 .tag6.plus:hover { box-shadow: inset 0 0 0 1.5px rgba(180,199,217,.32); color: var(--link); }
+  .p6 button.field6:hover { background: linear-gradient(rgba(255,255,255,.06), rgba(255,255,255,.06)), var(--well); color: var(--link); }
+  .p6 :is(.seg6 button:not([aria-pressed="true"]), .mrow6:not([aria-checked="true"]), .tab6:not(.on), .stab6:not(.on)):hover { color: var(--text); }
+  .p6 :is(button.srow6, .row6):hover { background: rgba(255,255,255,.04); }
+  .p6 .gl6:hover:not(.ring) { box-shadow: inset 0 0 0 1px rgba(255,255,255,.32); }
+  .p6 .gl6.ring:hover { box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), 0 0 0 2px var(--gold); }
+}
+@media (prefers-reduced-motion: reduce) { .p6 :is(.chip6, .back6, .more6, .quiet6, .x6, .xwell6, .tag6, .tundo6, .row6, .srow6, .gl6, .link6), .p6 .tools6 button::after { transition: none; } }
+
+/* the top bar on a computer: 8 from the window's top, 8 narrower than the column on each side */
+.dmain6 .cbar6 { height: 84px; padding: 8px 0 0; background: linear-gradient(rgba(2,15,35,.86), transparent); }
+.dmain6 .cbar6 .in { width: 584px; margin: 0 auto; }
+.scrolled6 { margin-top: var(--up, -300px); }
+
+/* ---------- One head, whatever is under it (owner: "keep the area above the grid/scroll views consistently sized") ---------- */
+.dmain6.wide > .dcol6 { padding-top: 0; }
+.dmain6.wide > .dcol6 .chips6 { margin: 0; padding-left: 0; padding-right: 0; }
+
+/* ---------- A chip drops its panel under itself (proposed) ---------- */
+.chip6.open:not([aria-pressed="true"]) { background: linear-gradient(var(--raised-a), var(--raised-b)); }
+.chip6.open > .ic:last-child { transform: rotate(180deg); }
+.chip6.open:not([aria-pressed="true"]) > .ic:last-child { color: var(--text); }
+.drop6 { position: absolute; z-index: 9; min-width: 220px; border-radius: 24px; padding: 4px 16px; background: linear-gradient(var(--panel-a), var(--panel-b)); box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); }
+.drop6.still { position: relative; }
+.drop6.m { padding: 4px; border-radius: 26px; }
+.drop6.m .menu6 { background: none; box-shadow: none; padding: 0; border-radius: 22px; }
+.drop6.m .menu6 .thumb { top: 0; left: 0; right: 0; }
+.drop6 .qrows6.ico { --div: 44px; }
+.drop6 .qrows6 .srow6 { padding-left: 0; padding-right: 0; }
+.ddpair6 { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; }
+.drop6.m .cust6 { margin: 4px 0 0; padding: 12px; border-top: 1px solid rgba(180,199,217,.1); }
+.drop6.custom .cust6 { display: block; }
+.drop6 .sub6 { margin: 12px 0 4px; }
+.drop6 .lnote6 { margin-top: 8px; }
+.drop6 > .btn6.wide { margin-bottom: 12px; }
+.ddpair6 > .drop6 { max-width: 100%; }
+/* a row straight on a sheet has no panel to clip its wash: the wash is 8 wider than the words on each side, radius 16 */
+.p6 .qrows6 button.srow6::after { content: ""; position: absolute; inset: 0 -8px; border-radius: 16px; background: rgba(255,255,255,.04); opacity: 0; transition: opacity .1s ease-out; pointer-events: none; }
+.p6 .qrows6 button.srow6:active, .p6 .qrows6 button.srow6.hov { background: none; }
+.p6 .qrows6 button.srow6:active::after, .p6 .qrows6 button.srow6.hov::after { opacity: 1; }
+.p6 .qrows6 button.srow6.hovbad { background: rgba(255,255,255,.04); }
+@media (hover: hover) and (pointer: fine) { .p6 .qrows6 button.srow6:hover { background: none; } .p6 .qrows6 button.srow6:hover::after { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .p6 .qrows6 button.srow6::after { transition: none; } }
+.fsheet6 .list { margin-inline: -8px; padding-inline: 8px; }
+.hp6 .onsheet { flex: 1; min-width: 0; padding: 4px 16px; border-radius: 16px; background: linear-gradient(var(--panel-a), var(--panel-b)); box-shadow: var(--lit); }
+.hp6.tall { row-gap: 44px; padding-bottom: 44px; }
+.hp6 { display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 14px 12px; padding: 16px; }
+.hp6 > small { font: var(--t-foot); color: var(--muted); }
+.hp6 > div { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-width: 0; }
+.hp6 .group6, .hp6 .rows6 { margin: 0; flex: 1; }
+.hp6.onart { background: linear-gradient(160deg, #6B4A5E, #2B3A55); }
+.hp6 .panel { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 16px; background: var(--panel-a); box-shadow: var(--lit); }
+
+/* ---------- Grid loading (proposed): the tile's own shapes as wells ---------- */
+.tile6.skt6 { pointer-events: none; }
+.tile6.skt6 > .sk.pic { aspect-ratio: 1; border-radius: var(--r-art); }
+.tile6.skt6 .nums { height: 18px; align-items: center; }
+.tile6.skt6 .nums .sk { height: 10px; }
 </style>
 
 <div class="wrap" id="root">
@@ -997,7 +1102,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <section id="more" aria-label="Artists, toasts and Popular artists">
     <h2 class="pg-h2" style="margin-top:40px">Artists, toasts and Popular artists</h2>
-    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>Drawn overnight for the Artists tab. Toasts had not been drawn anywhere in v6, so this is also the first look at them for the whole app. The two toast choices that had switches are set to my picks (a ring around Undo, a toast that hugs its words); the other options are in the table. In the fifth phone, tap Follow on a row.</p>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>Drawn overnight for the Artists tab. Toasts had not been drawn anywhere in v6, so this is also the first look at them for the whole app. The two toast choices are picked: a ring around Undo, and a toast that hugs its words. In the fifth phone, tap Follow on a row.</p>
     <div class="cols">
       <section class="col" aria-label="Artists, Suggested">
         <div class="col-head"><h2 class="pg-h3">1. Artists, Suggested</h2><p>The offer row leads when three or more artists stand out. Under it, each suggestion is the artist card from the feed at full width, with a ⋯ of its own.</p></div>
@@ -1049,7 +1154,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The pieces of Results, the grid and the artist page that had no drawing: a link that brings its own settings, holding a tile, and what the artist page shows when the name is wrong, is not an artist, or you cannot follow.</p>
     <div class="cols">
       <section class="col" aria-label="Opened from a link">
-        <div class="col-head"><h2 class="pg-h3">1. Opened from a link</h2><p>The "From a link" chip leads the row. It opens a sheet that lists what the link set, with one button to go back to your own settings.</p></div>
+        <div class="col-head"><h2 class="pg-h3">1. Opened from a link</h2><p>The "From a link" chip leads the row. It drops a panel that lists what the link set, with one button to go back to your own settings.</p></div>
         <div class="phone-holder" id="s-link"></div>
         <div class="under" id="u-link"></div>
       </section>
@@ -1068,7 +1173,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <div class="tbl"><table>
       <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
       <tbody>
-        <tr><th>The "From a link" chip</th><td>First in the chips row; lists what the link set, with "Use my settings"</td><td>A chip with a link glyph and the gold ring (it is on). It opens a titled sheet: six rows of name and value, one line saying it is for this visit only, and a tonal "Use my settings".</td><td>A chip that is on already wears the ring. The button is tonal because gold is Play's. Other option: a menu of switches, one per setting.</td></tr>
+        <tr><th>The "From a link" chip</th><td>First in the chips row; lists what the link set, with "Use my settings"</td><td>A chip with a link glyph and the gold ring (it is on). It drops a panel under itself, like every chip with an arrow: six rows of name and value, one line saying it is for this visit only, and a tonal "Use my settings".</td><td>A chip that is on already wears the ring. The button is tonal because gold is Play's. Other option: a menu of switches, one per setting.</td></tr>
         <tr><th>Not signed in on this browser</th><td>A notice over the player for 4 s, then the same strip on Results</td><td>On Results: the sunk banner at two lines with a small raised "Sign in". Over the player: the same words in the player's glass.</td><td>The offline banner is the app's strip for "something about this session"; this one needs a second line and an action. Other option: a toast.</td></tr>
         <tr><th>Holding a tile</th><td>Menu: Favorite, Open artist, Play from here, Open on e621</td><td>The tile sinks to 96% after 400 ms and the ⋯ sheet rises, headed by the artist and the post number. Favorited already: "Unfavorite" with a filled heart.</td><td>One menu for the whole app. Other option: a small menu at the finger, like the tag targets.</td></tr>
         <tr><th>No such artist</th><td>"No artist called X on e621" + Search</td><td>The empty shape: Goo looking, "No artist called "inkwel fox"", one sentence, a tonal Search. Back stays in the header.</td><td>It is "nothing found", which is Goo looking everywhere else.</td></tr>
@@ -1162,7 +1267,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The same screens with the tab bar stood on its side. Nothing new was made: the sidebar is the app's panel with the tab bar's sliding capsule, a popover and a dialog are the phone's sheet, and Post info is that sheet standing beside the picture. Each frame is a 1280 by 800 window, shrunk to fit this page. The sidebar's tabs slide.</p>
     <div class="dframes6">
       <figure class="dfig6"><figcaption><h2 class="pg-h3">1. Following</h2><p>The sidebar holds the app mark, the four tabs, Search and your account. The feed is a 600 column in the middle of what is left. Play stands beside the column, so it never covers a picture.</p></figcaption><div class="desk-holder" id="d-feed"></div></figure>
-      <figure class="dfig6"><figcaption><h2 class="pg-h3">2. Grid, with a chip's popover</h2><p>The grid takes the full width, as many 176 tiles as fit. A chip's sheet opens as a popover under the chip: the same panel, with no handle and no close button.</p></figcaption><div class="desk-holder" id="d-grid"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">2. Grid, with a chip's dropdown</h2><p>The tiles take the full width, as many 176 tiles as fit. The head stays in the 600 column, where it is on the feed. A chip drops its panel under itself: no title, no close button.</p></figcaption><div class="desk-holder" id="d-grid"></div></figure>
       <figure class="dfig6"><figcaption><h2 class="pg-h3">3. The player, with Post info</h2><p>The sidebar leaves. Post info is a panel at the right and the picture moves over to make room, so nothing covers it. The controls are one row.</p></figcaption><div class="desk-holder" id="d-player"></div></figure>
       <figure class="dfig6"><figcaption><h2 class="pg-h3">4. Settings</h2><p>All the sub-pages on one page in the 600 column, each under its name. Sign out sits on the account row.</p></figcaption><div class="desk-holder" id="d-settings"></div></figure>
       <figure class="dfig6"><figcaption><h2 class="pg-h3">5. A dialog</h2><p>A titled sheet (shortcuts, Quick settings, sign-in, install steps) opens in the middle of the window, 420 wide, over the dim.</p></figcaption><div class="desk-holder" id="d-dialog"></div></figure>
@@ -1179,7 +1284,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <tr><th>The grid tile's menu</th><td>(not said)</td><td>Right-click, or the keyboard's menu key. No ⋯ appears on hover.</td><td>Nothing sits on top of art, on a computer too.</td></tr>
         <tr><th>The player</th><td>Info is a right panel</td><td>A 360 panel, 8 from the window; the picture is centred in the rest. The four buttons move to the right end of one control row; a full-screen button joins the count at the top.</td><td>A wide window has the room, and one row keeps the controls off the middle of the picture.</td></tr>
         <tr><th>Tall pictures</th><td>(not said)</td><td>In the feed a picture is never taller than the window less 160, shown whole on the well.</td><td>The phone's cap (1:2) would make a picture taller than the window here.</td></tr>
-        <tr><th>Hover</th><td>(not said)</td><td>Rows get the 4% white wash they already use when pressed. Raised controls step up to Raised Highlight. Gold and art do not change.</td><td>Two rules cover every control.</td></tr>
+        <tr><th>Hover</th><td>(not said)</td><td>Redone as a full pass. See "Under the pointer (hover)" below.</td><td>Two rules did not cover the tools capsule, where the highlight touched the edge.</td></tr>
         <tr><th>Goo</th><td>(not said)</td><td>Not designed. The sidebar is drawn clean.</td><td>The goo lies along the phone's bent bar. Where it goes on a straight sidebar, and how the secret tab is found, is yours to pick. My suggestion is in the morning list.</td></tr>
       </tbody>
     </table></div>
@@ -1187,12 +1292,106 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
 
 
+  <section id="topbar" aria-label="The top bar after you scroll">
+    <h2 class="pg-h2" style="margin-top:40px">The top bar after you scroll</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Capsule</span>Before, the bar was a flat band from edge to edge. On a phone that is the usual iOS bar. On a computer it stretches across the whole window while its contents sit in the 600 column, and it ends hard against the floating sidebar. It was the only thing in the app that neither floated nor had a rounded shape. Now the bar is a floating capsule, the tab bar's sibling, the same on a phone and on a computer. Every phone on this page shows it when you scroll.</p>
+    <div class="cols" style="margin-top:24px">
+      <section class="col" aria-label="Following, scrolled">
+        <div class="col-head"><h2 class="pg-h3">1. Following, scrolled</h2><p>The title, the count in gold, the tool buttons. The capsule is as wide as the tab bar, 8 narrower than a post on each side, and sits 4 under the status area. The page darkens behind the clock, the way it does behind the tab bar.</p></div>
+        <div class="phone-holder" id="s-tb1"></div>
+      </section>
+      <section class="col" aria-label="Artist page, scrolled">
+        <div class="col-head"><h2 class="pg-h3">2. An artist, scrolled</h2><p>Back, the mark, the name, Follow. Back is 4 from the capsule's end and Follow is 8, so each follows the capsule's curve.</p></div>
+        <div class="phone-holder" id="s-tb2"></div>
+      </section>
+    </div>
+    <div class="dframes6" style="margin-top:48px">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">3. An artist on a computer, scrolled</h2><p>The screen from your picture. The capsule is 8 narrower than the column on each side, as on a phone, and 8 from the top of the window, level with the sidebar's top edge.</p></figcaption><div class="desk-holder" id="d-tb1"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">4. Following on a computer, scrolled</h2><p>The same capsule with the title, the count and the tools.</p></figcaption><div class="desk-holder" id="d-tb2"></div></figure>
+    </div>
+    <h2 class="pg-h2">The capsule</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Part</th><th>Value</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><th>Shape</th><td>52 tall, 26 radius. Raised, the top light, the floating shadow.</td><td>The same floating material as the tab bar.</td></tr>
+        <tr><th>On a phone</th><td>16 from the sides (as wide as the tab bar), 4 under the status area.</td><td>It is 8 narrower than a post on each side, so it reads as floating over the posts.</td></tr>
+        <tr><th>On a computer</th><td>584 wide, centred on the 600 column, 8 from the top of the window.</td><td>Level with the sidebar's top edge. It stays put when the grid goes wide.</td></tr>
+        <tr><th>On a tab</th><td>The title 20 from the end, the count in gold, the tool buttons 4 from the other end.</td><td></td></tr>
+        <tr><th>On an artist</th><td>Bare Back 4 from the end, the 24 mark, the name, Follow 8 from the other end.</td><td>Each follows the capsule's curve.</td></tr>
+        <tr><th>Behind it</th><td>The page fades to Ground: solid behind the clock, clear by 128 from the top (84 on a computer).</td><td>The clock stays readable. The tab bar has the same fade at the bottom.</td></tr>
+        <tr><th>Arriving</th><td>Fades in and drops 8 over 150 ms, ease-out. With reduced motion it only fades.</td><td></td></tr>
+        <tr><th>When</th><td>Unchanged: after 64 px on a tab, after the hero on an artist page.</td><td></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="samehead" aria-label="One head">
+    <h2 class="pg-h2" style="margin-top:40px">The head stays one size</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Your rule, my drawing</span>You asked that the area above the feed and the grid keep one size. On a computer the head of a screen (Back and the tools, the title or the artist's hero, the stats, Follow, the chips) now always sits in the 600 column. Only the tiles go wide. Before, switching to the grid stretched the head across the window, so Back, the stats and the grid button itself all jumped away from the pointer. My first desktop drawing had that mistake.</p>
+    <div class="dframes6" style="margin-top:24px">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">1. An artist, as a feed</h2><p>The head in the 600 column, posts under it.</p></figcaption><div class="desk-holder" id="d-sh1"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">2. The same artist, as a grid</h2><p>The same head in the same place. The tiles use the full width, 24 from each side. The grid button has not moved, so a second click switches back.</p></figcaption><div class="desk-holder" id="d-sh2"></div></figure>
+    </div>
+  </section>
+
+  <section id="dropdown" aria-label="Chips drop down">
+    <h2 class="pg-h2" style="margin-top:40px">A chip drops its panel under itself</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Dropdown</span>You asked whether a chip should open a dropdown, because its arrow points down. Yes, on a phone and on a computer. On a computer the spec already said "a popover under the chip", but I drew it with a title, and what is built is a box with a title, a close button and Done. Now: no title, no close button, no Done. The chip is the title. The panel hangs 8 under the chip, its left edge on the chip's left edge. A change applies at once. Only a custom range needs Apply, and that button is tonal, not gold, because Play is still on screen. A tap or click outside closes it, and so does Esc. While it is open the chip is one step lighter and its arrow points up.</p>
+    <div class="dframes6" style="margin-top:24px">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">1. Media, open on a computer</h2><p>Three switches, because more than one can be on. The feed stays lit behind it: no dim.</p></figcaption><div class="desk-holder" id="d-dd1"></div></figure>
+    </div>
+    <div class="cols" style="margin-top:24px">
+      <section class="col" aria-label="Media on a phone">
+        <div class="col-head"><h2 class="pg-h3">2. Media, open on a phone</h2><p>The same dropdown, kept inside the 16 inset. A panel at the top stays in view when the keyboard is up (Date, Score). Every filter menu is drawn this way under "Filter menus, player sheets and tag targets".</p></div>
+        <div class="phone-holder ddph" id="s-dd1"></div>
+      </section>
+      <section class="col"><div class="under" id="u-dd"></div></section>
+    </div>
+  </section>
+
+  <section id="hover" aria-label="Under the pointer">
+    <h2 class="pg-h2" style="margin-top:40px">Under the pointer (hover)</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed. Lift is picked by you</span>A pass over every kind of control, started by your two pictures: the tools capsule, where the highlight touched the capsule's edge, and the artist list, where it was a square block. Three rules, by what a control is made of. A button with a lip rises 1. A raised thing without a lip goes one step lighter. A flat or sunk thing gets a faint wash that stays inside its container. Pictures never change. On a computer, move the pointer over anything on this page to feel it. Each strip also shows the hover state fixed in place, so it reads on a phone.</p>
+    <div class="cols" style="margin-top:24px">
+      <section class="col"><div class="under" id="u-hov1"></div></section>
+      <section class="col"><div class="under" id="u-hov2"></div></section>
+      <section class="col"><div class="under" id="u-hov3"></div></section>
+    </div>
+    <h2 class="pg-h2">The rules</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Made of</th><th>Which controls</th><th>Under the pointer</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><th>A lip</th><td>Tonal and gold buttons, Play, Follow, the heart, the stepper, the player's Play</td><td>Rises 1 px; the lip grows by 1. Nothing changes colour. Picked by you ("Lift").</td><td>It is the opposite of a press, which sinks the button onto its lip. Gold can do it too, and no button ends up looking "on".</td></tr>
+        <tr><th>Raised, no lip</th><td>Chips, the round Back button, an artist's mark in a post's header, the clear button in a field</td><td>One step lighter: Panel to Raised, Raised to Raised Highlight.</td><td>These squish when pressed, so there is no lip to grow.</td></tr>
+        <tr><th>An icon or words with no body</th><td>The tools capsule's buttons, a post's ⋯, "Skip for now", links</td><td>A 6% white wash and the icon turns white. In the tools capsule the wash is 40 by 36, 4 from the capsule on every side. A ⋯ gets its 36 disc. A link only turns white.</td><td>The wash follows the container's curve, so the gap is the same all the way round.</td></tr>
+        <tr><th>A well</th><td>✕, the remove well, tags, Undo, the Search field</td><td>The same 6% wash over the well; an icon turns white. A tag keeps its e621 colour. "+14" gets a brighter outline.</td><td>A well cannot rise. Tag colours carry meaning, so they stay.</td></tr>
+        <tr><th>A row</th><td>List rows, sheet rows, the sidebar's tabs and account</td><td>A 4% white wash. Inside a panel or a well it runs edge to edge and the container's corners clip it. Straight on a sheet it is 8 wider than the words on each side, with a 16 radius. A press on a phone uses the same shapes. A sidebar tab's icon and name turn white.</td><td>A wash must never show a square corner in the open. The sheet case was missing from my drawing.</td></tr>
+        <tr><th>One of several</th><td>Menu rows, a segmented control's parts, the tab bar's tabs</td><td>The words turn white. No wash: the raised capsule already marks the current one.</td><td>Two capsules in one well would read as two choices.</td></tr>
+        <tr><th>Glass</th><td>The player's round buttons</td><td>The rim doubles, from 16% to 32% white.</td><td>The glass sits on a picture, so it must not get heavier.</td></tr>
+        <tr><th>Pictures</th><td>Art in a post, grid tiles, artist cards</td><td>Nothing, except the pointer becomes a hand.</td><td>Nothing sits on top of art and art does not move.</td></tr>
+        <tr><th>All of them</th><td></td><td>100 ms, ease-out. Only with a mouse or trackpad, never after a tap. Focus is still the gold ring. A disabled control does not react.</td><td>Touch screens leave hover stuck after a tap.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="gridload" aria-label="Grid loading">
+    <h2 class="pg-h2" style="margin-top:40px">Grid loading</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The grid had no loading drawing; the feed's skeleton post did. A skeleton tile is the tile's own shapes as wells: the square with the picture's radius, and two short bars where the score and the favorites go. The same light band crosses each shape.</p>
+    <div class="cols">
+      <section class="col" aria-label="Grid, first load">
+        <div class="col-head"><h2 class="pg-h3">1. First load</h2><p>The title, tools and chips are real at once. Twelve skeleton tiles fill the first screen (four rows of three). No gold dots, no play marks, nothing to press.</p></div>
+        <div class="phone-holder" id="s-gload"></div>
+      </section>
+      <section class="col" aria-label="Grid, loading more"><div class="under" id="u-gload"></div></section>
+    </div>
+  </section>
+
   <section id="new" aria-label="Menus and sheets">
     <h2 class="pg-h2" style="margin-top:40px">Filter menus, player sheets and tag targets</h2>
     <p class="pg-p dimtxt" style="margin-bottom:28px">Everything is live: tap a row, a switch, a tag. A menu marks the chosen row with a raised capsule that slides to it (picked), the same move as the tab bar and the segmented control.</p>
     <div class="cols">
       <section class="col" aria-label="Filter menus">
-        <div class="col-head"><h2 class="pg-h3">Filter menus</h2><p>A chip opens a sheet. Tapping a row applies it and closes the sheet; only Custom needs Apply. Tap Random to see its Reshuffle.</p></div>
+        <div class="col-head"><h2 class="pg-h3">Filter menus</h2><p>A chip drops its menu under itself (picked by you). Tapping a row applies it and closes the menu; only Custom needs Apply. Tap Random to see its Reshuffle.</p></div>
         <div class="phone-holder" id="s-sort"></div>
         <div class="under" id="u-sort"></div>
       </section>
@@ -1707,31 +1906,31 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   $('s-sort').innerHTML = phone(`
     <div class="scroll6" style="overflow:hidden">
       <div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'solo')}</span></button><div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div></div>
-        <div class="chips6"><button class="chip6" type="button">${ic('x', 14, 2.8)}Reset</button>${chip('Videos', true)}${chip('Top', true)}${chip('Date')}${chip('Score')}</div></div>
+        <div class="chips6"><button class="chip6" type="button">${ic('x', 14, 2.8)}Reset</button>${chip('Videos', true)}${chip('Top', true).replace('class="chip6"', 'class="chip6 open"')}${chip('Date')}${chip('Score')}</div></div>
       ${post(P2)}
     </div>
     <div class="scrim6"></div>${fab(0)}${tabbar('Following', '', 343, 'live')}
-    <div class="dim6"></div>
-    <div class="sheet6 in" role="dialog" aria-label="Sort">${shtop('Sort')}
+    <div class="drop6 m" role="dialog" aria-label="Sort" style="right:16px;top:161px;width:220px">
       ${menu('Sort', mrow('New') + mrow('Top', true) + mrow('Hot') + '<div class="msep6"></div>' + mrow('Oldest') + mrow('Most favorited') + mrow('Random', false, `<span class="act">${ic('shuffle', 16, 2.4)}Reshuffle</span>`) + mrow('Most comments') + mrow('Largest'))}
     </div><span class="home6"></span>`);
+  const openC = h => h.replace('class="chip6"', 'class="chip6 open"');
+  const applyT = '<button class="btn6 lip6 wide" type="button">Apply</button>';
 
   const mediaSw = (i, t, on) => `<div class="srow6"><span class="ico">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b></span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
   $('u-sort').innerHTML = [
-    strip('Media', 'More than one can be on, so these are switches, not a one-of list. The chip reads "Videos" here.', sheetStrip(`${shtop('Media')}
-      <div class="qrows6 ico">${mediaSw('image', 'Images', false)}${mediaSw('frames', 'GIFs', false)}${mediaSw('film', 'Videos', true)}</div>`)),
-    strip('Date, with Custom open', 'Custom adds its controls under the list. Try the five kinds: the fields change.', sheetStrip(`${shtop('Date')}
+    strip('Media', 'More than one can be on, so these are switches, not a one-of list. The chip reads "Videos" here.', `<div class="strip p6 ddpair6">${openC(chip('Videos', true))}<div class="drop6 still" style="width:260px"><div class="qrows6 ico">${mediaSw('image', 'Images', false)}${mediaSw('frames', 'GIFs', false)}${mediaSw('film', 'Videos', true)}</div></div></div>`),
+    strip('Date, with Custom open', 'Custom adds its controls under the list, and the menu grows to the full width. Try the five kinds: the fields change. Apply is tonal here, not gold.', `<div class="strip p6 ddpair6">${openC(chip('Custom', true))}<div class="drop6 m still custom" style="width:343px">
       ${menu('Date', mrow('Any') + mrow('Today') + mrow('This week') + mrow('This month') + mrow('Custom…', true, '', 'role="radio" data-custom'))}
       <div class="cust6" data-k="two">
         <div class="seg6" style="--n:5;--i:3" role="group" aria-label="Kind of date"><span class="thumb"></span><button type="button" data-k="one" aria-pressed="false">On</button><button type="button" data-k="one" aria-pressed="false">After</button><button type="button" data-k="one" aria-pressed="false">Before</button><button type="button" data-k="two" aria-pressed="true">Between</button><button type="button" data-k="n" aria-pressed="false">Last</button></div>
         <div class="pair6" data-for="two">${fld('From', `${ic('cal', 18, 2.2)}<span class="val">Nov 1, 2026</span>`)}${fld('To', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`)}</div>
         ${fld('Date', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`, '', 'data-for="one"')}
         <div class="frow6" data-for="n"><span class="flabel6">In the last</span><div class="nrow6"><div class="field6 focus"><span class="val">7<span class="caret"></span></span></div><div class="seg6 big" style="--n:3;--i:0" role="group" aria-label="Unit"><span class="thumb"></span><button type="button" aria-pressed="true">days</button><button type="button" aria-pressed="false">weeks</button><button type="button" aria-pressed="false">months</button></div></div></div>
-        ${apply6}
-      </div>`, 'custom')),
-    strip('Score', 'Tap Custom… for the number field.', sheetStrip(`${shtop('Score')}
+        ${applyT}
+      </div></div></div>`),
+    strip('Score', 'Tap Custom… for the number field.', `<div class="strip p6 ddpair6">${openC(chip('≥ 50', true))}<div class="drop6 m still" style="width:220px">
       ${menu('Score', mrow('Any') + mrow('≥ 10') + mrow('≥ 50', true) + mrow('≥ 100') + mrow('≥ 500') + mrow('Custom…', false, '', 'role="radio" data-custom'))}
-      <div class="cust6">${fld('At least', `${ic('up', 18, 1.6, 'solid')}<span class="val">250<span class="caret"></span></span>`, 'focus scorefld')}${apply6}</div>`)),
+      <div class="cust6">${fld('At least', `${ic('up', 18, 1.6, 'solid')}<span class="val">250<span class="caret"></span></span>`, 'focus scorefld')}${applyT}</div></div></div>`),
   ].join('');
 
   // Player › Quick settings
@@ -2015,7 +2214,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <div class="dim6"></div>
     <div class="sheet6 in" role="dialog" aria-label="cedar lynx">${ctx('cedar lynx', 'cedar_lynx')}${rows6(['share', 'Share artist'], ['ext', 'Open on e621', 'e621.net'], ['minus', 'Unfollow'])}</div><span class="home6"></span>`);
   $('u-amenu').innerHTML = [
-    strip('Sort', 'The Recent chip opens the app\'s menu: one capsule slides to the choice.', sheetStrip(`${shtop('Sort')}${menu('Sort', mrow('Recent', true) + mrow('A–Z') + mrow('Most faved'))}`)),
+    strip('Sort', 'The Recent chip drops the app\'s menu under itself: one capsule slides to the choice.', `<div class="strip p6 ddpair6"><button class="chip6 open" type="button" aria-pressed="false">Recent${ic('down', 16, 2.4)}</button><div class="drop6 m still" style="width:220px">${menu('Sort', mrow('Recent', true) + mrow('A–Z') + mrow('Most faved'))}</div></div>`),
     strip('Filter your artists', 'Typing narrows the list as you go. With no match the list is one muted line: No artist you follow matches "zz".', `<div class="strip p6" style="padding:16px 0 0"><div style="display:flex;padding:0 16px;margin-bottom:16px"><div class="field6 focus has">${ic('search', 18, 2.2)}<span class="val">ot<span class="caret"></span></span><button class="clr" type="button" aria-label="Clear" style="margin-right:6px">${ic('x', 14, 2.8)}</button></div></div><div class="group6 who">${arow('mossy otter', 'posted 3h ago · you faved 31', true)}</div><p class="foot6">1 of 42</p></div>`),
   ].join('');
 
@@ -2060,17 +2259,16 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     tag: '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/>',
   });
   const resTools = `<div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
-  const linkChip = `<button class="chip6" type="button" aria-pressed="true">${ic('link', 16, 2.4, 'lead')}From a link${ic('down', 16, 2.4)}</button>`;
+  const linkChip = `<button class="chip6 lk" type="button" aria-pressed="true">${ic('link', 16, 2.4, 'lead')}From a link${ic('down', 16, 2.4)}</button>`;
   const resHead = `<div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'solo')}</span></button>${resTools}</div>
         <div class="chips6">${linkChip}${chip('Videos', true)}${chip('Top', true)}${chip('Date')}${chip('Score')}</div></div>`;
   const outBanner = `<div class="banner6 two" role="status">${ic('info', 18, 2.2)}<span><b>Not signed in on this browser</b><small>Your blacklist isn't applied</small></span><button class="btn6 lip6" type="button">Sign in</button></div>`;
   const lrow = (t, v) => `<div class="srow6"><span class="lbl"><b>${t}</b></span><span class="val">${v}</span></div>`;
   $('s-link').innerHTML = phone(`
-    <div class="scroll6" style="overflow:hidden">${resHead}${outBanner}${post(P2)}</div>
+    <div class="scroll6" style="overflow:hidden">${resHead.replace('chip6 lk', 'chip6 lk open')}${outBanner}${post(P2)}</div>
     <div class="scrim6"></div>${fab(0)}${tabbar('Following', '', 343, 'live')}
-    <div class="dim6"></div>
-    <div class="sheet6 in" role="dialog" aria-label="From a link">${shtop('From a link')}
-      <p class="sub6" style="margin:-4px 0 8px">This link came with its own settings.</p>
+    <div class="drop6" role="dialog" aria-label="From a link" style="left:16px;top:161px;width:343px">
+      <p class="sub6">This link came with its own settings.</p>
       <div class="qrows6">${lrow('Ratings', 'Safe, Questionable')}${lrow('Media', 'Videos')}${lrow('Sort', 'Top')}${lrow('Date', 'This week')}${lrow('Score', '≥ 50')}${lrow('Slideshow', 'Ken Burns · 4 s')}</div>
       <p class="lnote6">For this visit only. Nothing of yours is changed.</p>
       <button class="btn6 lip6 wide" type="button">Use my settings</button>
@@ -2235,9 +2433,9 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   $('d-feed').innerHTML = desk(side('Following') + feedMain);
 
   // 2. Grid: the full width; a chip's sheet becomes a popover under the chip
-  $('d-grid').innerHTML = desk(side('Following', '', 5) + `<div class="dmain6 wide">${dhead().replace('<b>12 new</b> from 5 artists', '<b>5 new</b> from 2 artists')}
+  $('d-grid').innerHTML = desk(side('Following', '', 5) + `<div class="dmain6 wide"><div class="dcol6">${dhead().replace('<b>12 new</b> from 5 artists', '<b>5 new</b> from 2 artists').replace('<button class="chip6"', '<button class="chip6 open"')}</div>
     <div class="grid6">${tiles('mossy otter', 5, 0, 5)}<div class="gridrule6">${caught()}</div>${tiles('dune jackal', 15, 5, 0)}</div>${fab(5)}
-    <div class="sheet6 pop6" role="dialog" aria-label="Media" style="left:24px;top:162px"><div class="shtop"><b>Media</b></div><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div></div>`);
+    <div class="drop6" role="dialog" aria-label="Media" style="left:calc(50% - 300px);top:162px;width:260px"><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div></div>`);
 
   // 3. The player: Post info is a panel beside the picture, not a sheet over it
   const sinfo = $('s-info').querySelector('.sheet6').innerHTML;
@@ -2269,8 +2467,6 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   $('u-desk').innerHTML = [
     strip('A tile\'s menu', 'Right-click a tile (or the menu key). The same rows as the phone\'s hold menu, as a popover at the pointer.', `<div class="strip p6" style="padding:20px 0"><div class="sheet6 pop6 still">${ctx('mossy otter', '#4512290').replace('<div class="grab"></div>', '')}${tileRows(false)}</div></div>`),
     strip('Narrower windows, 900 to 1099', 'The same panel with icons only. The label shows as a tooltip. Under 900 it is the phone layout.', `<div class="strip p6" style="padding:8px;display:flex;justify-content:center">${side('Following', 'rail still')}</div>`),
-    strip('Under the pointer', 'A row gets a faint wash. A raised button steps up to the lighter navy. Gold and pictures do not change.',
-      `<div class="strip p6 hovs6"><div class="pairs"><small>Rest</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist')}</div></div><div class="pairs"><small>Hover</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist').replace('class="srow6"', 'class="srow6 hov"')}</div></div><div class="pairs"><small>Rest</small><button class="btn6 lip6" type="button">Import</button><small style="margin-left:24px">Hover</small><button class="btn6 lip6 hov" type="button">Import</button></div></div>`),
   ].join('');
 
   // the sidebar's capsule slides to the tab you pick
@@ -2279,6 +2475,81 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   // a desktop frame is 1280 wide; it shrinks to fit the page
   const dfit = () => document.querySelectorAll('.desk-holder').forEach(h => { const z = Math.min(1, h.clientWidth / 1280), el = h.firstElementChild; h.style.height = (800 * z) + 'px'; if (el) el.style.zoom = z; });
   dfit(); addEventListener('resize', dfit);
+
+
+  /* ================= The head stays one size; chips drop down (proposed) ================= */
+  const aTools = `<div class="tools6"><button type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const aHead = `<div class="head6"><div class="titlerow">${back()}${aTools}</div></div>
+    <div class="hero6">${avatar('inkwell fox', 'x')}<h3 class="title6">inkwell fox</h3><span class="handle">inkwell_fox</span>
+      <div class="stats6"><div class="stat6"><b>${ic('image', 16, 2.4)}1.2k</b><small>posts</small></div><div class="stat6 pink"><b>${ic('heart', 16, 2.6)}48</b><small>you faved</small></div><div class="stat6 green"><b>${ic('clock', 16, 2.4)}2h</b><small>last post</small></div></div>
+      ${hfollow(true)}</div>
+    <div class="chips6" style="margin:0">${chip('Media')}${chip('Hide favorited', false, false, true)}${chip('New')}${chip('Date')}${chip('Score')}</div>`;
+  $('d-sh1').innerHTML = desk(side('Artists') + `<div class="dmain6"><div class="dcol6">${aHead}${post({ ...P1, isNew: false, time: '3d ago', ar: '4/3', v: 3 })}</div>${fab(0)}</div>`);
+  $('d-sh2').innerHTML = desk(side('Artists') + `<div class="dmain6 wide"><div class="dcol6">${aHead}</div><div class="grid6">${tiles('inkwell fox', 18, 0, 3)}</div>${fab(0)}</div>`);
+  const ddMedia = (st = '') => `<div class="drop6 ${st ? 'still' : ''}" role="dialog" aria-label="Media" style="width:260px;${st ? '' : 'left:calc(50% - 300px);top:162px'}"><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div>`;
+  const ddSort = `<div class="drop6 m still" style="width:220px">${menu('Sort', mrow('New') + mrow('Top', true) + mrow('Hot') + mrow('Oldest'))}</div>`;
+  const openChip = h => h.replace('<button class="chip6"', '<button class="chip6 open"');
+  $('d-dd1').innerHTML = desk(side('Following') + `<div class="dmain6"><div class="dcol6">${openChip(dhead())}${post(PD)}${post(P2)}</div>${ddMedia()}${fab(12)}</div>`);
+  $('s-dd1').innerHTML = phone(`<div class="scroll6" style="overflow:hidden">${openChip(head())}${post(P1)}${post(P2)}</div>
+    <div class="drop6" role="dialog" aria-label="Media" style="left:16px;top:192px;width:260px"><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div>` + bottom('Following', 12));
+  $('u-dd').innerHTML = [
+    strip('More than one can be on', 'Switch rows on the sheet\'s Panel: 24 radius, 16 at the sides, the floating shadow. 260 wide.', `<div class="strip p6 ddpair6">${openChip(chip('Media'))}${ddMedia('still')}</div>`),
+    strip('One of a list', 'The app\'s menu with its sliding capsule, floating: 26 radius and 4 padding, so the capsule follows the corner. 220 wide.', `<div class="strip p6 ddpair6">${openChip(chip('Top'))}${ddSort}</div>`),
+  ].join('');
+  dfit();
+
+  /* ================= The top bar after you scroll (proposed) ================= */
+  const tbRoot = cbar('show');
+  const tbWho = `<div class="cbar6 who show"><div class="in">${back('bare')}${avatar('inkwell fox', 's')}<b>inkwell fox</b>${follow(true)}</div></div>`;
+  const PA = { ...P1, isNew: false, time: '3d ago', ar: '4/3', v: 3 }, PB = { ...P1, isNew: false, time: '5d ago', ar: '1/1', v: 5, favs: '804', score: '212' }, PC = { ...P1, isNew: false, time: '1w ago', ar: '3/2', v: 7, favs: '301', score: '96' };
+  $('s-tb1').innerHTML = phone(`${tbRoot}<div class="scroll6" style="overflow:hidden"><div class="scrolled6" style="--up:-250px">${post(P1)}${post(P2)}${post(PB)}</div></div>` + bottom('Following', 12));
+  $('s-tb2').innerHTML = phone(`${tbWho}<div class="scroll6" style="overflow:hidden"><div class="scrolled6" style="--up:-330px">${post(PA)}${post(PB)}${post(PC)}</div></div>` + bottom('Artists'));
+  $('d-tb1').innerHTML = desk(side('Artists') + `<div class="dmain6">${tbWho}<div class="dcol6 scrolled6" style="--up:-300px">${post(PA)}${post(PB)}${post(PC)}</div></div>`);
+  $('d-tb2').innerHTML = desk(side('Following') + `<div class="dmain6">${tbRoot.replace(tools(), dtools)}<div class="dcol6 scrolled6" style="--up:-260px">${post(PD)}${post(P2)}${post(PB)}</div>${fab(12)}</div>`);
+  dfit();
+
+  /* ================= Under the pointer (proposed) ================= */
+  const H = h => h.replace('class="', 'class="hov ');
+  const hp = (rows, cls = '') => `<div class="strip p6 hp6 ${cls}">${rows.map(([l, h]) => `<small>${l}</small><div>${h}</div>`).join('')}</div>`;
+  const pair = (rest, hover = H(rest)) => [['Rest', rest], ['Hover', hover]];
+  const tcap = cls => `<div class="tools6"><button type="button" class="${cls}" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const favb = `<button class="fav6 lip6" type="button" aria-pressed="false" aria-label="Favorite, 486">${ic('heart', 18, 2.4)}<span>486</span></button>`;
+  const lips = [act('Import'), '<button class="btn6 gold lip6" type="button">Sign in</button>', follow(), favb];
+  const moreb = `<span class="panel"><b style="font:var(--t-head)">inkwell fox</b><button class="more6" type="button" aria-label="More">${ic('more', 22, 2.4)}</button></span>`;
+  const wells = [`<button class="x6" type="button" aria-label="Close">${ic('x', 18, 2.6)}</button>`, tg('s', 'otter'), tg('', 'smile'), '<button class="tag6 plus" type="button">+14</button>', '<button class="tundo6" type="button">Undo</button>'];
+  $('u-hov1').innerHTML = [
+    strip('The tools capsule, from your picture', 'Built today: the highlight fills the button\'s box, 40 by 44, so it touches the capsule at the top, bottom and end. Proposed: 40 by 36, which leaves 4 on every side and follows the capsule\'s curve.',
+      hp([['Built today', tcap('hovbad')], ['Proposed', tcap('hov')], ['Rest', tcap('')]])),
+    strip('Buttons with a lip', 'They rise 1 and the lip grows. Nothing changes colour.', hp([['Rest', lips.join('')], ['Hover', lips.map(H).join('')]])),
+    strip('Play', 'The same rise. Its shadow on the page grows by 1 as well.', hp([['Rest', fab(12, 'static')], ['Hover', H(fab(12, 'static'))]], 'tall')),
+  ].join('');
+  $('u-hov2').innerHTML = [
+    strip('Raised, with no lip', 'One step lighter. A chip that is on does not change.', hp(pair(chip('Media') + back() + `<span class="panel ph" style="height:auto;margin:0"><button class="who" type="button" aria-label="More from inkwell fox">${avatar('inkwell fox')}</button></span>`,
+      H(chip('Media')) + H(back()) + `<span class="panel ph" style="height:auto;margin:0"><button class="who hov" type="button" aria-label="More from inkwell fox">${avatar('inkwell fox')}</button></span>`))),
+    strip('An icon or words with no body', 'A wash the size of the control, and the icon or words turn white.', hp(pair(moreb + quiet('Skip for now'), moreb.replace('class="more6"', 'class="more6 hov"') + H(quiet('Skip for now'))))),
+    strip('Wells', 'A faint wash over the well. A tag keeps its colour.', hp([['Rest', wells.join('')], ['Hover', wells.map(H).join('')]])),
+  ].join('');
+  $('u-hov3').innerHTML = [
+    strip('Rows in a panel', 'The wash a row already has when pressed. It runs edge to edge and the panel\'s corners clip it.', hp(pair(`<div class="group6">${srow('eye', 'Content', 'Ratings, blacklist')}</div>`, `<div class="group6">${H(srow('eye', 'Content', 'Ratings, blacklist'))}</div>`))),
+    strip('Rows straight on a sheet, from your second picture', 'Built today, and drawn that way by me: the row has no side padding, so its wash is a square block that stops short of the sheet\'s edges. Proposed: the wash is 8 wider than the words on each side, with a 16 radius. Pressing a row on a phone gets the same shape.',
+      hp([['Built today', `<div class="onsheet"><div class="qrows6">${prow(PICKS[4], true)}${prow(PICKS[5], false).replace('class="', 'class="hovbad ')}${prow(PICKS[6], false)}</div></div>`], ['Proposed', `<div class="onsheet"><div class="qrows6">${prow(PICKS[4], true)}${H(prow(PICKS[5], false))}${prow(PICKS[6], false)}</div></div>`]])),
+    strip('In a well', 'The same wash on a row inside a well. The well clips it.', hp(pair(`<div class="rows6"><button class="row6" type="button">${ic('users', 20, 2)}Open artist</button></div>`, `<div class="rows6"><button class="row6 hov" type="button">${ic('users', 20, 2)}Open artist</button></div>`))),
+    strip('On the player', 'Glass sits on a picture, so only its rim gets brighter.', hp(pair(`<button class="gl6" type="button" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6" type="button" aria-label="Post info">${ic('info', 22, 2.2)}</button>`,
+      `<button class="gl6 hov" type="button" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6 hov" type="button" aria-label="Post info">${ic('info', 22, 2.2)}</button>`), 'onart')),
+  ].join('');
+
+  /* ================= Grid loading (proposed) ================= */
+  const skTile = (a, b) => `<div class="tile6 skt6" aria-hidden="true"><span class="sk pic"></span><span class="nums"><span class="sk" style="width:${a}px"></span><span class="sk" style="width:${b}px"></span></span></div>`;
+  const skTiles = n => Array.from({ length: n }, (_, k) => skTile([28, 22, 32][k % 3], [34, 28, 24][(k + 1) % 3])).join('');
+  $('s-gload').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div><div class="chips6">${chip('Media')}${chip('Hide favorited', false, false, true)}</div></div>
+      <div class="grid6" aria-busy="true" aria-label="Loading posts">${skTiles(12)}</div>
+    </div>` + bottom('Following'));
+  $('u-gload').innerHTML = [
+    strip('Loading more', 'One row of skeleton tiles after the last real row: three on a phone, a full row on a computer.', `<div class="strip p6" style="padding:16px 0 0"><div class="grid6" style="padding-bottom:16px">${tiles('dune jackal', 3, 4, 0)}${skTiles(3)}</div></div>`),
+    strip('One tile', 'The square keeps the picture\'s 16 radius. Two bars, 10 tall, stand where the score and the favorites go. Their widths differ a little from tile to tile.', `<div class="strip p6" style="padding:16px"><div style="width:109px">${skTile(28, 34)}</div></div>`),
+  ].join('');
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2610,7 +2881,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     document.querySelectorAll('.tgts6.live').forEach(n => n.remove()); document.querySelectorAll('.sheet6.in .tag6.held').forEach(n => n.classList.remove('held'));
     const mr = e.target.closest('.mrow6');
     if (mr) { const m = mr.parentElement;
-      m.querySelectorAll('.mrow6').forEach(b => b.setAttribute('aria-checked', b === mr)); placeThumb(m); const sh = m.closest('.sheet6'); if (sh.querySelector('.cust6')) sh.classList.toggle('custom', mr.hasAttribute('data-custom')); return; }
+      m.querySelectorAll('.mrow6').forEach(b => b.setAttribute('aria-checked', b === mr)); placeThumb(m); const sh = m.closest('.sheet6, .drop6'); if (sh && sh.querySelector('.cust6')) sh.classList.toggle('custom', mr.hasAttribute('data-custom')); return; }
     const kd = e.target.closest('.cust6 > .seg6 button'); if (kd) return void (kd.closest('.cust6').dataset.k = kd.dataset.k);
     const tw = e.target.closest('.sheet6.in .tagwrap6 .tag6');
     if (tw) { const sh = tw.closest('.sheet6'), el = document.createElement('div'); el.className = 'tgts6 live' + (calm ? '' : ' pop');
