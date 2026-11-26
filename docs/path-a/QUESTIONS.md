@@ -47,5 +47,9 @@ Format: id — question. Options (recommendation first). Status.
 - **Q8 — Moving e621's "seen" marker automatically.** e621 can only move it to its newest post and
   never back. (a) Auto: after you scroll a screen past "You're caught up" with no filters on, with a
   "Marked as seen on e621" toast; plus ⋯ › Mark all as seen. (b) Manual only: ⋯ › Mark all as seen.
-  Recommendation: (a). Status: open.
-- **Q9 — UX sign-off** on the wireframe page. Status: open.
+  Recommendation: (a). **Answered:** (a) automatic.
+- **Q9 — UX sign-off** on the wireframe page. **Answered: almost.** Do a research pass on spacing and
+  visual hierarchy (what makes app spacing good and consistent), use tokenized values throughout. Specific
+  notes: the card's artist avatar and the ⋯ icon feel too far right / unevenly placed; the artist
+  suggestion tiles look janky. Research well-reviewed component libraries and indie designers' work for
+  inspiration; run research subagents that write findings to disk. Then re-ask sign-off.

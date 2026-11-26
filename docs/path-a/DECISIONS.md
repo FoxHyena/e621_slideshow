@@ -30,3 +30,9 @@ Format: date — decision. Why. Rejected alternatives.
 - **Hosting:** stay on Vercel (not static export), so `/artist/[name]` works without
   `generateStaticParams`. One persistent client shell in the root layout keeps queues and scroll alive;
   don't rely on `cacheComponents` (keeps only 3 hidden routes). Details in ENGINEERING.md target (Phase 4).
+
+## 2026-11-25 — UX sign-off round
+- Seen marker moves automatically (owner, Q8): after scrolling a screen past the divider with no filters,
+  dwell 1.5 s, toast "Marked as seen on e621". Manual ⋯ › Mark all as seen too.
+- UX not yet signed off (Q9): spacing/hierarchy research first, all wireframe values tokenized, fix card
+  header alignment and suggestion tiles. Research lives in `docs/path-a/research/`.

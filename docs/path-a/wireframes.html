@@ -1,0 +1,297 @@
+<title>Scroll-first e621 Slideshow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: a long sheet of lo-fi phone frames, grouped by flow, with the rules beside them. */
+:root {
+  --bg: #f4f2f7; --fg: #1d1a24; --muted: #6b6578; --line: #d9d4e2; --card: #ffffff;
+  --accent: #f0a81c; --accent-ink: #3a2600;
+  --phone: #15121c; --phone-2: #221d2c; --phone-3: #2f2939; --phone-fg: #efeaf6; --phone-muted: #8e869d;
+  --art-a: #3b3350; --art-b: #4a4060;
+  --display: "Nunito", ui-rounded, system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f0d14; --fg: #ece8f3; --muted: #9a93a8; --line: #2a2533; --card: #17141e; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0f0d14; --fg: #ece8f3; --muted: #9a93a8; --line: #2a2533; --card: #17141e; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; }
+h2 { font-size: 24px; font-weight: 800; }
+h3 { font-size: 15px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.lede { color: var(--muted); font-size: 16px; margin-top: 8px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 20px; }
+.row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+figure { margin: 0; display: grid; gap: 10px; width: 260px; max-width: 100%; }
+figcaption { font-size: 13px; color: var(--muted); }
+figcaption b { color: var(--fg); font-weight: 600; }
+ul.rules { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: 72ch; }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+/* phone frame */
+.phone { width: 260px; max-width: 100%; aspect-ratio: 375 / 812; background: var(--phone); color: var(--phone-fg);
+  border-radius: 34px; border: 6px solid #000; position: relative; overflow: hidden; font-size: 10px;
+  box-shadow: 0 12px 30px rgba(20, 10, 40, .18); display: flex; flex-direction: column; }
+.status { height: 22px; flex: none; }
+.hdr { padding: 4px 12px 6px; display: flex; align-items: center; gap: 6px; }
+.hdr .t { font-family: var(--display); font-weight: 800; font-size: 17px; flex: 1; }
+.hdr .sub { font-size: 9px; color: var(--accent); font-weight: 600; }
+.ic { width: 20px; height: 20px; border-radius: 50%; background: var(--phone-3); display: grid; place-items: center; font-size: 9px; color: var(--phone-muted); flex: none; }
+.chips { display: flex; gap: 5px; padding: 0 12px 6px; overflow: hidden; }
+.chip { border: 1px solid var(--phone-3); border-radius: 99px; padding: 2px 7px; font-size: 8.5px; color: var(--phone-muted); white-space: nowrap; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.body { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 0 10px; }
+.card { background: var(--phone-2); border-radius: 12px; padding: 6px; display: grid; gap: 5px; flex: none; }
+.who { display: flex; align-items: center; gap: 5px; font-size: 9px; }
+.av { width: 16px; height: 16px; border-radius: 50%; flex: none;
+  background: conic-gradient(from 30deg, #f0a81c, #e86aa8, #6aa8e8, #8ee8a0, #f0a81c); }
+.av.lg { width: 54px; height: 54px; }
+.who .n { font-weight: 600; flex: 1; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex: none; }
+.art { border-radius: 8px; background: linear-gradient(135deg, var(--art-a), var(--art-b)); position: relative; }
+.art::after { content: ""; position: absolute; inset: 30% 30%; border-radius: 50%; background: rgba(255,255,255,.06); }
+.meta { display: flex; gap: 8px; font-size: 8.5px; color: var(--phone-muted); }
+.tags { display: flex; gap: 3px; overflow: hidden; }
+.tags span { background: var(--phone-3); border-radius: 4px; padding: 1px 4px; font-size: 7.5px; color: var(--phone-muted); white-space: nowrap; }
+.divider { display: flex; align-items: center; gap: 6px; color: var(--accent); font-size: 8.5px; font-weight: 600; flex: none; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--accent); opacity: .5; }
+.burst { background: var(--phone-2); border-radius: 10px; padding: 6px 8px; font-size: 9px; color: var(--phone-fg); display: flex; justify-content: space-between; flex: none; }
+.sugg { background: var(--phone-2); border-radius: 12px; padding: 8px; display: grid; gap: 6px; flex: none; }
+.sugg .list { display: flex; gap: 6px; }
+.sugg .a { background: var(--phone-3); border-radius: 10px; padding: 6px; width: 64px; display: grid; justify-items: center; gap: 3px; font-size: 7.5px; flex: none; }
+.btn { background: var(--accent); color: var(--accent-ink); border-radius: 99px; padding: 3px 8px; font-weight: 700; font-size: 8.5px; text-align: center; }
+.btn.ghost { background: var(--phone-3); color: var(--phone-fg); }
+.btn.big { padding: 7px 10px; font-size: 10px; }
+.pill { position: absolute; left: 50%; transform: translateX(-50%); bottom: 50px; background: var(--accent); color: var(--accent-ink);
+  font-weight: 700; padding: 5px 12px; border-radius: 99px; font-size: 9.5px; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+.newpill { position: absolute; left: 50%; transform: translateX(-50%); top: 74px; background: var(--phone-fg); color: var(--phone);
+  font-weight: 700; padding: 3px 9px; border-radius: 99px; font-size: 8.5px; }
+.tabs { height: 40px; flex: none; display: flex; justify-content: space-around; align-items: center; background: rgba(21,18,28,.96);
+  border-top: 1px solid var(--phone-3); font-size: 7.5px; color: var(--phone-muted); }
+.tabs div { display: grid; justify-items: center; gap: 2px; }
+.tabs div::before { content: ""; width: 12px; height: 12px; border-radius: 4px; background: var(--phone-3); }
+.tabs .cur { color: var(--accent); font-weight: 700; }
+.tabs .cur::before { background: var(--accent); }
+.mascot { width: 60px; height: 60px; border-radius: 50%; background: var(--phone-3); display: grid; place-items: center; font-size: 26px; margin: 0 auto; }
+.center { text-align: center; display: grid; gap: 6px; padding: 10px; }
+.check { display: flex; align-items: center; gap: 6px; font-size: 9px; padding: 4px 0; border-bottom: 1px solid var(--phone-3); }
+.box { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--phone-muted); flex: none; }
+.box.on { background: var(--accent); border-color: var(--accent); }
+.check .s { color: var(--phone-muted); font-size: 8px; }
+.seg { display: flex; background: var(--phone-2); border-radius: 99px; padding: 2px; margin: 0 12px 6px; }
+.seg div { flex: 1; text-align: center; padding: 3px; border-radius: 99px; font-size: 8.5px; color: var(--phone-muted); }
+.seg .on { background: var(--phone-3); color: var(--phone-fg); font-weight: 600; }
+.arow { display: flex; align-items: center; gap: 6px; padding: 5px 2px; font-size: 9px; border-bottom: 1px solid var(--phone-2); }
+.arow .n { flex: 1; display: grid; }
+.arow small { color: var(--phone-muted); font-size: 7.5px; }
+.player { background: #000; }
+.player .slide { position: absolute; inset: 70px 8px 120px; border-radius: 6px; background: linear-gradient(160deg, var(--art-a), var(--art-b)); }
+.rail { position: absolute; left: 0; right: 0; bottom: 64px; display: flex; justify-content: space-around; }
+.ctl { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; gap: 14px; align-items: center; }
+.ctl .ic { width: 26px; height: 26px; }
+.prog { position: absolute; left: 0; right: 0; bottom: 16px; height: 2px; background: var(--phone-3); }
+.prog::after { content: ""; display: block; width: 40%; height: 100%; background: var(--accent); }
+.x { position: absolute; top: 30px; left: 12px; }
+.input { margin: 0 12px; background: var(--phone-2); border-radius: 10px; padding: 6px 8px; font-size: 10px; color: var(--phone-fg); }
+.lbl { font-size: 8px; color: var(--phone-muted); text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px 3px; }
+.kbd { position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: var(--phone-3); opacity: .6; display: grid; place-items: center; font-size: 9px; color: var(--phone-muted); }
+.history { font-family: ui-monospace, Menlo, monospace; font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.history span { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; }
+.history i { color: var(--muted); font-style: normal; }
+table { border-collapse: collapse; font-size: 14px; width: 100%; }
+td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.tablewrap { overflow-x: auto; }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:6px">
+    <span class="tag">UX plan v3 · for sign-off · wireframes, not the visual design</span>
+    <h1>Scroll-first e621 Slideshow</h1>
+    <p class="lede">Four tabs (Following, For You, Artists, Settings). The slideshow becomes a player you open from any feed. These grey boxes show layout and flow only; colors, type and motion come in the design step.</p>
+  </header>
+
+  <section>
+    <h2>Following: your home</h2>
+    <div class="row">
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="t">Following</div><div class="ic">⌕</div><div class="ic">▦</div><div class="ic">⋯</div></div>
+          <div class="hdr" style="padding-top:0"><span class="sub">12 new</span></div>
+          <div class="chips"><span class="chip">Media ▾</span><span class="chip">Hide favorited</span></div>
+          <div class="body">
+            <div class="card"><div class="who"><div class="av"></div><span class="n">artist_name · 2h</span><span class="dot"></span><span>⋯</span></div>
+              <div class="art" style="height:120px"></div><div class="meta"><span>♥ 1.2k</span><span>▲ 340</span></div>
+              <div class="tags"><span>wolf</span><span>solo</span><span>smile</span><span>forest</span></div></div>
+            <div class="burst"><span>+9 more from artist_x</span><span>▾</span></div>
+            <div class="divider">✓ You're caught up</div>
+            <div class="sugg"><div class="who"><span class="n">Artists you might like</span><span style="color:var(--accent)">See all</span></div>
+              <div class="list"><div class="a"><div class="av"></div>artist_a<div class="btn">Follow</div></div><div class="a"><div class="av"></div>artist_b<div class="btn">Follow</div></div><div class="a"><div class="av"></div>artist_c<div class="btn">Follow</div></div></div></div>
+          </div>
+          <div class="pill">▶ Play</div>
+          <div class="tabs"><div class="cur">Following</div><div>For You</div><div>Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>Reading.</b> New posts sit above the "caught up" line. A burst from one artist folds into "+9 more". Suggestions show once, after the line.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="t">Following</div><div class="ic">⌕</div><div class="ic">▦</div><div class="ic">⋯</div></div>
+          <div class="chips"><span class="chip">Media ▾</span><span class="chip">Hide favorited</span></div>
+          <div class="newpill">↑ 6 new posts</div>
+          <div class="body">
+            <div class="card"><div class="who"><div class="av"></div><span class="n">artist_q · 1d</span><span>⋯</span></div><div class="art" style="height:150px"></div><div class="meta"><span>♥ 220</span><span>▲ 90</span></div></div>
+            <div class="card"><div class="who"><div class="av"></div><span class="n">artist_r · 1d</span><span>⋯</span></div><div class="art" style="height:110px"></div></div>
+          </div>
+          <div class="pill">▶ Play from here</div>
+          <div class="tabs"><div class="cur">Following</div><div>For You</div><div>Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>New posts while you read.</b> They wait behind a pill; nothing moves until you tap it or pull to refresh.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="t">Following</div><div class="ic">⌕</div></div>
+          <div class="body">
+            <div class="card center"><div class="mascot">🦊</div><b style="font-size:11px">Follow the artists you love and see their new posts first.</b><div class="btn big">Sign in with e621</div></div>
+            <div class="hdr" style="padding:2px 2px"><div class="t" style="font-size:12px">Popular today</div></div>
+            <div class="card"><div class="who"><div class="av"></div><span class="n">artist_p · 5h</span><span>⋯</span></div><div class="art" style="height:120px"></div></div>
+          </div>
+          <div class="tabs"><div class="cur">Following</div><div>For You</div><div>Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>Signed out.</b> A friendly sign-in card, with a real feed underneath so the app is useful straight away.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="t" style="font-size:14px">You've favorited these artists a lot. Follow them?</div></div>
+          <div class="body" style="gap:0">
+            <div class="check"><div class="box on"></div><div class="av"></div><span style="flex:1">artist_a</span><span class="s">faved 48 · 312 posts</span></div>
+            <div class="check"><div class="box on"></div><div class="av"></div><span style="flex:1">artist_b</span><span class="s">faved 31 · 90 posts</span></div>
+            <div class="check"><div class="box on"></div><div class="av"></div><span style="flex:1">artist_d</span><span class="s">faved 22 · 410 posts</span></div>
+            <div class="check"><div class="box"></div><div class="av"></div><span style="flex:1">artist_c</span><span class="s">faved 9 · 1.2k posts</span></div>
+            <div class="check"><div class="box"></div><div class="av"></div><span style="flex:1">artist_e</span><span class="s">faved 7 · 60 posts</span></div>
+            <div style="display:grid;gap:6px;padding-top:10px"><div class="btn big">Follow 10 artists</div><div style="text-align:center;color:var(--phone-muted);font-size:9px">Select all · None · Skip for now</div></div>
+          </div>
+          <div class="tabs"><div class="cur">Following</div><div>For You</div><div>Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>First run after sign-in.</b> Top 10 artists from your favorites are pre-ticked. One tap follows them all.</figcaption>
+      </figure>
+    </div>
+    <ul class="rules">
+      <li>"New" uses e621's own marker, so e621.net and this app agree. The app moves it only once you've scrolled past every new post with no filters on. e621 can't move it back, so ⋯ › Mark all as seen asks first.</li>
+      <li>Pull down at the top to refresh. Tap the Following tab to jump to the top.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Artists and artist pages</h2>
+    <div class="row">
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="t">Artists</div><div class="ic">⌕</div></div>
+          <div class="seg"><div class="on">Following (42)</div><div>Suggested</div></div>
+          <div class="input" style="font-size:9px;color:var(--phone-muted)">Filter your artists</div>
+          <div class="body" style="gap:0;padding-top:6px">
+            <div class="arow"><div class="av"></div><div class="n">artist_a<small>posted 2h ago · you faved 48</small></div><span class="dot"></span><span>⋯</span></div>
+            <div class="arow"><div class="av"></div><div class="n">artist_b<small>posted 3d ago · you faved 12</small></div><span>⋯</span></div>
+            <div class="arow"><div class="av"></div><div class="n">artist_c<small>posted 1w ago · you faved 5</small></div><span>⋯</span></div>
+            <div class="arow"><div class="av"></div><div class="n">artist_d<small>posted a while ago</small></div><span>⋯</span></div>
+            <div style="text-align:center;color:var(--phone-muted);font-size:8px;padding:6px">42 of 500</div>
+          </div>
+          <div class="tabs"><div>Following</div><div>For You</div><div class="cur">Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>Who you follow.</b> A dot means new posts. ⋯ has Unfollow (with Undo) and Share.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="ic">‹</div><div class="t"></div><div class="ic">⤴</div><div class="ic">⋯</div></div>
+          <div class="center" style="padding-top:0"><div class="av lg" style="margin:0 auto"></div><b style="font-size:13px;font-family:var(--display)">Artist Name</b><span style="color:var(--phone-muted);font-family:ui-monospace,monospace;font-size:8px">artist_name</span>
+            <span style="color:var(--phone-muted);font-size:8.5px">1.2k posts · you faved 48 · posted 2h ago</span><div class="btn big" style="margin:0 30px">Follow</div></div>
+          <div class="chips"><span class="chip">Media ▾</span><span class="chip">Hide favorited</span><span class="chip">Sort ▾</span><span class="chip">Date ▾</span></div>
+          <div class="body"><div class="card"><div class="art" style="height:120px"></div></div></div>
+          <div class="pill">▶ Play</div>
+          <div class="tabs"><div>Following</div><div>For You</div><div class="cur">Artists</div><div>Settings</div></div>
+        </div>
+        <figcaption><b>Artist page.</b> Follow, share, stats, then their posts. The header shrinks to a slim bar as you scroll.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone">
+          <div class="status"></div>
+          <div class="hdr"><div class="ic">‹</div><div class="input" style="flex:1;margin:0">wolf solo|</div></div>
+          <div class="lbl">Recent</div>
+          <div class="chips"><span class="chip">wolf solo</span><span class="chip">fox -feral</span><span class="chip">pool:123</span></div>
+          <div class="lbl">Saved</div>
+          <div class="body" style="gap:0"><div class="arow">★ <div class="n">Cozy foxes<small>fox cozy · Videos · Top</small></div></div><div class="arow">♥ <div class="n">Your favorites</div>›</div></div>
+          <div class="kbd">keyboard</div>
+        </div>
+        <figcaption><b>Search</b> opens from the magnifier on every tab, with the keyboard up. Results open as their own feed.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="phone player">
+          <div class="status"></div>
+          <div class="ic x">✕</div>
+          <div class="slide"></div>
+          <div class="rail"><div class="ic">♥</div><div class="ic">ⓘ</div><div class="ic">⚙</div><div class="ic">⤴</div></div>
+          <div class="ctl"><div class="ic">‹</div><div class="ic">❚❚</div><div class="ic">›</div><span style="color:var(--phone-muted);font-size:8.5px">12 / 300+</span></div>
+          <div class="prog"></div>
+        </div>
+        <figcaption><b>Player.</b> All 5 slideshow styles. Buttons sit at the bottom, in thumb reach. Swipe sideways for next, down to close. ⚙ opens quick settings.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>How Back works</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Tabs replace, screens push</h3>
+        <div class="history"><span>/following</span><i>→</i><span>/artists</span><i>→</i><span>/artist/fox_artist</span><i>→</i><span>?play=123</span></div>
+        <ul class="rules">
+          <li>Back closes the player, then the artist page, then goes to Following, then leaves the app.</li>
+          <li>Switching tabs never piles up history. Back from any tab goes to Following.</li>
+          <li>A pasted or shared link has nothing to go back to, so ‹ Back and ✕ go to the screen's parent instead of leaving.</li>
+          <li>In the installed app, a swipe from the left edge goes back too.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Links people already have still work</h3>
+        <div class="tablewrap"><table>
+          <tr><th>Link</th><th>Opens</th></tr>
+          <tr><td>e621 "▶ Slideshow" button</td><td>The slideshow plays straight away. Closing it shows that search as a feed.</td></tr>
+          <tr><td>Share link</td><td>Same, with the sharer's style and filters, for that visit only.</td></tr>
+          <tr><td>Share link with sign-in</td><td>Same, signed in for that tab only.</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where today's settings go</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Today</th><th>After</th></tr>
+      <tr><td>Source: Search / Favs / Recommended</td><td>Search results · Your favorites (from Search and Settings) · For You tab</td></tr>
+      <tr><td>Order, media, upload date, min score</td><td>Filter chips on each feed (Media, Sort, Date, Score, plus Hide favorited)</td></tr>
+      <tr><td>Ratings</td><td>Settings › Content, for every feed</td></tr>
+      <tr><td>Blacklist</td><td>Settings › Content</td></tr>
+      <tr><td>Saved searches, recent</td><td>Search screen</td></tr>
+      <tr><td>Playback</td><td>Player's ⚙ sheet (quick) and Settings › Slideshow (everything)</td></tr>
+      <tr><td>Recommended profile (pins, mutes, breadth, rebuild)</td><td>For You › Tune</td></tr>
+    </table></div>
+  </section>
+</div>

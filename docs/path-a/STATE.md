@@ -2,14 +2,16 @@
 Phase: 2 — UX plan                 Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
-UX review round 2 (fresh subagent, UX.md v2 + README + screenshots). Then owner sign-off via a
-published wireframe Artifact.
+Three research agents running (spacing/hierarchy, component libraries, indie designers) → files in
+docs/path-a/research/. Then: write spacing/size tokens, rebuild the wireframe artifact
+(https://claude.ai/artifact/VLu8URSVsrVfC3zrx38c2a, source in scratchpad ux-wireframes.html — copy to
+docs/path-a/wireframes.html) on those tokens, fix card header + suggestion tiles, re-ask UX sign-off (Q9).
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
 - [x] Phase 1: ENGINEERING.md current state
 - [x] Phase 1: peripheral feature brainstorm
 - [x] Phase 1: owner questions answered, scope frozen (DECISIONS 2026-11-25) — GATE MET
-- [ ] Phase 2: UX.md v2 written; round 1 done (REVIEWS.md); round 2 + owner OK pending
+- [ ] Phase 2: UX.md v3.1, 3 review rounds done; owner: "almost" — spacing research + tokenized wireframes, then re-ask
 - [ ] Phase 3: DESIGN.md + mocks + ≥2 review rounds + owner OK
 - [ ] Phase 4: ENGINEERING.md target + Plan review
 - [ ] Phase 5: slices 1–9
