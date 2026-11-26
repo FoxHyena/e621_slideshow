@@ -357,6 +357,7 @@ interested. States: reading favorites (loader); too few favorites (explain + Sea
 ```
 
 - Header collapses to a compact bar (‹, avatar, name, Follow) on scroll.
+- As drawn (DESIGN.md, mocks/screens-v6.html): the three stats sit in wells under the name; Follow is one full-width button; there is no separate "Play all" (Play is the floating button); the tools are Share, Grid view and ⋯.
 - **Follow** → wiggle + "Following ✓". Tapping **Following ✓** unfollows at once, toast + Undo.
 - **Share** → system share sheet with `https://<site>/artist/<name>`; fallback copies the link.
 - Stats: posts = tag post count; "you faved" from the favorites profile (hidden when 0 or signed out);
@@ -368,9 +369,9 @@ interested. States: reading favorites (loader); too few favorites (explain + Sea
 
 ```
   ‹  [ wolf solo_         ✕ ]          keyboard up on open
-  Recent:  [wolf solo] [fox -feral] [pool:123]      Clear
+  Recent:  [wolf · solo] [fox · -feral] [pool:123]  Clear
   Saved
-    ★ Cozy foxes      fox cozy · Videos · Top      ⋯
+    ★ Cozy foxes      fox · cozy · Videos · Top    ⋯
   ♥ Your favorites                    ›
   Search cheatsheet ↗
 ```

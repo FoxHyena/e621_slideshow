@@ -366,3 +366,29 @@ Format: date — decision. Why. Rejected alternatives.
   v5.3 in v6 tokens; check each by eye when built. Open: whether un-favouriting removes goo.
 - Updated to match: DESIGN.md, .impeccable/design.json, the surface brief, docs/path-a/DESIGN.md, and the
   Play / avatar / double-tap lines in UX.md.
+
+## 2026-11-25 — The other screens in v6 (mocks/screens-v6.html)
+
+- Owner: "Yes, mock them" (artist page, grid view, Artists, Search, Tune, Settings, a Settings sub-page,
+  sign-in sheet, player), then picked each open choice from a switch, and "Yes, write it" (into DESIGN.md).
+  Artifact: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1.
+- **Artist stats: three wells** in one panel (owner pick over one line of text).
+- **Grid tiles: score and favs under each tile** (owner pick over no numbers). Nothing sits on the picture
+  except a video's play disc; the new dot hangs outside the corner.
+- **Settings row icons: in round wells** (owner pick over bare icons). Sunk, not raised: the row is the
+  button. Saved searches and "Your favorites" use the same wells.
+- Owner asked for the welled items to be centred ("they look like they might be a little off"): stat wells
+  got even padding, and a glyph in a round well sits 0.5 px below its box's centre (the rim shading makes
+  the hole read lower). Owner: "Slideshow selection is a little cut off": the style row leaves room for the
+  selected ring.
+- Decided by the designer, shown to the owner in the mock's table, not objected to: no gold "Play all" on
+  the artist page (one gold fill per screen; Play is the floating button); fields are sunk capsules (was 12
+  radius); a search shown as text separates tags with a middle dot ("wolf · solo") while the field keeps
+  e621 syntax; the goo row is a normal list row with a raised "Wipe clean"; the segmented control is a sunk
+  track with a sliding capsule.
+- Closed-system clean-up: the 32 gap, the 8 thumbnail radius and the 12 field radius are gone.
+- Not drawn yet: landing, empty and error states (need the mascot), the player's sheets, filter menus,
+  hold-a-tag targets, "Follow from favorites", desktop. Still open: whether un-favouriting removes goo.
+- Updated to match: DESIGN.md (the "carried over" section is replaced by real specs), .impeccable/design.json
+  (Field, List Row, Segmented Control, Switch, Stat Wells), the surface brief, docs/path-a/DESIGN.md, UX.md
+  (artist page note, dot-separated searches).

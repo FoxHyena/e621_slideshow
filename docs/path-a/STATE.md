@@ -13,20 +13,36 @@ Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-li
 (deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
 PRODUCT.md written (repo root).
 ## Slice R — v6 restyle (added 2026-11-25, owner via the design session; before slice 5)
-Restyles what slices 1–4 built to DESIGN.md v6 / mocks/feed-v6.html. Same slice rules: tests, code-review
-(high) + fresh reviewer, docs, budgets, commit.
+Restyles what slices 1–4 built to DESIGN.md v6. Re-scoped 2026-11-25 after the second design merge
+(4f9b983, mocks/screens-v6.html): the other screens are now drawn, so "token swaps only" became a real
+restyle, split into two slices. Each keeps the slice rules: tests, code-review (high) + fresh reviewer,
+docs, budgets, commit.
+
+### R1 — feed chrome (source: mocks/feed-v6.html) — built, in review
 - Tokens in globals.css: three materials (raised with a lip, panel, sunk wells), no hairline outlines;
-  heights 44/36/28; gaps 4/8/12/16/24; radii 24 with 16 nested; Fredoka 500/600 via next/font (drop Nunito).
-- Post panel: 8 edge, post number in the header line, tags above the footer, score then heart at the
-  right end; header with the tools capsule; chips; new-posts pill. Follow pill (slice 4) to v6 tokens.
-- Play at the bottom left, 4 lip, soft shadow.
-- Tab bar: one solid tube bent 10 px, sliding capsule, secret fifth "Goo" tab; goo that builds with
-  favourites (only ever adds, until the owner decides on un-favouriting); Wipe clean in Settings only.
-- Fav pill goo drip; "Bends" artist marks (kaleidoscope only as the app mark); Tuck scroll; dot burst on
-  Follow only (centred on the artist mark, subtle); double tap shows a big heart only.
-- Not redrawn in v6 (artist page, player, Settings groups, sign-in sheet, Search, Tune, Artists tab, grid
-  view): token swaps only, no layout redesign. Their v6 mocks arrive as a second merge.
-- Open (owner): whether un-favouriting removes goo.
+  heights 44/36/28; radii 24 with 16 nested; Fredoka 500/600 via next/font (Nunito dropped).
+- Post panel: 8 edge, "New · 2h ago · #id" header line, tags above the footer, score then heart at the
+  right end; header with the tools capsule; chips; new-posts pill; Follow pill to v6 ("✓ Following").
+- Play at the bottom left, 4 lip, soft shadow, steps aside on scroll down.
+- Tab bar: one solid tube bent 10 px, sliding capsule, secret fifth "Goo" tab (drag, wheel or focus);
+  goo that builds with favourites (only ever adds); Wipe clean in Settings only.
+- Fav pill goo drip; Bends artist marks (kaleidoscope only as the app mark); Tuck; dot burst on Follow only.
+- Not done in R1 (see R2 or later): the compact header bar, the Following tab badge, the rating badge
+  (no user default rating exists yet to differ from).
+
+### R2 — the other screens (source: mocks/screens-v6.html, DESIGN.md Components) — next
+- Shared parts first: list group / row (≥ 56 tall; sheet rows stay 52) / 32 round sunk icon well; field
+  (sunk capsule; no 12 radius); segmented control (sunk track, sliding capsule); switch, stepper, slider,
+  toggle. Glyphs in round wells sit 0.5 px below centre.
+- Screens: artist page (stats as three wells in one panel; one wide Follow/Following button, no gold
+  Play all, Play stays floating), grid view (tiles with score and favs under them, no 8 radius / 32 gap),
+  Artists, Search + suggestions + Results header (a search shown as text joins tags with a muted " · ";
+  the input keeps e621 syntax), Tune, Settings and Settings › Slideshow (the goo row joins the list
+  style), the sign-in sheet, the player.
+- Not drawn yet (build from UX.md + DESIGN.md parts, show the owner before they ship): signed-out
+  landing, empty and error states (mascot), the player's quick-settings and info sheets, filter menus,
+  hold-a-tag targets, "Follow from favorites", desktop.
+- Open (owner): whether un-favouriting removes goo (built add-only).
 
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
@@ -37,7 +53,8 @@ Restyles what slices 1–4 built to DESIGN.md v6 / mocks/feed-v6.html. Same slic
 - [x] Phase 3: DESIGN.md (root) + mocks v5.2 + 2 review rounds + owner OK — GATE MET
 - [x] Phase 4: ENGINEERING.md target + Plan review — GATE MET
 - [x] Design update: feed components v6 (mocks/feed-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
-- [ ] Phase 5: slices 1–9 (1, 2a, 2b, 3a, 3b, 4 done; v6 restyle next)
+- [x] Design update: the other screens in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
+- [ ] Phase 5: slices 1–9 (1, 2a, 2b, 3a, 3b, 4 done; slice R1 (v6 feed chrome) in review, then R2 (v6 screens))
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over
 ## Blocked on
