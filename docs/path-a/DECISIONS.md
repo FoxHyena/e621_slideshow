@@ -1289,3 +1289,12 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Fix carried over:** a pool swell's progress is clamped to 0 to 1, so its first frame can't give
   an ellipse a negative height.
 
+## 2026-11-26 — The goo row is called "Goo" everywhere
+
+- Owner, asked "Goo" everywhere or "Sidebar goo" / "Tab bar goo": "Goo, everywhere".
+- The row in Settings is "Goo" on a phone and on a computer. The phone's old name, "Tab bar goo", is
+  gone from the mock, DESIGN.md and the sidecar's preview. The heading "Tab bar goo" in DESIGN.md
+  stays: it names the goo on the tab bar, not the row.
+- Still mine, not approved: where the row sits on a computer (last group, after App, a plain row).
+- Later the same day, owner, asked whether the row's place on a computer is right (the last group of
+  Settings, under App, a plain row with no jar): "Approve". Nothing about the goo row is open now.
