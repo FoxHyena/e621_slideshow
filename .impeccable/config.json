@@ -1,0 +1,16 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "docs/path-a/mocks/**"
+        ],
+        "createdAt": "2026-11-26T02:14:19.052Z"
+      }
+    ]
+  }
+}
