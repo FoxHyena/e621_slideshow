@@ -67,6 +67,9 @@ Built from the hover pass, Inset rows and grid loading you approved:
   the foot of Settings). The kaleidoscope is gone.
 - **The hexagon pops** the first time "You're all caught up" scrolls into view, and when you tap it in
   Settings (you approved it).
+- **Your note: the title vanished for a moment when scrolling back up** (Settings, and the same on
+  Following, For You and Artists). Fixed on all four: the title is back in the page at once; only the
+  capsule's shape fades.
 - **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
   the name in white, "artist" at the right.
 

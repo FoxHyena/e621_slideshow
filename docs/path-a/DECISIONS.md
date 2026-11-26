@@ -1069,3 +1069,16 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Added to the mock after the approval, so the drawing matches the spec: the caught-up mark pops the
   first time it comes into view.
 
+
+## 2026-11-26 — The title no longer goes missing when you scroll back up
+
+- Owner: "when I scroll up in settings the title is gone then pops in after a couple ms ... make sure
+  the same behavior isn't there in other screens".
+- Cause: the floating capsule is the title row itself (no button twice). Leaving, the row stayed in
+  the capsule for its 150 ms fade, so the page had no title for that long. Every tab with a title row
+  had it: Following, For You, Artists, Settings, on a phone and a computer. The artist page's compact
+  bar is a separate bar over a hero that never leaves the page, so it never had it.
+- Fix: leaving, the row goes back into the page at once and a copy of the capsule (title and count,
+  no tools, can't be pressed or read out) does the fade. Arriving is unchanged.
+- e2e: on all four tabs at 375 and 1280, two frames after scrolling to the top the title is in the page;
+  the test fails on the old code.

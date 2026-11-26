@@ -489,6 +489,47 @@ test("Top bar: after 64 px of scroll the title row floats as a capsule, 16 from 
   await expect(bar).not.toHaveAttribute("data-at");
 });
 
+for (const [w, h] of [
+  [375, 812],
+  [1280, 800],
+]) {
+  test(`Top bar at ${w}: scrolling back up, the title is in the page at once on every tab`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h });
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem("seeded")) return;
+      sessionStorage.setItem("seeded", "1");
+      localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "goodkey" }));
+    });
+    const mock = await mockE621(page, Array.from({ length: 40 }, (_, i) => ({ id: 1150 - i, artist: i % 2 ? "fox_artist" : "otter_artist" })));
+    mock.subscriptions = ["fox_artist", "otter_artist"];
+    mock.lastSeen = 1140;
+    for (const path of ["/following", "/for-you", "/artists", "/settings"]) {
+      await page.goto(path);
+      const bar = page.locator("section[data-screen]:visible [data-testid=top-bar]");
+      await expect(bar.locator("h1")).toBeVisible();
+      // make the page long enough to scroll past the line, whatever has loaded
+      await page.evaluate(() => {
+        document.body.style.paddingBottom = "2000px";
+        window.scrollTo(0, 300);
+      });
+      await expect(bar).toHaveAttribute("data-at", "in");
+      const back = await page.evaluate(async () => {
+        window.scrollTo(0, 0);
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        // the shown screen's row (hidden screens keep their own, not drawn)
+        const row = [...document.querySelectorAll<HTMLElement>("[data-testid=top-bar]")].find((e) => e.querySelector("h1")!.getClientRects().length > 0)!;
+        const h1 = row.querySelector("h1")!.getBoundingClientRect();
+        return { at: row.getAttribute("data-at"), top: Math.round(h1.top), height: Math.round(h1.height) };
+      });
+      expect(back.at, path).toBeNull();
+      expect(back.height, path).toBeGreaterThan(30);
+      expect(back.top, path).toBeGreaterThanOrEqual(0);
+      // the leaving copy fades, then goes
+      await expect(page.getByTestId("top-bar-leaving")).toHaveCount(0);
+    }
+  });
+}
+
 test("A post's +N tag shows the rest of its tags in the same row, and the card keeps its height", async ({ page }) => {
   const tags = Array.from({ length: 20 }, (_, i) => `tag_${i}`);
   await mockE621(page, [{ id: 1150, tags }, { id: 1149 }]);

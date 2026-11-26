@@ -5,7 +5,8 @@
  * "Capsule"). After 64 px of scroll the same row floats as a capsule: the title in headline, the
  * count in gold, the tools bare. It's the same elements, not a copy, so no button is there twice; the
  * row keeps its 52 in the page, so nothing under it moves. It arrives with a 150 ms fade and an 8 drop
- * and leaves with the fade.
+ * and leaves with the fade. Leaving, the row goes back into the page at once (scrolling up, the title
+ * is never missing) and a copy of the capsule that can't be pressed does the fade.
  */
 import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { scrollY } from "@/nav/scroll";
@@ -48,7 +49,15 @@ export function TitleRow({ title, count, children }: { title: string; count?: st
   const at = useTopBar();
   return (
     <div className="title-row">
-      <div className="topbar" data-at={at ?? undefined} data-testid="top-bar">
+      {at === "out" && (
+        <div className="topbar" data-at="out" aria-hidden data-testid="top-bar-leaving">
+          <div className="topcap">
+            <span className="screen-title">{title}</span>
+            {count && <span className="topcap-count">{count}</span>}
+          </div>
+        </div>
+      )}
+      <div className="topbar" data-at={at === "in" ? "in" : undefined} data-testid="top-bar">
         <div className="topcap">
           <h1 tabIndex={-1} className="screen-title">
             {title}
