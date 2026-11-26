@@ -6,12 +6,15 @@
  * DOM, placed from `layout.ts` so nothing jumps as pictures load. Where you were (a post and an
  * offset into it) is saved for a day, so a reload comes back to the same post.
  */
-import { ArrowUp, ChevronDown, Heart, Play, RotateCw } from "lucide-react";
+import { ArrowUp, ChevronDown, Heart, Play } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
 import { TagActionsOverlay, tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
 import type { Feed } from "@/state/feeds";
+import type { QueueStats } from "@/lib/slideshow/queue";
+import { ErrorPanel, SlowDownPanel, SlowDownRow } from "@/components/State";
+import { skipBackOff } from "@/lib/e621/client";
 import { useStore } from "@/state/store";
 import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { compact } from "@/lib/feed/format";
@@ -89,8 +92,8 @@ export interface FeedViewProps {
   anchorKey: string;
   /** the history entry, so the player closing over this list can land on its last post */
   entryKey: string;
-  /** what an empty result says (screen-specific) */
-  empty: ReactNode;
+  /** what an empty result says (screen-specific); a function gets the real counts of what was left out */
+  empty: ReactNode | ((stats: QueueStats) => ReactNode);
   /** For You: holding a tag offers Pin in place of Search */
   recommended?: boolean;
   /** cards offer Follow for artists you don't follow (For You, Results, Favorites) */
@@ -218,14 +221,20 @@ export function FeedView({
 
   // e621 asked us to slow down: try again in a moment.
   const limited = q.error !== null && /rate limited/i.test(q.error);
+  const retry = useCallback(() => {
+    q.retry();
+    void q.ensure(q.posts.length - 1);
+  }, [q]);
+  /** a tap: Try now really is now, past the lane's back-off */
+  const retryNow = useCallback(() => {
+    skipBackOff();
+    retry();
+  }, [retry]);
   useEffect(() => {
     if (!limited) return;
-    const t = setTimeout(() => {
-      q.retry();
-      void q.ensure(posts.length - 1);
-    }, RETRY_MS);
+    const t = setTimeout(retry, RETRY_MS);
     return () => clearTimeout(t);
-  }, [limited, q, posts.length]);
+  }, [limited, retry]);
 
   // After a reload: the saved place, until we've gone back to it (or given up).
   const [saved] = useState(() => readAnchor(anchorKey));
@@ -400,31 +409,36 @@ export function FeedView({
             })}
       </div>
       <div className="feed-foot" data-testid="feed-state">
-        {q.error ? (
-          <div className="feed-error" role="alert">
-            <p>{limited ? "e621 asked us to slow down. Trying again in a moment." : q.error}</p>
-            {!limited && (
-              <button
-                type="button"
-                className="btn-tonal"
-                onClick={() => {
-                  q.retry();
-                  void q.ensure(posts.length - 1);
-                }}
-              >
-                <RotateCw aria-hidden /> Retry
-              </button>
-            )}
+        {q.error && posts.length === 0 ? (
+          limited ? (
+            <SlowDownPanel waitMs={RETRY_MS} onNow={retryNow} />
+          ) : (
+            <ErrorPanel error={q.error} onRetry={retryNow} testId="feed-error" />
+          )
+        ) : limited ? (
+          <SlowDownRow waitMs={RETRY_MS} onNow={retryNow} />
+        ) : q.error ? (
+          <div className="feed-more-row" role="alert" data-testid="feed-more-failed">
+            <span>Couldn&rsquo;t load more posts</span>
+            <button type="button" className="btn-tonal" onClick={retryNow} data-testid="state-retry">
+              Try again
+            </button>
           </div>
         ) : q.exhausted && posts.length === 0 ? (
-          <div className="feed-empty">
-            {empty}
-            {hidden > 0 && <p className="feed-note">{hiddenNote(stats)}</p>}
-          </div>
+          typeof empty === "function" ? (
+            empty(stats)
+          ) : (
+            <div className="feed-empty">
+              {empty}
+              {hidden > 0 && <p className="feed-note">{hiddenNote(stats)}</p>}
+            </div>
+          )
         ) : q.exhausted ? (
-          <p className="feed-end">
-            That&rsquo;s everything ✿{hidden > 0 && <span className="feed-note"> {hiddenNote(stats)}</span>}
-          </p>
+          <div className="feed-caught feed-end-moment" data-testid="feed-end">
+            <AppMark seed="caught-up-617" className="feed-caught-mark" />
+            <b>That&rsquo;s everything</b>
+            {hidden > 0 && <small>{hiddenNote(stats)}</small>}
+          </div>
         ) : q.loading && posts.length > 0 ? (
           <span className="feed-spinner" role="status" aria-label="Loading more" />
         ) : null}
@@ -437,8 +451,8 @@ export function FeedView({
 function hiddenNote(s: { blacklisted: number; hidden: number }): string {
   const parts: string[] = [];
   if (s.blacklisted) parts.push(`${s.blacklisted} hidden by your blacklist`);
-  if (s.hidden) parts.push(`${s.hidden} need${s.hidden === 1 ? "s" : ""} sign-in to see`);
-  return `${parts.join(", ")}.`;
+  if (s.hidden) parts.push(`${s.hidden} ${s.hidden === 1 ? "post needs" : "posts need"} you signed in`);
+  return parts.join(" · ");
 }
 
 function Skeletons() {

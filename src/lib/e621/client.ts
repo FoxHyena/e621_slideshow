@@ -41,6 +41,8 @@ let lastStart = 0;
 let pausedUntil = 0;
 let busy = false;
 let seq = 0;
+/** wakes the lane early from a wait (see skipBackOff) */
+let wake: (() => void) | null = null;
 
 const effectiveRank = (t: Task, now: number) => t.rank - Math.floor((now - t.at) / AGE_MS);
 function next(now: number): Task {
@@ -60,7 +62,11 @@ async function pump() {
       const wait = Math.max(lastStart + MIN_GAP_MS, pausedUntil) - Date.now();
       // Wait first, then choose: a more urgent task may arrive meanwhile.
       if (wait > 0) {
-        await new Promise((r) => setTimeout(r, wait));
+        await new Promise<void>((r) => {
+          wake = r;
+          setTimeout(r, wait);
+        });
+        wake = null;
         continue;
       }
       const t = next(Date.now());
@@ -76,6 +82,15 @@ async function pump() {
 /** The whole lane waits after e621 says it's busy. */
 function backOff() {
   pausedUntil = Math.max(pausedUntil, Date.now() + BACKOFF_MS);
+}
+
+/**
+ * Someone tapped Try now: lift e621's back-off once, so the next request leaves now rather than
+ * when the pause ends. The minimum gap between requests still holds.
+ */
+export function skipBackOff() {
+  pausedUntil = 0;
+  wake?.();
 }
 
 const abortError = () => new DOMException("The request was cancelled", "AbortError");

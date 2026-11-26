@@ -15,13 +15,12 @@ import { runTransition, type NavDirection } from "@/nav/transition";
 import { activeTab, screenKey, tab as tabRoute, tabRoot, TABS, type Tab } from "@/nav/routes";
 import { LegacyHome } from "./LegacyHome";
 import { FollowingScreen } from "@/screens/Following";
-import { NotFoundScreen, PlaceholderScreen } from "./screens";
 import { migrate } from "@/state/migrate";
 import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
-import { ArtistScreen, FavoritesScreen, ForYouScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
+import { ArtistScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
@@ -242,10 +241,12 @@ export default function Shell() {
                 <Suspense fallback={null}>{t === "following" ? <FollowingScreen /> : <ForYouScreen />}</Suspense>
               </ScreenContext>
             ) : (
-              <PlaceholderScreen
-                screen={tabRoute(t).screen}
-                onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })}
-              />
+              <Suspense fallback={null}>
+                <PlaceholderScreen
+                  screen={tabRoute(t).screen}
+                  onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })}
+                />
+              </Suspense>
             )}
           </section>
         </Activity>

@@ -542,3 +542,40 @@ review fixes. Visual check at 375×812: player, Post info with targets, Quick se
 **Budgets** (production build, 375×812, mock e621): JS cold load of `/following` **198.6 KB** (≤ 200; R2a
 199.1: the old sheets left the first load with the filter menus), 250.9 KB with the idle prefetch; 12 cards
 in the DOM; CLS 0.0000; first feed content 0.36 s; scroll at 4× CPU: 0 long tasks.
+
+## Slice R3 review (2026-11-26): Goo the mascot, landing, empty, error and offline states
+
+**code-review skill (high), 5 findings: 5 fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | "Try now" didn't try sooner: the request lane holds every request for e621's 5 s back-off, so the tap swapped the panel for skeletons and the request left on the old schedule | Med | `skipBackOff()` in the lane lifts the pause once (the 550 ms gap still holds) and wakes the waiting pump; only the tap uses it, the automatic retry doesn't. Unit test; e2e asks again within 2 s |
+| 2 | The offline banner could mismatch on hydration (server online, client offline at load) | Low | The banner reads the net store through `useSyncExternalStore` with an online server snapshot |
+| 3 | A lifted gate cleared `inert` on a stepped-aside (invisible) Play | Low | React no longer writes `inert`; a layout effect sets it from gate and step-aside together; e2e |
+| 4 | Three empties (For You's window, an artist, Popular) kept the old plain line | Low | `quietEmpty()`: Goo snoozes with a headline and sentence, or looks and counts when the blacklist or sign-in took the posts |
+| 5 | Dead CSS from the replaced markup | Low | Removed (`.feed-error`, `.feed-end`, `.feed-empty-title`, `.feed-empty-mark`, `.feed-empty-actions`, `.following-mascot`) |
+
+**Fresh reviewer, 8 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Following's "No posts yet" and Favorites' "No favorites yet" ignored posts the blacklist or sign-in took | Med | Those go to the "No posts match" state with real counts; Reset filters shows only when a filter is on; e2e |
+| 2 | "None of the 1 artist you follow…" | Low | One artist reads "The artist you follow hasn't posted since you joined."; e2e. The count is e621's `tag_count` of followed tags (follows are artists in this app) |
+| 3 | "3 need you signed in" had no noun | Low | "3 posts need you signed in" in the sentence and the end note |
+| 4 | The slow-down countdown was a live region that spoke every second | Low | The seconds sit in `aria-live="off"`; the headline is announced once; e2e |
+| 5 | Gate and `inert` | Low | Same as code-review 3; also, a gate with no element never keeps Play hidden |
+| 6 | Follow pills on the landing's Popular and on FollowsNoOne | Low | **No change**: signed out, Follow opens sign-in (follows.ts); FollowsNoOne's sentence asks you to tap Follow |
+| 7 | `toss` flew drops to the top left when the bar had no box (under the player) | Low | A bar with no box counts the drops in place |
+| 8 | First-load JS (State and Goo in the first load, 202.0 KB) | Med | Results, Favorites and the artist page had been in the first load because Following imported shared parts from their module: the parts moved to `screens/feedParts.tsx`, so those screens are lazy at last. Also lazy: the error and slow-down panels (`StatePanels`, prefetched at idle, with a plain panel if the chunk can't come), the placeholder and Not found screens, pull to refresh on Following. 194.5 KB |
+
+**Gates:** typecheck and lint clean; unit tests pass (lane: Try now); full e2e: see STATE. New e2e
+(e2e/states-v6.spec.ts, 14): landing gate and inert, Goo tap to the goo count, needs sign-in, For You signed
+out, no match counts, filter count and Reset, error panel, slow down with Try now, offline banner, end of
+feed, load more failed, Following nothing yet (2 artists, 1 artist), blacklist counted not "nothing yet", the
+plain panel when the panels' chunk can't load. The first full run caught the offline banner in the lazy chunk
+(offline, it couldn't download): the banner is back in the first load.
+Visual check at 375×812: landing, needs sign-in, no match, error, slow down, offline.
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` **194.5 KB** (≤ 200; R2b 198.6),
+259.5 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first feed content 0.36 s; scroll at 4× CPU: 0
+long tasks.

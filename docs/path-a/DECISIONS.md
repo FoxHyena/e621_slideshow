@@ -545,3 +545,29 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md (Goo the mascot; States; Quiet button; the end of a feed; Goo Shade; One Gold
   and Lip rules; motion rows; build ruling 10), .impeccable/design.json (Goo, State, Error Panel, Landing
   Card, Offline Banner), the surface brief, docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+## 2026-11-26 — Slice R3 build (Goo the mascot; landing, empty, error, offline)
+- **Goo is one inline SVG** (src/components/Goo.tsx) with the shared blur 2.4 / alpha ×22 −9 filter; each
+  instance has its own filter id (`useId`), since two Goos can share a screen. Pointer-only, `aria-hidden`.
+- **Tapping Goo counts toward the goo** (and so the "N favorites" line): 1–3 drops are added up front and
+  each landing draws one more; with reduced motion they're added in place; with no bar in sight they fall
+  beside Goo and nothing is counted. **Show the owner.**
+- **Try now really is now**: it lifts the request lane's back-off once (`skipBackOff`), keeping the 550 ms
+  gap. The automatic retry still waits the full 5 s. Each tap is one request, so a stuck 429 can't be
+  hammered faster than the person taps.
+- **Wrong sign-in** reads "e621 didn't accept your sign-in" / "Check your username and API key in
+  Settings › Account." in the same Oops panel, with what e621 said in the capsule.
+- **Copy proposed here (show the owner):** "You don't follow anyone yet" / "Tap Follow on an artist, and
+  their new posts show up here first."; "No favorites yet" / "Tap the heart on a post and it shows up
+  here."; "Nothing new for you" / "Nothing in this date window yet. A wider Date finds more."; "No posts
+  by X" / "e621 has no posts under this name yet."; "Nothing popular right now" / "Popular fills up
+  through the day. Check back soon."; "For You needs a little more"; the Favorites signed-out sentence.
+- **Empty means empty**: when the blacklist or sign-in took what was there, the state counts it ("No posts
+  match") instead of saying nothing exists; Reset filters shows only when a filter is on.
+- **Play waits on signed-out For You too** (under the sign-in block, like the landing card), and Popular
+  under it has Follow pills (signed out they open sign-in).
+- **Artists signed out** waits for slice 5: the Artists tab is still the "Soon" placeholder.
+- **First load:** the parts every feed screen shares live in `screens/feedParts.tsx`, so Results,
+  Favorites and the artist page are finally out of the first load. The error and slow-down panels are a
+  lazy chunk prefetched at idle; if it can't download (offline), a plain panel says the same thing with
+  its way out. The offline banner stays in the first load (offline, nothing more can download). The
+  placeholder and Not found screens are lazy; pull to refresh loads only on the signed-in Following feed.

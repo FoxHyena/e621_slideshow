@@ -390,7 +390,12 @@ test("Review fixes: Post info counts real artists, and signed-out For You offers
   await mockE621(page, defaultSpecs().map((s) => ({ ...s, artists: ["mock_artist", "conditional_dnp"] })));
   await page.goto("/for-you");
   await expect(page.getByTestId("for-you-signed-out")).toBeVisible();
-  await page.getByTestId("play-fab").click();
+  // Play waits until the sign-in block has scrolled away, then comes back when you rest
+  await page.mouse.wheel(0, 900);
+  const play = page.getByTestId("play-fab");
+  await expect(play).not.toHaveAttribute("data-gated");
+  await expect(play).not.toHaveAttribute("data-away");
+  await play.click();
   await page.getByTestId("info-button").click();
   const sheet = page.getByTestId("sheet-info");
   await settled(sheet);

@@ -6,7 +6,7 @@
  * order. Nothing re-ranks on its own: a changed profile (Tune, a sync) offers **Update ranking**, and
  * ⋯ › Refresh ranks again in the background, keeping the old list until you swap it in.
  */
-import { ArrowUp, MoreHorizontal, RotateCw, Search, SlidersHorizontal, Sparkles, VolumeX } from "lucide-react";
+import { ArrowUp, MoreHorizontal, RotateCw, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, recSteps } from "@/components/Loader";
 import { searchPosts } from "@/lib/e621/client";
@@ -32,8 +32,10 @@ import { shallow, useStore } from "@/state/store";
 import type { TagAction } from "@/components/TagActions";
 import type { Route } from "@/nav/routes";
 import { toast } from "sonner";
-import { onFeedTag, openSignIn } from "./actions";
-import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./FeedScreens";
+import { onFeedTag } from "./actions";
+import { FeedBody, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./feedParts";
+import { ErrorPanel, quietEmpty, StateBlock } from "@/components/State";
+import { MIN_SUPPORT } from "@/lib/recommend/weights";
 
 /** How long a saved ranking is shown again instead of ranking afresh (UX §3). */
 export const RANKED_TTL = 30 * 60_000;
@@ -404,34 +406,39 @@ function Body({
   if (!feed && planEmpty) {
     if (r.error && !r.profile) {
       return (
-        <div className="feed-error" role="alert" data-testid="for-you-error">
-          <p className="feed-empty-title">Couldn&rsquo;t read your favorites</p>
-          <p className="feed-note">{r.error}</p>
-          <button type="button" className="btn-tonal" onClick={() => getRec().rebuild()}>
-            <RotateCw aria-hidden /> Retry
-          </button>
-        </div>
+        <ErrorPanel error={r.error} onRetry={() => getRec().rebuild()} testId="for-you-error" />
       );
     }
     const allMuted = r.profile && r.overrides.muted.length > 0 && weightsOf({ ...r, overrides: NO_OVERRIDES }).size > 0;
     if (allMuted) {
       return (
-        <div className="feed-empty" data-testid="for-you-all-muted">
-          <VolumeX aria-hidden className="feed-empty-mark" />
-          <p className="feed-empty-title">Every tag is muted</p>
-          <p className="feed-note">Unmute a few in Tune to get posts here.</p>
-          <button type="button" className="btn-tonal" onClick={() => getNav().push({ screen: { kind: "tune" }, play: null }, { from: "for-you" })}>
-            <SlidersHorizontal aria-hidden /> Tune
-          </button>
-        </div>
+        <StateBlock
+          mood="look"
+          screen
+          head="Every tag is muted"
+          text="Unmute a few in Tune to get posts here."
+          testId="for-you-all-muted"
+          actions={
+            <button type="button" className="btn-tonal" onClick={() => getNav().push({ screen: { kind: "tune" }, play: null }, { from: "for-you" })}>
+              <SlidersHorizontal aria-hidden className="state-icon" /> Tune
+            </button>
+          }
+        />
       );
     }
     return (
-      <div className="feed-empty" data-testid="for-you-too-few">
-        <Sparkles aria-hidden className="feed-empty-mark" />
-        <p className="feed-empty-title">Not enough favorites yet</p>
-        <p className="feed-note">A tag needs 3 favorites. Favorite a few more posts.</p>
-      </div>
+      <StateBlock
+        mood="look"
+        screen
+        head="For You needs a little more"
+        text={`A tag needs ${MIN_SUPPORT} favorites. Favorite a few more posts and it starts picking.`}
+        testId="for-you-too-few"
+        actions={
+          <button type="button" className="btn-tonal" onClick={() => getNav().push({ screen: { kind: "search" }, play: null })}>
+            <Search aria-hidden className="state-icon" /> Search
+          </button>
+        }
+      />
     );
   }
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;
@@ -457,7 +464,7 @@ function Body({
       grid={grid}
       route={route}
       anchorKey={`for-you:${feed.key}`}
-      empty={<p className="feed-empty-title">Nothing new for you in this window.</p>}
+      empty={quietEmpty("Nothing new for you", "Nothing in this date window yet. A wider Date finds more.", { screen: true, testId: "for-you-empty" })}
       onTag={onTag}
       recommended
       follow
@@ -469,15 +476,11 @@ function Body({
 function SignedOut({ grid }: { grid: boolean }) {
   const { entry, sheet } = useScreen();
   const feed = useFeed(POPULAR, null);
+  const block = useRef<HTMLDivElement>(null);
   return (
     <>
-      <div className="feed-empty" data-testid="for-you-signed-out">
-        <Sparkles aria-hidden className="feed-empty-mark" />
-        <p className="feed-empty-title">For You learns from your favorites</p>
-        <p className="feed-note">Sign in with your e621 username and API key, and your favorites pick what shows up here.</p>
-        <button type="button" className="btn-gold" onClick={openSignIn}>
-          Sign in
-        </button>
+      <div ref={block} data-testid="for-you-signed-out">
+        <NeedsSignIn head="For You learns from your favorites" text="Sign in and it picks posts from the tags and artists you favorite most." />
       </div>
       <h2 className="section-title">Popular today</h2>
       <FeedBody
@@ -485,10 +488,11 @@ function SignedOut({ grid }: { grid: boolean }) {
         grid={grid}
         route={entry.route}
         anchorKey={feed ? `for-you:${feed.key}` : undefined}
-        empty={<p className="feed-empty-title">Nothing popular right now.</p>}
+        empty={quietEmpty("Nothing popular right now", "Popular fills up through the day. Check back soon.", { testId: "popular-empty" })}
         onTag={onFeedTag}
+        follow
       />
-      <PlayFab feed={feed} route={entry.route} />
+      <PlayFab feed={feed} route={entry.route} gate={block} />
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </>
   );

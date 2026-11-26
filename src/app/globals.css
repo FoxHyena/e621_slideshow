@@ -38,6 +38,7 @@
   --color-goo: #ffffff;
   --color-goo-aged: #f3e6a8;
   --color-goo-ink: #35527f;
+  --color-goo-shade: #9fb3cc;
   --color-tag-artist: #f2ac08;
   --color-tag-character: #00c900;
   --color-tag-species: #f3946b;
@@ -1732,19 +1733,13 @@ html {
   justify-content: center;
   padding: 24px 0;
 }
-.feed-end,
 .feed-note {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
   text-align: center;
 }
-.feed-end {
-  font-family: var(--font-rounded);
-  font-weight: 600;
-}
-.feed-empty,
-.feed-error {
+.feed-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1752,25 +1747,6 @@ html {
   max-width: 34ch;
   margin: 32px auto 0;
   text-align: center;
-}
-.feed-empty-title {
-  font-family: var(--font-rounded);
-  font-size: var(--text-headline);
-  line-height: var(--text-headline--line-height);
-  font-weight: 600;
-}
-.feed-empty-mark {
-  width: 48px;
-  height: 48px;
-  color: var(--color-heart);
-}
-.feed-empty-actions {
-  display: flex;
-  gap: 8px;
-}
-.feed-error p {
-  font-size: var(--text-body);
-  line-height: var(--text-body--line-height);
 }
 .feed-spinner {
   width: 24px;
@@ -2938,10 +2914,6 @@ html {
   font-weight: 600;
   color: var(--color-fg);
 }
-.following-mascot {
-  width: 64px;
-  height: 64px;
-}
 .sheet-note {
   padding: 8px 4px 0;
   color: var(--color-link);
@@ -4051,4 +4023,263 @@ button.field6:focus-visible {
   .style-pic {
     transition: none;
   }
+}
+
+/* Goo the mascot (DESIGN.md "Goo (the mascot)"): a toy. Squash under the finger, spring back on
+   release; the arm waves three times, the z's drift. Pointer only. */
+.goo {
+  display: block;
+  flex: none;
+  overflow: visible;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.goo .goo-bd,
+.goo .goo-arm,
+.goo .goo-tick,
+.goo .goo-zz {
+  transform-box: view-box;
+}
+.goo .goo-bd {
+  transform-origin: 60px 100px;
+  transition: transform 100ms ease-out;
+}
+.goo.goo-press .goo-bd {
+  transform: scale(1.07, 0.9);
+}
+.goo.goo-pop .goo-bd {
+  animation: goo-pop 420ms cubic-bezier(0.3, 0, 0.3, 1);
+}
+@keyframes goo-pop {
+  0% {
+    transform: scale(1.07, 0.9);
+  }
+  35% {
+    transform: scale(0.94, 1.09);
+  }
+  65% {
+    transform: scale(1.03, 0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+.goo .goo-arm {
+  transform-origin: 89px 78px;
+  animation: goo-wave 900ms ease-in-out 400ms 3;
+}
+.goo .goo-tick {
+  animation: goo-tick 900ms ease-in-out 400ms 3 both;
+}
+.goo .goo-zz {
+  animation: goo-zz 3.2s ease-in-out infinite;
+}
+@keyframes goo-wave {
+  50% {
+    transform: rotate(16deg);
+  }
+}
+@keyframes goo-tick {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes goo-zz {
+  50% {
+    transform: translate(2px, -3px);
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .goo *,
+  .goo.goo-pop .goo-bd {
+    animation: none !important;
+    transition: none !important;
+  }
+  .goo .goo-tick {
+    opacity: 0;
+  }
+}
+
+/* States (DESIGN.md "States"): Goo → 12 → headline → 4 → the sentence → 16 → the way out. */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--spacing-inset);
+  text-align: center;
+}
+.state[data-screen] {
+  margin-top: 64px;
+}
+.state > .goo {
+  margin-bottom: 12px;
+}
+.state-head {
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+  text-wrap: balance;
+}
+.state-text {
+  max-width: 30ch;
+  margin-top: 4px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+.state-acts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+}
+.state-acts .btn-gold,
+.state-acts .btn-tonal {
+  height: var(--spacing-control);
+  padding: 0 24px;
+}
+.state-icon {
+  width: 18px !important;
+  height: 18px !important;
+  margin-left: -4px;
+}
+/* What e621 said: a well capsule the size of a tag, 12 above the button. */
+.state-said {
+  max-width: 100%;
+  margin-bottom: 12px;
+  padding: 5px 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The quiet button: the lesser way out, under a gold or tonal one. No fill, no lip. */
+.btn-quiet {
+  height: var(--spacing-control);
+  padding: 0 16px;
+  border-radius: 999px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.btn-quiet:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.btn-quiet:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* An error sits in a panel where the first post would be. */
+.state-panel {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 24px 0;
+  border-radius: 24px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+/* The landing card (Following signed out): the screen's one gold fill. */
+.state-hello {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px 0 24px;
+  padding: 20px 16px 16px;
+  border-radius: 24px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+  text-align: center;
+}
+.state-hello .state-head {
+  margin-top: 12px;
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+}
+.state-hello .state-text {
+  max-width: none;
+  margin-bottom: 16px;
+}
+.state-hello .btn-gold {
+  width: 100%;
+  height: var(--spacing-control);
+}
+.state-hello + .section-title {
+  margin-top: 0;
+}
+/* Offline: a sunk capsule under the header, not a button. */
+.state-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--spacing-control-compact);
+  margin-bottom: 12px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.state-banner svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-muted);
+}
+.state-banner[data-ok] {
+  color: var(--color-fg);
+}
+.state-banner[data-ok] svg {
+  color: var(--color-score);
+}
+/* Loading more failed: one row at the end of the feed. */
+.feed-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding-left: 16px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+  text-align: left;
+}
+.feed-more-row .btn-tonal {
+  flex: none;
+  height: var(--spacing-control-compact);
+  padding: 0 16px;
+  font-size: var(--text-callout);
+}
+/* The end of a feed: the caught-up moment with other words. */
+.feed-caught.feed-end-moment {
+  width: 100%;
+  padding-top: 0;
+}
+/* Play waits until the landing card has scrolled away. */
+.play-fab[data-gated] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
 }

@@ -7,14 +7,13 @@
  * three and "+N more". Once you've scrolled a screen past the divider and rested (or played past
  * it), with no filter on and nothing newer on e621, the marker moves (owner Q8), and a toast says so.
  */
-import { ArrowUp, CheckCheck, MoreHorizontal, RotateCw, Search, UserPlus } from "lucide-react";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { DEFAULT_FILTERS, isDefaultFilters, type Filters } from "@/lib/feed/filters";
+import { ArrowUp, CheckCheck, MoreHorizontal, RotateCw, Search } from "lucide-react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { DEFAULT_FILTERS, filtersOn, isDefaultFilters, type Filters } from "@/lib/feed/filters";
 import type { Post } from "@/lib/e621/types";
 import { dividerIndex, feedRows, isNew, newCountLabel } from "@/lib/following/feed";
 import { scrolledPast, SEEN_IDLE_MS, shouldMarkSeen } from "@/lib/following/marker";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
-import { PullToRefresh } from "@/feed/PullToRefresh";
 import { getNav } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
@@ -26,9 +25,13 @@ import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { shallow, useStore } from "@/state/store";
-import { AppMark } from "@/components/Avatar";
+import { Goo } from "@/components/Goo";
+import { ErrorPanel, noMatchSentence, quietEmpty, StateBlock } from "@/components/State";
 import { onFeedTag, openSignIn } from "./actions";
-import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./FeedScreens";
+import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./feedParts";
+
+/** only the signed-in feed pulls to refresh: a signed-out cold load never fetches it */
+const PullToRefresh = lazy(() => import("@/feed/PullToRefresh").then((m) => ({ default: m.PullToRefresh })));
 
 const CHIPS: ChipId[] = ["media", "hideFaved"];
 /** e621's metatag for the tags you follow (one tag toward the search limit). */
@@ -136,13 +139,7 @@ export function FollowingScreen() {
       ) : !signedIn ? (
         <Landing grid={grid} />
       ) : fs.status === "error" ? (
-        <div className="feed-error" role="alert" data-testid="following-error">
-          <p className="feed-empty-title">Couldn&rsquo;t read what you follow</p>
-          <p className="feed-note">{fs.error}</p>
-          <button type="button" className="btn-tonal" onClick={() => void following.load()}>
-            <RotateCw aria-hidden /> Retry
-          </button>
-        </div>
+        <ErrorPanel error={fs.error ?? "e621 didn't answer"} onRetry={() => void following.load()} testId="following-error" />
       ) : !follows ? (
         <FollowsNoOne grid={grid} />
       ) : (
@@ -331,7 +328,9 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
 
   return (
     <>
-      <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />
+      <Suspense fallback={null}>
+        <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />
+      </Suspense>
       <p className="screen-sub" aria-live="polite" data-testid="following-status">
         {label && newCount > 0 ? (
           <>
@@ -354,22 +353,40 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         grid={grid}
         route={route}
         anchorKey={feed ? `following:${feed.key}` : undefined}
-        empty={
-          filtered ? (
-            <>
-              <p className="feed-empty-title">No posts match.</p>
-              <p className="feed-note">Filters are on.</p>
-              <button type="button" className="btn-tonal" onClick={() => change({ ...DEFAULT_FILTERS })}>
-                Reset filters
-              </button>
-            </>
+        empty={(stats) =>
+          // something was there, and the filters or the blacklist took it: say so, never "nothing yet"
+          filtered || stats.blacklisted + stats.hidden > 0 ? (
+            <StateBlock
+              mood="look"
+              screen
+              head="No posts match"
+              text={noMatchSentence(filtersOn(filters), stats)}
+              testId="following-empty"
+              actions={
+                filtered && (
+                  <button type="button" className="btn-tonal" onClick={() => change({ ...DEFAULT_FILTERS })}>
+                    Reset filters
+                  </button>
+                )
+              }
+            />
           ) : (
-            <>
-              <p className="feed-empty-title">No posts yet</p>
-              <p className="feed-note">
-                {followCount ? `Nothing yet from the ${followCount} ${followCount === 1 ? "tag" : "tags"} you follow.` : "Nothing yet from what you follow."}
-              </p>
-            </>
+            <StateBlock
+              mood="snooze"
+              screen
+              head="No posts yet"
+              text={
+                followCount === 1
+                  ? "The artist you follow hasn't posted since you joined."
+                  : `None of the ${followCount ? `${followCount} ` : ""}artists you follow has posted since you joined.`
+              }
+              testId="following-empty"
+              actions={
+                <button type="button" className="btn-tonal" onClick={() => getNav().push({ screen: { kind: "search" }, play: null })}>
+                  Find more artists
+                </button>
+              }
+            />
           )
         }
         onTag={onTag}
@@ -448,16 +465,18 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
 
 /** Signed out (or on someone's share link): what Following is, and what's popular meanwhile. */
 function Landing({ grid }: { grid: boolean }) {
+  const card = useRef<HTMLDivElement>(null);
   return (
     <>
-      <div className="feed-empty following-landing" data-testid="following-signed-out">
-        <AppMark seed="e621-slideshow" className="following-mascot" />
-        <p className="feed-empty-title">Follow the artists you love and see their new posts first.</p>
+      <div ref={card} className="state-hello" data-testid="following-signed-out">
+        <Goo mood="wave" size={104} />
+        <h2 className="state-head">Follow the artists you love</h2>
+        <p className="state-text">See their new posts first, all in one feed.</p>
         <button type="button" className="btn-gold" onClick={openSignIn} data-testid="following-sign-in">
           Sign in with e621
         </button>
       </div>
-      <Popular grid={grid} />
+      <Popular grid={grid} gate={card} />
     </>
   );
 }
@@ -466,17 +485,18 @@ function Landing({ grid }: { grid: boolean }) {
 function FollowsNoOne({ grid }: { grid: boolean }) {
   return (
     <>
-      <div className="feed-empty" data-testid="following-none">
-        <UserPlus aria-hidden className="feed-empty-mark" />
-        <p className="feed-empty-title">You don&rsquo;t follow anyone yet</p>
-        <p className="feed-note">Follow artists on e621, and their new posts show up here first.</p>
-      </div>
+      <StateBlock
+        mood="snooze"
+        head="You don't follow anyone yet"
+        text="Tap Follow on an artist, and their new posts show up here first."
+        testId="following-none"
+      />
       <Popular grid={grid} />
     </>
   );
 }
 
-function Popular({ grid }: { grid: boolean }) {
+function Popular({ grid, gate }: { grid: boolean; gate?: RefObject<HTMLElement | null> }) {
   const { entry, sheet } = useScreen();
   const feed: Feed | null = useFeed(POPULAR, null);
   return (
@@ -487,10 +507,11 @@ function Popular({ grid }: { grid: boolean }) {
         grid={grid}
         route={entry.route}
         anchorKey={feed ? `following:${feed.key}` : undefined}
-        empty={<p className="feed-empty-title">Nothing popular right now.</p>}
+        empty={quietEmpty("Nothing popular right now", "Popular fills up through the day. Check back soon.", { testId: "popular-empty" })}
         onTag={onTag}
+        follow
       />
-      <PlayFab feed={feed} route={entry.route} />
+      <PlayFab feed={feed} route={entry.route} gate={gate} />
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </>
   );

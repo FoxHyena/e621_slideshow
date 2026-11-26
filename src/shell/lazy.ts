@@ -16,6 +16,10 @@ const settingsHome = () => import("@/screens/SettingsHome");
 const filterSheets = () => import("@/feed/FilterSheets");
 /** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
 export const motionFx = () => import("@/feed/motionFx");
+/** The error, slow-down and offline states (src/components/StatePanels.tsx). */
+const statePanels = () => import("@/components/StatePanels");
+/** The tabs and pages not built yet ("Soon"), and Not found. */
+const shellScreens = () => import("@/shell/screens");
 
 export const ResultsScreen = lazy(() => feedScreens().then((m) => ({ default: m.ResultsScreen })));
 export const FavoritesScreen = lazy(() => feedScreens().then((m) => ({ default: m.FavoritesScreen })));
@@ -24,12 +28,14 @@ export const SearchScreen = lazy(() => searchScreen().then((m) => ({ default: m.
 export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYouScreen })));
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));
 export const SettingsHome = lazy(() => settingsHome().then((m) => ({ default: m.SettingsHome })));
+export const PlaceholderScreen = lazy(() => shellScreens().then((m) => ({ default: m.PlaceholderScreen })));
+export const NotFoundScreen = lazy(() => shellScreens().then((m) => ({ default: m.NotFoundScreen })));
 export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, filterSheets, motionFx]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

@@ -126,3 +126,45 @@ export function drip(btn: HTMLElement | null | undefined) {
   }
   setTimeout(() => box.remove(), T + 300);
 }
+
+/**
+ * Goo the mascot's drops with no tab bar on screen (DESIGN.md "Goo (the mascot)", Tap it): they
+ * arc out of its tip, land beside it on the ground line `ground`, and soak away. Nothing is counted.
+ */
+export function gooSoak(x0: number, y0: number, n: number, scale: number, ground: number) {
+  if (calm() || typeof document.body.animate !== "function") return;
+  const r = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+  const side = Math.random() < 0.5 ? -1 : 1;
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const dir = i % 2 ? -side : side;
+      const dx = dir * r(38, 62) * scale;
+      const dy = Math.max(1, ground - y0);
+      const rise = r(22, 40) * Math.max(1, scale);
+      const b = 2 * (rise + Math.sqrt(rise * rise + rise * dy));
+      const a = dy + b;
+      const dur = 70 + 17 * (Math.sqrt(rise) + Math.sqrt(rise + dy));
+      const frames: Keyframe[] = [];
+      for (let j = 0; j <= 14; j++) {
+        const t = j / 14;
+        const grow = Math.min(1, 0.4 + t * 5);
+        frames.push({ offset: t, transform: `translate(${(dx * t).toFixed(1)}px, ${(a * t * t - b * t).toFixed(1)}px) scale(${(grow * 0.85).toFixed(2)}, ${grow.toFixed(2)})` });
+      }
+      const end = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+      const el = document.createElement("span");
+      el.className = "goo-drop";
+      el.style.left = `${x0.toFixed(1)}px`;
+      el.style.top = `${y0.toFixed(1)}px`;
+      document.body.appendChild(el);
+      el.animate(frames, { duration: dur, fill: "forwards" }).onfinish = () => {
+        el.animate(
+          [
+            { transform: `${end} scale(1)`, opacity: 1 },
+            { transform: `${end} scale(1.7, .3)`, opacity: 0 },
+          ],
+          { duration: 200, easing: "ease-out", fill: "forwards" },
+        ).onfinish = () => el.remove();
+      };
+    }, 120 + i * 70);
+  }
+}

@@ -160,6 +160,11 @@ export function scoreLabel(min: number | null): string | null {
   return min === null ? null : `≥ ${min}`;
 }
 
+/** How many filters are on (a state's sentence counts them). */
+export function filtersOn(f: Filters): number {
+  return [mediaLabel(f.media) !== null, f.order !== "newest", dateLabel(f.date) !== null, f.minScore !== null, f.hideFaved].filter(Boolean).length;
+}
+
 export function isDefaultFilters(f: Filters): boolean {
   return (
     mediaLabel(f.media) === null && f.order === "newest" && dateLabel(f.date) === null && f.minScore === null && !f.hideFaved

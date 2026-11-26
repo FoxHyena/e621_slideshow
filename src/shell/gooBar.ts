@@ -374,6 +374,64 @@ export function createGooBar(nav: HTMLElement, gg: SVGGElement, blade: HTMLEleme
         }
       });
     },
+    toss(x0, y0, n, scale) {
+      // calm, or the bar has no box (under the player, say): counted in place, nothing flies
+      if (calm() || typeof nav.animate !== "function" || nav.getBoundingClientRect().width === 0) {
+        getGoo().add(n);
+        return;
+      }
+      const r = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+      // counted now (none lost if the bar goes away mid-flight); each landing draws one more
+      inAir += n;
+      getGoo().add(n);
+      for (let i = 0; i < n; i++) {
+        later(() => {
+          const box = nav.getBoundingClientRect();
+          // onto the goo that is there, or where goo starts on a clean bar
+          const on = cur.t >= 0.1;
+          const u = Math.min(Math.max(on ? r(cur.uL - 12, cur.uR + 12) : q.L * 0.9 + r(-14, 14), 10), q.L - 10);
+          const e = gooEdge(q, u);
+          const dx = box.left + e.x - x0;
+          const dy = Math.max(1, box.top + e.y - 4 - y0);
+          // up first, then down: a ballistic arc whose top is `rise` above the tip
+          const rise = r(22, 40) * Math.max(1, scale);
+          const b = 2 * (rise + Math.sqrt(rise * rise + rise * dy));
+          const a = dy + b;
+          const dur = 70 + 17 * (Math.sqrt(rise) + Math.sqrt(rise + dy));
+          const k = r(0.85, 1.2);
+          const N = 14;
+          const frames: Keyframe[] = [];
+          let prev: number | null = null;
+          for (let j = 0; j <= N; j++) {
+            const t = j / N;
+            const vy = 2 * a * t - b;
+            let ang = Math.atan2(vy, dx);
+            if (prev != null) {
+              while (ang - prev > Math.PI) ang -= 2 * Math.PI;
+              while (prev - ang > Math.PI) ang += 2 * Math.PI;
+            }
+            prev = ang;
+            const sp = Math.hypot(dx, vy) / dur;
+            const grow = Math.min(1, 0.4 + t * 5);
+            frames.push({
+              offset: t,
+              transform: `translate(${(dx * t).toFixed(1)}px, ${(a * t * t - b * t).toFixed(1)}px) rotate(${((ang * 180) / Math.PI - 90).toFixed(1)}deg) scale(${(k * grow * 0.85).toFixed(2)}, ${(k * grow * (1 + Math.min(0.7, sp * 0.8))).toFixed(2)})`,
+            });
+          }
+          const el = document.createElement("span");
+          el.className = "goo-drop";
+          el.style.left = `${x0.toFixed(1)}px`;
+          el.style.top = `${y0.toFixed(1)}px`;
+          document.body.appendChild(el);
+          el.animate(frames, { duration: dur, fill: "forwards" }).onfinish = () => {
+            el.remove();
+            inAir--;
+            const all = getGoo().store.get().count;
+            if (!dead) api.set(inAir === 0 ? all : Math.min(all, shown + 1), u);
+          };
+        }, 120 + i * 70);
+      }
+    },
     falling: () => inAir,
     destroy() {
       dead = true;

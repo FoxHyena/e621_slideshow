@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AGE_MS, BACKOFF_MS, isAbort, resetLane, searchPosts } from "../e621/client";
+import { AGE_MS, BACKOFF_MS, isAbort, resetLane, searchPosts, skipBackOff } from "../e621/client";
 
 /** The request lane (ENGINEERING §3): one at a time, by priority with aging, a shared back-off. */
 
@@ -49,6 +49,23 @@ describe("request lane", () => {
     await vi.runAllTimersAsync();
     await Promise.all(all);
     expect(started.map((s) => s.tags)).toEqual(["slow", "old bg", "late user"]);
+  });
+
+  it("Try now lifts the back-off at once, but keeps the 550 ms gap", async () => {
+    status = (t) => (t === "busy" ? 429 : 200);
+    const a = run("busy", "user");
+    await vi.advanceTimersByTimeAsync(200);
+    expect((await a).status).toBe(429);
+    const b = run("again", "user");
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(started.map((s) => s.tags)).toEqual(["busy"]); // still paused
+    skipBackOff();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(started.map((s) => s.tags)).toEqual(["busy", "again"]);
+    expect(started[1].at - started[0].at).toBeLessThan(BACKOFF_MS);
+    expect(started[1].at - started[0].at).toBeGreaterThanOrEqual(550);
+    await vi.runAllTimersAsync();
+    await b;
   });
 
   it("pauses the whole lane for 5 s after a 429", async () => {
