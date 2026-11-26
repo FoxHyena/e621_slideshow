@@ -2,9 +2,15 @@
 Phase: 3 — Visual design           Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
-Wait for the 3 research files (docs/path-a/research/), then load design skills (impeccable,
-emil-design-eng, apple-design, mobile-native, animate), write DESIGN.md with tokens (spacing, sizes,
-radii, type, color, motion), build 1:1 mocks of key screens as an Artifact, design review rounds.
+Direction round (impeccable new-work, Operate mode). concept-seed ran: key 6916281b3fb103850ea7e30b56c74e86,
+seed:03339dd96a2c6b22, assigned index 5 = "plush hang tag". Directions to show the owner side by side at
+1:1 (375x812, Following first viewport) with contrast numbers: (1) e621 colors refined (navy + #fcb328,
+owner-required baseline), (2) plush hang tag (assigned), (3) reference sheet (my pick). Then: owner picks
+-> telemetry ping (concept-seed --from <key> --scope direction --mode operate --kind <...>) -> direction
+contract in surface brief -> DESIGN.md -> 1:1 key-screen mocks -> 2 review rounds -> owner OK.
+Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-libraries.md
+(deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
+PRODUCT.md written (repo root).
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
 - [x] Phase 1: ENGINEERING.md current state
