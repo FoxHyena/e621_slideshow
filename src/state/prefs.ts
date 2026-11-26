@@ -21,6 +21,8 @@ export interface Prefs {
   visitBlacklist: string | null;
   /** For You's chips (UX §5: kept across visits). Order and Hide favorited don't apply there. */
   forYou: Filters;
+  /** Following's chips: Media and Hide favorited (UX §5) */
+  following: Filters;
 }
 
 export interface PrefsApi {
@@ -44,6 +46,7 @@ export interface PrefsApi {
   /** Leaving a link's sign-in drops its blacklist. */
   endVisit(): void;
   setForYou(f: Filters): void;
+  setFollowing(f: Filters): void;
 }
 
 /** Saved For You filters over the defaults; anything malformed is the default. */
@@ -61,6 +64,19 @@ function loadForYou(): Filters {
   return { ...DEFAULT_FILTERS, media, date, minScore };
 }
 
+/** Saved Following chips over the defaults; anything malformed is the default. */
+function loadFollowing(): Filters {
+  const raw = storage.loadFollowing();
+  if (!raw || typeof raw !== "object") return DEFAULT_FILTERS;
+  const r = raw as Partial<Filters>;
+  const m = r.media && typeof r.media === "object" ? r.media : null;
+  const media =
+    m && (m.image === true || m.gif === true || m.video === true)
+      ? { image: m.image === true, gif: m.gif === true, video: m.video === true }
+      : DEFAULT_FILTERS.media;
+  return { ...DEFAULT_FILTERS, media, hideFaved: r.hideFaved === true };
+}
+
 /** The blacklist in force: a link visit's, else the saved one. */
 export const blacklistOf = (p: Prefs): string => p.visitBlacklist ?? p.search.blacklist;
 
@@ -72,6 +88,7 @@ export function createPrefs(): PrefsApi {
     history: storage.loadHistory(),
     visitBlacklist: null,
     forYou: loadForYou(),
+    following: loadFollowing(),
   });
   return {
     store,
@@ -118,6 +135,11 @@ export function createPrefs(): PrefsApi {
       const { media, date, minScore } = f;
       storage.saveForYou({ media, date, minScore });
       store.set((p) => ({ ...p, forYou: { ...DEFAULT_FILTERS, media, date, minScore } }));
+    },
+    setFollowing(f) {
+      const { media, hideFaved } = f;
+      storage.saveFollowing({ media, hideFaved });
+      store.set((p) => ({ ...p, following: { ...DEFAULT_FILTERS, media, hideFaved } }));
     },
     endVisit() {
       store.set((p) => (p.visitBlacklist === null ? p : { ...p, visitBlacklist: null }));

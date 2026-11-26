@@ -47,6 +47,8 @@ export interface SlideQueue {
   matchFor?(id: number): { score: number; reasons: string[] } | undefined;
   /** stop any background fetching */
   dispose?(): void;
+  /** the highest id e621 sent, before any filtering (cursor-paged search queues) */
+  readonly rawMax?: number;
   /** background search progress, for sources that fetch ahead on their own */
   readonly progress?: SearchProgress;
 }
@@ -88,6 +90,12 @@ export class PostQueue implements SlideQueue {
   loading = false;
   error: string | null = null;
   stats: QueueStats = { hidden: 0, blacklisted: 0 };
+  /**
+   * The highest and lowest ids e621 sent, before the blacklist and media filters dropped any
+   * (Following: what "everything loaded" means for marking seen; 0 before the first page).
+   */
+  rawMax = 0;
+  rawMin = 0;
 
   private seen = new Set<number>();
   private nextPage: string | number;
@@ -167,8 +175,11 @@ export class PostQueue implements SlideQueue {
           this.exhausted = true;
           break;
         }
+        const ids = raw.map((p) => p.id);
+        this.rawMax = Math.max(this.rawMax, ...ids);
+        this.rawMin = Math.min(this.rawMin || Infinity, ...ids);
         if (this.built.paging === "cursor") {
-          this.nextPage = `b${Math.min(...raw.map((p) => p.id))}`;
+          this.nextPage = `b${Math.min(...ids)}`;
         } else {
           const n = (this.nextPage as number) + 1;
           this.nextPage = n;

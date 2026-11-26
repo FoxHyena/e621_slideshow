@@ -23,6 +23,14 @@ export function resultsRoute(tags: string, filters: Filters = defaultFilters()):
   return { screen: { kind: "results", params: encodeResults({ tags: normTags(tags), filters, link: null }) }, play: null };
 }
 
+/**
+ * Where you sign in: Settings › Account. Until slice 7 that's the legacy panel, which moved there
+ * from the Following tab in slice 3.
+ */
+export function openSignIn(): void {
+  getNav().push({ screen: { kind: "settings", section: "account" }, play: null }, { from: "settings" });
+}
+
 /** Open Results for a search, and remember it as a recent search. */
 export function openResults(tags: string, filters?: Filters): void {
   getPrefs().addHistory(tags);

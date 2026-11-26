@@ -19,6 +19,8 @@ export interface MockPostSpec {
   is_favorited?: boolean;
   hidden?: boolean;
   duration?: number;
+  /** the artist tag (default `mock_artist`) */
+  artist?: string;
 }
 
 export function mockPost(spec: MockPostSpec) {
@@ -40,7 +42,7 @@ export function mockPost(spec: MockPostSpec) {
       fav_count: 3,
       is_favorited: spec.is_favorited ?? false,
     },
-    tags: { general: spec.tags ?? ["solo"], artist: ["mock_artist"], species: ["wolf"] },
+    tags: { general: spec.tags ?? ["solo"], artist: [spec.artist ?? "mock_artist"], species: ["wolf"] },
     rating: spec.rating ?? "s",
     uploader_id: 1,
     uploader_name: "uploader",
@@ -76,6 +78,17 @@ export interface E621Mock {
   favoritesDelay: number;
   /** /posts.json searches that fail with e621's 422 */
   searchFails: (tags: string) => boolean;
+  /**
+   * The tags the signed-in user follows (`search:subscriptions`), or null before they ever followed
+   * one (no anchor saved search, like e621).
+   */
+  subscriptions: string[] | null;
+  /** the anchor's `last_seen_post_id` */
+  lastSeen: number;
+  /** GET /saved_searches/:id/visit.json calls */
+  visits: number;
+  /** whether a visit moves the marker (false: e621 answers but nothing moves) */
+  visitMoves: boolean;
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -104,7 +117,13 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     searchDelay: () => 0,
     favoritesDelay: 0,
     searchFails: () => false,
+    subscriptions: null,
+    lastSeen: 0,
+    visits: 0,
+    visitMoves: true,
   };
+  const ANCHOR_ID = 7;
+  const tagsOf = (p: ReturnType<typeof mockPost>) => Object.values(p.tags).flat();
 
   const json = (route: Route, body: unknown, status = 200) =>
     route.fulfill({ status, headers: { ...CORS, "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -130,6 +149,13 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       if (tags.includes("nothing_matches")) return postList([]);
       if (tags.includes("server_error") || state.searchFails(tags)) return json(route, { success: false, message: "Mock search failure" }, 422);
       let list = state.posts;
+      // `search:subscriptions`: posts with any followed tag (nothing without the anchor, like e621)
+      if (tags.split(" ").includes("search:subscriptions")) {
+        const subs = auth ? state.subscriptions : null;
+        list = subs ? list.filter((p) => tagsOf(p).some((t) => subs.includes(t))) : [];
+      }
+      const above = tags.match(/(?:^| )id:>(\d+)/);
+      if (above) list = list.filter((p) => p.id > Number(above[1]));
       // `id:1,2,3`: those posts (newest first, like e621)
       const ids = tags.match(/(?:^| )id:([\d,]+)/);
       if (ids) {
@@ -175,6 +201,46 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const [user, key] = Buffer.from(auth.replace("Basic ", ""), "base64").toString().split(":");
       if (key !== "goodkey") return json(route, { success: false, message: "Invalid API key" }, 401);
       return json(route, { id: 42, name: user, blacklisted_tags: "account_rule\nsecond_rule other", tag_query_limit: 40 });
+    }
+
+    if (url.pathname === "/tag_subscriptions.json") {
+      if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
+      return json(
+        route,
+        (state.subscriptions ?? []).map((name, i) => ({ id: 100 + i, tag_id: 1000 + i, tag_name: name, category: 1, created_at: "2024-05-01T12:00:00.000-04:00" })),
+      );
+    }
+
+    if (url.pathname === "/saved_searches.json") {
+      if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
+      const subs = state.subscriptions;
+      return json(
+        route,
+        subs === null
+          ? []
+          : [
+              {
+                id: ANCHOR_ID,
+                name: "subscriptions",
+                query: "",
+                is_tracked: true,
+                is_subscription: true,
+                last_seen_post_id: state.lastSeen,
+                tag_count: subs.length,
+                new_count: Math.min(100, state.posts.filter((p) => p.id > state.lastSeen && tagsOf(p).some((t) => subs.includes(t))).length),
+                created_at: "2024-05-01T12:00:00.000-04:00",
+                updated_at: "2024-05-01T12:00:00.000-04:00",
+              },
+            ],
+      );
+    }
+
+    if (url.pathname === `/saved_searches/${ANCHOR_ID}/visit.json`) {
+      if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
+      state.visits++;
+      if (state.visitMoves) state.lastSeen = Math.max(0, ...state.posts.map((p) => p.id));
+      // Like e621: a redirect to the posts page, whatever the format.
+      return route.fulfill({ status: 302, headers: { ...CORS, location: "https://e621.net/posts?tags=search%3Asubscriptions" } });
     }
 
     if (url.pathname === "/users/42.json") {

@@ -50,7 +50,7 @@ export function PlaceholderScreen({
       if (screen.tab === "for-you")
         return (
           <Frame title="For You">
-            <Soon>Posts picked from your favorites will show up here. For now, start For You from the Following tab.</Soon>
+            <Soon>Posts picked from your favorites will show up here. For now, start For You from Settings › Account.</Soon>
           </Frame>
         );
       return (
@@ -62,7 +62,7 @@ export function PlaceholderScreen({
       if (screen.section)
         return (
           <Frame title={SECTION_LABEL[screen.section]} onBack={onBack}>
-            <Soon>These settings are moving here. Until then, they&rsquo;re in the panel on the Following tab.</Soon>
+            <Soon>These settings are moving here. Until then, they&rsquo;re under Account.</Soon>
           </Frame>
         );
       return (
@@ -96,7 +96,7 @@ export function PlaceholderScreen({
     case "search":
       return (
         <Frame title="Search" onBack={onBack}>
-          <Soon>Search e621 by tags. For now, search from the panel on the Following tab.</Soon>
+          <Soon>Search e621 by tags. For now, search from Settings › Account.</Soon>
         </Frame>
       );
     case "results":

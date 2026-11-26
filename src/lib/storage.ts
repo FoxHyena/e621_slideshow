@@ -66,6 +66,41 @@ export interface RankedList {
   at: number;
 }
 
+/** Following's "new since" threshold for a session (UX §5), so a reload shows the same dots. */
+export interface MarkerRecord {
+  threshold: number;
+  at: number;
+  /** marked seen since: the next load starts a new session from e621's marker */
+  marked: boolean;
+}
+
+/**
+ * Per-account records that persist only with Remember on (DECISIONS: signed-in data at rest):
+ * localStorage then, this tab's sessionStorage otherwise, so a reload still finds them.
+ */
+function readAccount<T>(key: string): T | null {
+  for (const s of [() => localStorage, () => sessionStorage]) {
+    try {
+      const raw = s().getItem(PREFIX + key);
+      if (raw !== null) return JSON.parse(raw) as T;
+    } catch {
+      // unreadable or off
+    }
+  }
+  return null;
+}
+function writeAccount(key: string, value: unknown, remember: boolean): void {
+  const stores = [() => localStorage, () => sessionStorage];
+  stores.forEach((s, i) => {
+    try {
+      if (value === null || (i === 0) !== remember) s().removeItem(PREFIX + key);
+      else s().setItem(PREFIX + key, JSON.stringify(value));
+    } catch {
+      // full or off: just not kept
+    }
+  });
+}
+
 export const storage = {
   loadSearch: (): SearchSettings => {
     const s = read("search", DEFAULT_SEARCH);
@@ -116,6 +151,9 @@ export const storage = {
   /** For You's filters (media, ranking window, min score): kept across visits. Validated by the caller. */
   loadForYou: (): unknown => read<unknown>("forYou", null),
   saveForYou: (f: unknown) => write("forYou", f),
+  /** Following's chips (media, hide favorited). Validated by the caller. */
+  loadFollowing: (): unknown => read<unknown>("following", null),
+  saveFollowing: (f: unknown) => write("following", f),
   /** For You's last ranked list for an account. Saved only with Remember on; sign-out removes it. */
   loadRanked: (username: string): RankedList | null => {
     const r = read<RankedList | null>(`ranked:${username}`, null);
@@ -129,6 +167,23 @@ export const storage = {
       : null;
   },
   saveRanked: (username: string, r: RankedList | null) => write(`ranked:${username}`, r),
+  loadMarker: (username: string): MarkerRecord | null => {
+    const m = readAccount<MarkerRecord>(`marker:${username}`);
+    return m && Number.isInteger(m.threshold) && m.threshold >= 0 && typeof m.at === "number" ? { ...m, marked: m.marked === true } : null;
+  },
+  saveMarker: (username: string, m: MarkerRecord | null, remember: boolean) => writeAccount(`marker:${username}`, m, remember),
+  /** Where Following marked seen itself when e621 didn't take it (the local marker fallback). */
+  loadLocalSeen: (username: string): number => {
+    const n = readAccount<number>(`seen:${username}`);
+    return Number.isInteger(n) && (n as number) > 0 ? (n as number) : 0;
+  },
+  saveLocalSeen: (username: string, id: number | null, remember: boolean) => writeAccount(`seen:${username}`, id, remember),
+  /** Everything kept for an account (sign-out, or a sign-in without Remember). */
+  purgeAccount: (username: string) => {
+    write(`ranked:${username}`, null);
+    writeAccount(`marker:${username}`, null, false);
+    writeAccount(`seen:${username}`, null, false);
+  },
 };
 
 export function pushHistory(history: HistoryEntry[], tags: string, now: number): HistoryEntry[] {

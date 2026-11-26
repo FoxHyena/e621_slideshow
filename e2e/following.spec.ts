@@ -1,0 +1,233 @@
+import { expect, test, type Page } from "@playwright/test";
+import { mockE621, type MockPostSpec } from "./mock";
+
+/**
+ * Following (UX §5): the tags you follow, newest first. New is above e621's seen marker as read at
+ * the start of the session; runs of 5+ new posts by one artist fold; "You're caught up" sits at the
+ * marker; and the marker moves once you're a screen past it, with no filter on and nothing newer.
+ */
+
+const SHOTS = process.env.E6_SHOTS;
+if (process.env.E6_MOBILE) test.use({ viewport: { width: 375, height: 812 } });
+const shot = async (page: Page, name: string) => {
+  if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: false, animations: "disabled" });
+};
+
+const signIn = (page: Page) =>
+  page.addInitScript(() => {
+    if (sessionStorage.getItem("seeded")) return;
+    sessionStorage.setItem("seeded", "1");
+    localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "goodkey" }));
+  });
+
+/**
+ * 1150 by fox, 1149–1143 by otter (7 in a run: 3 shown, 4 folded), 1142–1141 by fox: 10 new above
+ * the marker at 1140. Older posts by fox down to 1001.
+ */
+function specs(): MockPostSpec[] {
+  return Array.from({ length: 150 }, (_, i) => {
+    const id = 1150 - i;
+    return { id, artist: id <= 1149 && id >= 1143 ? "otter_artist" : "fox_artist" };
+  });
+}
+
+async function followingSignedIn(page: Page, opts: { lastSeen?: number } = {}) {
+  const mock = await mockE621(page, specs());
+  mock.subscriptions = ["fox_artist", "otter_artist"];
+  mock.lastSeen = opts.lastSeen ?? 1140;
+  await signIn(page);
+  return mock;
+}
+
+const status = (page: Page) => page.getByTestId("following-status");
+const ids = (page: Page) => page.getByTestId("post-card").evaluateAll((els) => els.map((e) => Number(e.getAttribute("data-post-id"))));
+
+/** Scroll down until a windowed row is in the DOM, then bring it into view. */
+async function reveal(page: Page, testId: string) {
+  const el = page.getByTestId(testId).first();
+  for (let i = 0; i < 40 && (await el.count()) === 0; i++) {
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(50);
+  }
+  await el.scrollIntoViewIfNeeded();
+  return el;
+}
+
+/** Scroll the divider a screen past the top of the view. */
+async function scrollPast(page: Page) {
+  await reveal(page, "caught-up");
+  await page.evaluate(() => window.scrollBy(0, window.innerHeight + 200));
+}
+
+test("signed out, Following says what it's for, and shows what's popular", async ({ page }) => {
+  const mock = await mockE621(page);
+  await page.goto("/following");
+  await expect(page.getByTestId("following-signed-out")).toBeVisible();
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  expect(mock.searches[0].tags).toContain("order:rank");
+  await shot(page, "following-signed-out");
+  await page.getByTestId("following-sign-in").click();
+  await expect(page).toHaveURL(/\/settings\/account$/);
+  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+});
+
+test("following nobody yet says so, over what's popular", async ({ page }) => {
+  await mockE621(page);
+  await signIn(page);
+  await page.goto("/following");
+  await expect(page.getByTestId("following-none")).toBeVisible();
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+});
+
+test("new posts are marked New, a long run folds, and the divider sits at e621's marker", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  expect(mock.searches[0].tags).toBe("search:subscriptions");
+  expect(mock.searches[0].auth).not.toBeNull();
+  await expect(page.getByTestId("play-count")).toHaveText("10");
+  await shot(page, "following");
+  // 1150, then otter's first three, then "+4".
+  const more = await reveal(page, "burst-more");
+  await expect(more).toHaveText("4 more from otter artist");
+  await expect.poll(() => ids(page)).toEqual(expect.arrayContaining([1150, 1149, 1148, 1147, 1142]));
+  expect(await ids(page)).not.toContain(1146);
+  await expect(page.locator('[data-post-id="1150"] [data-testid=card-new]')).toBeVisible();
+
+  await more.click();
+  await expect(page.locator('[data-post-id="1146"]')).toBeVisible();
+  await expect(more).toHaveCount(0);
+  await expect(await reveal(page, "caught-up")).toContainText("You’re caught up");
+  await expect(page.locator('[data-post-id="1140"] [data-testid=card-new]')).toHaveCount(0);
+  await shot(page, "following-caught-up");
+});
+
+test("a screen past the divider, at rest, marks seen on e621; the dots stay for the session", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await scrollPast(page);
+  await expect.poll(() => mock.visits).toBe(1);
+  await expect(page.getByText("Marked as seen on e621").first()).toBeVisible();
+  // The check for anything newer came first, with the feed's own search.
+  expect(mock.searches.some((s) => s.tags === "search:subscriptions id:>1150")).toBe(true);
+  expect(mock.lastSeen).toBe(1150);
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  // A later session starts from the new marker.
+  await page.reload();
+  await expect(status(page)).toHaveText("All caught up");
+});
+
+test("a reload before marking shows the same dots, even if e621's marker moved meanwhile", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  mock.lastSeen = 1148;
+  await page.reload();
+  await expect(status(page)).toHaveText("10 new since your last visit");
+});
+
+test("with a filter on, scrolling past doesn't mark seen", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await page.getByTestId("chip-hide-faved").click();
+  await expect.poll(() => mock.searches.some((s) => s.tags.includes("-fav:tester"))).toBe(true);
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await scrollPast(page);
+  await page.waitForTimeout(2500);
+  expect(mock.visits).toBe(0);
+});
+
+test("newer posts on e621 hold the mark and offer the new-posts pill", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  mock.setPosts([{ id: 1151, artist: "fox_artist" }, ...specs()]);
+  await scrollPast(page);
+  await expect(page.getByTestId("new-posts-pill")).toBeVisible();
+  expect(mock.visits).toBe(0);
+  await page.getByTestId("new-posts-pill").click();
+  await expect(status(page)).toHaveText("11 new since your last visit");
+  await expect.poll(() => ids(page)).toContain(1151);
+});
+
+test("⋯ › Mark all as seen asks first, then marks with a filter on", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await page.getByTestId("chip-hide-faved").click();
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await page.getByTestId("following-more").click();
+  await page.getByTestId("following-mark-all").click();
+  await expect(page.getByTestId("sheet-mark-all")).toContainText("Mark 10 new posts as seen on e621? This can’t be undone.");
+  await shot(page, "following-mark-all");
+  await page.getByTestId("mark-all-confirm").click();
+  await expect.poll(() => mock.visits).toBe(1);
+  await expect(page.getByText("Marked as seen on e621").first()).toBeVisible();
+});
+
+test("when e621's marker doesn't move, the mark is kept on this device", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  mock.visitMoves = false;
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await scrollPast(page);
+  await expect(page.getByText("Marked as seen on this device. e621 didn't take it.")).toBeVisible();
+  await page.reload();
+  await expect(status(page)).toHaveText("All caught up");
+});
+
+test("playing past the last new post marks seen", async ({ page }) => {
+  const mock = await followingSignedIn(page, { lastSeen: 1148 });
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("2 new since your last visit");
+  await page.getByTestId("play-fab").click();
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1150");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1148");
+  await expect.poll(() => mock.visits).toBe(1);
+});
+
+test("⋯ › Refresh starts the feed again from the top, not the place kept for it", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await page.mouse.wheel(0, 3000);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(2000);
+  await page.waitForTimeout(500); // the place is saved once scrolling rests
+  const before = mock.searches.length;
+  await page.getByTestId("following-more").click();
+  await page.getByTestId("following-refresh").click();
+  await expect.poll(() => mock.searches.length).toBeGreaterThan(before);
+  await expect(page.locator('[data-post-id="1150"]')).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(() => window.scrollY)).toBeLessThan(50);
+});
+
+test("a share link's borrowed sign-in never reads or moves the owner's marker", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.addInitScript(() => localStorage.removeItem("e6ss:v1:creds"));
+  const touched: string[] = [];
+  page.on("request", (r) => {
+    if (/\/(saved_searches|tag_subscriptions)/.test(r.url())) touched.push(r.url());
+  });
+  await page.goto("/#u=tester&k=goodkey");
+  await expect(page.getByTestId("following-signed-out")).toBeVisible();
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(touched).toEqual([]);
+  expect(mock.visits).toBe(0);
+});
+
+test("opening an old post straight away isn't playing past the new ones", async ({ page }) => {
+  const mock = await followingSignedIn(page, { lastSeen: 1148 });
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("2 new since your last visit");
+  // The first old post, opened without scrolling (scrolling past the divider would mark by rule 1).
+  await page.locator('[data-post-id="1148"] [data-testid=card-media]').dispatchEvent("click");
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1148");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1147");
+  await page.waitForTimeout(2000);
+  expect(mock.visits).toBe(0);
+});

@@ -108,3 +108,54 @@ export function gridRange(g: GridLayout, scrollTop: number, viewport: number, ov
   const last = Math.min(g.rows, Math.ceil((scrollTop + viewport + overscan * viewport) / row));
   return [first * g.cols, last * g.cols];
 }
+
+// ---- rows (Following: the divider and folded runs between cards) ------------
+
+/** Fixed heights of the rows between cards (ENGINEERING.md §5), pinned in CSS too. */
+export const ROW = { divider: 120, more: 48 } as const;
+
+export type FeedRow =
+  | { kind: "post"; index: number }
+  /** a folded run: `count` posts after the shown ones, by `artist`; `run` is the run's first post id */
+  | { kind: "more"; run: number; artist: string; count: number }
+  | { kind: "divider" };
+
+export interface RowLayout extends FeedLayout {
+  /** for each post, the row that shows it (a folded post: its "+N more" row) */
+  rowOf: number[];
+}
+
+/** Every post as its own row: a feed without dividers or folded runs. */
+export function plainRows(count: number): FeedRow[] {
+  return Array.from({ length: count }, (_, index) => ({ kind: "post", index }));
+}
+
+export function layoutRows(rows: FeedRow[], posts: Pick<Post, "files">[], column: number): RowLayout {
+  const tops: number[] = [];
+  const heights: number[] = [];
+  const rowOf = new Array<number>(posts.length).fill(-1);
+  let y = 0;
+  rows.forEach((r, i) => {
+    const h = r.kind === "post" ? cardHeight(posts[r.index], column) : ROW[r.kind];
+    if (r.kind === "post") rowOf[r.index] = i;
+    tops.push(y);
+    heights.push(h);
+    y += h + CARD.gap;
+  });
+  // Folded posts: their run's "+N more" row (the next one after the last shown post before them).
+  let more = -1;
+  for (let p = posts.length - 1; p >= 0; p--) {
+    if (rowOf[p] >= 0) {
+      more = -1;
+      continue;
+    }
+    if (more < 0) {
+      // the first row after the shown post above this one
+      let above = p - 1;
+      while (above >= 0 && rowOf[above] < 0) above--;
+      more = above >= 0 ? rowOf[above] + 1 : 0;
+    }
+    rowOf[p] = more;
+  }
+  return { column, tops, heights, total: rows.length ? y - CARD.gap : 0, rowOf };
+}

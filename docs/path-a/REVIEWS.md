@@ -287,3 +287,48 @@ stay deferred to slice 3, which deletes the legacy home.
 | Layout shift | 0 | 0.0000 |
 | First feed content | < 1.5 s | 0.37 s to the first Results card (no `feedHead` cache yet; slice 3) |
 | Scroll, 4× CPU | no task > 50 ms | 0–1 long task per run, 53–55 ms. Borderline: recheck in Phase 6 with the performance panel |
+
+## Slice 3a review (2026-11-25): Following
+
+**code-review skill (high), 7 findings: 6 fixed, 1 not a bug**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The newer check dropped Hide favorited, so a faved newest post held the mark forever | High | The check runs the feed's own filters |
+| 2 | Refresh would restore the old scroll place, not the top | High | **Not a bug**: the feed view is keyed by feed key, so it doesn't remount and the place is only read on mount. e2e guards it |
+| 3 | The newer check re-ran on every scroll rest while the pill was up | Low | Skipped while newer posts are known |
+| 4 | A failed read-back after a good visit read as a refusal | Low | One retry, and its own message |
+| 5 | Grid view never marked seen by scrolling | Low | The grid reports the tile row of the first old post as the divider |
+| 6 | Focus was lost opening Settings › Account | Low | The account section takes focus |
+| 7 | Expanded runs folded again on reload | Low | Kept in sessionStorage |
+
+**Fresh reviewer, 11 findings: 8 fixed, 3 no change**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Opening an old post in the player marked seen without anything seen | High | Needs a new post in the player first; e2e fails without the fix |
+| 2 | "A screen past" read as "divider at the top"; the list end could never mark | Med | Reading kept and logged; the list's bottom with the divider on screen counts; unit tests |
+| 3 | A failed mark retried and toasted on every scroll rest | Med | A minute's back-off after a failure; only the first automatic failure toasts; unit test |
+| 4 | A read-back failure after a good visit said "e621 didn't take it" | Low | "Couldn't confirm it with e621"; unit test |
+| 5 | Esc on Settings › Account doesn't go back | Low | **No change**: the legacy app owns Esc there (its panel); interim until slice 7; logged |
+| 6 | A saved place on a post folded since lands wrong | Low | Lands on its "+N more" row |
+| 7 | Expanded runs keyed by first id fold again when newer posts join their head | Low | Open if any of the run's posts opened one; unit test |
+| 8 | Test gaps: borrowed sign-in, sign-out purge | Med | e2e: a share link's sign-in never calls `/saved_searches` or `/tag_subscriptions`; unit: purge clears both stores |
+| 9 | Turning Remember on leaves markers in the wrong store | Low | **No change**: every write moves the record to the right store and removes the other copy; reads fall through to the other store |
+| 10 | Mark all that found newer posts said nothing | Low | Toasts "New posts came in, so nothing was marked" |
+| 11 | "40 new" lost its "+" after a page error | Low | A failed page doesn't end the list |
+
+Not covered: the real e621 marker (needs the owner signed in in the browser pane); the mock ignores
+`-fav:` and `rating:` in the newer check.
+
+**Gates:** 233 unit tests, 122 e2e passed (2 skipped), typecheck and lint clean.
+
+**Budgets** (production build, `e2e/budgets.spec.ts`, 375×812, mock e621):
+
+| Budget | Target | Measured |
+|---|---|---|
+| JS, cold load of `/following` | ≤ 200 KB | 187.8 KB (was 199.7): the legacy home left the first load; Following joined it. 221.6 KB with the idle prefetch |
+| Cards in the DOM | ≤ 30 | 12 |
+| Layout shift | 0 | 0.0000 |
+| First feed content | < 1.5 s | 0.38 s |
+| Scroll, 4× CPU | no task > 50 ms | 0 long tasks |

@@ -1,4 +1,4 @@
-import type { AutocompleteTag, CurrentUser, Post, TagInfo, UserProfile } from "./types";
+import type { AutocompleteTag, CurrentUser, Post, SavedSearchRow, TagInfo, TagSubscription, UserProfile } from "./types";
 
 export const E621_BASE = "https://e621.net";
 
@@ -182,6 +182,56 @@ export async function addFavorite(postId: number, creds: Credentials): Promise<v
 
 export async function removeFavorite(postId: number, creds: Credentials): Promise<void> {
   await request(`/favorites/${postId}.json`, { method: "DELETE", creds });
+}
+
+// ---- Following (ENGINEERING.md §3, §4; e621ng research notes) --------------------------------
+
+/** The tags you follow on e621: the whole list (e621 allows 500), sorted by name. */
+export async function getSubscriptions(creds: Credentials, signal?: AbortSignal): Promise<TagSubscription[]> {
+  const res = await request<unknown>("/tag_subscriptions.json", { creds, signal });
+  return Array.isArray(res) ? (res as TagSubscription[]) : [];
+}
+
+/**
+ * Your saved searches, the followed-tags anchor first. Its `last_seen_post_id` is the "new since
+ * last visit" marker; the anchor doesn't exist until you first follow a tag.
+ */
+export async function getSavedSearches(creds: Credentials, signal?: AbortSignal): Promise<SavedSearchRow[]> {
+  const res = await request<unknown>("/saved_searches.json", { creds, signal });
+  if (Array.isArray(res)) return res as SavedSearchRow[];
+  throw new E621Error("e621 sent saved searches in a format this app doesn't understand", 200);
+}
+
+/** The followed-tags anchor, or null when you follow nothing yet. */
+export async function getAnchor(creds: Credentials, signal?: AbortSignal): Promise<SavedSearchRow | null> {
+  return (await getSavedSearches(creds, signal)).find((r) => r.is_subscription) ?? null;
+}
+
+/**
+ * Move e621's "seen" marker for followed tags to its newest post. e621 answers with a redirect to
+ * the posts page (its side effect is already done), so the redirect isn't followed: an
+ * `opaqueredirect` (or any 2xx/3xx) counts as success. It can't be moved back.
+ */
+export async function visitAnchor(anchorId: number, creds: Credentials): Promise<void> {
+  const url = new URL(`/saved_searches/${anchorId}/visit.json`, E621_BASE);
+  url.searchParams.set("_client", clientParam(creds));
+  await throttle(async () => {
+    const res = await fetch(url, {
+      headers: { Authorization: "Basic " + btoa(`${creds.username}:${creds.apiKey}`) },
+      redirect: "manual",
+    });
+    if (res.type === "opaqueredirect" || (res.status >= 200 && res.status < 400)) return;
+    throw new E621Error(await errorMessage(res), res.status);
+  });
+}
+
+/**
+ * Whether a search finds anything: one post asked for. Following's "anything newer?" check passes
+ * its own feed's query with `id:>N` in the tag box, so ratings and blacklist apply the same way.
+ */
+export async function anyPost(query: string, creds: Credentials | null): Promise<boolean> {
+  const posts = await searchPosts(query, 1, 1, creds);
+  return posts.length > 0;
 }
 
 export function postPageUrl(id: number): string {

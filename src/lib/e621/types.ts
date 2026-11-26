@@ -131,3 +131,30 @@ export function mediaKind(post: Post): MediaKind {
   if (ext === "jpg" || ext === "png" || ext === "webp") return "image";
   return "other";
 }
+
+/** A row of GET /tag_subscriptions.json (e621ng TagSubscriptionBlueprint). */
+export interface TagSubscription {
+  id: number;
+  tag_id: number;
+  tag_name: string;
+  category: number;
+  created_at: string;
+}
+
+/**
+ * A row of GET /saved_searches.json. The hidden "subscriptions" anchor (`is_subscription`) holds
+ * the "new since last visit" marker for followed tags (e621ng SavedSearchBlueprint).
+ */
+export interface SavedSearchRow {
+  id: number;
+  name: string;
+  query: string;
+  is_tracked: boolean;
+  is_subscription: boolean;
+  /** posts above this id are new */
+  last_seen_post_id: number | null;
+  /** followed tags (the anchor only) */
+  tag_count?: number | null;
+  /** posts above the marker, capped at 100 by e621; null when e621 didn't count */
+  new_count?: number | null;
+}

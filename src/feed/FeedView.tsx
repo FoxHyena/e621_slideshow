@@ -6,14 +6,15 @@
  * DOM, placed from `layout.ts` so nothing jumps as pictures load. Where you were (a post and an
  * offset into it) is saved for a day, so a reload comes back to the same post.
  */
-import { Play, RotateCw } from "lucide-react";
+import { ChevronDown, Play, RotateCw } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
-import { gridRange, indexAt, layoutFeed, layoutGrid, mediaHeight, visibleRange, GRID_GAP } from "@/lib/feed/layout";
+import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, visibleRange, GRID_GAP, type FeedRow } from "@/lib/feed/layout";
 import { TagActionsOverlay, useTagHold, type TagAction } from "@/components/TagActions";
 import type { Feed } from "@/state/feeds";
 import { useStore } from "@/state/store";
 import { isLocked, registerRevealer, scrollY } from "@/nav/scroll";
+import Avatar from "@/components/Avatar";
 import { PostCard } from "./PostCard";
 
 /** Start the next page this far before the end (UX §5). */
@@ -89,12 +90,40 @@ export interface FeedViewProps {
   empty: ReactNode;
   /** For You: holding a tag offers Pin in place of Search */
   recommended?: boolean;
+  /**
+   * Following: the rows between cards (the "You're caught up" divider, folded runs), from the
+   * posts as they are now. Without it every post is its own row.
+   */
+  rowsFor?: (posts: Post[], exhausted: boolean) => FeedRow[];
+  /** Following: posts marked New */
+  fresh?: (post: Post) => boolean;
+  /** Following: the line under "You're caught up" */
+  caughtNote?: string;
+  /** Following: a folded run's "+N more" was tapped (`run` is its first post's id) */
+  onExpand?: (run: number) => void;
+  /** Following: where the view is, and the divider's top (list coordinates), as the page scrolls */
+  onView?: (v: { top: number; height: number; dividerTop: number | null; total: number }) => void;
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
   onTag: (tag: string, action: TagAction) => void;
 }
 
-export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMenu, onTag, recommended = false }: FeedViewProps) {
+export function FeedView({
+  feed,
+  grid,
+  anchorKey,
+  entryKey,
+  empty,
+  onOpen,
+  onMenu,
+  onTag,
+  recommended = false,
+  rowsFor,
+  fresh,
+  caughtNote,
+  onExpand,
+  onView,
+}: FeedViewProps) {
   useStore(feed.version, (v) => v);
   const q = feed.queue;
   const posts = q.posts;
@@ -115,7 +144,15 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
   }, []);
 
   // Cheap (one pass over the loaded posts), so it's simply recomputed with each render.
-  const layout = layoutFeed(posts, width);
+  const rows = rowsFor ? rowsFor(posts, q.exhausted) : plainRows(posts.length);
+  const layout = layoutRows(rows, posts, width);
+  /** The post a row stands for: itself, else the nearest shown post above it (then below). */
+  const postAt = (r: number): number => {
+    for (let k = r; k >= 0; k--) if (rows[k]?.kind === "post") return (rows[k] as { index: number }).index;
+    for (let k = r + 1; k < rows.length; k++) if (rows[k].kind === "post") return (rows[k] as { index: number }).index;
+    return -1;
+  };
+  const topOf = (i: number) => layout.tops[layout.rowOf[i]];
   const tiles = layoutGrid(posts.length, width);
   const total = grid ? tiles.total : layout.total;
 
@@ -181,12 +218,13 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
   }, []);
   useEffect(() => {
     if (grid || posts.length === 0 || !restored.current) return;
-    const i = Math.min(indexAt(layout, view.top), posts.length - 1);
-    const a = view.top <= 0 ? null : { id: posts[i].id, off: Math.round(view.top - layout.tops[i]), at: Date.now() };
+    const i = postAt(Math.min(indexAt(layout, view.top), rows.length - 1));
+    if (i < 0) return;
+    const a = view.top <= 0 ? null : { id: posts[i].id, off: Math.round(view.top - topOf(i)), at: Date.now() };
     unsaved.current = { key: anchorKey, a };
     const t = setTimeout(flush, ANCHOR_SAVE_MS);
     return () => clearTimeout(t);
-  }, [view, grid, layout, posts, anchorKey, flush]);
+  }, [view, grid, layout, posts, anchorKey, flush]); // eslint-disable-line react-hooks/exhaustive-deps -- postAt/topOf read this render's layout
   useEffect(() => {
     window.addEventListener("pagehide", flush);
     return () => {
@@ -204,7 +242,9 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
       const el = list.current;
       if (!el) return;
       const listTop = el.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo(0, listTop + layout.tops[i] + saved.off);
+      // Folded since (its run closed): land on the run's "+N more" row instead.
+      const off = rows[layout.rowOf[i]]?.kind === "post" ? saved.off : 0;
+      window.scrollTo(0, listTop + topOf(i) + off);
       return;
     }
     if (q.exhausted || q.error || posts.length >= ANCHOR_SEARCH_MAX) restored.current = true;
@@ -218,10 +258,10 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
     const k = keep.current;
     if (k && !grid && !isLocked()) {
       const i = posts.findIndex((p) => p.id === k.id);
-      if (i >= 0 && layout.tops[i] !== k.top) window.scrollBy(0, layout.tops[i] - k.top);
+      if (i >= 0 && topOf(i) !== k.top) window.scrollBy(0, topOf(i) - k.top);
     }
-    const i = posts.length && view.top > 0 ? Math.min(indexAt(layout, view.top), posts.length - 1) : -1;
-    keep.current = i >= 0 && !grid ? { id: posts[i].id, top: layout.tops[i] } : null;
+    const i = rows.length && view.top > 0 ? postAt(Math.min(indexAt(layout, view.top), rows.length - 1)) : -1;
+    keep.current = i >= 0 && !grid ? { id: posts[i].id, top: topOf(i) } : null;
   });
 
   // The player closing over this list centres the last post it showed (or the nearest older one).
@@ -241,16 +281,36 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
         if (i < 0 && newestFirst) i = g.posts.findIndex((p) => p.id < id);
         if (i < 0) return null;
         const docTop = el.getBoundingClientRect().top + scrollY();
+        const r = g.layout.rowOf[i];
         const [top, h] = g.grid
           ? [Math.floor(i / g.tiles.cols) * (g.tiles.tile + GRID_GAP), g.tiles.tile]
-          : [g.layout.tops[i], g.layout.heights[i]];
+          : [g.layout.tops[r], g.layout.heights[r]];
         return docTop + top + h / 2 - window.innerHeight / 2;
       }),
     [entryKey],
   );
 
   const [start, end] = grid ? gridRange(tiles, view.top, view.height) : visibleRange(layout, view.top, view.height);
-  const live = grid ? -1 : indexAt(layout, view.top + view.height / 2);
+  const mid = grid ? -1 : indexAt(layout, view.top + view.height / 2);
+  const live = rows[mid]?.kind === "post" ? (rows[mid] as { index: number }).index : -1;
+
+  // Following: where the view and the divider are (rule 1 of marking seen). In the grid, the divider
+  // is the top of the tile row holding the first post after it.
+  const dividerRow = rowsFor ? rows.findIndex((r) => r.kind === "divider") : -1;
+  let dividerTop: number | null = null;
+  if (dividerRow >= 0 && !grid) dividerTop = layout.tops[dividerRow];
+  else if (dividerRow >= 0) {
+    const after = rows.slice(dividerRow).find((r) => r.kind === "post");
+    const first = after?.kind === "post" ? after.index : posts.length;
+    dividerTop = Math.floor(first / tiles.cols) * (tiles.tile + GRID_GAP);
+  }
+  const report = useRef(onView);
+  useLayoutEffect(() => {
+    report.current = onView;
+  });
+  useEffect(() => {
+    report.current?.({ top: view.top, height: view.height, dividerTop, total });
+  }, [view, dividerTop, total]);
 
   const stats = q.stats;
   const hidden = stats.blacklisted + stats.hidden;
@@ -269,23 +329,46 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
                 <Tile
                   key={p.id}
                   post={p}
+                  fresh={fresh?.(p) ?? false}
                   style={{ top: row * (tiles.tile + GRID_GAP), left: col * (tiles.tile + GRID_GAP), width: tiles.tile, height: tiles.tile }}
                   onOpen={() => onOpen(p, i)}
                 />
               );
             })
-          : posts.slice(start, end).map((p, k) => {
-              const i = start + k;
+          : rows.slice(start, end).map((r, k) => {
+              const at = { top: layout.tops[start + k], height: layout.heights[start + k] };
+              if (r.kind === "divider")
+                return (
+                  <div key="divider" className="feed-slot feed-caught" style={at} data-testid="caught-up">
+                    {/* a seed that draws in gold and pale blue, the caught-up colours of the approved mock */}
+                    <Avatar seed="caught-up-617" className="feed-caught-mark" />
+                    <b>You&rsquo;re caught up</b>
+                    {caughtNote && <small data-testid="caught-note">{caughtNote}</small>}
+                  </div>
+                );
+              if (r.kind === "more")
+                return (
+                  <div key={`more:${r.run}`} className="feed-slot" style={at}>
+                    <button type="button" className="btn-tonal feed-burst" onClick={() => onExpand?.(r.run)} data-testid="burst-more">
+                      <span>
+                        {r.count} more from {r.artist.replaceAll("_", " ")}
+                      </span>
+                      <ChevronDown aria-hidden />
+                    </button>
+                  </div>
+                );
+              const p = posts[r.index];
               return (
-                <div key={p.id} className="feed-slot" style={{ top: layout.tops[i], height: layout.heights[i] }}>
+                <div key={p.id} className="feed-slot" style={at}>
                   <PostCard
                     post={p}
-                    index={i}
+                    index={r.index}
                     mediaHeight={mediaHeight(p, width)}
-                    live={i === live}
+                    live={r.index === live}
                     still={still}
                     now={now}
                     hold={hold}
+                    fresh={fresh?.(p) ?? false}
                     onOpen={onOpen}
                     onMenu={onMenu}
                   />
@@ -354,10 +437,19 @@ function Skeletons() {
   );
 }
 
-function Tile({ post, style, onOpen }: { post: Post; style: React.CSSProperties; onOpen: () => void }) {
+function Tile({ post, fresh, style, onOpen }: { post: Post; fresh: boolean; style: React.CSSProperties; onOpen: () => void }) {
   const src = post.files.preview.jpg ?? post.files.sample.jpg;
   return (
-    <button type="button" className="feed-tile" style={style} onClick={onOpen} aria-label={`Post ${post.id}`} data-testid="grid-tile" data-post-id={post.id}>
+    <button
+      type="button"
+      className="feed-tile"
+      style={style}
+      onClick={onOpen}
+      aria-label={`Post ${post.id}${fresh ? ", new" : ""}`}
+      data-testid="grid-tile"
+      data-post-id={post.id}
+      data-new={fresh || undefined}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element -- remote CDN thumbnails */}
       {src && <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />}
       {mediaKind(post) === "video" && (

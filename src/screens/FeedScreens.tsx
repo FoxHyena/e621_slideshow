@@ -13,7 +13,7 @@ import { DEFAULT_FILTERS, decodeFilters, decodeResults, encodeFilters, encodeRes
 import { artists } from "@/lib/feed/format";
 import { DEFAULT_SEARCH, type SearchSettings } from "@/lib/settings";
 import type { TagAction } from "@/components/TagActions";
-import { FeedView } from "@/feed/FeedView";
+import { FeedView, type FeedViewProps } from "@/feed/FeedView";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { getNav } from "@/nav/history";
 import type { Route } from "@/nav/routes";
@@ -24,7 +24,7 @@ import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
-import { blacklistLine, copyText, openResults, sharePost } from "./actions";
+import { blacklistLine, copyText, openResults, openSignIn, sharePost } from "./actions";
 import { SearchForm } from "./SearchScreen";
 import { shareUrlFor } from "@/player/share";
 import { openPaused } from "@/player/intent";
@@ -82,7 +82,7 @@ export function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: bool
   );
 }
 
-export function PlayFab({ feed, route }: { feed: Feed | null; route: Route }) {
+export function PlayFab({ feed, route, count = 0 }: { feed: Feed | null; route: Route; count?: number }) {
   useStore(feed?.version ?? getFeeds().generation, (v) => v);
   const first = feed?.queue.posts[0];
   if (!first) return null;
@@ -90,7 +90,7 @@ export function PlayFab({ feed, route }: { feed: Feed | null; route: Route }) {
     <button
       type="button"
       className="play-fab"
-      aria-label="Play"
+      aria-label={count > 0 ? `Play ${count} new posts` : "Play"}
       onClick={() => {
         openPaused(false);
         getNav().push({ screen: route.screen, play: String(first.id) });
@@ -98,6 +98,11 @@ export function PlayFab({ feed, route }: { feed: Feed | null; route: Route }) {
       data-testid="play-fab"
     >
       <Play aria-hidden />
+      {count > 0 && (
+        <span className="play-fab-count" aria-hidden data-testid="play-count">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
     </button>
   );
 }
@@ -170,6 +175,7 @@ export function FeedBody({
   onTag,
   anchorKey,
   recommended,
+  ...following
 }: {
   feed: Feed | null;
   grid: boolean;
@@ -179,7 +185,7 @@ export function FeedBody({
   /** where the reading place is kept; tab roots name the tab, since their entry changes per visit */
   anchorKey?: string;
   recommended?: boolean;
-}) {
+} & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView">) {
   const { entry } = useScreen();
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;
   return (
@@ -189,6 +195,7 @@ export function FeedBody({
       grid={grid}
       anchorKey={anchorKey ?? `${entry.key}:${feed.key}`}
       recommended={recommended}
+      {...following}
       entryKey={entry.key}
       empty={empty}
       onOpen={(p: Post) => {
@@ -379,7 +386,7 @@ export function FavoritesScreen({ params }: { params: string }) {
           <p className="feed-empty-title">Sign in to see your favorites</p>
           <p className="feed-note">Favorites are kept on your e621 account. Sign in with your username and API key.</p>
           <div className="feed-empty-actions">
-            <button type="button" className="btn-gold" onClick={() => void getNav().goTab("following")}>
+            <button type="button" className="btn-gold" onClick={openSignIn}>
               Sign in
             </button>
             <button type="button" className="btn-tonal" onClick={() => getNav().replace({ screen: { kind: "search" }, play: null })}>

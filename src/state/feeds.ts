@@ -62,6 +62,11 @@ export function feedSearch(spec: FeedSpec, env: FeedEnv, blacklist = ""): Search
 
 const tagLimit = (env: FeedEnv) => env.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
 
+/** The e621 query a feed runs (blacklist lines stay out: they're matched on our side). */
+export function feedQuery(spec: FeedSpec, env: FeedEnv): string {
+  return buildQuery(feedSearch(spec, env), tagLimit(env)).query;
+}
+
 export function feedKey(spec: FeedSpec, env: FeedEnv): string {
   const b = buildQuery(feedSearch(spec, env), tagLimit(env));
   return JSON.stringify([spec.kind, b.query, spec.filters.media, env.user?.name ?? null, env.creds?.username ?? null]);

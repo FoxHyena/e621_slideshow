@@ -3,8 +3,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 
-// Slice 1 interim home (ENGINEERING.md §11): today's settings-panel app runs in the
-// Following tab until slice 3 replaces it. Its `fixed inset-0` layers stay inside the
+// Interim (ENGINEERING.md §11): today's settings-panel app, at Settings › Account since slice 3
+// (sign-in and the settings not moved yet) until slice 7. Its `fixed inset-0` layers stay inside the
 // box because the box is a containing block (transform), which keeps them off the tab bar.
 const App = dynamic(() => import("@/components/App"), { ssr: false });
 

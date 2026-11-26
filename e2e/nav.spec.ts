@@ -33,7 +33,8 @@ test.beforeEach(async ({ page }) => {
 
 test("every route serves the shell and opens its screen", async ({ page }) => {
   const cases: [string, string | null][] = [
-    ["/following", null],
+    ["/following", "Following"],
+    ["/settings/account", null],
     ["/for-you", "For You"],
     ["/for-you/tune", "Tune For You"],
     ["/artists", "Artists"],
@@ -58,7 +59,7 @@ test("every route serves the shell and opens its screen", async ({ page }) => {
 
 test("tabs and pushed screens move without RSC requests, and Back/Forward retrace them", async ({ page }) => {
   await page.goto("/following");
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
   const rsc = watchRsc(page);
 
   await tab(page, "Artists").click();
@@ -80,7 +81,7 @@ test("tabs and pushed screens move without RSC requests, and Back/Forward retrac
   expect(page.url()).toMatch(/\/settings$/);
   // Other tabs replace each other: one entry above Following.
   await page.goBack();
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
   expect(page.url()).toMatch(/\/following$/);
   await page.goForward();
   await expect(heading(page, "Settings")).toBeVisible();
@@ -91,7 +92,7 @@ test("tabs and pushed screens move without RSC requests, and Back/Forward retrac
   await page.getByRole("button", { name: "Back" }).click();
   await expect(heading(page, "Settings")).toBeVisible();
   await tab(page, "Following").click();
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
   expect(page.url()).toMatch(/\/following$/);
 
   expect(rsc).toEqual([]);
@@ -107,7 +108,7 @@ test("a pasted deep link gets the app under it, and a quick double Back lands ho
     history.back();
   });
   await expect(page).toHaveURL(/\/following$/);
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
   await page.goForward();
   await expect(page).toHaveURL(/\/artist\/fox$/);
   await expect(heading(page, "fox")).toBeVisible();
@@ -120,7 +121,7 @@ test("Back on a pasted URL with nothing under it goes to its parent", async ({ p
   await expect(heading(page, "Page not found")).toBeVisible();
   await page.getByRole("button", { name: "Go to Following" }).click();
   await expect(page).toHaveURL(/\/following$/);
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
 });
 
 test("a reload keeps the place and its depth", async ({ page }) => {
@@ -139,10 +140,10 @@ test("a reload keeps the place and its depth", async ({ page }) => {
 
 test("focus moves to a pushed screen's heading and comes back to what opened it", async ({ page }) => {
   await page.goto("/settings");
-  const row = page.getByRole("link", { name: "Account" });
+  const row = page.getByRole("link", { name: "Content" });
   await row.focus();
   await page.keyboard.press("Enter");
-  await expect(heading(page, "Account")).toBeFocused();
+  await expect(heading(page, "Content")).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(heading(page, "Settings")).toBeVisible();
   await expect(row).toBeFocused();
@@ -156,7 +157,7 @@ test("a share link's sign-in fragment is gone before the app starts, and is kept
     });
   });
   await page.goto("/#u=tester&k=abcdef123456");
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
   await expect(page).toHaveURL(/\/following$/);
   const seen = await page.evaluate(() => (window as unknown as { __seen: string }).__seen);
   expect(seen).not.toContain("abcdef123456");
@@ -169,17 +170,19 @@ test("a share link's sign-in fragment is gone before the app starts, and is kept
 });
 
 test("Esc goes back on every screen, even after the legacy home has mounted", async ({ page }) => {
-  await page.goto("/following");
+  await page.goto("/settings/account");
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
   await tab(page, "Settings").click();
-  await page.getByRole("link", { name: "Account" }).click();
-  await expect(heading(page, "Account")).toBeVisible();
+  await page.getByRole("link", { name: "Content" }).click();
+  await expect(heading(page, "Content")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(heading(page, "Settings")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page).toHaveURL(/\/following$/);
-  // The hidden legacy home ignored both presses (its Esc would have started a search).
-  expect(mock.searches).toHaveLength(0);
+  await expect(heading(page, "Following")).toBeVisible();
+  // The hidden legacy home ignored both presses (its Esc would have started a search). Following,
+  // signed out, only asks for what's popular.
+  expect(mock.searches.filter((s) => !s.tags.includes("order:rank"))).toHaveLength(0);
 });
 
 test("Back with nothing of ours underneath goes to the parent", async ({ page }) => {
@@ -188,7 +191,7 @@ test("Back with nothing of ours underneath goes to the parent", async ({ page })
   expect((await entry(page)).e6?.depth).toBe(0);
   await page.keyboard.press("Escape");
   await expect(page).toHaveURL(/\/following$/);
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
+  await expect(heading(page, "Following")).toBeVisible();
 });
 
 test("an old profile keeps its settings and is stamped with the schema version", async ({ page }) => {
@@ -197,13 +200,13 @@ test("an old profile keeps its settings and is stamped with the schema version",
     localStorage.setItem("e6ss:seeded", "1");
     localStorage.setItem("e6ss:v1:search", JSON.stringify({ tags: "old_profile_tag" }));
   });
-  await page.goto("/");
+  await page.goto("/settings/account");
   await expect(page.getByTestId("search-input")).toHaveValue(/old_profile_tag/);
   expect(await page.evaluate(() => localStorage.getItem("e6ss:schema"))).toBe("1");
 });
 
 test("the tab bar steps aside while the show plays", async ({ page }) => {
-  await page.goto("/following");
+  await page.goto("/settings/account");
   const bar = page.getByRole("navigation", { name: "Tabs" });
   await expect(bar).toBeVisible();
   await page.getByTestId("play-button").click();
@@ -221,7 +224,7 @@ test("a pasted Settings page goes back to Settings, then home", async ({ page })
 });
 
 test("the legacy show keeps its place across a tab round-trip", async ({ page }) => {
-  await page.goto("/following");
+  await page.goto("/settings/account");
   await page.getByTestId("play-button").click();
   const slide = page.locator("[data-testid=slide-image],[data-testid=slide-video]");
   await expect(slide).toBeVisible();
@@ -231,7 +234,8 @@ test("the legacy show keeps its place across a tab round-trip", async ({ page })
   await page.getByTestId("settings-button").click();
   await tab(page, "Artists").click();
   await expect(heading(page, "Artists")).toBeVisible();
-  await tab(page, "Following").click();
+  await tab(page, "Settings").click();
+  await page.getByRole("link", { name: "Account" }).click();
   await expect(page.getByTestId("play-button")).toHaveText(/Resume/);
   await page.getByTestId("play-button").click();
   await expect(slide).toHaveAttribute("data-post-id", id!);

@@ -33,6 +33,8 @@ export interface PostCardProps {
   still: boolean;
   now: number;
   hold: TagHold;
+  /** Following: above e621's seen marker */
+  fresh?: boolean;
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
 }
@@ -146,7 +148,7 @@ function CardMedia({ post, index, height, live, still, onOpen }: { post: Post; i
   );
 }
 
-function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, onOpen, onMenu }: PostCardProps) {
+function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
   const tags = cardTags(post);
@@ -157,7 +159,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, onOpen
     <article
       className="post"
       style={{ height }}
-      aria-label={`Post ${post.id}${name ? ` by ${name}` : ""}`}
+      aria-label={`${fresh ? "New post" : "Post"} ${post.id}${name ? ` by ${name}` : ""}`}
       data-testid="post-card"
       data-post-id={post.id}
       data-index={index}
@@ -183,6 +185,12 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, onOpen
           </span>
         )}
         <time className="post-time" dateTime={post.created_at} title={new Date(post.created_at).toLocaleString()}>
+          {fresh && (
+            <span className="post-new" data-testid="card-new">
+              New
+            </span>
+          )}
+          {fresh && " · "}
           {ago(post.created_at, now)}
         </time>
         <button type="button" className="post-menu" aria-label="More" aria-haspopup="dialog" onClick={() => onMenu(post)} data-testid="card-menu">

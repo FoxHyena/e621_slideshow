@@ -204,3 +204,55 @@ Format: date — decision. Why. Rejected alternatives.
 - **Rec warnings go through sonner**, not the legacy toast (which hides behind the other screens).
 - **Screens load lazily.** Search, Results, Favorites, Artist, For You, Tune and the player are their own
   chunks, fetched on idle after boot; a pushed screen's heading takes focus when its code lands.
+
+## 2026-11-25 — Slice 3a build (Following)
+
+- **Slice 3 splits like slice 2.** 3a: the Following screen (feed, threshold, New, divider, folded runs,
+  Play count, marking seen, the e621 marker calls) and the legacy home's move. 3b: pull to refresh, the
+  new-posts pill's own checks and count, request-lane priorities and back-off, `feedHead` instant paint.
+- **The legacy home moved to Settings › Account** (`/settings/account`) until slice 7. It's one screen
+  however many entries show it, mounted on first visit outside `<Activity>` (hiding there would dispose a
+  running show) and hidden when not on show. Every "Sign in" button goes there (`openSignIn`).
+- **Following is part of the first-load bundle** (not a lazy chunk): it's the home tab, so a lazy chunk
+  would only add a round trip before first content.
+- **Following ignores a share link's borrowed sign-in**, like For You: it shows the signed-out landing,
+  so a visitor never reads or moves the link owner's marker.
+- **The "anything newer?" check runs the feed's own search** with `id:>N` in its tag box (ratings,
+  Media) instead of a bare `search:subscriptions id:>N`. With ratings off for some posts the bare check
+  would keep finding posts the feed never shows, and the marker would never move. `N` is the highest id
+  e621 sent the feed before the blacklist and filters (`PostQueue.rawMax`).
+- **The session's threshold** is kept 12 h under `marker:<user>` (localStorage with Remember, this tab's
+  sessionStorage without), so a reload shows the same dots. **After a mark, the next load starts a new
+  session** from e621's new marker; otherwise a reload hours later would show the same posts as New again.
+- **Local marker fallback:** when `visit.json` fails or the marker doesn't move on a re-read, the app
+  keeps `seen:<user>` (the highest id loaded) and the next session's threshold is the larger of e621's
+  marker and it. The toast says "Marked as seen on this device. e621 didn't take it." Sign-out (and a
+  sign-in without Remember) purges `ranked:`, `marker:` and `seen:` for the account.
+- **Mark all as seen still runs the newer check** (it skips rules 1 and 2, as UX §5 says). If newer
+  posts came in, the pill shows and nothing is marked.
+- **Following's chips (Media, Hide favorited) are kept** across visits, like For You's (`following` in
+  prefs). Follows-nobody shows a short note over **Popular today** until Follow from favorites (slice 5).
+- **New is a gold "New" in the card's time line** (the approved mock), and a gold dot on grid tiles. A
+  folded run's row reads "4 more from otter artist ▾"; the divider is the kaleidoscope mark, "You're
+  caught up" and, once marked, "Marked as seen on e621".
+- **The empty feed says "Nothing yet from the N tags you follow."** (UX: "artists"): e621 follows are tags,
+  and someone may follow general tags on e621.net.
+- **"A screen past the divider" means the divider has reached the top of the view**: the whole screen
+  is then older posts. Near the end of the list, where it can't reach the top, reaching the bottom with
+  the divider on screen counts too. In the grid the divider is the top of the tile row holding the first
+  old post, so grid scrolling marks seen as well.
+- **The newer check uses every filter, Hide favorited too** (review): a check without `-fav:` kept
+  finding a faved post the feed hid, and the mark never moved.
+- **Playing past the new posts needs a new post first**: the player must have shown a post above the
+  threshold before an old one marks seen. Opening an old post straight from its card, a link or a reload
+  marks nothing.
+- **A failed mark backs off**: automatic tries wait a minute after a failure and toast only the first
+  one; Mark all as seen always says why. Mark all that finds newer posts says "New posts came in, so
+  nothing was marked."
+- **A visit that went through but couldn't be read back** keeps the local marker too and says "Marked as
+  seen. Couldn't confirm it with e621." (not "e621 didn't take it").
+- **Expanded runs last the session** (sessionStorage, by first post id). A run counts as open if any of
+  its posts opened one, so newer posts by the same artist joining its head don't fold it again. A saved
+  place on a post that has folded since lands on its "+N more" row.
+- **Esc on Settings › Account stays with the legacy app** (it opens and closes its own panel with Esc);
+  back is the browser's Back or the tab bar. Interim until slice 7 replaces the account screen.

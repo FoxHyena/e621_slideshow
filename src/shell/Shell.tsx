@@ -14,6 +14,7 @@ import { lockScroll, restoreOffset, saveOffset, unlockScroll } from "@/nav/scrol
 import { runTransition, type NavDirection } from "@/nav/transition";
 import { activeTab, screenKey, tab as tabRoute, tabRoot, TABS, type Tab } from "@/nav/routes";
 import { LegacyHome } from "./LegacyHome";
+import { FollowingScreen } from "@/screens/Following";
 import { NotFoundScreen, PlaceholderScreen } from "./screens";
 import { migrate } from "@/state/migrate";
 import { getSession } from "@/state/session";
@@ -24,6 +25,14 @@ import { ArtistScreen, FavoritesScreen, ForYouScreen, Player, prefetchScreens, R
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
+
+/**
+ * Settings › Account holds the legacy app until slice 7 (sign-in, and the settings not moved yet).
+ * It's one screen however many entries show it, kept mounted outside <Activity>: hiding there would
+ * run its effect cleanups, which dispose a running show for good.
+ */
+const isAccount = (e: Entry) => e.route.screen.kind === "settings" && e.route.screen.section === "account";
+const ACCOUNT_ID = "account";
 
 /** The entry whose screen is on show (under any player or sheet). */
 const baseOf = (s: NavState): Entry => s.stack[baseIndex(s.stack, s.index)];
@@ -61,7 +70,7 @@ export default function Shell() {
   const [immersive, setImmersive] = useState(false);
 
   const screens = useRef(new Map<string, HTMLElement>());
-  const screenOf = (e: Entry) => screens.current.get(rootOf(e) ?? e.key) ?? null;
+  const screenOf = (e: Entry) => screens.current.get(isAccount(e) ? ACCOUNT_ID : (rootOf(e) ?? e.key)) ?? null;
 
   // Boot runs in a layout effect, not in render: it writes history, and Next's patched
   // pushState updates the router, which React forbids while another component renders.
@@ -104,7 +113,7 @@ export default function Shell() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented || isTyping(e.target)) return;
       const cur = nav.current();
-      if (rootOf(cur) === "following" && !isOverlay(cur)) return;
+      if (isAccount(cur) && !isOverlay(cur)) return;
       // An open dialog handles Esc itself (closed ones stay in the DOM, inert or hidden).
       const open = [...document.querySelectorAll<HTMLElement>("[role=dialog][aria-modal=true]")].some(
         (d) => !d.closest("[inert],[aria-hidden=true],[hidden]") && d.getClientRects().length > 0,
@@ -123,9 +132,11 @@ export default function Shell() {
   const curRoot = rootOf(cur);
   const lit = curRoot ?? activeTab(cur.route.screen, cur.from);
 
-  // Tab roots mount on first visit and then stay (adjusting state while rendering).
-  const [visited, setVisited] = useState<ReadonlySet<Tab>>(() => new Set(curRoot ? [curRoot] : []));
-  if (curRoot && !visited.has(curRoot)) setVisited(new Set(visited).add(curRoot));
+  // Tab roots mount on first visit and then stay (adjusting state while rendering). Not for the
+  // pre-boot `/`: a share link moves on to its Results, and Following would fetch for nothing.
+  const visit = cur.route.screen.kind === "root" ? null : curRoot;
+  const [visited, setVisited] = useState<ReadonlySet<Tab>>(() => new Set(visit ? [visit] : []));
+  if (visit && !visited.has(visit)) setVisited(new Set(visited).add(visit));
   // Each tab root's latest entry: a hidden root keeps its own, so its feed stays bound to it.
   const [roots, setRoots] = useState<Partial<Record<Tab, Entry>>>(() => (curRoot ? { [curRoot]: cur } : {}));
   if (curRoot && roots[curRoot] !== cur) setRoots({ ...roots, [curRoot]: cur });
@@ -133,7 +144,10 @@ export default function Shell() {
   // Pushed screens below and at the current entry; popped ones unmount. Overlays aren't screens.
   const pushed = shown.stack
     .slice(0, shown.index + 1)
-    .filter((e, i) => !rootOf(e) && baseIndex(shown.stack, i) === i);
+    .filter((e, i) => !rootOf(e) && !isAccount(e) && baseIndex(shown.stack, i) === i);
+  const onAccount = isAccount(cur);
+  const [accountMounted, setAccountMounted] = useState(onAccount);
+  if (onAccount && !accountMounted) setAccountMounted(true);
 
   // Focus and scroll after the new screen is on screen.
   const last = useRef(shown);
@@ -159,7 +173,11 @@ export default function Shell() {
     if (wasQuiet) return;
     const el = screenOf(to);
     restoreOffset(offsetKey(to));
-    if (shown.cause === "push") focusScreen(el);
+    // The legacy account panel has no heading: focus its box, not a row left behind on Settings.
+    if (shown.cause === "push") {
+      if (isAccount(to)) el?.focus({ preventScroll: true });
+      else focusScreen(el);
+    }
     else if (shown.cause === "back" || shown.cause === "pop") restoreFocus(from.key, el);
   }, [shown]);
 
@@ -186,7 +204,7 @@ export default function Shell() {
     return unlockScroll;
   }, [held]);
 
-  const barHidden = (immersive && curRoot === "following") || overlay?.route.play != null;
+  const barHidden = (immersive && onAccount) || overlay?.route.play != null;
   const ctx = (e: Entry, visible: boolean) => ({
     entry: e,
     visible,
@@ -202,21 +220,25 @@ export default function Shell() {
         onTab={(t) => void onTab(t)}
         onSearch={() => nav.push({ screen: { kind: "search" }, play: null }, { from: lit })}
       />
-      {visited.has("following") && (
-        // Not in <Activity>: hiding would run the legacy app's effect cleanups, which dispose
-        // its running show for good. Slice 3 replaces it with a real screen.
-        <section ref={ref} data-id="following" className="screen screen-legacy" data-screen="following" hidden={curRoot !== "following"}>
-          <LegacyHome active={curRoot === "following"} immersive={barHidden} onImmersive={setImmersive} />
+      {accountMounted && (
+        <section
+          ref={ref}
+          data-id={ACCOUNT_ID}
+          className="screen screen-legacy"
+          data-screen="account"
+          hidden={!onAccount}
+          tabIndex={-1}
+          aria-label="Account"
+        >
+          <LegacyHome active={onAccount} immersive={barHidden} onImmersive={setImmersive} />
         </section>
       )}
-      {TABS.filter((t) => t !== "following" && visited.has(t)).map((t) => (
+      {TABS.filter((t) => visited.has(t)).map((t) => (
         <Activity key={t} mode={curRoot === t ? "visible" : "hidden"}>
           <section ref={ref} data-id={t} className="screen" data-screen={t}>
-            {t === "for-you" && roots[t] ? (
+            {(t === "for-you" || t === "following") && roots[t] ? (
               <ScreenContext value={ctx(curRoot === t ? cur : roots[t]!, curRoot === t)}>
-                <Suspense fallback={null}>
-                  <ForYouScreen />
-                </Suspense>
+                <Suspense fallback={null}>{t === "following" ? <FollowingScreen /> : <ForYouScreen />}</Suspense>
               </ScreenContext>
             ) : (
               <PlaceholderScreen

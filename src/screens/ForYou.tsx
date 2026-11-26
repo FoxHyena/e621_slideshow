@@ -31,7 +31,7 @@ import { shallow, useStore } from "@/state/store";
 import type { TagAction } from "@/components/TagActions";
 import type { Route } from "@/nav/routes";
 import { toast } from "sonner";
-import { blacklistLine, openResults } from "./actions";
+import { blacklistLine, openResults, openSignIn } from "./actions";
 import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./FeedScreens";
 
 /** How long a saved ranking is shown again instead of ranking afresh (UX §3). */
@@ -457,7 +457,7 @@ function SignedOut({ grid }: { grid: boolean }) {
         <Sparkles aria-hidden className="feed-empty-mark" />
         <p className="feed-empty-title">For You learns from your favorites</p>
         <p className="feed-note">Sign in with your e621 username and API key, and your favorites pick what shows up here.</p>
-        <button type="button" className="btn-gold" onClick={() => void getNav().goTab("following")}>
+        <button type="button" className="btn-gold" onClick={openSignIn}>
           Sign in
         </button>
       </div>
