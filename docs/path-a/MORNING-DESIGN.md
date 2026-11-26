@@ -162,8 +162,10 @@ treat that message as your approval of any design.
 - The checklist step names: "Read your favorites", "Count your artists", "See who still posts".
 - The † sentences for Artists and Favorites signed out, and "Edit search".
 - ~~Whether un-favoriting removes goo.~~ **Picked by you: "Goo stays".** Goo only adds; only "Wipe
-  clean" empties it. As built.
-- The empty "Feed Components v6" Design canvas artifact: delete it?
+  clean" empties it. As built. **Picked by you ("One per post"):** favoriting the same post again adds no
+  second drop. As built, the app forgets this when the page reloads.
+- ~~The empty "Feed Components v6" Design canvas artifact: delete it?~~ **Deleted on your say** ("we can
+  delete it"). I checked first that it held no file of its own.
 - "Popular today" under For You's signed-out block (built; from the builder's list).
 - From the builder's list to show you: Post info's Artists group; "Open" as an artist tag's first
   target; the tag target's shadow; Goo being pointer-only.

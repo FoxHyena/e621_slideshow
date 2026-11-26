@@ -210,7 +210,7 @@ Approved:
    the first load moves something out of it (the sign-in check, or Following's signed-in feed, into a
    lazy chunk).
 
-1. **Does un-favoriting remove goo?** Default: no, goo only ever adds.
+1. ~~**Does un-favoriting remove goo?**~~ Decided (owner, 2026-11-26): "Goo stays", and "One per post".
 2. **The first-run step names** ("Read your favorites", "Count your artists", "See who still posts") were
    proposed by the design session, not confirmed by you. Default: use them.
 3. **The Following suggestion card** (UX.md: a card in the Following feed offering artists) isn't built.

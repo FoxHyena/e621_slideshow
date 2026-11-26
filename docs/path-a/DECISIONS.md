@@ -1332,3 +1332,7 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Fix, owner's report:** on a computer Artists showed an empty sliver at the top right. Its tools
   capsule held only Search, which is in the sidebar there; the capsule now goes with it.
 
+- Later, from the builder: the build remembers which posts added goo for the page session, so the
+  same post adds no second drop until a reload. I changed the spec to match the build and dropped my
+  "adds again" line. Not owner-approved either way; the question is on the morning list.- Owner, asked one drop per post or a new drop every time: "One per post". Locked, as built. The
+  build's memory lasts for the page session only; the owner was told and did not ask for more.
