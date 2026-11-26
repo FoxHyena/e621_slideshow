@@ -1,7 +1,20 @@
 # Morning list
 
-Built overnight (2026-11-26). Most important first in each group. The local URL and try-it list go
-at the top once Phase 7 hands over.
+Built overnight (2026-11-26). Most important first in each group.
+
+## Start here (10 minutes)
+
+- **Open:** http://localhost:3640 (production build, already running).
+- **On your phone** (same Wi-Fi): http://192.168.1.21:3640
+- **Draft PR:** https://github.com/FoxHyena/e621_slideshow/pull/24 (not merged).
+- **If the server is gone:** `pnpm build && pnpm start --port 3640 -H 0.0.0.0` (about 1 minute).
+
+1. Settings › Sign in with your username and API key (Remember on). Following shows what's new.
+2. Tap Play (bottom left). Swipe or ←/→, tap ⓘ for Post info, Esc or ✕ to leave.
+3. Artists › Suggested: who you favorite a lot. Open one for the artist page. (Follow writes to
+   e621: that's the held check, Needs you 1.)
+4. Make the window wider than 900 px: sidebar, the 600 column, Post info beside the picture.
+5. Go through "Approve" below and strike what you'd change.
 
 ## Approve (design or copy I chose)
 
@@ -102,7 +115,12 @@ at the top once Phase 7 hands over.
 
 ## Try in the app (steps)
 
-(Filled in at Phase 7 with the local URL.)
+1. Open a link visit: http://localhost:3640/search?l=1&tags=wolf in a private window. The "From a
+   link" chip opens what the link set; the banner says you're not signed in.
+2. Turn Remember off, sign in, reload: you're asked again. Sign out: nothing of the account stays.
+3. For You › Tune: pin a tag, mute one; the ranking updates.
+4. Tap Goo on the signed-out Following page; drops land on the tab bar.
+5. Settings › App › Install (Chrome) or Share › Add to Home Screen (Safari).
 
 ## Decide (open questions, with my default)
 
