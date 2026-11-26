@@ -2,14 +2,14 @@
 Phase: 2 — UX plan                 Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
-Write UX.md (IA, every screen + states, nav model, player, onboarding, artist recs), then UX review round 1
-with a fresh subagent (UX.md + README + docs/screenshots only).
+UX review round 2 (fresh subagent, UX.md v2 + README + screenshots). Then owner sign-off via a
+published wireframe Artifact.
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
 - [x] Phase 1: ENGINEERING.md current state
 - [x] Phase 1: peripheral feature brainstorm
 - [x] Phase 1: owner questions answered, scope frozen (DECISIONS 2026-11-25) — GATE MET
-- [ ] Phase 2: UX.md + ≥2 review rounds + owner OK
+- [ ] Phase 2: UX.md v2 written; round 1 done (REVIEWS.md); round 2 + owner OK pending
 - [ ] Phase 3: DESIGN.md + mocks + ≥2 review rounds + owner OK
 - [ ] Phase 4: ENGINEERING.md target + Plan review
 - [ ] Phase 5: slices 1–9
