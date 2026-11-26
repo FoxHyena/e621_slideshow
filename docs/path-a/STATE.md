@@ -39,12 +39,19 @@ docs, budgets, commit.
   Artists, Search + suggestions + Results header (a search shown as text joins tags with a muted " · ";
   the input keeps e621 syntax), Tune, Settings and Settings › Slideshow (the goo row joins the list
   style), the sign-in sheet, the player.
+- Drawn later (eb86dd6, merged 2026-11-25; build from DESIGN.md + the mock's first section, not UX.md
+  alone): titled sheets (title left, 36 round close well with its edge on the 16 inset; moves the sign-in
+  sheet's close well too), Menu (a 26-radius sunk track with 44 rows and one raised capsule that slides to
+  the choice in 360 ms cubic-bezier(.3,1.35,.5,1); no check marks), the Media menu (switches), the player's
+  Quick settings and Post info sheets (rows with no side padding of their own), and the tag targets (up to
+  three raised 44 targets 8 above a held tag: Search, Pin from For You, Blacklist with the danger ring;
+  Mute stays in Tune). List rows are padded 8 / 16 and whatever ends a row stops 16 from the panel's
+  edge (a chevron pulled 5, a ⋯ 10). Rule: outer radius = inner radius + gap.
+- Spec only, show the owner when built: Post info's "Artists" group (only with more than one artist tag),
+  "Open" as an artist tag's first target, the tag targets' blurred shadow.
 - Not drawn yet (build from UX.md + DESIGN.md parts, show the owner before they ship): signed-out
-  landing, empty and error states (mascot), "Follow from favorites", the Reset and "From a link" chips,
-  the grid tile hold menu (uses the ⋯ sheet), desktop.
-- **Wait, build last**: the filter menus (Sort, Media, Date, Score), the player sheets (quick settings,
-  post info) and the hold-a-tag targets are being mocked in the design session (2026-11-25, not approved
-  yet). Don't build them from UX.md; the design session sends a commit once the owner approves.
+  landing, empty and error states (mascot), "Follow from favorites", the "From a link" chip, the grid
+  tile hold menu (uses the ⋯ sheet), desktop.
 - Open (owner): whether un-favouriting removes goo (built add-only).
 
 ## Checklist
@@ -57,6 +64,7 @@ docs, budgets, commit.
 - [x] Phase 4: ENGINEERING.md target + Plan review — GATE MET
 - [x] Design update: feed components v6 (mocks/feed-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [x] Design update: the other screens in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
+- [x] Design update: filter menus, player sheets, tag targets in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [ ] Phase 5: slices 1–9 (1, 2a, 2b, 3a, 3b, 4, R1 done; R2 (v6 screens) next)
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over

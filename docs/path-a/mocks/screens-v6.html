@@ -420,27 +420,27 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Lists: one panel, rows inside it */
 .glabel6 { margin: 0 var(--inset) 8px; padding-left: 16px; font: var(--t-foot-r); color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
-.glabel6 button { color: var(--link); font: var(--t-foot-r); height: 28px; padding: 0 12px; margin-right: -4px; position: relative; }
+.glabel6 button { color: var(--link); font: var(--t-foot-r); height: 28px; padding: 0 12px; margin-right: 4px; position: relative; }
 .glabel6 button::before { content: ""; position: absolute; inset: -8px 0; }
 .group6 { margin: 0 var(--inset) 16px; border-radius: var(--r-panel); background: var(--panel-a); box-shadow: var(--lit), var(--lit-b); overflow: hidden; --div: 60px; }
 .group6.flat { --div: 16px; }
-.srow6 { width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 16px; text-align: left; position: relative; }
+.srow6 { width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 16px; text-align: left; position: relative; }
 .srow6 + .srow6::before { content: ""; position: absolute; top: 0; right: 0; left: var(--div); border-top: 1px solid rgba(180,199,217,.1); }
 button.srow6:active { background: rgba(255,255,255,.04); }
 .srow6 .lbl { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srow6 .lbl b { font: var(--t-count); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .srow6 .lbl small { font: var(--t-foot); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .srow6 .val { font: var(--t-foot); color: var(--muted); white-space: nowrap; }
-.srow6 > .ic.chev { color: var(--muted); margin-left: -4px; }
+.srow6 > .ic.chev { color: var(--muted); margin: 0 -5px 0 -4px; }
 .srow6 .ico { width: 32px; height: 32px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; }
 .srow6 .ico .ic:not(.flat), .x6 .ic { transform: translateY(.5px); }
 .srow6 .ico.pink { color: var(--heart); } .srow6 .ico.green { color: var(--score); }
 .group6.who { --div: 64px; }
-.group6.who .srow6 { min-height: 60px; padding-right: 6px; }
+.group6.who .srow6 { min-height: 60px; }
 .group6.who .srow6 .lbl b { font: var(--t-head); line-height: 20px; }
 .srow6.acct { min-height: 72px; } .srow6.acct .lbl b { font: var(--t-head); }
 .srow6.danger .lbl b, .srow6.danger .ico { color: var(--danger); }
-.srow6 .more6 { margin-right: 0; }
+.srow6 .more6 { margin-right: -10px; }
 .srow6 .btn6 { flex: none; }
 
 /* Switch, stepper, slider, small toggles */
@@ -486,7 +486,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .sheet6.in { position: absolute; z-index: 21; left: 0; right: 0; bottom: 0; padding-bottom: 34px; }
 .sheet6 .shtop { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .sheet6 .shtop b { font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); }
-.x6 { width: var(--h-c); height: var(--h-c); margin-right: -6px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; position: relative; }
+.x6 { width: var(--h-c); height: var(--h-c); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; position: relative; }
 .x6::before { content: ""; position: absolute; inset: -4px; }
 .steps6 { display: flex; flex-direction: column; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
 .steps6 li { display: flex; gap: 12px; align-items: center; font: var(--t-body); }
@@ -538,6 +538,88 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   .seg6 .thumb, .sw6::after, .back6, .tog6, .gl6 { transition: none; }
   .field6 .caret, .hfollow6.wig, .gl6.pop .ic { animation: none; }
 }
+
+/* ============ menus and sheets ============ */
+
+/* Menu: one choice from a list. A sunk track; the chosen row sits on a raised capsule that slides to it. */
+.menu6 { position: relative; border-radius: calc(var(--h) / 2 + 4px); padding: 4px; background: var(--well); box-shadow: var(--sunk); }
+.menu6 .thumb { position: absolute; top: 4px; left: 4px; right: 4px; height: var(--h); border-radius: 999px; background: var(--raised-hi-a); box-shadow: var(--lit), 0 1px 0 rgba(2,15,35,.5); transform: translateY(var(--y, 0px)); transition: transform .36s cubic-bezier(.3,1.35,.5,1); }
+.mrow6 { position: relative; z-index: 1; width: 100%; height: var(--h); display: flex; align-items: center; gap: 8px; padding: 0 8px 0 16px; border-radius: 999px; font: var(--t-count); font-variant-numeric: tabular-nums; color: var(--muted); text-align: left; transition: color .2s ease-out; }
+.mrow6[aria-checked="true"] { color: var(--text); }
+.mrow6 .act { margin-left: auto; display: none; align-items: center; gap: 4px; height: var(--h-w); padding: 0 8px; color: var(--link); font: var(--t-foot-r); }
+.mrow6[aria-checked="true"] .act { display: inline-flex; }
+.msep6 { height: 9px; position: relative; }
+.msep6::before { content: ""; position: absolute; top: 4px; left: 16px; right: 16px; border-top: 1px solid rgba(180,199,217,.1); }
+
+/* Custom: what a menu's last row opens */
+.cust6 { display: none; margin-top: 16px; }
+.sheet6.custom .cust6 { display: block; }
+.cust6 > .seg6 { margin-bottom: 12px; }
+.cust6 [data-for] { display: none; }
+.cust6[data-k="one"] [data-for="one"], .cust6[data-k="two"] [data-for="two"], .cust6[data-k="n"] [data-for="n"] { display: flex; }
+.cust6[data-k="two"] .pair6[data-for="two"] { display: grid; }
+.pair6 { grid-template-columns: 1fr 1fr; gap: var(--edge); }
+.pair6 .field6 { padding-right: 12px; }
+.nrow6 { display: flex; gap: var(--edge); align-items: center; }
+.nrow6 .field6 { flex: 0 0 88px; }
+.nrow6 .seg6 { flex: 1; }
+.cust6 .btn6.wide { margin-top: 4px; }
+
+/* A sheet shown on its own in a strip */
+.under .strip.shs6 { border-radius: var(--r-panel); background: none; }
+.chip6 > .ic:first-child { margin: 0 0 0 -4px; }
+
+/* Rows that sit straight on a sheet (the sheet is the panel) */
+.qrows6 { --div: 0px; }
+.qrows6.ico { --div: 44px; }
+.qrows6 .srow6 { padding-left: 0; padding-right: 0; }
+.sheet6 .styles6 { margin: -4px calc(-1 * var(--inset)) 0; padding-bottom: 12px; }
+.sheet6 .style6[aria-pressed="true"] > i { box-shadow: 0 0 0 2px var(--panel-a), 0 0 0 3.5px var(--gold); }
+.qmore6 { width: 100%; justify-content: center; margin-bottom: -10px; }
+.qmore6 .ic { color: var(--muted); }
+
+/* Post info */
+.itop6 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.itop6 .who { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
+.itop6 .idn { min-width: 0; display: flex; flex-direction: column; }
+.itop6 b { display: flex; align-items: center; gap: 2px; font: var(--t-head); line-height: 20px; white-space: nowrap; }
+.itop6 b .ic { color: var(--muted); }
+.itop6 small { font: 400 12px/16px var(--f-m); color: var(--muted); }
+.wells6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--edge); }
+.wells6 .stat6 .ic.up { color: var(--score); } .wells6 .stat6 .ic.hrt { color: var(--heart); fill: currentColor; }
+.wells6 .stat6 b.safe { color: var(--score); }
+.why6 { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; font: var(--t-foot); color: var(--muted); }
+.why6 .ic { color: var(--link); flex: none; margin-top: 1px; }
+.why6 b { color: var(--text); font-weight: 500; }
+.tlabel6 { display: flex; gap: 6px; margin: 16px 0 8px; font: var(--t-foot-r); color: var(--muted); }
+.tlabel6 span { font-variant-numeric: tabular-nums; opacity: .7; }
+.tagwrap6 { display: flex; flex-wrap: wrap; gap: 12px 8px; }
+.tagwrap6 .tag6::before { inset: -6px 0; }
+.tag6.held { background: #071631; box-shadow: var(--sunk), inset 0 0 0 1.5px rgba(180,199,217,.32); }
+.ifoot6 { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 -10px; }
+.ifoot6 small { font: 400 12px/16px var(--f-m); color: var(--muted); }
+
+/* Tag targets: two capsules that pop up over a held tag */
+.tgts6 { display: flex; gap: var(--edge); }
+.tgts6.live { position: absolute; z-index: 30; }
+.tgt6 { height: var(--h); display: inline-flex; align-items: center; gap: 6px; padding: 0 16px 0 12px; border-radius: 999px; font: var(--t-count); white-space: nowrap; background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); transition: transform .12s ease-out; }
+.tgt6 .ic { color: var(--link); }
+.tgt6.danger, .tgt6.danger .ic { color: var(--danger); }
+.tgt6.over, .tgt6:active { transform: scale(1.06); box-shadow: var(--lit), inset 0 0 0 1.5px var(--gold), 0 12px 24px rgba(0,0,0,.4); }
+.tgt6.danger.over, .tgt6.danger:active { box-shadow: var(--lit), inset 0 0 0 1.5px var(--danger), 0 12px 24px rgba(0,0,0,.4); }
+.tgts6.pop .tgt6 { animation: tgt6 .32s cubic-bezier(.3,1.35,.5,1) backwards; }
+.tgts6.pop .tgt6:nth-child(2) { animation-delay: .04s; } .tgts6.pop .tgt6:nth-child(3) { animation-delay: .08s; }
+@keyframes tgt6 { from { opacity: 0; transform: translateY(10px) scale(.6); } }
+.tdemo6 { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r-panel); background: var(--panel-a); box-shadow: var(--lit), var(--lit-b); }
+.tdemo6 + .tdemo6 { margin-top: var(--edge); }
+.tdemo6 > small { font: var(--t-foot); color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .menu6 .thumb, .tgt6, .mrow6 { transition: none; }
+  .tgts6.pop .tgt6 { animation: none; }
+}
+
+.scorefld > .ic { color: var(--score); }
 </style>
 
 <div class="wrap" id="root">
@@ -555,7 +637,43 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     </filter>
   </defs></svg>
 
-  <div class="cols">
+  <section id="new" aria-label="Menus and sheets">
+    <h2 class="pg-h2" style="margin-top:40px">Filter menus, player sheets and tag targets</h2>
+    <p class="pg-p dimtxt" style="margin-bottom:28px">Everything is live: tap a row, a switch, a tag. A menu marks the chosen row with a raised capsule that slides to it (picked), the same move as the tab bar and the segmented control.</p>
+    <div class="cols">
+      <section class="col" aria-label="Filter menus">
+        <div class="col-head"><h2 class="pg-h3">Filter menus</h2><p>A chip opens a sheet. Tapping a row applies it and closes the sheet; only Custom needs Apply. Tap Random to see its Reshuffle.</p></div>
+        <div class="phone-holder" id="s-sort"></div>
+        <div class="under" id="u-sort"></div>
+      </section>
+      <section class="col" aria-label="Player quick settings">
+        <div class="col-head"><h2 class="pg-h3">Player › Quick settings</h2><p>The same controls as Settings › Slideshow, sitting straight on the sheet. Opening it pauses the slideshow; closing resumes.</p></div>
+        <div class="phone-holder" id="s-quick"></div>
+        <div class="under" id="u-quick"></div>
+      </section>
+      <section class="col" aria-label="Player post info">
+        <div class="col-head"><h2 class="pg-h3">Player › Post info</h2><p>Who, three stats in wells, why For You picked it, then every tag by kind. Tap a tag to pop its targets.</p></div>
+        <div class="phone-holder" id="s-info"></div>
+        <div class="under" id="u-info"></div>
+      </section>
+    </div>
+
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><th>One-of menus</th><td>A menu, not drawn</td><td>A sunk track of 44 rows; the chosen row rides a raised capsule (picked)</td><td>It is the segmented control turned on its side, so it adds no new part.</td></tr>
+        <tr><th>Media menu</th><td>Three checkboxes</td><td>Three switches</td><td>v6 has no checkbox. On and off is a switch everywhere else.</td></tr>
+        <tr><th>Sheets in the player</th><td>Not said</td><td>The same navy Panel sheet as the rest of the app</td><td>One sheet material. Glass stays for controls that sit on art.</td></tr>
+        <tr><th>Tag menu in Post info</th><td>A menu of up to four items</td><td>The hold-a-tag capsules: Search, Blacklist, plus Pin in For You</td><td>One pattern for tags everywhere. Mute stays in Tune.</td></tr>
+        <tr><th>Where a row ends</th><td>Not said</td><td>Controls, values, chevrons and ⋯ all stop 16 from the panel's edge</td><td>The same line the text starts on at the left. A switch no longer sits half-tucked into a group's corner.</td></tr>
+        <tr><th>Quick settings rows</th><td>Not said</td><td>Rows straight on the sheet, no group around them</td><td>The sheet is already a Panel; wells and raised controls need it under them to read.</td></tr>
+              </tbody>
+    </table></div>
+  </section>
+
+  <h2 class="pg-h2">The other screens</h2>
+  <div class="cols" style="margin-top:20px">
     <section class="col" aria-label="Artist page">
       <div class="col-head"><h2 class="pg-h3">Artist page</h2><p>The three stats sit in wells (picked). Follow is the action here. Play stays the floating button, as on every feed, so the screen has one gold fill. Scroll to see the compact bar.</p></div>
       <div class="phone-holder" id="s-artist"></div>
@@ -608,8 +726,8 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
     <li>Signed-out landing, and the empty and error states (they need the mascot, which does not exist yet).</li>
-    <li>Sheets inside the player: quick settings and post info.</li>
-    <li>Filter menus, the hold-a-tag targets and "Follow from favorites".</li>
+    <li>The Reset chip and the "From a link" chip on Results, and "Follow from favorites".</li>
+    <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
     <li>Desktop layouts.</li>
   </ul>
 </div>
@@ -940,7 +1058,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       <div class="group6 flat" style="margin-top:16px"><div class="srow6"><span class="lbl"><b>1,284 favorites read</b><small>Synced 3 min ago</small></span><button class="btn6 lip6" type="button">${ic('refresh', 16, 2.4)}Rebuild</button></div></div>
       <div class="card6"><div class="top"><b>Breadth</b><span data-breadth>Balanced</span></div><input class="range6" type="range" min="0" max="100" value="50" aria-label="Breadth"><div class="ends6"><span>Close to my favorites</span><span>Surprise me</span></div></div>
       <div class="pad6" style="display:flex;margin-bottom:16px"><button class="field6" type="button">${ic('search', 18, 2.2)}Filter tags</button></div>
-      <div class="glabel6"><span>Your tags</span><span style="padding-right:8px">Pin · Mute</span></div>
+      <div class="glabel6"><span>Your tags</span><span style="padding-right:16px">Pin · Mute</span></div>
       <div class="group6 flat">
         ${trow('s', 'red fox', 48, true)}${trow('s', 'otter', 31)}${trow('c', 'ember (inkwell)', 22, true)}${trow('', 'cozy', 19)}${trow('', 'night', 14, false, true)}${trow('', 'swimming', 12)}${trow('y', 'inkwell tales', 9)}
       </div>
@@ -964,17 +1082,18 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   const A = v => `--art:${art('mossy otter', v)}`;
   const vrow = (t, val) => `<button class="srow6" type="button"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${chev()}</button>`;
   const swrow = (t, s, on) => `<div class="srow6"><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
-  $('s-slideshow').innerHTML = phone(`
-    <div class="scroll6">
-      <div class="head6"><div class="titlerow">${back()}</div><h3 class="title6">Slideshow</h3></div>
-      <div class="glabel6 edge" style="margin-top:16px"><span>Style</span></div>
-      <div class="styles6" role="group" aria-label="Style">
+  const stylesHTML = `<div class="styles6" role="group" aria-label="Style">
         ${sty('Classic', true, `<u style="inset:22px 0;${A(0)}"></u>`)}
         ${sty('Ken Burns', false, `<u style="inset:-10px -22px -10px -6px;${A(1)}"></u>`)}
         ${sty('Collage', false, `<u style="inset:0 27px 0 0;${A(2)}"></u><u style="inset:0 0 51px 51px;${A(3)}"></u><u style="inset:51px 0 0 51px;${A(0)}"></u>`)}
         ${sty('Prints', false, `<u style="inset:20px 12px 24px;transform:rotate(-6deg);box-shadow:0 0 0 3px #F4F1EA;${A(3)}"></u>`)}
         ${sty('Reflections', false, `<u style="inset:6px 10px 46px;${A(1)}"></u><u style="inset:56px 10px -4px;transform:scaleY(-1);opacity:.3;${A(1)}"></u>`)}
-      </div>
+      </div>`;
+  $('s-slideshow').innerHTML = phone(`
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow">${back()}</div><h3 class="title6">Slideshow</h3></div>
+      <div class="glabel6 edge" style="margin-top:16px"><span>Style</span></div>
+      ${stylesHTML}
       <div class="group6 flat">
         <div class="srow6"><span class="lbl"><b>Seconds per slide</b></span><span class="step6"><button class="lip6" type="button" data-step="-1" aria-label="Less">${ic('minus', 16, 2.8)}</button><output>6 s</output><button class="lip6" type="button" data-step="1" aria-label="More">${ic('plus', 16, 2.8)}</button></span></div>
         <div class="srow6"><span class="lbl"><b>Fit</b></span><div class="seg6" style="--n:3;--i:0;width:168px;flex:none" role="group" aria-label="Fit"><span class="thumb"></span><button type="button" aria-pressed="true">Fit</button><button type="button" aria-pressed="false">Fill</button><button type="button" aria-pressed="false">1:1</button></div></div>
@@ -1007,7 +1126,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     </div><span class="home6"></span>`);
 
   /* ---------- player ---------- */
-  $('s-player').innerHTML = `<div class="phone6 p6 player6"><div class="status6"><span>9:41</span><span class="batt"></span></div>
+  const playerHTML = (playing = true, over = '') => `<div class="phone6 p6 player6"><div class="status6"><span>9:41</span><span class="batt"></span></div>
     <div class="slide"><i style="--art:${art('mossy otter', 1)}"></i></div><div class="ts"></div><div class="bs"></div>
     <div class="ptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="pcount6">12 / 300+</span></div>
     <div class="pbot6">
@@ -1018,9 +1137,95 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <button class="gl6" type="button" aria-label="Slideshow settings">${ic('sliders', 20, 2.2)}</button>
         <button class="gl6" type="button" aria-label="Share">${ic('share', 20, 2.2)}</button>
       </div>
-      <div class="ptrans6" style="justify-content:center;gap:24px"><button class="gl6" type="button" aria-label="Previous">${ic('prev', 20, 2.2, 'solid')}</button><button class="pplay6 lip6" type="button" aria-label="Pause" data-playing="1">${ic('pause', 28, 0, 'solid')}</button><button class="gl6" type="button" aria-label="Next">${ic('next', 20, 2.2, 'solid')}</button></div>
+      <div class="ptrans6" style="justify-content:center;gap:24px"><button class="gl6" type="button" aria-label="Previous">${ic('prev', 20, 2.2, 'solid')}</button><button class="pplay6 lip6" type="button" aria-label="${playing ? 'Pause' : 'Play'}" data-playing="${playing ? 1 : 0}">${ic(playing ? 'pause' : 'play', 28, 0, 'solid')}</button><button class="gl6" type="button" aria-label="Next">${ic('next', 20, 2.2, 'solid')}</button></div>
       <div class="pbar6"><i></i><span>4 s</span></div>
-    </div><span class="home6"></span></div>`;
+    </div>${over}<span class="home6"></span></div>`;
+  $('s-player').innerHTML = playerHTML();
+
+  /* ---------- menus and sheets (first pass) ---------- */
+  Object.assign(P, {
+    cal: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/>',
+    frames: '<rect x="3" y="7" width="14" height="14" rx="3"/><path d="M7 3h11a3 3 0 0 1 3 3v11"/>',
+    shuffle: '<path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="m4 4 5 5"/>',
+  });
+  const shtop = t => `<div class="grab"></div><div class="shtop"><b>${t}</b><button class="x6" type="button" aria-label="Close">${ic('x', 18, 2.6)}</button></div>`;
+  const mrow = (label, on = false, extra = '', attrs = 'role="radio"') => `<button class="mrow6" type="button" ${attrs} aria-checked="${on}">${label}${extra}</button>`;
+  const menu = (label, rows) => `<div class="menu6" role="radiogroup" aria-label="${label}"><span class="thumb"></span>${rows}</div>`;
+  const sheetStrip = (inner, cls = '') => `<div class="strip p6 shs6"><div class="sheet6 ${cls}">${inner}</div></div>`;
+  const apply6 = '<button class="btn6 gold lip6 wide" type="button">Apply</button>';
+  const fld = (label, inner, cls = '', attrs = '') => `<div class="frow6" ${attrs}><span class="flabel6">${label}</span><div class="field6 ${cls}">${inner}</div></div>`;
+
+  // Sort: over a Results feed
+  $('s-sort').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'solo')}</span></button><div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div></div>
+        <div class="chips6"><button class="chip6" type="button">${ic('x', 14, 2.8)}Reset</button>${chip('Videos', true)}${chip('Top', true)}${chip('Date')}${chip('Score')}</div></div>
+      ${post(P2)}
+    </div>
+    <div class="scrim6"></div>${fab(0)}${tabbar('Following', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Sort">${shtop('Sort')}
+      ${menu('Sort', mrow('New') + mrow('Top', true) + mrow('Hot') + '<div class="msep6"></div>' + mrow('Oldest') + mrow('Most favorited') + mrow('Random', false, `<span class="act">${ic('shuffle', 16, 2.4)}Reshuffle</span>`) + mrow('Most comments') + mrow('Largest'))}
+    </div><span class="home6"></span>`);
+
+  const mediaSw = (i, t, on) => `<div class="srow6"><span class="ico">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b></span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
+  $('u-sort').innerHTML = [
+    strip('Media', 'More than one can be on, so these are switches, not a one-of list. The chip reads "Videos" here.', sheetStrip(`${shtop('Media')}
+      <div class="qrows6 ico">${mediaSw('image', 'Images', false)}${mediaSw('frames', 'GIFs', false)}${mediaSw('film', 'Videos', true)}</div>`)),
+    strip('Date, with Custom open', 'Custom adds its controls under the list. Try the five kinds: the fields change.', sheetStrip(`${shtop('Date')}
+      ${menu('Date', mrow('Any') + mrow('Today') + mrow('This week') + mrow('This month') + mrow('Custom…', true, '', 'role="radio" data-custom'))}
+      <div class="cust6" data-k="two">
+        <div class="seg6" style="--n:5;--i:3" role="group" aria-label="Kind of date"><span class="thumb"></span><button type="button" data-k="one" aria-pressed="false">On</button><button type="button" data-k="one" aria-pressed="false">After</button><button type="button" data-k="one" aria-pressed="false">Before</button><button type="button" data-k="two" aria-pressed="true">Between</button><button type="button" data-k="n" aria-pressed="false">Last</button></div>
+        <div class="pair6" data-for="two">${fld('From', `${ic('cal', 18, 2.2)}<span class="val">Nov 1, 2026</span>`)}${fld('To', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`)}</div>
+        ${fld('Date', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`, '', 'data-for="one"')}
+        <div class="frow6" data-for="n"><span class="flabel6">In the last</span><div class="nrow6"><div class="field6 focus"><span class="val">7<span class="caret"></span></span></div><div class="seg6 big" style="--n:3;--i:0" role="group" aria-label="Unit"><span class="thumb"></span><button type="button" aria-pressed="true">days</button><button type="button" aria-pressed="false">weeks</button><button type="button" aria-pressed="false">months</button></div></div></div>
+        ${apply6}
+      </div>`, 'custom')),
+    strip('Score', 'Tap Custom… for the number field.', sheetStrip(`${shtop('Score')}
+      ${menu('Score', mrow('Any') + mrow('≥ 10') + mrow('≥ 50', true) + mrow('≥ 100') + mrow('≥ 500') + mrow('Custom…', false, '', 'role="radio" data-custom'))}
+      <div class="cust6">${fld('At least', `${ic('up', 18, 1.6, 'solid')}<span class="val">250<span class="caret"></span></span>`, 'focus scorefld')}${apply6}</div>`)),
+  ].join('');
+
+  // Player › Quick settings
+  const quickRows = `<div class="qrows6">
+      <div class="srow6"><span class="lbl"><b>Seconds per slide</b></span><span class="step6"><button class="lip6" type="button" data-step="-1" aria-label="Less">${ic('minus', 16, 2.8)}</button><output>6 s</output><button class="lip6" type="button" data-step="1" aria-label="More">${ic('plus', 16, 2.8)}</button></span></div>
+      <div class="srow6"><span class="lbl"><b>Fit</b></span><div class="seg6" style="--n:3;--i:0;width:168px;flex:none" role="group" aria-label="Fit"><span class="thumb"></span><button type="button" aria-pressed="true">Fit</button><button type="button" aria-pressed="false">Fill</button><button type="button" aria-pressed="false">1:1</button></div></div>
+      ${swrow('Mute videos', '', true)}${vrow('Quality', 'Sample')}
+    </div>`;
+  $('s-quick').innerHTML = playerHTML(false, `<div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Quick settings">${shtop('Quick settings')}
+      ${stylesHTML}${quickRows}
+      <button class="link6 qmore6" type="button">More in Settings${chev()}</button>
+    </div>`);
+  $('u-quick').innerHTML = strip('Opened from a link', 'A link can carry its own slideshow settings. This control says where your changes go.', sheetStrip(`${shtop('Quick settings')}
+      <div class="seg6 big" style="--n:2;--i:0;margin-bottom:16px" role="group" aria-label="Where changes go"><span class="thumb"></span><button type="button" aria-pressed="true">This visit only</button><button type="button" aria-pressed="false">Save as default</button></div>
+      ${stylesHTML}`));
+
+  // Player › Post info
+  const tg = (c, t, cls = '') => `<button class="tag6 ${c} ${cls}" type="button">${t}</button>`;
+  const tgroup = (name, c, tags) => `<div class="tlabel6">${name}<span>${tags.length}</span></div><div class="tagwrap6">${tags.map(t => tg(c, t)).join('')}</div>`;
+  const tgt = (i, t, cls = '') => `<button class="tgt6 ${cls}" type="button">${ic(i, 18, 2.2)}${t}</button>`;
+  $('s-info').innerHTML = playerHTML(false, `<div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Post info" data-targets="foryou"><div class="grab"></div>
+      <div class="itop6"><button class="who" type="button">${avatar('mossy otter')}<span class="idn"><b>mossy otter${ic('right', 16, 2.4)}</b><small>#4512290 · 3h ago</small></span></button><button class="x6" type="button" aria-label="Close">${ic('x', 18, 2.6)}</button></div>
+      <div class="wells6">
+        <div class="stat6"><b>${ic('up', 16, 1.6, 'solid up')}112</b><small>score</small></div>
+        <div class="stat6"><b>${ic('heart', 16, 2.6, 'hrt')}486</b><small>favs</small></div>
+        <div class="stat6"><b class="safe">Safe</b><small>rating</small></div>
+      </div>
+      <p class="why6">${ic('spark', 16, 2.2)}<span>For you because you fav <b>otter</b> and <b>cozy</b> a lot.</span></p>
+      ${tgroup('Characters', 'c', ['reed (mossy)'])}
+      ${tgroup('Species', 's', ['otter', 'mustelid', 'mammal'])}
+      ${tgroup('General', '', ['river', 'cozy', 'smile', 'sitting', 'scarf', 'autumn', 'leaves', 'outside', 'looking at viewer', 'detailed background'])}
+      ${tgroup('Meta', 'm', ['hi res', 'digital media (artwork)'])}
+      <div class="ifoot6"><small>1536 × 2048 · PNG · 2.1 MB</small><button class="link6" type="button">Open on e621${ic('ext', 16, 2.2)}</button></div>
+    </div>`);
+  const tdemo = (note, tgts, tags) => `<div class="tdemo6"><small>${note}</small><div class="tgts6">${tgts}</div><div class="tagwrap6">${tags}</div></div>`;
+  $('u-info').innerHTML = strip('Tag targets', 'Hold a tag (or tap it) and two capsules pop up over it. Drag onto one, or lift and tap. The one under your finger grows and gets a ring.',
+    `<div class="strip p6" style="padding:8px;border-radius:32px">
+      ${tdemo('Following, Search, an artist page', tgt('search', 'Search', 'over') + tgt('ban', 'Blacklist', 'danger'), tg('s', 'otter', 'held') + tg('s', 'mustelid') + tg('', 'river') + tg('', 'cozy'))}
+      ${tdemo('For You: Pin replaces Search', tgt('pin', 'Pin') + tgt('ban', 'Blacklist', 'danger over'), tg('s', 'otter') + tg('s', 'mustelid') + tg('', 'river', 'held') + tg('', 'cozy'))}
+    </div>`);
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1340,6 +1545,20 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   });
   const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
     const w = h.parentElement.clientWidth, z = Math.min(1, w / 375), el = h.firstElementChild; h.style.height = (812 * z) + 'px'; if (el) el.style.zoom = z;
+  });
+  // Menus: the capsule slides to the chosen row (44 per row, 9 per divider); Custom opens its controls.
+  const placeThumb = m => { let y = 0; for (const n of m.children) { if (n.getAttribute('aria-checked') === 'true') break; y += n.classList.contains('mrow6') ? 44 : n.classList.contains('msep6') ? 9 : 0; } m.style.setProperty('--y', y + 'px'); };
+  document.querySelectorAll('.menu6').forEach(placeThumb);
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.tgts6.live').forEach(n => n.remove()); document.querySelectorAll('.sheet6.in .tag6.held').forEach(n => n.classList.remove('held'));
+    const mr = e.target.closest('.mrow6');
+    if (mr) { const m = mr.parentElement;
+      m.querySelectorAll('.mrow6').forEach(b => b.setAttribute('aria-checked', b === mr)); placeThumb(m); const sh = m.closest('.sheet6'); if (sh.querySelector('.cust6')) sh.classList.toggle('custom', mr.hasAttribute('data-custom')); return; }
+    const kd = e.target.closest('.cust6 > .seg6 button'); if (kd) return void (kd.closest('.cust6').dataset.k = kd.dataset.k);
+    const tw = e.target.closest('.sheet6.in .tagwrap6 .tag6');
+    if (tw) { const sh = tw.closest('.sheet6'), el = document.createElement('div'); el.className = 'tgts6 live' + (calm ? '' : ' pop');
+      el.innerHTML = tgt('search', 'Search') + (sh.dataset.targets === 'foryou' ? tgt('pin', 'Pin') : '') + tgt('ban', 'Blacklist', 'danger'); sh.appendChild(el); tw.classList.add('held');
+      const w = el.offsetWidth; el.style.left = clamp(tw.offsetLeft + tw.offsetWidth / 2 - w / 2, 8, sh.clientWidth - w - 8) + 'px'; el.style.top = (tw.offsetTop - 44 - 8) + 'px'; }
   });
   const tagRows = () => document.querySelectorAll('.p6 .tags6').forEach(fadeTags);
   addEventListener('resize', () => { fit(); apply(); tagRows(); }); fit(); apply(); tagRows(); gooLabels();

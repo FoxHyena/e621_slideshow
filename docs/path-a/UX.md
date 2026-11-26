@@ -211,6 +211,7 @@ instance has its own filters; Following and For You keep theirs across visits.
 
 - Tapping a chip opens its menu (bottom sheet on phone, popover on desktop); Hide favorited toggles.
   A non-default chip is filled and shows its value ("Videos", "Top", "This week", "≥ 50").
+- As drawn (DESIGN.md, mocks/screens-v6.html): Sort, Date and Score are a list where the chosen row rides a sliding capsule; a row applies and closes, only Custom… needs Apply; Media is three switches, not checkboxes.
 - A filter change reloads that feed from the top (replace history). On For You it debounces 600 ms.
 - **Hide favorited** hides posts that were already favorited when the page loaded; a post you favorite
   while reading stays (dimmed heart) until the next refresh, so nothing vanishes under you.
@@ -426,6 +427,7 @@ appends to it as it goes (the feed grows too).
   "This visit only / Save as default" switch shows (default: this visit only).
 - **ⓘ Info sheet:** tags by category; tap a tag → menu: Search this tag · Blacklist · Pin/Mute (For You)
   · Open artist (artist tags). Recommended reasons here.
+- As drawn (DESIGN.md, mocks/screens-v6.html): both are the app's navy sheet. Post info is headed by the artist, then score, favs and rating in wells, the reason, and tags by kind. Its tag menu is the hold-a-tag targets, never more than three (Search, Pin in For You, Blacklist); Mute stays in Tune.
 - **⤴ Share:** Results/Favorites/Artist copy a share link (search + filters + playback);
   Following/For You share the post's e621 link (those feeds depend on the account).
 - **Close** scrolls the feed so the last post shown is centered (or the nearest older one if it's gone),

@@ -412,3 +412,35 @@ Format: date — decision. Why. Rejected alternatives.
   (`gooBar.ts`, `motionFx.ts`); the count is kept meanwhile and drawn when the code arrives. A tap on the
   secret tab before then still adds ten.
 - Desktop Play sits bottom-left just past the rail (it was covering the rail at left 16).
+
+## 2026-11-25 — Filter menus, player sheets and tag targets in v6 (mocks/screens-v6.html)
+
+- Owner: "Yes, mock them" (the player's quick-settings and post-info sheets, the filter menus), picked
+  "Sliding capsule" from a switch, and "Yes, write it" (into DESIGN.md).
+  Artifact: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1.
+- **A one-of menu is a vertical segmented control** (owner pick over rows with a gold check): a sunk track
+  of 44 rows; the chosen row rides a Raised Highlight capsule that slides to it. No check mark, no checkbox.
+- Owner, on the Date menu: "should we consider aligning the border radius here? Should do another review
+  pass?" The track is now 26 (its 22 capsule plus the 4 gap), and the rule is written down: outer radius =
+  inner radius + gap. The review pass (two measuring scripts: nested corners, and left and right edges)
+  also put every sheet's ✕ well on the 16 inset (it sat 6 outside; this moves the approved sign-in sheet's
+  too) and gave the Reset chip's ✕ a normal gap.
+- Owner, on the two approved parts the pass had left alone: "Maybe we fix those two things too".
+  - **List rows:** whatever ends a row now stops 16 from the panel's edge, like the text's left edge (controls
+    sat at 12, so a switch in a group's first row looked tucked into the corner but was not concentric). A
+    chevron is pulled 5 and a ⋯ 10 so their ink sits on the same line; a group label's action ends there too.
+  - **The artist mark in a post's corner: left as it is.** A 36 circle 8 inside a 24 corner is 0.8 px looser
+    on the diagonal than at the sides. Making it exact means a 32 mark, or moving it 2 px off the picture's
+    left edge; both cost more than they fix. The owner has been told and can ask for either.
+- Decided by the designer, shown to the owner in the mock's table, not objected to: the Media menu is three
+  switches (UX.md said checkboxes; v6 has none); sheets in the player are the app's navy Panel sheet, not
+  glass; the tag menu in Post info is the hold-a-tag targets, never more than three (UX.md listed up to
+  four; Mute stays in Tune); quick-settings rows sit straight on the sheet with no group around them.
+- Decided by the designer and NOT yet shown to the owner (written as "spec, not in mock"): in Post info an
+  "Artists" tag group appears only when a post has more than one artist tag; an artist tag's first target is
+  "Open". Tag targets use the new-posts pill's shadow, so there are now four blurred shadows, not three.
+- Not drawn yet: landing, empty and error states (need the mascot), the "From a link" chip, the hold menu on
+  a grid tile, "Follow from favorites", desktop. Still open: whether un-favouriting removes goo.
+- Updated to match: DESIGN.md (Sheets with a title, Menu, Media menu, Player sheets, Tag targets; `menu`
+  radius; list-row padding 8 / 16), .impeccable/design.json (Menu, Tag Targets; List Row), the surface brief,
+  docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
