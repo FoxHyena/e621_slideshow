@@ -111,6 +111,7 @@ rounded:
   art: "16px"
   panel: "24px"
   sheet: "24px"
+  menu: "26px"
   full: "999px"
 spacing:
   s1: "4px"
@@ -313,6 +314,31 @@ components:
     typography: "{typography.callout}"
     padding: "0 14px"
     height: "52px"
+  menu:
+    backgroundColor: "{colors.well}"
+    rounded: "{rounded.menu}"
+    padding: "4px"
+  menu-row:
+    textColor: "{colors.muted}"
+    typography: "{typography.callout}"
+    rounded: "{rounded.full}"
+    padding: "0 8px 0 16px"
+    height: "44px"
+  menu-row-selected:
+    backgroundColor: "{colors.raised-hi}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.full}"
+  tag-target:
+    backgroundColor: "{colors.raised-hi}"
+    textColor: "{colors.text}"
+    typography: "{typography.callout}"
+    rounded: "{rounded.full}"
+    padding: "0 16px 0 12px"
+    height: "44px"
+  tag-target-danger:
+    backgroundColor: "{colors.raised-hi}"
+    textColor: "{colors.danger}"
+    rounded: "{rounded.full}"
   back-button:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.link}"
@@ -360,7 +386,7 @@ components:
   list-row:
     textColor: "{colors.text}"
     typography: "{typography.callout}"
-    padding: "8px 12px 8px 16px"
+    padding: "8px 16px"
     height: "56px"
   row-icon-well:
     backgroundColor: "{colors.well}"
@@ -414,9 +440,9 @@ components:
 
 # Design System: e621 Slideshow
 
-Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet and the player. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
+Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus and the tag targets. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
 
-Still not drawn in v6: the signed-out landing, empty and error states (they need a mascot that does not exist yet), the sheets inside the player, filter menus, hold-a-tag targets, "Follow from favorites" and desktop. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
+Still not drawn in v6: the signed-out landing, empty and error states (they need a mascot that does not exist yet), the "From a link" chip, the hold menu on a grid tile, "Follow from favorites" and desktop. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
 
 ## Overview
 
@@ -521,12 +547,13 @@ Numbers (fav counts, scores, badges, post numbers, lengths) use tabular figures.
 - **Phone frame:** 375 wide reference; one 16 screen edge (`inset`). Panels start at 16 and end at 359.
 - **Inside a panel:** one 8 edge (`edge`) between everything: panel to header, header to picture, picture to tags, tags to footer, footer to panel.
 - **Gaps:** 4 · 8 · 12 · 16 · 24. 4 between an icon and its label; 8 between tags and between chips; 12 between items in a row (avatar and name, score and heart, artist cards); 16 between posts; 24 under a section.
-- **Control heights:** **44** regular (tools capsule, burst row, large buttons) · **36** compact pressable (fav pill, Follow, chips, small buttons, ⋯) · **28** sunk or on the picture (tags, video length, mute). 36 and 28 controls extend their touch area to 44 with an invisible `::before`. Rows in a sheet are 52. Rows in a list group are at least 56 (60 for an artist row, 72 for the account row, 48 for a search suggestion).
+- **Control heights:** **44** regular (tools capsule, burst row, large buttons) · **36** compact pressable (fav pill, Follow, chips, small buttons, ⋯) · **28** sunk or on the picture (tags, video length, mute). 36 and 28 controls extend their touch area to 44 with an invisible `::before`. Rows in the ⋯ sheet are 52; rows in a menu are 44; rows of controls that sit straight on a sheet are 56, like list rows. Rows in a list group are at least 56 (60 for an artist row, 72 for the account row, 48 for a search suggestion).
 - **Badges:** 16 (tab badge) · 20 ("+N" artists, rating) · 24 (Play count).
-- **Avatars:** 24 burst row, the artist page's compact bar, an artist among search suggestions · 28 the pile in the header · 36 post header, artist card, artist row, sheet, player · 56 app mark at caught-up and in the Settings footer, the account row · 80 artist hero.
+- **Avatars:** 24 burst row, the artist page's compact bar, an artist among search suggestions · 28 the pile in the header · 36 post header, artist card, artist row, sheets, player · 56 app mark at caught-up and in the Settings footer, the account row · 80 artist hero.
 - **Icons:** 24 tab bar (stroke 2, 2.4 on the current tab) · 20 tools and sheet rows (2.2 / 2) · 18 heart, score, burst chevron · 16 next to 13 px text (Follow, chip chevron, mute). The ⋯ glyph is 22. Play glyphs are 26, filled.
 - **Top:** 47 status area, then a 52 title row (large title left, tools capsule right), a 28 line under it (avatar pile, "**12 new** from 5 artists"), then the chip row (12 above, 16 below). After 64 px of scroll the compact bar fades in (150 ms): status area plus a 48 row with the title, the count in gold and the tool buttons.
 - **Pushed screens** (artist, Search, Results, Tune, a Settings sub-page): the 52 row holds a 44 back button at the left and the tools capsule, if any, at the right. Tune and Settings sub-pages put the large title on its own line under that row; Search and Results put a field in the row instead.
+- **Inside a sheet:** one 16 inset. Every left and right edge lands on it: the title, the ✕ well, fields, wells, menus, switches. A trailing chevron is pulled 5 to the right so its tip, not its box, touches the inset, as in every list row.
 - **Bottom stack** (each above the safe-area inset): tab bar 22 from the bottom, 16 from each side → Play, **left** edge 16, 100 from the bottom (the bar passes 14 under its disc) → toasts above that. Scroll content gets 176 bottom padding so the last post's heart clears the stack. Search (keyboard up), sheets and the player have no tab bar and no Play.
 - **Horizontal rows** (chips, tags, artist cards) scroll sideways with hidden scrollbars. A tag row fades at an edge only while tags are hidden past that edge (28 fade, driven by the scroll position), and never scrolls vertically. Artist card rows snap to the 16 edge.
 - **Tall pictures:** anything taller than 1:2 is capped at 1:2 and shown whole, centred on Well.
@@ -545,27 +572,28 @@ Depth is three materials lit from one direction (above). Fills are flat; the onl
 ### Lip sizes
 3 by default; **4** on Play and the player's Play / Pause; **2** on Follow pills and the stepper's − and +.
 
-### Real shadows (three, each with a job)
+### Real shadows (four, each with a job)
 - **Play:** `0 14px 28px rgba(0,0,0,.45)` under the lip (`0 8px 18px` when pressed). It floats over the feed.
 - **New-posts pill:** `0 12px 24px rgba(0,0,0,.4)` under its lip. It floats over the feed.
+- **Tag targets:** the same `0 12px 24px rgba(0,0,0,.4)`, no lip. They float over whatever the tag sits on.
 - **Tab bar:** a copy of the tube's outline, 10 px lower, blurred 14 px at 50% black. Its light is a 1 px `rgba(255,255,255,.16)` stroke along the top outer edge and a `rgba(255,255,255,.06)` ring around the whole tube.
 
 ### Rings
-- **Selected ring** (`inset 0 0 0 1.5px #E8C446`): selected filter chip, a focused field, a pinned tag's toggle. The selected slideshow style wears it outside the preview: 2 px of Ground, then 1.5 gold.
-- **Danger ring** (the same ring in Danger Rose): a muted tag's toggle; a field with an error.
-- **Quiet outline** (`inset 0 0 0 1.5px rgba(180,199,217,.22)`): Following (pill and the artist page's wide button), "+N" tag.
+- **Selected ring** (`inset 0 0 0 1.5px #E8C446`): selected filter chip, a focused field, a pinned tag's toggle, the tag target under the finger. The selected slideshow style wears it outside the preview: 2 px of Ground, then 1.5 gold.
+- **Danger ring** (the same ring in Danger Rose): a muted tag's toggle; a field with an error; the Blacklist target under the finger.
+- **Quiet outline** (`inset 0 0 0 1.5px rgba(180,199,217,.22)`): Following (pill and the artist page's wide button), "+N" tag. A held tag wears it at .32 so it reads against the targets.
 - **Badge rings**: Play count `0 0 0 2px #E8C446`; new-post dot `0 0 0 2.5px` panel colour; tab badge `0 0 0 2px` bar colour; avatars in the header pile `0 0 0 2.5px` ground.
 - **Sheet:** top light only, over a `rgba(2,15,35,.6)` dim.
 
 ### Named Rules
-**The Lip Is a Promise Rule.** A lip means "press me, and something happens". It goes on Play, the fav pill, Follow, the burst row, the new-posts pill, gold or tonal buttons, the stepper's buttons and the player's Play / Pause. Never on panels, rows, fields, tags, chips, toggles, the segmented control, the tools capsule, back buttons, tabs, or anything over art. Chips answer a press by shrinking to 96%; tags by darkening.
+**The Lip Is a Promise Rule.** A lip means "press me, and something happens". It goes on Play, the fav pill, Follow, the burst row, the new-posts pill, gold or tonal buttons, the stepper's buttons and the player's Play / Pause. Never on panels, rows, fields, tags, chips, toggles, the segmented control, menus, the tools capsule, back buttons, tabs, tag targets (you drag onto them as often as you press them; they answer by growing), or anything over art. Chips answer a press by shrinking to 96%; tags by darkening.
 
 **The One Light Rule.** Light comes from above on every surface: raised things are lit on top, sunk things are dark on top. Never a gradient fill, never a glow, never an outline around a panel.
 
 ## Shapes
 
 - Everything you touch is a full capsule (`999px`): buttons, chips, tags, pills, tabs, badges, avatars. The rating badge is the one exception (6 radius, so it reads as a label, not a button).
-- Containers nest: **24** for post panels, artist cards, list groups, the stat panel and the top corners of sheets; **16** for whatever sits 8 inside them (the picture, a collage, the row group in a sheet). 24 − 8 = 16, so the corners stay concentric.
+- Containers nest: **24** for post panels, artist cards, list groups, the stat panel and the top corners of sheets; **16** for whatever sits 8 inside them (the picture, a collage, the row group in a sheet). 24 − 8 = 16, so the corners stay concentric. The same rule sizes a menu's track: its rows are 44 capsules (22 radius) sitting 4 inside, so the track is **26**. Whenever a rounded thing sits in the corner of another, the outer radius is the inner radius plus the gap.
 - Fields are capsules too. Grid tiles, slideshow style previews and stat wells are 16. Sheet grabber 36 × 5, 30% white.
 - Artist collage: one tall picture left (2fr) and two stacked right (1fr), 3 gap, 164 tall, with a 1 px dark rim.
 - The tab bar is a 64 thick tube whose centre line is an arc: 343 wide, the middle 10 higher than the ends (radius ≈ 978).
@@ -587,10 +615,10 @@ Favouriting plays three things at once: the heart **pops** (320 ms), white goo *
 **Double tap** a picture favourites it (never un-favourites) and shows one 88 pink heart over the picture for 640 ms. No dots.
 
 ### Tag
-Sunk capsule, 28 tall (44 touch area), system 13 at 500 in the tag's e621 category colour, shown with spaces. Press darkens the well (#071631). "+N": transparent with the quiet outline, muted footnote-rounded. Hold 450 ms for Search / Blacklist (spec, not in mock).
+Sunk capsule, 28 tall (44 touch area), system 13 at 500 in the tag's e621 category colour, shown with spaces. Press darkens the well (#071631). "+N": transparent with the quiet outline, muted footnote-rounded. Hold 450 ms for its targets (see Tag targets).
 
 ### Filter chip
-Panel capsule with top light, 36 tall (44 touch area), label (Fredoka 500 · 15), 14 side padding, a 16 muted chevron only when it opens a menu. **Selected:** Raised Highlight fill, 1.5 gold ring, gold chevron. Press shrinks it to 96%. Toggle chips use `aria-pressed`. No lip.
+Panel capsule with top light, 36 tall (44 touch area), label (Fredoka 500 · 15), 14 side padding, a 16 muted chevron only when it opens a menu. **Selected:** Raised Highlight fill, 1.5 gold ring, gold chevron. Press shrinks it to 96%. Toggle chips use `aria-pressed`. No lip. A chip with a chevron opens its menu as a sheet (see Menu) and, once set, shows the value instead of its name ("Top", "Videos", "≥ 50").
 
 ### Follow pill
 Raised capsule, 36 tall, gold 16 plus and "Follow" (footnote-rounded), 2 lip. **Following:** transparent with the quiet outline, green check and "Following"; it does not travel when pressed. Toggling plays the **wiggle** (360 ms). Following an artist also makes their mark throw **one ring of six 5 px dots** in its own colours, centred on the mark, starting at its rim and travelling 30 px (480 ms), and spin once. This is the only dot burst in the app.
@@ -643,8 +671,8 @@ Cards respond to the two edges they pass. Coming in above the tab bar, a card's 
 
 ### Lists: group, row, icon well
 The pattern for anything that is a list of things to open or set (Settings, the artist list, saved searches, Tune's tags).
-- **Group:** one Panel, 24 radius, 16 from the screen edge, 16 below. A **group label** above it when it needs one (footnote-rounded, muted, 16 in from the panel's edge, 8 above the panel), with an optional link-blue action at its right ("Clear").
-- **Row:** at least 56 tall, padding 8 / 12 / 8 / 16, items 12 apart: an optional lead (icon well, artist mark), the title (callout) over an optional muted footnote line, then an optional muted value, then one of: a 16 muted chevron (it opens something), a control (switch, stepper, small segmented control, compact tonal button) or ⋯. A row that opens something is a button and lightens by 4% when pressed. Rows are divided by a 1 px `rgba(180,199,217,.1)` line that starts where the text starts (60 with an icon well, 64 with a mark, 16 with neither).
+- **Group:** one Panel, 24 radius, 16 from the screen edge, 16 below. A **group label** above it when it needs one (footnote-rounded, muted, 16 in from the panel's edge, 8 above the panel), with an optional link-blue action at its right ("Clear"), its text ending 16 in from the panel's edge.
+- **Row:** at least 56 tall, padding 8 / 16, items 12 apart: an optional lead (icon well, artist mark), the title (callout) over an optional muted footnote line, then an optional muted value, then one of: a 16 muted chevron (it opens something), a control (switch, stepper, small segmented control, compact tonal button) or ⋯. Whatever ends the row (a control, a value, a button) has its right edge 16 from the panel's edge, the same as the text's left edge; a chevron is pulled 5 to the right and a ⋯ 10, so the ink, not the box, sits there. A row that opens something is a button and lightens by 4% when pressed. Rows are divided by a 1 px `rgba(180,199,217,.1)` line that starts where the text starts (60 with an icon well, 64 with a mark, 16 with neither).
 - **Icon well:** 32 round well, 20 link-blue icon (pink for favorites). It is sunk, not raised, because it is not a button: the row is.
 - **Artist row:** 60 tall, 36 mark (gold dot when they have new posts), name (headline 17 / 20) over "posted 2h ago · you faved 48", then ⋯.
 - **Account row:** 72 tall, 56 mark, name in headline, "Signed in to e621 · 42 follows", chevron. Sign out is its own group in Danger Rose (spec, not in mock).
@@ -694,7 +722,7 @@ Back, large title "Tune", a muted body line ("For You learns from your favorites
 - **Slideshow styles:** a sideways row of previews, 8 apart: 76 × 100, 16 radius, Player Black, each a tiny picture of what the style does (Classic, Ken Burns, Collage, Prints, Reflections), its name underneath in footnote-rounded, muted. The selected one wears the gold ring outside the preview and a white name. The row leaves 4 above itself so the ring is never clipped.
 
 ### Sign-in sheet
-The Panel sheet over the dim, with the grabber. Title "Sign in with e621" (section) and a 36 round well with ✕ at the right. Three steps, 8 apart: the number in a 28 round well (footnote-rounded, Link Blue), then the step in body; a step that opens e621 is a link (callout, Link Blue, with the ↗ icon). Then Username and API key fields with their labels; the key is shown as dots in mono, with Paste inside the field. A muted footnote with a 16 green shield: "Your key stays on this device and is only ever sent to e621." A row "Remember on this device" (callout) with a switch. A full-width 44 gold "Sign in". Gold is this sheet's one fill; the screen behind is dimmed.
+A titled sheet (see Sheets with a title): "Sign in with e621". Three steps, 8 apart: the number in a 28 round well (footnote-rounded, Link Blue), then the step in body; a step that opens e621 is a link (callout, Link Blue, with the ↗ icon). Then Username and API key fields with their labels; the key is shown as dots in mono, with Paste inside the field. A muted footnote with a 16 green shield: "Your key stays on this device and is only ever sent to e621." A row "Remember on this device" (callout) with a switch. A full-width 44 gold "Sign in". Gold is this sheet's one fill; the screen behind is dimmed.
 
 ### Player
 True black. The slide is shown whole, centred. A scrim fades in from the top (130 tall) and from the bottom (330 tall); on them, 16 from each side:
@@ -703,8 +731,38 @@ True black. The slide is shown whole, centred. A scrim fades in from the top (13
 - Favouriting here fills the heart pink, pops it, spins the artist's mark and adds to the tab bar's goo.
 - Controls auto-hide after 2.5 s while playing (spec, not in mock). Follow for an unfollowed artist goes after the name (spec, not in mock).
 
+### Sheets with a title
+Every sheet except the ⋯ menu starts the same way: the Panel sheet over the dim, the grabber, then a title row: the title in Section type at the left and a 36 round well with a link-blue ✕ at the right, its edge on the 16 inset, 8 above the content. Bottom padding is 28, or the safe-area inset when that is larger (34 in the mock). The sheet is already a Panel, so **rows of controls sit straight on it** with no group around them: list rows (56 tall, no side padding) divided by the usual 1 px line, which starts at the text (0, or 44 after an icon well). Wells and raised controls need the Panel under them to read; a Well group would swallow them.
+
+### Menu (one choice from a list)
+The filter menus Sort, Date and Score. A titled sheet holding **a vertical segmented control**:
+- **Track:** Well with the tag's rim, 26 radius, 4 padding.
+- **Rows:** 44 tall capsules, callout with tabular figures, muted, 16 left padding. `role="radio"` in a `radiogroup`.
+- **The chosen row** is white on a Raised Highlight capsule (top light, `0 1px 0 rgba(2,15,35,.5)` under it) that **slides** to it in 360 ms on the segmented control's curve. No gold, no check mark, no lip.
+- **A divider** between groups is a 9 tall gap with a 1 px `rgba(180,199,217,.1)` line, 16 in from each side. Sort is New, Top, Hot, then Oldest, Most favorited, Random, Most comments, Largest.
+- **Tapping a row applies it and closes the sheet.** The chip then shows the value.
+- **A row's own action** shows only while it is chosen, at its right end: Random carries "Reshuffle" (16 shuffle icon, footnote-rounded, Link Blue, 28 tall with a 44 touch area). Build it as a sibling button, not inside the row's button.
+- **Custom…** is the last row of Date and Score. Choosing it keeps the sheet open and adds controls 16 under the track, ending in a full-width 44 gold "Apply", the sheet's one gold fill.
+  - *Date:* a five-way segmented control (On · After · Before · Between · Last), then 12 below it: one "Date" field; or "From" and "To" side by side, 8 apart; or, for Last, an 88 wide number field and a 44 segmented control (days · weeks · months). Date fields carry a muted 18 calendar icon and open the system date picker (spec, not in mock).
+  - *Score:* one "At least" field with an 18 Score Green arrow in front and the numeric keyboard (spec, not in mock).
+
+### Media menu (more than one)
+Images, GIFs and Videos can each be on, so this is not a one-of list. A titled sheet with three rows straight on it: an icon well, the name in callout, a switch. v6 has no checkbox; on and off is always a switch.
+
+### Player sheets
+Both are the app's own Panel sheet over the dim, on top of the player: the same navy as everywhere, not glass. Glass stays for controls that sit on art. Opening one pauses the slideshow; closing resumes it.
+- **Quick settings** (the sliders button). Title "Quick settings". The slideshow style previews from Settings, in a row that bleeds to the sheet's sides (its ring's 2 px gap is Panel colour here, not Ground). Then four rows straight on the sheet: Seconds per slide (stepper), Fit (a 168 wide small segmented control: Fit · Fill · 1:1), Mute videos (switch), Quality (value and chevron). Last, a centred 44 link "More in Settings ›" (callout, Link Blue, a muted 16 chevron). **From a link**, a 44 segmented control "This visit only · Save as default" sits under the title, 16 above the previews.
+- **Post info** (the ⓘ button). No title: the artist is the heading. A row with the 36 mark, the name in headline followed by a muted 16 chevron (it opens their page), "#4512290 · 3h ago" in mono underneath, and the ✕ well at the right. 12 below, three stat wells 8 apart, straight on the sheet: score with a green arrow, favs with a pink heart, and the rating as a word in its colour ("Safe"). In For You only, 12 below: a muted footnote line with a 16 link-blue spark saying why ("For you because you fav **otter** and **cozy** a lot.", the tags in white). Then the tags by kind, in e621's order (Copyrights, Characters, Species, General, Meta, Lore; empty kinds are skipped): a label in muted footnote-rounded with its count at 70%, 16 above and 8 below, over tags that **wrap**, 8 apart with 12 between lines (the touch area here is 40 tall). Last, 12 below: the file in muted mono 12 / 16 ("1536 × 2048 · PNG · 2.1 MB") at the left and the link "Open on e621 ↗" at the right. A long tag list scrolls inside the sheet, which stops 56 below the top of the screen (spec, not in mock).
+- **More than one artist** (spec, not in mock): the heading is the artist the feed credits; an "Artists" group comes first, in `tag-artist`, only when the post has more than one artist tag.
+
+### Tag targets
+What a tag offers. Hold a tag for 450 ms, or tap one in Post info: its well darkens (#071631) and takes the quiet outline, and capsules pop up 8 above it, 8 apart, centred on the tag but kept 8 inside their container.
+- **A target:** 44 tall, Raised Highlight, top light, the floating shadow, an 18 link-blue icon and the word in callout, padding 12 left and 16 right. Blacklist is Danger Rose, icon and word. No lip.
+- **Which ones:** Search and Blacklist. On the For You feed, Pin replaces Search. In Post info, opened from For You, all three show: Search, Pin, Blacklist. Never more than three; Mute lives in Tune. For an artist tag, the first target is "Open" and goes to their page (spec, not in mock).
+- **Under the finger** a target grows to 106% (120 ms) and takes the gold ring, or the Danger ring on Blacklist. Drag onto one and lift, or lift and then tap one. A tap anywhere else closes them.
+
 ### Not drawn yet
-The signed-out landing; empty and error states and their mascot; the player's quick-settings and info sheets; filter menus; the hold-a-tag targets; "Follow from favorites"; desktop. Build them from UX.md with the parts above, and show the owner before they ship.
+The signed-out landing; empty and error states and their mascot; the "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯ sheet: Favorite, Open artist, Play from here, Open on e621); "Follow from favorites"; desktop. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |
@@ -728,11 +786,14 @@ The signed-out landing; empty and error states and their mascot; the player's qu
 | Skeleton shimmer | 1.4 s ease-in-out, looping | a light band crossing each well shape | mock |
 | Caught-up | once, on entering view | app mark turns one notch (45°) | mock |
 | Segmented capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateX to the chosen segment | mock |
+| Menu capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateY to the chosen row | mock |
 | Switch | knob 300 ms `cubic-bezier(.3,1.35,.5,1)`; track colour 200 ms | knob translateX 20 px | mock |
 | Glass, back and toggle press | 100 ms ease-out | scale to .94 | mock |
 | Hero follow dots | 520 ms | six 7 px dots from the 80 mark's rim | mock |
 | Player heart | 320 ms `cubic-bezier(.2,.9,.3,1.4)` | the favourite pop, on the glass heart | mock |
 | Field caret | 1.1 s, stepped | caret opacity | mock |
+| Tag targets pop | 320 ms `cubic-bezier(.3,1.35,.5,1)`, each 40 ms after the last | from 60% scale and 10 px lower, fading in | mock |
+| Tag target under the finger | 120 ms ease-out | scale to 1.06, ring | mock |
 | New-posts pill | slides in under the header; posts insert with a slide-down, keeping the reading position | translateY, opacity | spec (not in mock) |
 | Tab content | 120 ms fade | content opacity | spec (not in mock) |
 | Push / Back | 150 ms cross-fade + 8 px rise; gesture back never animates | opacity, translateY | spec (not in mock) |
@@ -743,7 +804,7 @@ The signed-out landing; empty and error states and their mascot; the player's qu
 | Toasts | stay 6 s, pause on hover or focus, `role="status"` | opacity, translateY | spec (not in mock) |
 
 Grammar: two speeds. **Touch feedback** is 100 to 200 ms, ease-out, no overshoot (press, hide, fade). **Celebrations** (favourite, follow, tab change) overshoot once and are done within 720 ms. **Goo** is the one slow thing. Everything animates transform and opacity only, except the goo's shapes.
-**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab and segmented capsules, the switch knob and Play move instantly; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
+**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab, segmented and menu capsules, the switch knob and Play move instantly; tag targets appear without the pop; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
 
 ## Build rulings (where the mock leaves a gap)
 
@@ -754,9 +815,9 @@ The two v6 mocks are approved; these rulings win over them when building.
 3. **The lip is always a darker shade of the current fill:** the favourited (plum) pill gets #291A35, not navy.
 4. **One quiet outline:** `rgba(180,199,217,.22)` at 1.5 px for both "Following" and the "+N" tag (the mock draws the tag at .18).
 5. **15 px Fredoka is always 15 / 20**, at 600 for counts and actions and 500 for chip labels.
-6. **One-off sizes are named component constants**, not steps: Play 56, tab bar tube 64 with 54 tabs, bend 10, glass play disc 56, sheet row 52, artist card 296, collage 164, double-tap heart 88, account row 72, player Play 62, artist hero mark 80, style preview 76 × 100, switch 51 × 31, slider thumb 28 on a 12 track.
+6. **One-off sizes are named component constants**, not steps: Play 56, tab bar tube 64 with 54 tabs, bend 10, glass play disc 56, sheet row 52, artist card 296, collage 164, double-tap heart 88, account row 72, player Play 62, artist hero mark 80, style preview 76 × 100, switch 51 × 31, slider thumb 28 on a 12 track, menu track radius 26.
 7. **Fredoka is self-hosted** (`next/font`), weights 500 and 600 only, never Google Fonts at runtime.
-8. **`tag-artist` (#F2AC08) stays** for artist-category tags in tag lists and the player's info sheet; posts don't show the artist tag.
+8. **`tag-artist` (#F2AC08) stays** for artist-category tags in tag lists and in Post info's "Artists" group (shown only when a post has more than one); posts don't show the artist tag.
 9. **The goo count** is local to the device and survives reloads (the mock keeps it in `localStorage`); wiping it is a Settings action only. There is no clean button on the tab bar.
 10. **Nothing in the mock is real art.** Placeholder colour fields only, in the mock and in anything committed.
 
@@ -774,7 +835,7 @@ The two v6 mocks are approved; these rulings win over them when building.
 - **Don't** put anything on top of the art except the video play glyph, length and mute (and the player's own auto-hiding controls). The double-tap heart is the one thing that may flash over a picture.
 - **Don't** tint or frame art with colour washes; navy panels may surround it, never cover it.
 - **Don't** draw depth with outlines, gradients or glows. One light, from above.
-- **Don't** put a lip on panels, rows, fields, tags, chips, toggles, tabs or anything over art, and don't add blurred shadows beyond Play, the new-posts pill and the tab bar.
+- **Don't** put a lip on panels, rows, fields, tags, chips, toggles, menus, tabs, tag targets or anything over art, and don't add blurred shadows beyond Play, the new-posts pill, tag targets and the tab bar.
 - **Don't** use Fredoka at 700, or for tags and reading text.
 - **Don't** use a second accent colour, meaning colours as large fills, gold in an artist's mark, or a second gold fill on a screen (the artist page has no "Play all").
 - **Don't** put muted text on Raised Highlight (3.7:1).
