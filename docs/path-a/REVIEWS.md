@@ -37,3 +37,36 @@ README, docs/screenshots only. 30 findings (3 blocker, 16 major, 10 minor, 1 nit
 | 28 | minor | For You header crowded; Favorites discoverability | **Changed.** Favorites moved to Search screen + Settings › Account; For You header: Tune + ⋯. |
 | 29 | minor | Memory on iOS with many live screens | **Changed.** Hidden screens keep data, not DOM beyond a window; anchors (post id + offset) in sessionStorage. |
 | 30 | nit | Cuts; "since yesterday" copy | **Changed.** Cut: shared-element transition, "because" line on cards, confetti, sort long-press, 5-min polling (visibility only). One mascot, 3 poses. Kept desktop keys and saved-search ★ (existing features). Copy: "12 new". |
+
+## UX round 2 — 2026-11-25
+
+Reviewer: fresh general-purpose subagent, same brief and inputs (UX.md v2). 25 findings (1 blocker,
+13 major, 10 minor, 1 nit). "Material issues remaining: yes" → UX.md v3, then round 3.
+
+| # | Sev | Finding (short) | Outcome |
+|---|---|---|---|
+| 1 | blocker | Back/✕ dead on pasted or shared URLs and reloads | **Changed.** One Back helper with `history.state.depth`; no in-app entry → replace with the parent. Tab-tap popping uses it too. |
+| 2 | major | Marker advance ignores filters, bursts, player | **Changed.** Advance only with no filters on, divider dwell or player past the last new post, and a 1-post check that nothing newer is unloaded. Collapsed bursts count as seen (the row was shown). e621 can't set an arbitrary id or move back (`permitted_params` = query, name, is_tracked), so "Mark all as seen" confirms instead of offering Undo. |
+| 3 | major | Launch-link ratings vs global ratings | **Changed.** Per-link filter table; "From a link" chip with "Use my settings". |
+| 4 | major | iOS links open Safari, not the PWA; separate storage | **Changed.** "Not signed in on this browser" strip; explained in Settings › App. |
+| 5 | major | sessionStorage wiped when iOS kills the PWA | **Changed.** Anchors and For You ranking in localStorage with TTLs; missing anchor → nearest older post. |
+| 6 | major | Back with a sheet open closes two layers | **Changed** (reverses round 1 #17): sheets push a same-URL entry; Back closes only the sheet. |
+| 7 | major | Standalone edge-swipe back deferred | **Changed.** Ships with the routing slice; tab bar visible on pushed screens. |
+| 8 | major | Avatar source unspecified, explicit leak risk | **Changed.** Stated: generated kaleidoscope avatars only, never post art. |
+| 9 | major | Regressions: GIFs, sort options, custom date/score, saved search contents, loop | **Changed.** Media has GIFs; Sort "More"; Custom date and score; saved = tags + filters + ratings; loop per setting; mapping table of old settings. |
+| 10 | major | Artists dots vs frozen threshold; when dots clear | **Changed.** Same session threshold; clears when the artist page opens; "40+ new". |
+| 11 | major | No way to view an image big; zoom vs swipes | **Changed.** Single tap image → player paused (viewer). Pinch zoom; zoomed disables swipes; axis lock. |
+| 12 | major | Bottom collisions; tab bar on pushed screens; keyboard | **Changed.** Bottom stack order; tab bar hidden on Search and player only; `visualViewport`. |
+| 13 | major | iOS won't raise the keyboard on async focus | **Changed.** Focus inside the tap handler; fallback stated. |
+| 14 | major | Favoriting with Hide favorited removes the anchor | **Changed.** Posts stay until refresh; close falls back to nearest older. |
+| 15 | minor | Reset chip offscreen; menus out of reach | **Changed.** Reset first; "Filters are on" in empty state; bottom sheets on phone. |
+| 16 | minor | Tap on the ✓ after following undefined | **Changed.** Unfollows with toast + Undo. |
+| 17 | minor | Hold vs strip scroll; target placement; blacklist scope | **Changed.** 10 px cancel, strip locks while held, targets above the finger, local blacklist stated. |
+| 18 | minor | Double-tap zoom; signed-out heart | **Changed.** `touch-action: manipulation`; sign-in then carries out the action. |
+| 19 | minor | Grid behaviour undefined | **Changed.** Grid view section. |
+| 20 | minor | Two searches on Artists; settings IA mismatch; Favorites depth | **Changed** label "Filter your artists"; IA lists 5 sub-pages. **Declined** another Favorites entry: Search (one tap from every header) + Account is enough, and the For You header was decluttered in round 1. |
+| 21 | minor | PTR threshold ambiguous; non-passive listeners | **Changed.** 144 px finger / 72 px visual; axis lock; listener only during a top-start touch. |
+| 22 | minor | Reduced motion vs player styles; VoiceOver auto-hide | **Changed** reduced-motion defaults. **Declined** VoiceOver detection (not detectable on the web); controls stay while paused or focused. |
+| 23 | minor | Safari may skip history inserted on load | **Changed.** Verify in slice 1; Back helper covers it. |
+| 24 | minor | iOS memory | **Changed.** Unmount cards outside ±2 screens. |
+| 25 | nit | Three surfaces for suggestions; slice load | **Accepted for Phase 4/5 ordering:** follow-from-favorites + Suggested first; inline card and bursts in a later slice. |
