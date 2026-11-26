@@ -620,6 +620,52 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 }
 
 .scorefld > .ic { color: var(--score); }
+
+/* ---------- states: mascot, landing, empty, error ---------- */
+.mas6 { display: block; flex: none; overflow: visible; }
+.mas6 .arm, .mas6 .zz, .mas6 .tick { transform-box: view-box; }
+.mas6 { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+.mas6 .bd { transform-box: view-box; transform-origin: 60px 100px; transition: transform .1s ease-out; }
+.mas6.press .bd { transform: scale(1.07, .9); }
+.mas6.pop .bd { animation: mpop6 .42s cubic-bezier(.3,0,.3,1); }
+@keyframes mpop6 { 0% { transform: scale(1.07, .9); } 35% { transform: scale(.94, 1.09); } 65% { transform: scale(1.03, .97); } 100% { transform: none; } }
+.state6, .hello6, .gsheet6 > div { position: relative; }
+.mas6 .arm { animation: mwave6 .9s ease-in-out .4s 3; }
+.mas6 .tick { animation: mtick6 .9s ease-in-out .4s 3 both; }
+.mas6 .zz { animation: mzz6 3.2s ease-in-out infinite; }
+@keyframes mwave6 { 50% { transform: rotate(16deg); } }
+@keyframes mtick6 { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes mzz6 { 50% { transform: translate(2px, -3px); opacity: .6; } }
+.state6 { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 var(--inset); }
+.state6 > .mas6 { margin-bottom: 12px; }
+.state6 > b { font: var(--t-head); text-wrap: balance; }
+.state6 > p { margin: 4px 0 0; max-width: 30ch; font: var(--t-body); color: var(--muted); text-wrap: pretty; }
+.state6 .acts { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 16px; }
+.state6 .acts > .btn6 { height: var(--h); padding: 0 24px; font: var(--t-head); }
+.state6 .acts > .btn6 > .ic { margin-left: -4px; }
+.state6.screen { margin-top: 64px; }
+.state6.pad { padding-top: 24px; padding-bottom: 24px; }
+.quiet6 { height: var(--h); padding: 0 16px; border-radius: 999px; font: var(--t-count); color: var(--link); }
+.quiet6:active { background: rgba(255,255,255,.04); }
+.state6 code { margin-bottom: 12px; padding: 5px 12px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); font: 400 12px/18px var(--f-m); color: var(--muted); }
+.hello6 { margin: 8px var(--inset) 24px; padding: 20px 16px 16px; border-radius: var(--r-panel); background: var(--panel-a); box-shadow: var(--lit), var(--lit-b); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hello6 > b { margin-top: 12px; font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); text-wrap: balance; }
+.hello6 > p { margin: 4px 0 16px; font: var(--t-body); color: var(--muted); }
+.land6 .fab6 { opacity: 0; transform: translateY(24px); pointer-events: none; }
+.land6.scrolled .fab6:not(.hide) { opacity: 1; transform: none; pointer-events: auto; }
+.tabbar6.nobadge .badge { display: none; }
+.err6 { margin: 0 var(--inset) 16px; padding: 24px 0; border-radius: var(--r-panel); background: var(--panel-a); box-shadow: var(--lit), var(--lit-b); }
+.banner6 { margin: 0 var(--inset) 12px; height: var(--h-c); display: flex; align-items: center; gap: 8px; padding: 0 16px 0 12px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); font: var(--t-foot-r); color: var(--link); }
+.banner6:last-child { margin-bottom: 0; }
+.banner6 .ic { flex: none; color: var(--muted); }
+.banner6.ok { color: var(--text); } .banner6.ok .ic { color: var(--score); }
+.more6row { margin: 0 var(--inset) 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-left: 16px; font: var(--t-body); color: var(--muted); }
+.caught6.end { padding-top: 0; }
+.gsheet6 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 28px 16px 20px; margin-bottom: 36px; border-radius: 24px; }
+.gsheet6 > div { display: flex; flex-direction: column; align-items: center; gap: 10px; font: var(--t-foot); color: var(--muted); text-align: center; }
+.gsheet6 .mas6 { width: min(136px, 100%); height: auto; }
+@media (max-width: 520px) { .gsheet6 { grid-template-columns: repeat(2, 1fr); gap: 20px 8px; } }
+@media (prefers-reduced-motion: reduce) { .mas6 * { animation: none !important; transition: none !important; } }
 </style>
 
 <div class="wrap" id="root">
@@ -636,6 +682,44 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       <feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/>
     </filter>
   </defs></svg>
+
+  <section id="states" aria-label="Landing, empty and error states">
+    <h2 class="pg-h2" style="margin-top:40px">Landing, empty and error states</h2>
+    <p class="pg-p dimtxt">Goo is the mascot (picked): a dewdrop of goo with a :3 face, flat white, on a small spill. It is built the way the app's own goo is, white shapes melted together by the same filter as the drip under the heart, so the body, its base and its waving arm are one liquid. It has four moods. <b>Tap Goo:</b> it squashes, springs back and spurts one to three drops onto the tab bar. Try it on any of the three phones.</p>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="gooM" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="2.4"/><feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter></defs></svg>
+    <div id="u-goo"></div>
+    <div class="cols">
+      <section class="col" aria-label="Signed out">
+        <div class="col-head"><h2 class="pg-h3">Signed out: the landing</h2><p>One card says what the app is for, then a real feed so it is useful straight away. Sign in is the gold button; Play shows up once the card has scrolled away.</p></div>
+        <div class="phone-holder" id="s-land"></div>
+        <div class="under" id="u-land"></div>
+      </section>
+      <section class="col" aria-label="Empty">
+        <div class="col-head"><h2 class="pg-h3">Empty</h2><p>The mascot, a headline, one sentence that says why, one action that fixes it. It sits on the ground, not in a card.</p></div>
+        <div class="phone-holder" id="s-empty"></div>
+        <div class="under" id="u-empty"></div>
+      </section>
+      <section class="col" aria-label="Error and offline">
+        <div class="col-head"><h2 class="pg-h3">Error and offline</h2><p>A failed load takes the place of the first post, in a panel. It says whose fault it is, shows what e621 said, and offers one way out.</p></div>
+        <div class="phone-holder" id="s-err"></div>
+        <div class="under" id="u-err"></div>
+      </section>
+    </div>
+
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><th>The mascot</th><td>A mascot, not designed</td><td>Goo (picked): a dewdrop with a :3 face, flat white, on a small spill, in four moods.</td><td>Goo is already the app's own joke (the tab bar), it is white like text, and no other app has it.</td></tr>
+        <tr><th>Tapping Goo</th><td>Not said</td><td>Goo squashes under the finger and spurts 1 to 3 drops from its tip onto the tab bar (owner's ask). Each drop that lands is one more on the goo count.</td><td>The secret Goo tab already adds goo without a favorite; this is the same liquid from the same character. Signed out, the bar starts clean, so the landing is where you see it best.</td></tr>
+        <tr><th>Gold on the landing</th><td>Sign in, plus a feed with Play</td><td>Sign in is gold; Play appears once the card has scrolled away</td><td>One gold fill per screen. Scroll the landing phone to see the swap.</td></tr>
+        <tr><th>Where a state sits</th><td>Not said</td><td>Empty states sit on the ground. Errors sit in a panel where the first post would be.</td><td>Empty is the whole screen's answer. An error is one thing that failed, and it can be retried in place.</td></tr>
+        <tr><th>The end of a feed</th><td>"That's everything ✿"</td><td>The app mark between two rules, like the caught-up moment</td><td>The icons are drawn, not typed. The same moment already ends Following.</td></tr>
+        <tr><th>Offline</th><td>A banner under the header</td><td>A sunk capsule: it tells you something, it is not a button</td><td>Only things you press are raised.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
 
   <section id="new" aria-label="Menus and sheets">
     <h2 class="pg-h2" style="margin-top:40px">Filter menus, player sheets and tag targets</h2>
@@ -725,8 +809,8 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>Signed-out landing, and the empty and error states (they need the mascot, which does not exist yet).</li>
-    <li>The Reset chip and the "From a link" chip on Results, and "Follow from favorites".</li>
+    <li>First run after sign-in: the "Finding artists you love" loader and "Follow from favorites".</li>
+    <li>The "From a link" chip on Results.</li>
     <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
     <li>Desktop layouts.</li>
   </ul>
@@ -1227,6 +1311,134 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       ${tdemo('For You: Pin replaces Search', tgt('pin', 'Pin') + tgt('ban', 'Blacklist', 'danger over'), tg('s', 'otter') + tg('s', 'mustelid') + tg('', 'river', 'held') + tg('', 'cozy'))}
     </div>`);
 
+
+  /* ================= states: the mascot, landing, empty, error ================= */
+  // Goo, the mascot (picked): a dewdrop of goo with a :3 face, flat white, on a small spill. Four moods.
+  const MOODS = ['wave', 'snooze', 'look', 'oops'], INK = '#020F23', GW = '#FFFFFF', GL = '#9FB3CC';
+  const face = (m, x, y, dx, my) => {
+    const n = v => +v.toFixed(2), st = `fill="none" stroke="${INK}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"`;
+    const eye = (cx, cy) => `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="4.2" ry="5.6" fill="${INK}"/><circle cx="${n(cx - 1.26)}" cy="${n(cy - 2.13)}" r="1.5" fill="#fff"/>`;
+    const shut = cx => `<path d="M${n(cx - 5)} ${y}q5 4.5 10 0" ${st}/>`;
+    const cat = (w = 6.5, d = 4.6, ox = 0) => `<path d="M${n(x + ox - w)} ${my}q${n(w / 2)} ${d} ${w} 0q${n(w / 2)} ${d} ${w} 0" ${st}/>`;
+    const eyes = m === 'snooze' ? shut(x - dx) + shut(x + dx)
+      : m === 'oops' ? `<path d="M${n(x - dx - 4)} ${y - 4}l7 4l-7 4" ${st}/><path d="M${n(x + dx + 4)} ${y - 4}l-7 4l7 4" ${st}/>`
+      : m === 'look' ? eye(x - dx + 3, y - 2) + eye(x + dx + 3, y - 2) : eye(x - dx, y) + eye(x + dx, y);
+    // the :3 mouth; the tongue shows when it waves
+    const mouth = m === 'oops' ? `<path d="M${x - 8} ${my + 2}q4-5 8 0t8 0" ${st}/>`
+      : m === 'wave' ? `<ellipse cx="${x}" cy="${n(my + 4.4)}" rx="3.3" ry="3.5" fill="#FF8A95" stroke="${INK}" stroke-width="2.2"/>` + cat() : m === 'snooze' ? cat(5, 3.6) : m === 'look' ? cat(5.5, 4, 2.5) : cat();
+    const bx = dx + 11.5; return `<ellipse cx="${x - bx}" cy="${my}" rx="5" ry="3" fill="#FF8A95" opacity=".5"/><ellipse cx="${x + bx}" cy="${my}" rx="5" ry="3" fill="#FF8A95" opacity=".5"/>` + eyes + mouth;
+  };
+  const zs = (x, y, c = '#B4C7D9') => `<g class="zz" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M${x} ${y}h8l-8 9h8"/><path d="M${x + 12} ${y - 14}h5.5l-5.5 6.5h5.5" opacity=".7"/></g>`;
+  const ques = (x, y) => `<text class="qq" x="${x}" y="${y}" font-family="Fredoka, sans-serif" font-weight="600" font-size="24" fill="#B4C7D9" text-anchor="middle">?</text>`;
+  const sweat = (x, y) => `<path class="sw" d="M${x} ${y}c3.4 4.6 5 7 5 9.4a5 5 0 0 1-10 0c0-2.4 1.6-4.8 5-9.4Z" fill="#B4C7D9"/>`;
+  // Goo is made the way the app's goo is (the drip under the heart, the tab bar): white shapes under a blur-and-threshold filter,
+  // so the body, its base, the arm and the drop that got away read as one liquid. A darker copy underneath is its lip. The face is drawn on top.
+  const el6 = (cx, cy, rx, ry = rx) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>`;
+  const GOO = {
+    // a drop that has just landed: the tip is what is left of the neck it fell from
+    body: '<path d="M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z"/>',
+    // a short skirt, one lobe, and one drop that got away
+    base: el6(60, 99, 42, 5.5) + el6(91, 102.5, 11, 4) + el6(109, 104.4, 3.4),
+    arm: 'M89 78Q102 72 104 59', hand: [104, 57, 7.4], face: [59, 72, 14.5, 83], zs: [94, 36], q: [98, 38], sweat: [98, 28],
+  };
+  const gooSVG = (m) => {
+    const sq = m === 'snooze' ? ` transform="translate(60 100) scale(1.08 .86) translate(-60 -100)"` : '', [hx, hy, hr] = GOO.hand;
+    const arm = m === 'wave' ? `<g class="arm" style="transform-origin:89px 78px"><path d="${GOO.arm}" fill="none" stroke-width="9.5" stroke-linecap="round"/>${el6(hx, hy, hr)}</g>` : '';
+    const liquid = (c, dy, by) => `<g fill="${c}" stroke="${c}" stroke-width="0" filter="url(#gooM)"><g transform="translate(0 ${by})">${GOO.base}</g><g transform="translate(0 ${dy})"><g class="bd"><g${sq}>${GOO.body}${arm}</g></g></g></g>`;
+    const tick = m === 'wave' ? `<g class="tick" fill="none" stroke="#B4C7D9" stroke-width="2.4" stroke-linecap="round"><path d="M${hx + 11} ${hy - 9}q4 6 2 12"/><path d="M${hx - 7} ${hy - 14}q5-3 10-1" opacity=".7"/></g>` : '';
+    return `<ellipse cx="60" cy="109.5" rx="46" ry="4.5" fill="#000" opacity=".28"/>${liquid(GL, 4, 2.4)}${liquid(GW, 0, 0)}<g class="bd"><g${sq}>${face(m, ...GOO.face)}</g></g>${tick}
+      ${m === 'snooze' ? zs(...GOO.zs) : m === 'look' ? ques(...GOO.q) : m === 'oops' ? sweat(...GOO.sweat) : ''}`;
+  };
+  /* Tap Goo: it squashes under the finger, springs back, and one to three drops leave its tip for the tab bar. Each drop that
+     lands is one more on the bar's goo count, like a drop from the secret Goo tab. They come down on the goo that is already there. With no bar on screen they land beside it and soak away. */
+  const pokeAt = new WeakMap();
+  const gooPoke = (svg) => {
+    const now = performance.now(); if (now - (pokeAt.get(svg) || 0) < 260) return; pokeAt.set(svg, now);
+    const n = 1 + Math.floor(Math.random() * 3), phone = svg.closest('.phone6'), nav = phone && phone.querySelector('nav.tabbar6'), st = nav && gooSt.get(nav);
+    if (calm) { if (st) for (let i = 0; i < n; i++) gooLand(nav); return; }
+    svg.classList.remove('pop'); svg.getBoundingClientRect(); svg.classList.add('pop');
+    const host = phone || svg.parentElement, hr = host.getBoundingClientRect(), z = hr.width / host.offsetWidth || 1, sr = svg.getBoundingClientRect(), r = (lo, hi) => lo + Math.random() * (hi - lo);
+    const low = !!svg.querySelector('.zz'), px = sr.width / z / 120; // the snoozing body is squashed, so its tip sits lower
+    const x0 = (sr.left - hr.left) / z + (low ? 64.3 : 64) * px, y0 = (sr.top - hr.top) / z + (low ? 21 : 8) * px, side = Math.random() < .5 ? -1 : 1;
+    for (let i = 0; i < n; i++) setTimeout(() => {
+      const dir = i % 2 ? -side : side; let x1, y1, u = null;
+      if (st) { const q = st.q, c = st.cur, on = c.t >= .1; u = clamp(on ? r(c.uL - 12, c.uR + 12) : q.L * .9 + r(-14, 14), 10, q.L - 10); const e = gooEdge(q, u); x1 = nav.offsetLeft + e.x; y1 = nav.offsetTop + e.y - 4; } // onto the goo that is there, or where goo starts on a clean bar
+      else { x1 = x0 + dir * r(38, 62) * px; y1 = (sr.top - hr.top) / z + 106 * px; }
+      const dx = x1 - x0, dy = Math.max(1, y1 - y0), rise = r(22, 40) * Math.max(1, px), b = 2 * (rise + Math.sqrt(rise * rise + rise * dy)), a = dy + b;
+      const T = 70 + 17 * (Math.sqrt(rise) + Math.sqrt(rise + dy)), k = r(.85, 1.2), N = 14, frames = []; let prev = null, last = '';
+      for (let j = 0; j <= N; j++) {
+        const t = j / N, vy = 2 * a * t - b; let ang = Math.atan2(vy, dx); if (prev != null) { while (ang - prev > Math.PI) ang -= 2 * Math.PI; while (prev - ang > Math.PI) ang += 2 * Math.PI; } prev = ang;
+        const sp = Math.hypot(dx, vy) / T, grow = Math.min(1, .4 + t * 5);
+        last = `translate(${(dx * t).toFixed(1)}px, ${(a * t * t - b * t).toFixed(1)}px)`;
+        frames.push({ offset: t, transform: `${last} rotate(${(ang * 180 / Math.PI - 90).toFixed(1)}deg) scale(${(k * grow * .85).toFixed(2)}, ${(k * grow * (1 + Math.min(.7, sp * .8))).toFixed(2)})` });
+      }
+      const el = document.createElement('span'); el.className = 'gdrop'; el.style.left = x0.toFixed(1) + 'px'; el.style.top = y0.toFixed(1) + 'px'; host.appendChild(el);
+      el.animate(frames, { duration: T, fill: 'forwards' }).onfinish = () => {
+        if (st) { el.remove(); return gooLand(nav, u); }
+        el.animate([{ transform: `${last} scale(1)`, opacity: 1 }, { transform: `${last} scale(1.7, .3)`, opacity: 0 }], { duration: 200, easing: 'ease-out', fill: 'forwards' }).onfinish = () => el.remove();
+      };
+    }, 120 + i * 70);
+  };
+  document.addEventListener('pointerdown', e => { const m = e.target.closest && e.target.closest('svg.mas6'); if (m && !calm && !(e.pointerType === 'mouse' && e.button)) m.classList.add('press'); });
+  const unpress = () => document.querySelectorAll('.mas6.press').forEach(m => m.classList.remove('press'));
+  document.addEventListener('pointerup', unpress); document.addEventListener('pointercancel', unpress);
+  document.addEventListener('click', e => { const m = e.target.closest && e.target.closest('svg.mas6'); if (m) gooPoke(m); });
+  const mascot = (m = 'wave', size = 96) => `<svg class="mas6" viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true">${gooSVG(m)}</svg>`;
+  $('u-goo').innerHTML = `<div class="strip p6 gsheet6">${MOODS.map(m => `<div>${mascot(m, 136)}<small>${{ wave: 'Hello', snooze: 'Nothing here', look: 'Looking', oops: 'Something broke' }[m]}</small></div>`).join('')}</div>`;
+
+  Object.assign(P, {
+    wifioff: '<path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/>',
+    wifi: '<path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>',
+  });
+  // A state: the mascot, a headline, one sentence, then its actions.
+  const state = (mood, head, text, actions = '', cls = '', size = 112) => `<div class="state6 ${cls}">${mascot(mood, size)}<b>${head}</b><p>${text}</p>${actions ? `<div class="acts">${actions}</div>` : ''}</div>`;
+  const act = (t, cls = 'lip6', icon = '') => `<button class="btn6 ${cls}" type="button">${icon ? ic(icon, 18, 2.4) : ''}${t}</button>`;
+  const quiet = t => `<button class="quiet6" type="button">${t}</button>`;
+  const banner = (i, t, cls = '') => `<div class="banner6 ${cls}" role="status">${ic(i, 18, 2.2)}<span>${t}</span></div>`;
+  const POP = { artist: 'pastelbat', time: '5h ago', ar: '4/3', v: 2, favs: '2.1k', score: '512', id: '4511902', follow: false, more: 12, tags: [['s', 'bat'], ['', 'pastel colors'], ['', 'night'], ['', 'stars']] };
+  const POP2 = { artist: 'berry wolf', time: '8h ago', ar: '1/1', v: 1, favs: '1.6k', score: '430', id: '4511677', follow: false, more: 8, tags: [['s', 'wolf'], ['', 'forest'], ['', 'berries']] };
+
+  // Signed out: the landing
+  $('s-land').innerHTML = phone(`
+    <div class="cbar6"><div class="in"><b>Following</b><span></span>${tools()}</div></div>
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
+      <div class="hello6">${mascot('wave', 104)}<b>Follow the artists you love</b><p>See their new posts first, all in one feed.</p><button class="btn6 gold lip6 wide" type="button">Sign in with e621</button></div>
+      <div class="shead6"><b>Popular today</b></div>
+      ${post(POP)}${post(POP2)}
+    </div>
+    <div class="scrim6"></div>${fab(0)}${tabbar('Following', 'nobadge', 343, 'own')}<span class="home6"></span>`, 'land6', 'data-compact="300"');
+  $('u-land').innerHTML = [
+    strip('Needs sign-in', 'For You, Artists and Favorites signed out: the same shape with its own sentence. Artists says "Your artists live here"; Favorites says "Your favorites live on e621". Sign in is the gold button; Search stays quiet.',
+      `<div class="strip p6">${state('wave', 'For You learns from your favorites', 'Sign in and it picks posts from the tags and artists you favorite most.', act('Sign in', 'gold lip6') + quiet('Search instead'), 'pad')}</div>`),
+  ].join('');
+
+  // Empty: a search with nothing in it
+  $('s-empty').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'snow')}</span></button><div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div></div>
+        <div class="chips6"><button class="chip6" type="button">${ic('x', 14, 2.8)}Reset</button>${chip('Videos', true)}${chip('New')}${chip('Today', true)}${chip('Score')}</div></div>
+      ${state('look', 'No posts match', 'Two filters are on, and 3 posts are hidden by your blacklist.', act('Reset filters'), 'screen')}
+    </div>
+    <div class="scrim6"></div>${tabbar('Following', '', 343, 'live')}<span class="home6"></span>`);
+  $('u-empty').innerHTML = [
+    strip('Following, nothing yet', 'You follow artists but none has posted. The suggestions card goes under it.', `<div class="strip p6">${state('snooze', 'No posts yet', 'None of the 42 artists you follow has posted since you joined.', act('Find more artists'), 'pad')}</div>`),
+    strip('For You, too few favorites', 'The sentence names the rule, so you know what to do next.', `<div class="strip p6">${state('look', 'For You needs a little more', 'A tag needs 3 favorites. Favorite a few more posts and it starts picking.', act('Search', 'lip6', 'search'), 'pad')}</div>`),
+  ].join('');
+
+  // Error: the first load failed
+  $('s-err').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      ${head().replace(/<div class="newline6">.*?<\/div>\n/s, '')}
+      <div class="err6">${state('oops', "e621 didn't answer", 'Your feed is fine. The site is having a moment.', `<code>503 Service Unavailable</code>` + act('Try again', 'lip6', 'refresh'), '', 96)}</div>
+    </div>
+    <div class="scrim6"></div>${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
+  $('u-err').innerHTML = [
+    strip('Asked to slow down', 'e621 answered 429 or 503 with a wait. The app tries again by itself; the button skips the wait.', `<div class="strip p6" style="padding:16px 0 0"><div class="err6">${state('snooze', 'e621 asked us to slow down', 'Trying again in <span data-count>5</span> s.', act('Try now'), '', 96)}</div></div>`),
+    strip('Offline', 'A sunk banner under the header. It turns green for 2 s when the connection is back, then leaves.', `<div class="strip p6" style="padding:16px 0">${banner('wifioff', "You're offline. Showing what's loaded.")}${banner('wifi', 'Back online', 'ok')}</div>`),
+    strip('The end of a feed', 'Loading more failed: one row, one button. And the real end, with what was left out.', `<div class="strip p6" style="padding:20px 0 4px"><div class="more6row"><span>Couldn't load more posts</span>${act('Try again', 'lip6')}</div><div class="caught6 end"><div class="rule">${mark('l')}</div><b>That's everything</b><small>3 hidden by your blacklist · 2 need you signed in</small></div></div>`),
+  ].join('');
+
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const turns = new WeakMap();
@@ -1303,6 +1515,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
      and springs from what it shows to that. It is thick: fat drips that creep
      slowly, a heavy bead, and a deep skirt between them. It runs over the tabs; navy copies masked to it keep them readable. */
   let gooCount = 8; try { const s = parseInt(localStorage.getItem('feed-v6-goo'), 10); if (s >= 0) gooCount = s; } catch (e) {}
+  let gooOwn = 0; const gooN = nav => nav.dataset.goo === 'own' ? gooOwn : gooCount;
   const gooSt = new WeakMap();
   const gooGeo = nav => { const W = parseFloat(nav.style.width), g = tbGeo(W, BEND), ro = g.R + 32;
     return { W, R: g.R, ro, th: g.th, L: 2 * g.th * ro, cx: W / 2, cy: ro, tabs: TABS.map((_, k) => ((k - 1.5) * g.tw / g.R + g.th) * ro) }; };
@@ -1379,28 +1592,31 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     if (!moving) st.last = 0; return moving;
   };
   let gooRaf = 0;
-  const gooLive = () => [...document.querySelectorAll('nav.tabbar6[data-goo="live"]')];
+  const gooLive = () => [...document.querySelectorAll('nav.tabbar6[data-goo="live"], nav.tabbar6[data-goo="own"]')];
   const gooTick = (now) => { let live = false; gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st) return; if (gooStep(nav, st, now)) live = true; gooDraw(nav, st); }); gooRaf = live ? requestAnimationFrame(gooTick) : 0; };
   const gooKick = () => { if (!gooRaf) gooRaf = requestAnimationFrame(gooTick); };
   const gooLabels = () => document.querySelectorAll('[data-goo-count]').forEach(el => { el.textContent = gooCount === 1 ? '1 favorite' : gooCount + ' favorites'; });
   const gooSnap = (st) => { st.cur = { uL: st.T.uL, uR: st.T.uR, t: st.T.t, tint: st.T.tint }; st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, { l: d.len, v: 0 }])); };
   // Draw a bar's goo where it should be right now, with no animation. Called whenever a bar is drawn.
   const gooSync = (nav) => {
-    const g = nav.dataset.goo; if (!g) return; const live = g === 'live', q = gooGeo(nav), st = { q, T: gooTarget(live ? gooCount : +g, q), plops: [], wipe: null, last: 0 };
+    const g = nav.dataset.goo; if (!g) return; const live = g === 'live' || g === 'own', q = gooGeo(nav), st = { q, T: gooTarget(live ? gooN(nav) : +g, q), plops: [], wipe: null, last: 0 };
     gooSnap(st); if (live) gooSt.set(nav, st); gooDraw(nav, st);
   };
   // The count changed: aim every live bar at the new shape. landedAt is where the drop came down, for the plop.
+  const gooAim = (nav, landedAt) => {
+    const st = gooSt.get(nav); if (!st || st.wipe) return;
+    const old = st.len, u = landedAt == null ? st.q.L * .9 : landedAt; st.T = gooTarget(gooN(nav), st.q);
+    if (calm) { gooSnap(st); return gooDraw(nav, st); }
+    if (st.cur.t < .1) st.cur.uL = st.cur.uR = u; // a clean bar starts its bead where the first drop lands
+    st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, old.get(d.id) || { l: 0, v: 0 }])); st.plops.push({ u, t0: performance.now() });
+  };
   const gooSet = (landedAt) => {
     gooLabels(); try { localStorage.setItem('feed-v6-goo', gooCount); } catch (e) {}
-    gooLive().forEach(nav => {
-      const st = gooSt.get(nav); if (!st || st.wipe) return;
-      const old = st.len, u = landedAt == null ? st.q.L * .9 : landedAt; st.T = gooTarget(gooCount, st.q);
-      if (calm) { gooSnap(st); return gooDraw(nav, st); }
-      if (st.cur.t < .1) st.cur.uL = st.cur.uR = u; // a clean bar starts its bead where the first drop lands
-      st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, old.get(d.id) || { l: 0, v: 0 }])); st.plops.push({ u, t0: performance.now() });
-    });
+    gooLive().forEach(nav => { if (nav.dataset.goo !== 'own') gooAim(nav, landedAt); });
     if (!calm) gooKick();
   };
+  // One drop came down on this bar, u px along its top edge: one more on its count.
+  const gooLand = (nav, u) => { if (nav.dataset.goo !== 'own') { gooCount++; return gooSet(u); } gooOwn++; gooAim(nav, u); if (!calm) gooKick(); };
   // The drop that lets go of the heart keeps falling until it meets the tab bar.
   const gooFall = (btn) => {
     const phone = btn.closest('.phone6'), nav = phone && phone.querySelector('nav.tabbar6'), st = nav && gooSt.get(nav); if (!st) return false;
@@ -1417,7 +1633,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   const gooAdd = (k, btn) => { gooCount += k; if (btn && !calm && gooFall(btn)) return gooLabels(); gooSet(); };
   // Wipe: a blade sweeps left to right along the bend. Behind it the bar is clean; in front of it the goo piles up, then flies off the end.
   const gooWipe = () => {
-    gooCount = 0; gooLabels(); try { localStorage.setItem('feed-v6-goo', 0); } catch (e) {}
+    gooCount = gooOwn = 0; gooLabels(); try { localStorage.setItem('feed-v6-goo', 0); } catch (e) {}
     gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st || st.wipe) return; st.T = gooTarget(0, st.q);
       if (calm) { gooSnap(st); return gooDraw(nav, st); }
       st.wipe = { t0: performance.now(), pile: 0, ub: -1e9 }; });
@@ -1560,6 +1776,8 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       el.innerHTML = tgt('search', 'Search') + (sh.dataset.targets === 'foryou' ? tgt('pin', 'Pin') : '') + tgt('ban', 'Blacklist', 'danger'); sh.appendChild(el); tw.classList.add('held');
       const w = el.offsetWidth; el.style.left = clamp(tw.offsetLeft + tw.offsetWidth / 2 - w / 2, 8, sh.clientWidth - w - 8) + 'px'; el.style.top = (tw.offsetTop - 44 - 8) + 'px'; }
   });
+  // The slow-down card counts 5 to 1 and starts over (the app would retry at 0).
+  if (!calm) { let n = 5; setInterval(() => { n = n > 1 ? n - 1 : 5; document.querySelectorAll('[data-count]').forEach(el => el.textContent = n); }, 1000); }
   const tagRows = () => document.querySelectorAll('.p6 .tags6').forEach(fadeTags);
   addEventListener('resize', () => { fit(); apply(); tagRows(); }); fit(); apply(); tagRows(); gooLabels();
 })();

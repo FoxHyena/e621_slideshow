@@ -214,3 +214,51 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md (Sheets with a title, Menu, Media menu, Player sheets, Tag targets; `menu`
   radius; list-row padding 8 / 16), .impeccable/design.json (Menu, Tag Targets; List Row), the surface brief,
   docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+
+## 2026-11-25 — Goo the mascot; landing, empty, error and offline states in v6 (mocks/screens-v6.html)
+
+- Owner: "Yes, draw them" (the signed-out landing, empty and error states, which needed a mascot that did
+  not exist). Artifact: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1.
+- **The mascot is Goo**, a drop of the tab bar's goo with a face. Owner, from three candidates (Goo, a pup,
+  a flower): "Goo, but I'd like to take a couple rounds at refining it further". The pup and the flower are
+  dropped.
+- Round 1 (switches: shape Drop / Wisp / Blob; face Sweet / :3 / Big eyes; finish Flat / Shaded), owner:
+  ":3" and "flat", then "I think I desire it to look maybe more
+  goo-drop like? And the part that's under it looks more like snow than goo". Goo was rebuilt from plain
+  shapes under the app's own blur-and-threshold filter, so body, spill and arm are one liquid; the spill
+  became thin, with a lobe and a stray drop.
+- Round 2 (switches: shape Dewdrop / Dollop / Pinch; base Splat / Small / None), owner: "Dewdrop, Small".
+  Then "Yes, write it".
+- Four moods are the whole vocabulary: wave (hello, sign in), snooze (nothing yet, waiting), look (nothing
+  found), oops (something failed).
+- Decided by the designer, shown to the owner in the mock's table, not objected to:
+  - On the landing "Sign in with e621" is the one gold fill; Play hides until the card has scrolled away.
+  - Empty states sit on the ground; errors sit in a panel where the first post would be.
+  - The offline banner is a sunk capsule, not a button.
+  - The end of a feed reuses the caught-up moment with the app's mark; no typed "✿".
+  - The landing's one UX.md sentence is split into a headline and a sentence. With filters on, the empty
+    state says "No posts match" and counts the filters, in place of "Filters are on".
+- Decided by the designer and NOT yet shown to the owner as a decision:
+  - Goo has a pale blue underside (#9FB3CC, "Goo Shade") that does not close when pressed.
+    DESIGN.md calls it thickness, not a lip, and says so under "The Lip Is a Promise". It is in every
+    drawing the owner approved, but the exception was never pointed out.
+  - Goo never appears under 72, and only on the landing, needs sign-in, empty states and errors.
+  - The sentences for Artists and Favorites signed out, and the action for "No posts match" with no filter
+    on ("Edit search"), are proposed in DESIGN.md and marked there as not drawn.
+  - While writing this up, the gap between e621's message and "Try again" in the error panel went from 20
+    to 16, to sit on the spacing scale. The mock was rebuilt with it.
+- Owner, after the write-up: "Tapping the goo should make him spurt between 1-3 drops on the bar". Drawn in the
+  mock and written into DESIGN.md: Goo squashes under the finger, springs back, and 1 to 3 drops leave its tip
+  for the tab bar. Decided by the designer around that ask, shown in the mock's table, not yet answered:
+  - Each drop that lands is one more on the goo count, like a drop from the secret Goo tab (so Settings'
+    "N favorites" counts them). They land on the goo already on the bar, or 90% along a clean one.
+  - Signed out the bar is clean, so the landing's bar gets goo only from Goo.
+  - Goo is pointer-only (not focusable, no label). With reduced motion the drops are added in place.
+  - With no tab bar on screen the drops land beside Goo and soak away.
+  - In the mock the goo engine is patched at build time (a bar can keep its own count); feed-v6.html is untouched.
+- Not drawn: Popular today under For You's signed-out block (UX.md has it); the first run after sign-in
+  (the "Finding artists you love" loader and "Follow from favorites"); the "From a link" chip; the hold
+  menu on a grid tile; desktop. Still open: whether un-favouriting removes goo.
+- Updated to match: DESIGN.md (Goo the mascot; States; Quiet button; the end of a feed; Goo Shade; One Gold
+  and Lip rules; motion rows; build ruling 10), .impeccable/design.json (Goo, State, Error Panel, Landing
+  Card, Offline Banner), the surface brief, docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
