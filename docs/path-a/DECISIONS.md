@@ -1059,3 +1059,13 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the row can mount again after a long scroll: the pop is remembered per screen entry for the visit.
 - Test fix in passing: "Tapping Goo spurts…" waited 5 s for drops whose code loads when the page is
   idle; under the full parallel run that was too short twice. It waits 10 s.
+
+## 2026-11-26 — The mark's pop approved
+
+- I asked: "do you approve that pop", after saying the caught-up pop was in the spec only and that
+  the owner had not seen it move. Owner's word: "Approve".
+- **Approved:** the mark pops once as "You're all caught up" scrolls into view, and pops when pressed
+  in Settings: 92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`; nothing with reduced motion.
+- Added to the mock after the approval, so the drawing matches the spec: the caught-up mark pops the
+  first time it comes into view.
+
