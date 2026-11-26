@@ -1,14 +1,14 @@
 # State
-Phase: 1 — Orient and ask          Updated: 2026-11-25
+Phase: 2 — UX plan                 Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
-Finish Phase 1 research (e621ng API, Next docs, component map → ENGINEERING.md "Current state"),
-brainstorm peripheral features, then ask the owner the Phase 1 questions (QUESTIONS.md Q1–Q6).
+Write UX.md (IA, every screen + states, nav model, player, onboarding, artist recs), then UX review round 1
+with a fresh subagent (UX.md + README + docs/screenshots only).
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
-- [ ] Phase 1: ENGINEERING.md current state
-- [ ] Phase 1: peripheral feature brainstorm
-- [ ] Phase 1: owner questions asked + answered, scope frozen
+- [x] Phase 1: ENGINEERING.md current state
+- [x] Phase 1: peripheral feature brainstorm
+- [x] Phase 1: owner questions answered, scope frozen (DECISIONS 2026-11-25) — GATE MET
 - [ ] Phase 2: UX.md + ≥2 review rounds + owner OK
 - [ ] Phase 3: DESIGN.md + mocks + ≥2 review rounds + owner OK
 - [ ] Phase 4: ENGINEERING.md target + Plan review

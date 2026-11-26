@@ -18,24 +18,26 @@ Format: id — question. Options (recommendation first). Status.
 | P10 | Haptics on favorite / subscribe | Low | Low | `navigator.vibrate` is Android-only; iOS Safari has no web haptics |
 | P11 | App badge with the new-post count (installed PWA) | Low | Low | Badging API; only updates while the app is open |
 
-## Open (asked 2026-11-25)
+## Phase 1 (asked and answered 2026-11-25)
 
 - **Q1 — Extras for feeds.** P4 group bursts, P5 filter chips, P6 per-artist new dots, P9 snooze artist.
-  Recommendation: P4 + P5 + P6. Status: open.
+  Recommendation: P4 + P5 + P6. **Answered:** P4, P5, P6. Chips: drop the rating chip (most people want explicit), keep Images/Videos; asked for more chip ideas (see Q7).
 - **Q2 — Polish extras.** P3 heart burst, P7 offline state, P8 share artist, P11 app badge.
   Recommendation: P3 + P7 + P8. P1 (scroll per tab) and P2 (caught-up divider) are planned as baseline.
-  P10 haptics dropped: iOS Safari has no web vibration. Status: open.
+  P10 haptics dropped: iOS Safari has no web vibration. **Answered:** P3, P7, P8, and "consider other microinteractions; trial some with the Emil animation skills on different components".
 - **Q3 — Where slideshow settings live.** (a) Quick sheet inside the player (style, speed, fit, mute)
   plus the full list in Settings; (b) only in Settings; (c) only in the player.
-  Recommendation: (a). Status: open.
+  Recommendation: (a). **Answered:** (a) both.
 - **Q4 — What a userscript launch link opens.** (a) Start the slideshow straight away, X lands on the
   feed of that search; (b) open the feed of that search with a big Play button; (c) a setting.
-  Recommendation: (a), the button says "▶ Slideshow". Status: open.
+  Recommendation: (a), the button says "▶ Slideshow". **Answered:** (a).
 - **Q5 — Where plain search and Favorites live.** (a) Search button in every tab's header opening a
   search screen (saved + recent), Favorites reachable from For You and from your profile; (b) a fifth
   Search tab; (c) For You becomes "Explore" with a For You / Search / Favs switch.
-  Recommendation: (a). Status: open.
+  Recommendation: (a). **Answered:** (a).
 - **Q6 — New-since-last-visit marker.** e621ng has `GET /saved_searches/:id/visit.json` that advances
   only the subscription anchor (302 redirect, works with Basic auth, no CSRF). Caveats: it jumps the
   marker to the site's newest post id, and new_count caps at 100. (a) Share it, advance once you scroll
-  past the new posts; (b) local marker only. Recommendation: (a). Status: open.
+  past the new posts; (b) local marker only. Recommendation: (a). **Answered:** (a).
+- **Q7 — More feed chips.** Hide favorited, Sort New/Top/Hot, Date Today/Week/Month, Score above 50.
+  Recommendation: Hide favorited. **Answered:** all four. (UX must keep the chip row light: see UX.md.)
