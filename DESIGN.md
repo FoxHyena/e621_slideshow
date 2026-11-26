@@ -983,16 +983,21 @@ What Following shows the first time you sign in, before you follow anyone. Three
   - **Level:** 10 + 56(1 − e^(−n/60)) px above the sidebar's bottom edge, n = favorites since the last wipe: 14 at 5, 37 at 40, 61 at 150. It never passes the account row (12 padding + 52 row = 64).
   - **Shape:** the tab bar goo's filter (blur 2, alpha ×20 −8) over a full-width slab with a low swell or two on its surface and a small rise where it meets each side. Clipped to the sidebar's 24 bottom corners. It lies over the account row and takes no clicks.
   - **Colour:** the tab bar goo's ramp, white to Goo Cream #F3E6A8 with tint 1 − e^(−n/70).
-  - **Copy under the goo:** the account's name, its count and its avatar ring are drawn again in Goo Ink #35527F, cut to the goo's own shape (the same shapes used as a mask, so the cut follows the wavy surface), as tab names are on the phone.
+  - **Copy under the goo:** the account's name, its count and its avatar ring are drawn again in Goo Ink #35527F, cut to the goo's own shape (the same shapes used as a clip path, so the cut follows the wavy surface and can move with it), as tab names are on the phone.
   - **No goo** with the icon-only sidebar (900 to 1099 wide).
-  - **Not drawn:** the drop's flight from the heart into the sidebar's foot, the wipe on a computer, and what the "Tab bar goo" row is called there. The mock's pool is a still drawing.
+  - **Not designed:** the wipe's control on a computer, and what the "Tab bar goo" row is called there.
 - **The pool on a phone: the "Tab bar goo" row is a jar.** Owner's idea ("Maybe we bring the pool to mobile somewhere too? … Maybe the settings or something?"), owner-picked 2026-11-26 ("jar row"). Drawn in the mock's Settings phone and under it.
   - **Where:** inside the card of the "Tab bar goo" row in Settings. The tab bar's own goo does not change.
   - **Level:** 4 + 42(1 − e^(−n/60)) px above the card's bottom edge, of the row's 56: 7 at 5 favorites, 24 at 40, 43 at 150. Nothing at 0.
   - **Shape and colour:** as the computer's pool (same filter, a full-width slab with low swells, the tab bar goo's colour ramp), clipped to the card's 24 corners. It takes no clicks.
   - **Copy under the goo:** the row's title, its count and its icon well (a 2 px ring and the drops icon) are drawn again in Goo Ink #35527F, cut to the goo's own shape.
   - **"Wipe clean"** sits above the goo, unchanged, and empties the jar.
-  - **Not drawn:** the level's motion as it rises, and how the jar empties during the wipe. In the mock the level jumps.
+- **How a pool moves. Owner-approved 2026-11-26 ("Approve"): the rise, the catch-up and the drain; the drop on a computer is owner-picked ("Fall").** The catch-up was approved from its description: the mock shows it with a "+12 favorites" button, not by opening Settings. Drawn and live in the mock: "It rises on the goo's spring", "Wipe clean drains it", and the first desktop window's heart. One behaviour for both pools.
+  - **Rise:** the level moves to its new height on the spring the tab bar's drips sag on (stiffness 40, damping 9: about 1 px past, settled in about 600 ms). Where the goo arrives a swell comes up on the surface, 12 wide growing to 28, up to 6 tall, gone in 340 ms (the tab bar's plop time): at 30% along the jar row, at 75% along the sidebar's foot.
+  - **On a phone the jar catches up:** when Settings opens, the jar starts at the level it last showed and rises to the current one after 250 ms.
+  - **Drain (Wipe clean):** the level sinks to nothing in 900 ms on the blade's ease (in-out cubic), in step with the blade on the tab bar. The surface leans up to 8 px lower at the right end, mid-way through. The Goo Ink copy follows the surface, so words turn white again as the goo leaves them.
+  - **The drop on a computer: it falls.** Owner-picked 2026-11-26 ("Fall"). 380 ms after the press the drop falls straight down from the heart, as on a phone (8 by 10, white, 70 + 17·√distance ms, ease-in), and leaves by the bottom of the window. 140 ms after it has left, the pool swells at 75% along and rises. It does not fly to the sidebar.
+  - **Reduced motion:** no drop, no swell, no lean; the level changes at once.
 - **Not designed:** the secret tab on a computer.
 
 ### The top bar, the pointer, grid loading, one head, chip dropdowns
@@ -1032,7 +1037,7 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **"From a link":** the same Panel dropdown, 343 wide, holding the line, the six rows, the note and the tonal "Use my settings".
 
 ### Not drawn yet
-The secret tab on a computer, and for the goo there: the drop's flight and the wipe. Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
+The secret tab on a computer, and the wipe's control and row name there. Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |

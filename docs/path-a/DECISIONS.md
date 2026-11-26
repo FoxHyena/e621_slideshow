@@ -554,3 +554,37 @@ Format: date — decision. Why. Rejected alternatives.
   px of 56. Words in Goo Ink under the goo; "Wipe clean" on top. The switch and the Account and
   Puddle drawings are removed from the mock.
 - Not designed, not approved: the level's motion and how the jar empties during the wipe.
+
+## 2026-11-26 — How the pools move: proposed, not approved
+
+- I asked: "do you want me to design how the pool rises and empties". Owner's word: "Yes, show it".
+- The owner also passed on the builder's list of what it has not built because it is not designed:
+  the drop flying into the sidebar, the level rising smoothly, the pools draining on Wipe clean, the
+  goo row's name on a computer, the secret tab on a computer. This entry covers the first three.
+- Proposed, live in the mock: the level rises on the drips' spring with a 340 ms swell; on a phone
+  the jar catches up when Settings opens; Wipe clean drains it in 900 ms with the blade, leaning 8 px
+  to the right. Reduced motion: the level changes at once.
+- The drop on a computer is behind a switch: **Fall** (my pick) and **Arc**. When the owner picked
+  Pool I had said the drop "arcs left into it". Drawn, the arc crosses half the window and passes
+  over the Play disc, so I now recommend Fall. That is my change of mind, not the owner's.
+- **Nothing here is approved or picked.**
+
+## 2026-11-26 — The drop on a computer: Fall
+
+- I asked: "which drop do you want on a computer — Fall or Arc? If the rise and the drain also look
+  right, add 'approve'." Owner's word: "Fall".
+- **Picked:** the drop falls straight down from the heart and leaves by the bottom of the window;
+  the pool swells and rises 140 ms later. The switch and the Arc drop are removed from the mock.
+- **Not approved:** the owner did not say "approve", so the rise, the catch-up when Settings opens,
+  and the drain stay proposed.
+
+## 2026-11-26 — How the pools rise and drain: approved
+
+- I asked: "do you approve how the pool rises and drains". Owner's word: "Approve".
+- **Approved:** the rise on the drips' spring with a 340 ms swell; the jar catching up 250 ms after
+  Settings opens; the 900 ms drain on Wipe clean, leaning up to 8 px to the right; no motion with
+  reduced motion.
+- Honest limits: the catch-up is approved from its description, since the mock stands in for it
+  with a "+12 favorites" button. I tested the motion by script and did not watch it play.
+- Still not designed: the goo row's name and the wipe's control on a computer, and the secret tab
+  on a computer.

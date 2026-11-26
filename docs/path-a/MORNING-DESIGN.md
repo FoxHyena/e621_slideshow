@@ -133,7 +133,9 @@ treat that message as your approval of any design.
    suggestion: one more row under Settings that shows when you scroll the tabs), and how the wipe
    looks on a computer.
    **Your idea, picked by you ("jar row"):** the pool on a phone too, inside the "Tab bar goo" row in
-   Settings. Still open: how the level moves and how the jar empties when you wipe.
+   Settings. **Picked by you ("Fall"):** on a computer the drop falls off the bottom of the window.
+   **Approved by you ("Approve"):** how a pool rises, catches up when Settings opens, and drains.
+   Still open: the goo row's name on a computer, and the secret tab there.
 2. **Sidebar:** a floating panel, 232 wide, with names; the current tab wears the tab bar's sliding
    capsule. Icons only from 900 to 1099. Other option: icons only at every width.
 3. **Play** keeps its gold disc at the bottom left of the content, beside the feed column. Other
