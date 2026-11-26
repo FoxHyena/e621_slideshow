@@ -127,3 +127,29 @@ Format: date — decision. Why. Rejected alternatives.
 - **Dependencies:** add `sonner` (toasts with Undo, `role="status"`, pause on hover/focus). Nunito through
   `next/font/google` (self-served, build-time download). No Motion, Vaul, Serwist or state library.
 - **CSP** limiting `connect-src` to self + e621 (slice 8).
+
+## 2026-11-25 — Slice 1 build (scope adjustments)
+
+- **Spike passed, no fallback needed.** On Next 16.3.8: every entry we push carries `__NA`; tab and
+  pushed-screen moves and Back/Forward make no RSC request; boot's same-tick replace + push and a quick
+  double Back leave the right URL on each entry; an unknown URL and a reload on every route file serve the
+  shell (`e2e/nav.spec.ts`). The catch-all fallback route stays unused.
+- **Boot runs in a layout effect**, not during render: it writes history, and Next's patched `pushState`
+  updates Next's Router, which React forbids while another component renders.
+- **Boot walks parents** with `parentOf` (a pasted `/settings/content` gets `/following`, `/settings` under
+  it; `/for-you/tune` gets For You), so browser Back and in-app Back agree.
+- **The legacy home is not in `<Activity>`.** Hiding runs effect cleanups, and the legacy App disposes its
+  show's queue in one. It stays mounted and is hidden with `hidden`. Real screens use Activity as planned.
+- **Screens scroll in their own box** (`.screen`, fixed, `overflow-y: auto`) until slice 2 moves feeds to
+  document scroll; offsets and tab re-tap scroll-to-top act on that box. Post-anchored restore with the
+  1-day localStorage copy lands with the feeds in slice 2.
+- **Moved to slice 2:** the `session` and `prefs` stores (the legacy App still owns that state, and the
+  prefs keys don't change meaning yet), and `sonner`. `migrate.ts` ships now as a schema-versioned step
+  runner (`e6ss:schema`) with a no-op 0 → 1 step; each slice that changes what a key means adds its step.
+- **Legacy palette kept beside the new tokens.** DESIGN.md's `--color-panel` (#152F56) took the name, so
+  the legacy panel colour is `--color-panel-old` (5 class names changed, no visual change).
+- **Legacy link params:** boot moves `/?…` to `/following?…` only when the legacy decoders recognise a share
+  or launch link; other params are dropped.
+- **Gestures:** a Back from the edge swipe or from the browser (popstate we didn't start) never animates;
+  only our own push and Back buttons do. Tab switches cross-fade 120 ms.
+- **Desktop rail** is 88 px (16 + 56 + 16), not in the mock; logged as a spec value.

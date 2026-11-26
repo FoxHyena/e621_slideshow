@@ -194,7 +194,7 @@ function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite,
 
   return (
     <article
-      className="scroll-mt-16 overflow-hidden border-line bg-panel sm:rounded-xl sm:border"
+      className="scroll-mt-16 overflow-hidden border-line bg-panel-old sm:rounded-xl sm:border"
       aria-label={`Post #${post.id}`}
       aria-current={active || undefined}
       data-testid="feed-card"
@@ -435,7 +435,7 @@ export default function Feed(props: FeedProps) {
       data-testid={artist ? "artist-feed" : "feed"}
       data-artist={artist}
     >
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel-old/95 px-4 py-3 backdrop-blur">
         {artist && (
           <>
             <button

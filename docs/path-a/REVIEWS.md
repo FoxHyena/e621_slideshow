@@ -174,3 +174,37 @@ findings accepted; ENGINEERING.md target revised in place.
 Not verifiable without runtime or live e621 (carried into the slice-1 spike and slice-3 live check):
 RSC requests on restore, rapid-transition batching, iOS Safari scroll/toolbar/history behaviour, e621 CORS
 on `visit.json`, the `tag_subscriptions` POST body, `static1` CORS, Playwright + SW interception.
+
+## Slice 1 code review (2026-11-25)
+
+Two passes over the uncommitted slice: the `code-review` skill at high effort (in-session), and a fresh
+`general-purpose` reviewer given only the diff, ENGINEERING.md §0–2, §8, §11 and UX §3. All gates re-run
+after the fixes: typecheck, lint, 174 unit tests, 86 e2e.
+
+**code-review (high), 6 findings, all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Hiding the legacy home in `<Activity>` ran its effect cleanups, disposing the running show's queue for good | High | Legacy home kept mounted, hidden with `hidden`; e2e for a tab round-trip |
+| 2 | Boot put only `/following` under a pasted page, so Back from `/settings/content` skipped Settings | High | Boot walks `parentOf`; unit + e2e |
+| 3 | Concurrent tab taps (or a tap during Back) raced pending pops | High | `goTab` serialized; push/replace ignored while a Back lands |
+| 4 | Tab re-tap and offsets used `window` scroll, but screens scroll in their own box | Med | Offsets and scroll-to-top act on the screen element |
+| 5 | Focus openers were overwritten on Forward and dropped after one Back | Low | Recorded only on push; pruned only when the entry leaves the stack |
+| 6 | Non-link params on `/` stuck to `/following` | Low | Boot keeps only share or launch params |
+
+**Fresh reviewer, 12 findings: 10 fixed, 2 deferred**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Esc-as-Back dead once the legacy panel mounted (its closed dialog still matched `[role=dialog]`) | High | Only open, visible dialogs count; e2e visits `/following` first |
+| 2 | The hidden legacy home kept its keys, timer and video audio live | High | `onScreen` prop gates keys, timer and stall watch; videos pause when hidden; e2e asserts no search |
+| 3 | The 400 ms timeout could release the Back lock while a slow traversal was in flight | Med | If the entry hasn't changed, wait once more; unit test with a 600 ms popstate |
+| 4 | Tests passing for the wrong reason (fragment, double Back, depth-0 Back) | Med | Fragment test reads the page at DOMContentLoaded (before hydration); depth-0 Back via Esc on `/nope` |
+| 5 | Double tap pushed the same screen twice | Med | `push` ignores the current URL |
+| 6 | Fragment regex narrower than the decoder (`%6B=`) | Low | Head script uses `URLSearchParams.has("k")` |
+| 7 | Saving the offset of an already-hidden screen wrote 0 | Low | Save only while the screen has boxes |
+| 8 | `data-nav` cleanup raced between transitions; unhandled rejection | Low | Token per transition; `.catch` |
+| 9 | Our `replace` carried `__NA`, so Next's patched `replaceState` skipped its router update (verified in `app-router.js`) | Med | `ownState()` strips Next's keys from everything we write (shell and legacy App) |
+| 10 | Legacy artist-feed entries share the `/following` entry's key | Low | Deferred: reachable only with the bar hidden; artist feeds move to `nav.push` in slice 2 |
+| 11 | `.legacy-home`'s containing block offsets viewport-positioned overlays at ≥ 900 px | Low | Deferred: those overlays only show in immersive mode, where `left: 0`; recheck in slice 2 |
+| 12 | The first-entry stamp ran during render | Low | Stamp moved into boot (layout effect) |

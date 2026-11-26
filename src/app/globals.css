@@ -1,13 +1,100 @@
 @import "tailwindcss";
 
 @theme {
+  /* Legacy palette: the settings-panel home until slices 3–7 replace it. */
   --color-accent: #fcb328;
   --color-accent-strong: #ffd479;
-  --color-panel: #0f1a2b;
+  --color-panel-old: #0f1a2b;
   --color-panel-2: #16243a;
   --color-line: #263a57;
+
+  /* DESIGN.md tokens (Tailwind mapping section). */
+  --color-ground: #020f23;
+  --color-panel: #152f56;
+  --color-raised: #1f3c67;
+  --color-raised-hi: #2a4b7c;
+  --color-hairline: rgba(180, 199, 217, 0.14);
+  --color-fg: #ffffff;
+  --color-link: #b4c7d9;
+  --color-muted: #a0adc1;
+  --color-gold: #e8c446;
+  --color-on-gold: #020f23;
+  --color-lip-gold: #a8871f;
+  --color-lip-navy: #0b1f3e;
+  --color-glass: rgba(21, 47, 86, 0.88);
+  --color-glass-base: #0b1f3e;
+  --color-glass-art: rgba(2, 15, 35, 0.55);
+  --color-score: #5ec06a;
+  --color-heart: #ff8a95;
+  --color-danger: #ed9393;
+  --color-tag-artist: #f2ac08;
+  --color-tag-character: #00c900;
+  --color-tag-species: #f3946b;
+  --color-tag-general: #b4c7d9;
+  --color-tag-meta: #ffffff;
+
+  --font-rounded: ui-rounded, var(--font-nunito), "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-large-title: 34px;
+  --text-large-title--line-height: 41px;
+  --text-large-title--font-weight: 800;
+  --text-large-title--letter-spacing: -0.01em;
+  --text-section: 20px;
+  --text-section--line-height: 25px;
+  --text-section--font-weight: 800;
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline--font-weight: 700;
+  --text-callout: 15px;
+  --text-callout--line-height: 20px;
+  --text-callout--font-weight: 700;
+  --text-body: 15px;
+  --text-body--line-height: 20px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-tab: 11px;
+  --text-tab--line-height: 13px;
+  --text-tab--font-weight: 700;
+
+  --spacing-inset: 16px;
+  --spacing-control: 44px;
+  --spacing-control-compact: 32px;
+  --spacing-row: 52px;
+  --spacing-fab: 56px;
+  --spacing-bar: 62px;
+  --spacing-avatar-s: 24px;
+  --spacing-avatar: 36px;
+  --spacing-avatar-row: 44px;
+  --spacing-avatar-hero: 80px;
+  --spacing-rail: 88px;
+
+  --radius-thumb: 8px;
+  --radius-field: 12px;
+  --radius-panel: 16px;
+  --radius-sheet: 24px;
+
+  --shadow-bar: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.45);
+  --inset-shadow-hairline: inset 0 0 0 1px var(--color-hairline);
+
+  --blur-glass: 24px;
+  --blur-glass-art: 16px;
+
+  --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  --animate-pop: pop 300ms var(--ease-pop);
+  --animate-wiggle: wiggle 360ms ease-out;
+  @keyframes pop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+  @keyframes wiggle {
+    0% { transform: rotate(0); }
+    35% { transform: rotate(-3deg); }
+    70% { transform: rotate(2deg); }
+    100% { transform: rotate(0); }
+  }
 }
 
 html,
@@ -382,4 +469,329 @@ body {
 }
 .tag-actions-dim {
   animation: tag-actions-dim-in 160ms ease-out;
+}
+
+/* Inline, so `shadow-lip` reads --lip-c on the control itself rather than on :root. */
+@theme inline {
+  --shadow-lip: 0 3px 0 var(--lip-c, var(--color-lip-navy));
+  --shadow-lip-s: 0 2px 0 var(--lip-c, var(--color-lip-navy));
+}
+
+/* ---- shell (src/shell) ------------------------------------------------- */
+
+:root {
+  /* DESIGN.md bottom stack: the bar sits 22 from the bottom, above any larger safe area. */
+  --bar-bottom: max(22px, calc(env(safe-area-inset-bottom) - 12px));
+  --bar-top: calc(var(--bar-bottom) + var(--spacing-bar));
+}
+
+::selection {
+  background: var(--color-raised-hi);
+  color: var(--color-fg);
+}
+
+.tabbar {
+  position: fixed;
+  z-index: 50;
+  left: var(--spacing-inset);
+  right: var(--spacing-inset);
+  bottom: var(--bar-bottom);
+  height: var(--spacing-bar);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 4px;
+  border-radius: 999px;
+  background-color: var(--color-glass-base);
+  background-image: linear-gradient(var(--color-glass), var(--color-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
+  backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
+  box-shadow: var(--shadow-bar);
+  /* Its own transition layer, so push/back motion moves the screen and not the bar. */
+  view-transition-name: tabbar;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.tabbar[data-hidden] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  border-radius: 999px;
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: var(--text-tab);
+  line-height: var(--text-tab--line-height);
+  font-weight: 700;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+}
+.tab[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-gold);
+}
+.tab[aria-current="page"] .tab-icon {
+  stroke-width: 2.2;
+}
+.tab:focus-visible,
+.toolbar-circle:focus-visible,
+.settings-row:focus-visible,
+.btn-gold:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+.tab-rail-only {
+  display: none;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-ground);
+  color: var(--color-fg);
+}
+.screen-frame {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) var(--spacing-inset) 156px;
+}
+.screen-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--spacing-control);
+  margin-top: 12px;
+}
+.toolbar-circle {
+  display: grid;
+  place-items: center;
+  width: var(--spacing-control);
+  height: var(--spacing-control);
+  border-radius: 999px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-hairline);
+  color: var(--color-link);
+}
+.toolbar-circle svg {
+  width: 20px;
+  height: 20px;
+}
+.screen-title {
+  margin-top: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-large-title);
+  line-height: var(--text-large-title--line-height);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+.screen-note {
+  margin-top: 8px;
+  max-width: 65ch;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.settings-group {
+  margin-top: 24px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-hairline);
+  overflow: hidden;
+}
+.settings-group li + li {
+  position: relative;
+}
+.settings-group li + li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--spacing-inset);
+  right: 0;
+  height: 1px;
+  background: var(--color-hairline);
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--spacing-row);
+  padding: 0 var(--spacing-inset);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 700;
+  color: var(--color-fg);
+  text-decoration: none;
+}
+.settings-row:active {
+  background: var(--color-raised);
+}
+.settings-chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--color-muted);
+}
+.btn-gold {
+  --lip-c: var(--color-lip-gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--spacing-control);
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 700;
+  box-shadow: 0 3px 0 var(--lip-c);
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out;
+}
+.btn-gold:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--lip-c);
+}
+
+/* Interim home (slice 1): the legacy app in a box that keeps its fixed layers off the bar.
+   The transform makes the box the containing block for its `position: fixed` children. */
+.screen-legacy {
+  background: #000;
+}
+.legacy-home {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bar-top) + 12px);
+  transform: translateZ(0);
+  overflow: hidden;
+  background: #000;
+}
+.legacy-home[data-immersive] {
+  bottom: 0;
+}
+
+@media (min-width: 900px) {
+  .tabbar {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: 0;
+    width: var(--spacing-rail);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: calc(env(safe-area-inset-top) + 16px) 12px 16px;
+    border-radius: 0;
+    background-image: none;
+    box-shadow: inset -1px 0 0 var(--color-hairline);
+  }
+  .tabbar[data-hidden] {
+    transform: translateX(-24px);
+  }
+  .tab {
+    height: 64px;
+    border-radius: var(--radius-panel);
+  }
+  .tab-rail-only {
+    display: flex;
+    margin-top: auto;
+  }
+  .screen,
+  .legacy-home {
+    left: var(--spacing-rail);
+  }
+  .legacy-home {
+    bottom: 0;
+  }
+  .legacy-home[data-immersive] {
+    left: 0;
+  }
+}
+
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--color-fg);
+  }
+  .tab[aria-current="page"]:hover {
+    color: var(--color-gold);
+  }
+  .settings-row:hover {
+    background: var(--color-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabbar,
+  .btn-gold {
+    transition: none;
+  }
+}
+
+/* Push / Back / tab motion (DESIGN.md Motion), driven by src/nav/transition.ts. */
+@keyframes nav-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes nav-sink {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+:root[data-nav]::view-transition-group(root) {
+  animation-duration: 150ms;
+}
+:root[data-nav="push"]::view-transition-new(root) {
+  animation: nav-rise 150ms ease-out both;
+}
+:root[data-nav="push"]::view-transition-old(root) {
+  animation: nav-fade-out 150ms ease-out both;
+}
+:root[data-nav="back"]::view-transition-new(root) {
+  animation: nav-fade-in 150ms ease-out both;
+}
+:root[data-nav="back"]::view-transition-old(root) {
+  animation: nav-sink 150ms ease-out both;
+}
+:root[data-nav="tab"]::view-transition-new(root) {
+  animation: nav-fade-in 120ms ease-out both;
+}
+:root[data-nav="tab"]::view-transition-old(root) {
+  animation: nav-fade-out 120ms ease-out both;
 }

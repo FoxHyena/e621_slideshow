@@ -54,6 +54,7 @@ import { ImageIcon, Loader, recSteps, stepText, VideoIcon } from "./Loader";
 import SettingsPanel from "./SettingsPanel";
 import Stage from "./Stage";
 import { useRecommendations } from "./useRecommendations";
+import { ownState } from "@/nav/history";
 
 const HIDE_CONTROLS_MS = 2500;
 /** A touch drag at least this far sideways changes the slide. */
@@ -119,7 +120,14 @@ function launchedSearch(tags: string): SearchSettings {
   return { ...DEFAULT_SEARCH, tags, blacklist: storage.loadSearch().blacklist };
 }
 
-export default function App() {
+export default function App({
+  onScreen = true,
+  onImmersive,
+}: {
+  /** false while the shell shows another screen: no timer, no keys */
+  onScreen?: boolean;
+  onImmersive?: (on: boolean) => void;
+} = {}) {
   // ---- persisted settings -------------------------------------------------
   // A share link's settings apply for this visit; they're saved only once the visitor edits something.
   const [shared] = useState(() => decodeShare(new URLSearchParams(location.search)));
@@ -134,7 +142,8 @@ export default function App() {
   const [saved, setSaved] = useState<SavedSearch[]>(storage.loadSaved);
   const [history, setHistory] = useState<HistoryEntry[]>(storage.loadHistory);
   // A link's sign-in is used for this tab only: never saved, and it doesn't replace a saved key.
-  const [linkCreds] = useState(() => decodeShareCreds(location.hash));
+  // The shell's head script moved the fragment into memory before hydration (src/app/link-fragment.ts).
+  const [linkCreds] = useState(() => decodeShareCreds(window.__e6link ?? location.hash));
   const [linkSession, setLinkSession] = useState(linkCreds !== null);
   const [creds, setCreds] = useState<Credentials | null>(() => linkCreds ?? storage.loadCredentials());
   const [remember, setRemember] = useState(() => !linkCreds && storage.loadCredentials() !== null);
@@ -428,7 +437,8 @@ export default function App() {
     if (!(shared || launch || linkCreds) || sharedStarted.current) return;
     sharedStarted.current = true;
     // Also drops a sign-in fragment, so the key doesn't sit in the address bar or history.
-    window.history.replaceState(null, "", location.pathname);
+    // Keeps the entry's state: the shell's navigation key lives there (src/nav/history.ts).
+    window.history.replaceState(ownState(), "", location.pathname);
     if (launch) {
       apply(true);
       return;
@@ -440,11 +450,15 @@ export default function App() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => onShared(), []);
 
+  // The shell hides its tab bar while the show or a browse view fills the screen.
+  const immersive = !panelOpen && queue !== null;
+  useEffect(() => onImmersive?.(immersive), [immersive, onImmersive]);
+
   const shareLink = async () => {
     if (!active) return;
     const withSignIn = shareSignIn && !!creds && !!user && !linkSession;
     const hash = withSignIn ? `#${encodeShareCreds(creds)}` : "";
-    const url = `${location.origin}${location.pathname}?${encodeShare(effective(active.search), playback)}${hash}`;
+    const url = `${location.origin}/?${encodeShare(effective(active.search), playback)}${hash}`;
     try {
       await navigator.clipboard.writeText(url);
       showToast(withSignIn ? "Share link copied, with your sign-in" : "Share link copied");
@@ -549,7 +563,7 @@ export default function App() {
     return Math.max(base, Math.min(len, cap) * 1000);
   }, [current, ready, playback.intervalSec, playback.videoMaxSec]);
 
-  const running = isReady && !paused && !panelOpen && !infoOpen && !browsing;
+  const running = onScreen && isReady && !paused && !panelOpen && !infoOpen && !browsing;
   const timer = useRef<{ key: string; remaining: number }>({ key: "", remaining: 0 });
   const timerKey = `${current?.id}:${durationMs}`;
   const onTimerDone = useEffectEvent(() => void next());
@@ -570,7 +584,7 @@ export default function App() {
     showToast(`Post #${id} didn't load, skipped`);
     void next();
   });
-  const stallWatch = !!current && !isReady && !paused && !panelOpen && !browsing;
+  const stallWatch = onScreen && !!current && !isReady && !paused && !panelOpen && !browsing;
   useEffect(() => {
     if (!stallWatch || !current) return;
     const id = current.id;
@@ -689,7 +703,8 @@ export default function App() {
       needMore: () => void q.ensure(q.posts.length - 1),
     };
     setArtistFeeds([...openArtists, feed]);
-    window.history.pushState({ artistFeed: feed.id }, "");
+    // Carries the shell's entry state along, so Back into this entry stays on the same screen.
+    window.history.pushState({ ...ownState(), artistFeed: feed.id }, "");
     artistHistory.current++;
   };
 
@@ -757,6 +772,8 @@ export default function App() {
 
   // ---- keyboard -----------------------------------------------------------
   const onKey = useEffectEvent((e: KeyboardEvent) => {
+    // Another screen is showing: its keys aren't ours.
+    if (!onScreen) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (panelOpen) {
       if (e.key === "Escape") {
