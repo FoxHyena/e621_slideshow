@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-26T01:55:14+00:00",
+  "generatedAt": "2026-11-26T05:31:00+00:00",
   "title": "Design System: e621 Slideshow",
   "extensions": {
     "colorMeta": {
@@ -10,13 +10,28 @@
         "canonical": "oklch(16.9% 0.047 255.3)",
         "tonalRamp": [
           "#040B16",
-          "#1A2635",
-          "#344356",
-          "#51637A",
-          "#71849D",
-          "#95A7BD",
-          "#BCCBDF",
-          "#E3F0FF"
+          "#1C2736",
+          "#384659",
+          "#56687F",
+          "#778BA6",
+          "#9DB0C9",
+          "#C1D3EA",
+          "#E5F0FE"
+        ]
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "Well",
+        "canonical": "oklch(23.4% 0.063 259.2)",
+        "tonalRamp": [
+          "#030B1A",
+          "#19273B",
+          "#354660",
+          "#536787",
+          "#738AAF",
+          "#99AFD2",
+          "#BED2F2",
+          "#E5EFFE"
         ]
       },
       "panel": {
@@ -24,14 +39,29 @@
         "displayName": "Post Panel Navy",
         "canonical": "oklch(30.7% 0.077 258.4)",
         "tonalRamp": [
-          "#020B1D",
-          "#14253F",
-          "#2D4263",
-          "#47628A",
-          "#6784AE",
-          "#8DA7CD",
-          "#B4CBEC",
-          "#DDF0FF"
+          "#020A1E",
+          "#162740",
+          "#304666",
+          "#4D678E",
+          "#6C8BB8",
+          "#94B0DA",
+          "#B9D3F9",
+          "#E5EFFE"
+        ]
+      },
+      "bar": {
+        "role": "neutral",
+        "displayName": "Bar Navy",
+        "canonical": "oklch(33.5% 0.082 258.4)",
+        "tonalRamp": [
+          "#010A1F",
+          "#142641",
+          "#2F4568",
+          "#4C6790",
+          "#6B8ABA",
+          "#92B0DC",
+          "#B8D3FC",
+          "#E6EFFE"
         ]
       },
       "raised": {
@@ -39,30 +69,35 @@
         "displayName": "Raised Navy",
         "canonical": "oklch(35.7% 0.083 258.2)",
         "tonalRamp": [
-          "#010A1E",
-          "#132540",
-          "#2B4265",
-          "#45628D",
-          "#6584B1",
-          "#8BA7D0",
-          "#B3CBEF",
-          "#DCF0FF"
+          "#010A1F",
+          "#142642",
+          "#2E4668",
+          "#4B6791",
+          "#6A8BBB",
+          "#92B0DD",
+          "#B7D3FC",
+          "#E5EFFE"
         ]
       },
       "raised-hi": {
         "role": "neutral",
         "displayName": "Raised Highlight",
-        "canonical": "oklch(41.3% 0.091 258.1)",
+        "canonical": "oklch(42.1% 0.094 258.3)",
         "tonalRamp": [
-          "#010A20",
-          "#102543",
-          "#284269",
-          "#426291",
-          "#6284B6",
-          "#88A7D4",
-          "#B0CBF3",
-          "#DAF0FF"
+          "#000A21",
+          "#112645",
+          "#2B456D",
+          "#476796",
+          "#668AC2",
+          "#8EB0E3",
+          "#B6D3FF",
+          "#E6EFFE"
         ]
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "Quiet Outline",
+        "canonical": "rgba(180,199,217,.22), 1.5px inset ring"
       },
       "text": {
         "role": "neutral",
@@ -70,12 +105,12 @@
         "canonical": "oklch(100.0% 0.000 89.9)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
           "#EEEEEE"
         ]
       },
@@ -85,13 +120,13 @@
         "canonical": "oklch(82.1% 0.033 246.8)",
         "tonalRamp": [
           "#050C13",
-          "#1C2630",
-          "#374450",
-          "#536372",
-          "#748594",
-          "#98A7B5",
-          "#BECBD7",
-          "#E5F0FB"
+          "#1E2831",
+          "#3A4752",
+          "#596876",
+          "#7A8B9C",
+          "#A0B0C0",
+          "#C4D3E1",
+          "#E3F0FE"
         ]
       },
       "muted": {
@@ -100,13 +135,13 @@
         "canonical": "oklch(74.4% 0.032 258.9)",
         "tonalRamp": [
           "#070B13",
-          "#1F2530",
-          "#3A4350",
-          "#576273",
-          "#788395",
-          "#9BA6B6",
-          "#C1CAD8",
-          "#E7EFFB"
+          "#202731",
+          "#3D4653",
+          "#5C6777",
+          "#7E8A9D",
+          "#A3AFC0",
+          "#C7D2E2",
+          "#E6EFFE"
         ]
       },
       "gold": {
@@ -114,14 +149,14 @@
         "displayName": "Hexagon Gold",
         "canonical": "oklch(83.0% 0.145 92.7)",
         "tonalRamp": [
-          "#170700",
-          "#362100",
-          "#583E00",
-          "#7C5D00",
-          "#9F7F00",
-          "#BFA344",
-          "#E0C87B",
-          "#FFEEAF"
+          "#100B00",
+          "#2F2503",
+          "#534309",
+          "#7A6412",
+          "#A38612",
+          "#CAAB40",
+          "#EBCF76",
+          "#FFEEB8"
         ]
       },
       "on-gold": {
@@ -130,13 +165,13 @@
         "canonical": "oklch(16.9% 0.047 255.3)",
         "tonalRamp": [
           "#040B16",
-          "#1A2635",
-          "#344356",
-          "#51637A",
-          "#71849D",
-          "#95A7BD",
-          "#BCCBDF",
-          "#E3F0FF"
+          "#1C2736",
+          "#384659",
+          "#56687F",
+          "#778BA6",
+          "#9DB0C9",
+          "#C1D3EA",
+          "#E5F0FE"
         ]
       },
       "lip-gold": {
@@ -144,45 +179,85 @@
         "displayName": "Gold Lip",
         "canonical": "oklch(63.7% 0.121 89.7)",
         "tonalRamp": [
-          "#160800",
-          "#352100",
-          "#563E00",
-          "#7A5D00",
-          "#9D7E20",
-          "#BDA259",
-          "#DEC78A",
-          "#FFEDBB"
+          "#100A00",
+          "#312501",
+          "#554205",
+          "#7D6309",
+          "#A5851E",
+          "#C8AB5A",
+          "#E9CF88",
+          "#FEEDC2"
         ]
       },
       "lip-navy": {
         "role": "neutral",
         "displayName": "Lip Navy",
-        "canonical": "oklch(24.2% 0.065 259.0)",
+        "canonical": "oklch(22.6% 0.061 260.4)",
         "tonalRamp": [
-          "#030B1A",
-          "#18253B",
-          "#31435E",
-          "#4C6284",
-          "#6C84A7",
-          "#91A6C7",
-          "#B8CAE7",
-          "#E0F0FF"
+          "#040B1A",
+          "#1A273B",
+          "#36455F",
+          "#546786",
+          "#748AAE",
+          "#9BAFD1",
+          "#BFD2F1",
+          "#E6EFFE"
         ]
+      },
+      "fav-on": {
+        "role": "secondary",
+        "displayName": "Favourited Plum",
+        "canonical": "oklch(38.4% 0.070 322.7)",
+        "tonalRamp": [
+          "#130515",
+          "#321E34",
+          "#533B56",
+          "#785A7B",
+          "#9E7BA2",
+          "#C1A1C5",
+          "#E3C6E6",
+          "#FCE6FE"
+        ]
+      },
+      "lip-fav": {
+        "role": "secondary",
+        "displayName": "Plum Lip",
+        "canonical": "oklch(25.0% 0.053 308.6)",
+        "tonalRamp": [
+          "#0F0715",
+          "#2B2234",
+          "#4B3F56",
+          "#6E5F7B",
+          "#9281A2",
+          "#B6A6C5",
+          "#D9CAE6",
+          "#F4E9FE"
+        ]
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Chrome Glass",
+        "canonical": "rgba(21,47,86,.88) over #0B1F3E, blur(24px) saturate(1.6)"
       },
       "glass-base": {
         "role": "neutral",
         "displayName": "Glass Base",
         "canonical": "oklch(24.2% 0.065 259.0)",
         "tonalRamp": [
-          "#030B1A",
-          "#18253B",
-          "#31435E",
-          "#4C6284",
-          "#6C84A7",
-          "#91A6C7",
-          "#B8CAE7",
-          "#E0F0FF"
+          "#030B1B",
+          "#19273C",
+          "#344661",
+          "#526788",
+          "#728AB0",
+          "#98AFD3",
+          "#BDD2F3",
+          "#E5EFFF"
         ]
+      },
+      "glass-over-art": {
+        "role": "neutral",
+        "displayName": "Over-art Glass",
+        "canonical": "rgba(2,15,35,.55), blur(12px), inset ring rgba(255,255,255,.16)"
       },
       "player-ground": {
         "role": "neutral",
@@ -190,12 +265,12 @@
         "canonical": "oklch(0.0% 0.000 0.0)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
           "#EEEEEE"
         ]
       },
@@ -204,14 +279,14 @@
         "displayName": "Tag: Artist",
         "canonical": "oklch(79.1% 0.163 79.0)",
         "tonalRamp": [
-          "#1E0200",
-          "#401900",
-          "#663400",
-          "#8E5200",
-          "#B27400",
-          "#D19A32",
-          "#F1C171",
-          "#FFE8A8"
+          "#120900",
+          "#342302",
+          "#5B3F05",
+          "#855E0B",
+          "#B37E04",
+          "#DEA22A",
+          "#FEC769",
+          "#FEECD0"
         ]
       },
       "tag-character": {
@@ -219,14 +294,14 @@
         "displayName": "Tag: Character",
         "canonical": "oklch(72.4% 0.246 142.5)",
         "tonalRamp": [
-          "#001500",
-          "#003500",
-          "#005800",
-          "#007D00",
-          "#00A100",
-          "#48C342",
-          "#82E57B",
-          "#B7FFB0"
+          "#001000",
+          "#033002",
+          "#095507",
+          "#107C0E",
+          "#0BA609",
+          "#44CE3E",
+          "#7DF075",
+          "#CCFFC7"
         ]
       },
       "tag-species": {
@@ -234,14 +309,14 @@
         "displayName": "Tag: Species",
         "canonical": "oklch(75.7% 0.128 43.8)",
         "tonalRamp": [
-          "#210000",
-          "#451100",
-          "#6D2B08",
-          "#974620",
-          "#BD6843",
-          "#DC8F6F",
-          "#FBB79B",
-          "#FFE0C8"
+          "#1A0400",
+          "#431702",
+          "#702F0F",
+          "#9B4D29",
+          "#C76D45",
+          "#EA9672",
+          "#FCC2AA",
+          "#FFE9E1"
         ]
       },
       "tag-general": {
@@ -250,13 +325,13 @@
         "canonical": "oklch(82.1% 0.033 246.8)",
         "tonalRamp": [
           "#050C13",
-          "#1C2630",
-          "#374450",
-          "#536372",
-          "#748594",
-          "#98A7B5",
-          "#BECBD7",
-          "#E5F0FB"
+          "#1E2831",
+          "#3A4752",
+          "#596876",
+          "#7A8B9C",
+          "#A0B0C0",
+          "#C4D3E1",
+          "#E3F0FE"
         ]
       },
       "tag-meta": {
@@ -265,13 +340,43 @@
         "canonical": "oklch(100.0% 0.000 89.9)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
           "#EEEEEE"
+        ]
+      },
+      "tag-copyright": {
+        "role": "tertiary",
+        "displayName": "Tag: Copyright",
+        "canonical": "oklch(75.2% 0.197 327.3)",
+        "tonalRamp": [
+          "#190019",
+          "#420543",
+          "#6D176F",
+          "#983599",
+          "#C454C5",
+          "#E782E6",
+          "#FDB4FB",
+          "#FEE6FD"
+        ]
+      },
+      "tag-lore": {
+        "role": "tertiary",
+        "displayName": "Tag: Lore",
+        "canonical": "oklch(79.4% 0.199 143.4)",
+        "tonalRamp": [
+          "#001001",
+          "#013003",
+          "#03550A",
+          "#057C12",
+          "#1DA526",
+          "#60C95F",
+          "#8FEB8C",
+          "#CBFFC8"
         ]
       },
       "score": {
@@ -279,14 +384,14 @@
         "displayName": "Score Green",
         "canonical": "oklch(72.8% 0.153 146.3)",
         "tonalRamp": [
-          "#001300",
-          "#003100",
-          "#005210",
-          "#0E7528",
-          "#3D984A",
-          "#6EBA75",
-          "#9CDCA0",
-          "#CAFFCD"
+          "#001002",
+          "#02300C",
+          "#08541B",
+          "#1E7A30",
+          "#3EA14D",
+          "#71C579",
+          "#9CE6A2",
+          "#C9FFCC"
         ]
       },
       "heart": {
@@ -294,14 +399,14 @@
         "displayName": "Favourite Pink",
         "canonical": "oklch(76.4% 0.142 15.1)",
         "tonalRamp": [
-          "#230002",
-          "#490515",
-          "#72202E",
-          "#9E3A48",
-          "#C55D68",
-          "#E4868E",
-          "#FFAFB5",
-          "#FFD9DD"
+          "#1F0004",
+          "#4B0716",
+          "#752531",
+          "#A2424E",
+          "#D0616D",
+          "#F28B94",
+          "#FDBEC2",
+          "#FEE9E9"
         ]
       },
       "danger": {
@@ -309,30 +414,90 @@
         "displayName": "Danger Rose",
         "canonical": "oklch(75.6% 0.109 19.9)",
         "tonalRamp": [
-          "#1F0002",
-          "#431215",
-          "#692B2E",
-          "#924749",
-          "#B86869",
-          "#D78F8E",
-          "#F7B6B5",
-          "#FFDFDE"
+          "#1E0003",
+          "#441417",
+          "#6C2F31",
+          "#964D4E",
+          "#C26D6E",
+          "#E59595",
+          "#FEBEBD",
+          "#FEE9E8"
         ]
       },
-      "hairline": {
-        "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "rgba(180,199,217,.14)"
+      "rating-questionable": {
+        "role": "tertiary",
+        "displayName": "Rating Yellow",
+        "canonical": "oklch(85.5% 0.149 101.4)",
+        "tonalRamp": [
+          "#0E0B00",
+          "#2C2703",
+          "#4E4609",
+          "#726711",
+          "#9A8B10",
+          "#C0B040",
+          "#E1D475",
+          "#FDF19E"
+        ]
       },
-      "glass": {
-        "role": "neutral",
-        "displayName": "Chrome Glass",
-        "canonical": "rgba(21,47,86,.88) over #0B1F3E, blur(24px) saturate(1.6)"
+      "goo": {
+        "role": "tertiary",
+        "displayName": "Goo White",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
       },
-      "glass-over-art": {
-        "role": "neutral",
-        "displayName": "Over-art Glass",
-        "canonical": "rgba(2,15,35,.55), blur(16px), inset ring rgba(255,255,255,.16)"
+      "goo-aged": {
+        "role": "tertiary",
+        "displayName": "Goo Cream",
+        "canonical": "oklch(92.1% 0.081 97.7)",
+        "tonalRamp": [
+          "#0F0B00",
+          "#2E2601",
+          "#4E4518",
+          "#716633",
+          "#968A4F",
+          "#BAAF7A",
+          "#DCD2A3",
+          "#F8F0C5"
+        ]
+      },
+      "goo-ink": {
+        "role": "tertiary",
+        "displayName": "Goo Ink",
+        "canonical": "oklch(43.8% 0.083 258.9)",
+        "tonalRamp": [
+          "#010A1F",
+          "#152642",
+          "#2F4568",
+          "#4C6791",
+          "#6B8ABB",
+          "#92B0DD",
+          "#B8D3FC",
+          "#E6EFFE"
+        ]
+      },
+      "goo-ink-active": {
+        "role": "tertiary",
+        "displayName": "Goo Ink, current tab",
+        "canonical": "oklch(23.4% 0.063 259.2)",
+        "tonalRamp": [
+          "#030B1A",
+          "#19273B",
+          "#354660",
+          "#536787",
+          "#738AAF",
+          "#99AFD2",
+          "#BED2F2",
+          "#E5EFFE"
+        ]
       }
     },
     "typographyMeta": {
@@ -342,62 +507,94 @@
       },
       "section": {
         "displayName": "Section",
-        "purpose": "Section headers, sheet titles, landing headline."
+        "purpose": "Section headers, sheet titles."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Names, button labels, stat numbers."
+        "purpose": "Artist names, caught-up line, compact bar title, 44 button labels."
       },
       "callout": {
         "displayName": "Callout",
-        "purpose": "Settings row labels, See all, Sign out, bold subtitle counts."
+        "purpose": "Fav count, score, burst row, new-posts pill, See all, sheet rows, bold counts."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Filter chips."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Subtitles, steps, inputs."
+        "purpose": "Subtitles, inputs, steps."
       },
       "footnote": {
         "displayName": "Footnote",
-        "purpose": "Times, ids, tags, row subtitles."
+        "purpose": "Time and post number under a name, row values."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Tag text, in the e621 category colour."
       },
       "footnote-rounded": {
         "displayName": "Footnote rounded",
-        "purpose": "Counts, chips, pills, labels; tabular figures."
+        "purpose": "New, Follow, +N tag, video length, Play count; tabular figures."
       },
       "tab": {
         "displayName": "Tab",
-        "purpose": "Tab bar labels and badges only."
+        "purpose": "Tab labels and badges, the +N artists pill, the rating letter."
       },
       "handle": {
         "displayName": "Handle",
-        "purpose": "Artist handle under the hero name, in link blue."
+        "purpose": "Raw e621 name under the artist name on the artist page."
+      },
+      "post-id": {
+        "displayName": "Post id",
+        "purpose": "Post number in the ... sheet."
       }
     },
     "shadows": [
       {
-        "name": "hairline",
-        "value": "inset 0 0 0 1px rgba(180,199,217,.14)",
-        "purpose": "Outline on panels, chips, toolbar circles, inputs."
+        "name": "lit",
+        "value": "inset 0 1px 0 rgba(255,255,255,.09)",
+        "purpose": "Top light on raised things and panels."
+      },
+      {
+        "name": "lit-gold",
+        "value": "inset 0 1px 0 rgba(255,255,255,.5)",
+        "purpose": "Top light on gold."
+      },
+      {
+        "name": "lit-fav",
+        "value": "inset 0 1px 0 rgba(255,190,200,.22)",
+        "purpose": "Top light on the favourited pill."
+      },
+      {
+        "name": "lit-b",
+        "value": "inset 0 -1px 0 rgba(0,0,0,.25)",
+        "purpose": "Bottom shade on post panels."
       },
       {
         "name": "lip",
         "value": "0 3px 0 var(--lip-c)",
-        "purpose": "Pressable edge on 44+ controls; --lip-c is #A8871F under gold, #0B1F3E under navy."
+        "purpose": "Pressable edge; 4px on Play, 2px on Follow. --lip-c is #0A1B38 under navy, #A8871F under gold, #291A35 under the favourited pill."
       },
       {
-        "name": "lip-s",
-        "value": "0 2px 0 var(--lip-c)",
-        "purpose": "Pressable edge on 32 controls (fav pill, Follow, compact gold)."
+        "name": "sunk",
+        "value": "inset 0 1px 0 rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05)",
+        "purpose": "Tags and other wells."
       },
       {
-        "name": "floating-bar",
-        "value": "inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.45)",
-        "purpose": "Tab bar only."
+        "name": "sunk-art",
+        "value": "0 0 0 1px rgba(2,15,35,.6), 0 1.5px 0 rgba(255,255,255,.06)",
+        "purpose": "The picture in a panel."
       },
       {
-        "name": "sheet-top",
-        "value": "inset 0 1px 0 rgba(255,255,255,.08)",
-        "purpose": "Top edge of sheets, over a rgba(0,0,0,.55) dim."
+        "name": "float",
+        "value": "0 14px 28px rgba(0,0,0,.45)",
+        "purpose": "Under Play (0 8px 18px pressed). The new-posts pill uses 0 12px 24px rgba(0,0,0,.4)."
+      },
+      {
+        "name": "tab-bar",
+        "value": "outline copy 10px lower, blur(14px), 50% black; 1px rgba(255,255,255,.16) top edge stroke",
+        "purpose": "The tab bar tube only."
       },
       {
         "name": "selected-ring",
@@ -405,66 +602,151 @@
         "purpose": "Selected filter chip."
       },
       {
+        "name": "quiet-outline",
+        "value": "inset 0 0 0 1.5px rgba(180,199,217,.22)",
+        "purpose": "Following and the +N tag."
+      },
+      {
         "name": "glass-over-art-ring",
         "value": "inset 0 0 0 1px rgba(255,255,255,.16)",
-        "purpose": "Player buttons and count pill."
+        "purpose": "Video play disc and mute; player buttons."
       }
     ],
     "motion": [
       {
         "name": "lip-press",
-        "value": "100ms ease-out",
-        "purpose": "translateY(lip) and lip to 0 on :active. Mock."
+        "value": "100 ms ease-out",
+        "purpose": "translateY(lip) and the lip closing to 0. Mock."
       },
       {
-        "name": "pop",
-        "value": "300ms cubic-bezier(.2,.9,.3,1.4)",
-        "purpose": "Favourite heart scale .8 → 1.25 → 1. The only overshoot. Mock."
+        "name": "chip-press",
+        "value": "100 ms ease-out",
+        "purpose": "scale to .96. Mock."
       },
       {
-        "name": "wiggle",
-        "value": "360ms ease-out",
-        "purpose": "Follow toggle: rotate -3deg → 2deg → 0. Mock."
+        "name": "favourite-pop",
+        "value": "320 ms cubic-bezier(.2,.9,.3,1.4)",
+        "purpose": "heart scale .7 → 1.3 → 1. Mock."
       },
       {
-        "name": "fab-hide",
-        "value": "200ms ease-out; returns after 1000ms idle",
-        "purpose": "Play button opacity and translateY(24px) while scrolling down. Mock."
+        "name": "heart-goo-drip",
+        "value": "720 ms; sag cubic-bezier(.25,1.6,.45,1), pull back cubic-bezier(.5,0,.2,1)",
+        "purpose": "bead, three necks and blobs under the pill; the drop leaves for the tab bar at 380 ms. Mock."
       },
       {
-        "name": "tab-switch",
-        "value": "120ms fade",
-        "purpose": "Spec (not in mock), UX.md §7."
+        "name": "double-tap-heart",
+        "value": "640 ms",
+        "purpose": "one 88 heart over the picture. Mock."
+      },
+      {
+        "name": "mark-spin",
+        "value": "600 ms cubic-bezier(.3,1.5,.5,1)",
+        "purpose": "one turn, on favourite and on follow. Mock."
+      },
+      {
+        "name": "follow-wiggle",
+        "value": "360 ms ease-out",
+        "purpose": "rotate −3° → 2° → 0. Mock."
+      },
+      {
+        "name": "follow-dots",
+        "value": "480 ms",
+        "purpose": "six 5 px dots, from the mark's rim, 30 px out. Mock."
+      },
+      {
+        "name": "tab-capsule",
+        "value": "500 ms cubic-bezier(.3,1.35,.5,1)",
+        "purpose": "rotation about the bend's centre. Mock."
+      },
+      {
+        "name": "tab-icon-hop",
+        "value": "420 ms cubic-bezier(.3,1.5,.5,1)",
+        "purpose": "up 5 px, scale 1.12; label colour 200 ms. Mock."
+      },
+      {
+        "name": "tab-bar-scroll",
+        "value": "spring (stiffness 210, damping 21); rubber band past the ends",
+        "purpose": "rail rotation. Mock."
+      },
+      {
+        "name": "goo-spurt-secret-tab",
+        "value": "400 ms squeeze; ten drops in spurts of 4, 3, 3, 133 ms apart, each 240 ms plus 1.4 ms per px travelled",
+        "purpose": "drops on ballistic arcs, stretched along their speed. Mock."
+      },
+      {
+        "name": "goo-wipe",
+        "value": "900 ms blade, then a 520 ms gleam",
+        "purpose": "blade rotation, flung drops, gleam. Mock."
+      },
+      {
+        "name": "play-hide-return",
+        "value": "200 ms ease-out; returns after 1 s idle",
+        "purpose": "opacity and translateY(24px). Mock."
+      },
+      {
+        "name": "compact-bar",
+        "value": "150 ms ease-out, past 64 px of scroll",
+        "purpose": "opacity. Mock."
+      },
+      {
+        "name": "tuck",
+        "value": "scroll-driven",
+        "purpose": "card scale 95% ↔ 100%, 16 px rise, opacity 55% ↔ 100%. Mock."
+      },
+      {
+        "name": "skeleton-shimmer",
+        "value": "1.4 s ease-in-out, looping",
+        "purpose": "a light band crossing each well shape. Mock."
+      },
+      {
+        "name": "caught-up",
+        "value": "once, on entering view",
+        "purpose": "app mark turns one notch (45°). Mock."
+      },
+      {
+        "name": "new-posts-pill",
+        "value": "slides in under the header; posts insert with a slide-down, keeping the reading position",
+        "purpose": "translateY, opacity. Spec (not in mock)."
+      },
+      {
+        "name": "tab-content",
+        "value": "120 ms fade",
+        "purpose": "content opacity. Spec (not in mock)."
       },
       {
         "name": "push-back",
-        "value": "150ms cross-fade + 8px rise",
-        "purpose": "Spec (not in mock); gesture back never animates."
+        "value": "150 ms cross-fade + 8 px rise; gesture back never animates",
+        "purpose": "opacity, translateY. Spec (not in mock)."
       },
       {
-        "name": "player-open",
-        "value": "200ms fade-up",
-        "purpose": "Spec (not in mock)."
+        "name": "player-open-close",
+        "value": "200 ms fade-up from the card / fade out",
+        "purpose": "opacity, translateY. Spec (not in mock)."
       },
       {
-        "name": "player-controls-autohide",
-        "value": "2500ms",
-        "purpose": "Spec (not in mock); stays while paused or focused."
+        "name": "player-controls",
+        "value": "auto-hide after 2.5 s playing; stay while paused or focused; 250 ms double-tap guard",
+        "purpose": "opacity. Spec (not in mock)."
       },
       {
-        "name": "sheet",
-        "value": "spring; rubber-band drag to dismiss",
-        "purpose": "Spec (not in mock)."
+        "name": "sheets",
+        "value": "spring up; drag to dismiss with rubber-banding",
+        "purpose": "translateY. Spec (not in mock)."
       },
       {
-        "name": "toast",
-        "value": "6000ms",
-        "purpose": "Spec (not in mock); pauses on hover/focus."
+        "name": "pull-to-refresh",
+        "value": "indicator follows at half the finger; 144 px travel arms; spinner holds at 48 px for at least 400 ms",
+        "purpose": "translateY. Spec (not in mock)."
+      },
+      {
+        "name": "toasts",
+        "value": "stay 6 s, pause on hover or focus, role=\"status\"",
+        "purpose": "opacity, translateY. Spec (not in mock)."
       },
       {
         "name": "reduced-motion",
-        "value": "fades only",
-        "purpose": "No pop, wiggle, bounce, particles or slides; lip moves without transition; no video autoplay; player Classic."
+        "value": "instant",
+        "purpose": "No pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; goo still shows and updates in place."
       }
     ],
     "breakpoints": [
@@ -483,85 +765,102 @@
       "name": "Gold Button",
       "kind": "button",
       "refersTo": "button-gold",
-      "description": "The one main action per screen (Play all, Review, Sign in). 3 px gold lip sinks in 100 ms.",
-      "html": "<button class=\"ds-btn ds-btn-gold ds-lip\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg>Play all</button>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border:0;border-radius:999px;font:700 17px/22px var(--f-r);cursor:pointer}.ds-btn-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold)}.ds-btn-gold:hover{filter:brightness(1.05)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "The one main action per screen (Play all, Review, Sign in). Strong top light, gold lip closing in 100 ms.",
+      "html": "<button class=\"ds-btn ds-gold ds-lip\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.25 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L7.75 3.64A1 1 0 0 0 6.25 4.5Z\"/></svg>Play all</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);--lit:var(--lit-gold)}.ds-gold:hover{filter:brightness(1.05)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Tonal Button",
       "kind": "button",
       "refersTo": "button-tonal",
-      "description": "Secondary actions on navy, with a navy lip; green glyph when it means done.",
-      "html": "<button class=\"ds-btn ds-btn-tonal ds-lip\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border:0;border-radius:999px;font:700 17px/22px var(--f-r);cursor:pointer}.ds-btn-tonal{background:var(--raised);color:var(--fg)}.ds-btn-tonal svg{color:var(--score)}.ds-btn-tonal:hover{background:#244572} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "Secondary action: Raised Navy, top light, navy lip. 44 tall, or 36 compact.",
+      "html": "<button class=\"ds-btn ds-tonal ds-lip\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button> <button class=\"ds-btn ds-c ds-tonal ds-lip\">Sign in</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal:hover{background:var(--raised-hi)}.ds-tonal svg{color:var(--score)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Post Panel",
       "kind": "card",
       "refersTo": "post-panel",
-      "description": "Signature: e621 navy post box, artist line on top, one 12 inner edge for picture and text, fav pill, score, id and tags below. Nothing on the art.",
-      "html": "<article class=\"ds-post\"><div class=\"ds-l1\"><span class=\"ds-av\"></span><b>inkwell_fox</b><span class=\"ds-t\"><span class=\"ds-new\">New</span> · 2h ago</span></div><div class=\"ds-media\"></div><div class=\"ds-l2\"><button class=\"ds-fav ds-lip-s\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>1.2k</button><span class=\"ds-score\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg>340</span><span class=\"ds-id\">#4512345</span></div><div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember_(inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red_fox</button><button class=\"ds-tag\" style=\"color:#B4C7D9\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div></article>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-post{width:343px;padding:8px 8px 12px;border-radius:16px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--hair);color:var(--fg);font:400 15px/20px var(--f)}.ds-l1{height:44px;display:flex;align-items:center;gap:8px;padding:0 8px;margin:-4px 0 4px}.ds-l1 b{font:700 17px/22px var(--f-r)}.ds-t{font:400 13px/18px var(--f);color:var(--muted)}.ds-new{color:var(--gold);font-weight:600}.ds-av{width:24px;height:24px;border-radius:999px;background:repeating-conic-gradient(from 40deg,#3A1F2B 0 22.5deg,#F0B37E 0 45deg,#E8743B 0 67.5deg,#F0B37E 0 90deg)}.ds-media{aspect-ratio:1;border-radius:8px;background:linear-gradient(150deg,#3A1F2B,#6E3B5C)}.ds-l2{height:32px;display:flex;align-items:center;gap:12px;margin:12px 8px 0;font:700 13px/18px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;padding:0 12px 0 8px;background:var(--raised);color:var(--fg);box-shadow:inset 0 0 0 1px var(--hair)}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:rgba(255,138,149,.16)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-score{display:inline-flex;align-items:center;gap:4px;color:var(--score)}.ds-id{margin-left:auto;color:var(--muted);font:400 13px/18px var(--f)}.ds-tags{display:flex;gap:8px;margin:12px 8px 0;overflow:hidden}.ds-tag{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;font:400 13px/18px var(--f);background:var(--raised)}.ds-plus{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair);font:700 13px/18px var(--f-r)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "Signature: e621 navy post box with one 8 edge. Artist mark, name and New, time, post number on top; the picture sunk at 16 radius; tags in wells; score and the fav pill at the right end. Nothing on the art.",
+      "html": "<article class=\"ds-post\"><header class=\"ds-ph\"><span class=\"ds-av ds-new\"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M-0.658 -0.239A0.7 0.7 0 1 1 0.239 0.658\" fill=\"none\" stroke=\"#F3946B\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M0.314 0.264A0.41 0.41 0 1 1 -0.264 -0.314\" fill=\"none\" stroke=\"#E9F2FA\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#FF8A95\"/></svg></span><div class=\"ds-idn\"><b>inkwell fox</b><span><em>New</em> · 2h ago · #4512345</span></div><button class=\"ds-more\" aria-label=\"More\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1.2\"/><circle cx=\"19\" cy=\"12\" r=\"1.2\"/><circle cx=\"5\" cy=\"12\" r=\"1.2\"/></svg></button></header><div class=\"ds-art\"></div><div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember (inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red fox</button><button class=\"ds-tag\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div><footer class=\"ds-pf\"><span class=\"ds-score\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 19v-7H5.5L12 5l6.5 7H15v7Z\"/></svg>340</span><button class=\"ds-fav ds-lip\" aria-pressed=\"false\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button></footer></article>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-post{width:343px;padding:8px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);color:var(--fg)}.ds-ph{display:flex;align-items:center;gap:12px;height:36px;margin-bottom:8px}.ds-av.ds-new{position:relative}.ds-av.ds-new::after{content:'';position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:999px;background:var(--gold);box-shadow:0 0 0 2.5px var(--panel)}.ds-idn{flex:1;min-width:0;display:flex;flex-direction:column}.ds-idn b{font:600 17px/20px var(--f-r);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ds-idn span{font:400 13px/16px var(--f);color:var(--muted);font-variant-numeric:tabular-nums}.ds-idn em{font:500 13px/16px var(--f-r);color:var(--gold)}.ds-more{width:36px;height:36px;margin-right:-6px;display:grid;place-items:center;color:var(--muted);border-radius:999px}.ds-more:active{background:var(--well);color:var(--fg)}.ds-art{aspect-ratio:4/3;border-radius:16px;background:linear-gradient(160deg,#6E3B5C,#E8743B 60%,#F0B37E);box-shadow:0 0 0 1px rgba(2,15,35,.6),0 1.5px 0 rgba(255,255,255,.06)}.ds-pf{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-bottom:3px}.ds-score{display:inline-flex;align-items:center;gap:4px;font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-score svg{color:var(--score)}.ds-tags{display:flex;gap:8px;padding:8px 0}.ds-tag{height:28px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f);white-space:nowrap;color:#B4C7D9}.ds-tag:active{background:#071631}.ds-tag.ds-plus{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);color:var(--muted);font:500 13px/18px var(--f-r)}.ds-fav{height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 14px 0 11px;border-radius:999px;background:var(--raised);color:var(--fg);font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:var(--fav-on);--lip-c:var(--lip-fav);--lit:inset 0 1px 0 rgba(255,190,200,.22)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-pop svg{animation:ds-pop .32s cubic-bezier(.2,.9,.3,1.4)}@keyframes ds-pop{0%{transform:scale(.7)}60%{transform:scale(1.3)}100%{transform:scale(1)}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Fav Pill",
+      "kind": "button",
+      "refersTo": "fav-pill",
+      "description": "Raised 36 capsule: pink heart and count. On: plum fill with its own lip, filled heart, pop. In the app it also drips goo and sends a drop to the tab bar.",
+      "html": "<button class=\"ds-fav ds-lip\" aria-pressed=\"false\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button> <button class=\"ds-fav ds-lip ds-pop\" aria-pressed=\"true\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-fav{height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 14px 0 11px;border-radius:999px;background:var(--raised);color:var(--fg);font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:var(--fav-on);--lip-c:var(--lip-fav);--lit:inset 0 1px 0 rgba(255,190,200,.22)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-pop svg{animation:ds-pop .32s cubic-bezier(.2,.9,.3,1.4)}@keyframes ds-pop{0%{transform:scale(.7)}60%{transform:scale(1.3)}100%{transform:scale(1)}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Sunk 28 well, e621 category colour as text, names shown with spaces. +N is outlined, not sunk.",
+      "html": "<div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember (inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red fox</button><button class=\"ds-tag\" style=\"color:#EE7BEE\">inkwell tales</button><button class=\"ds-tag\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-tags{width:343px;box-sizing:border-box;padding:16px 8px!important;background:var(--panel);border-radius:24px;flex-wrap:wrap}.ds-tags{display:flex;gap:8px;padding:8px 0}.ds-tag{height:28px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f);white-space:nowrap;color:#B4C7D9}.ds-tag:active{background:#071631}.ds-tag.ds-plus{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);color:var(--muted);font:500 13px/18px var(--f-r)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Filter Chip",
       "kind": "chip",
       "refersTo": "filter-chip",
-      "description": "32 tall (44 hit), no lip. Selected = raised highlight with a 1.5 px gold ring and gold chevron.",
-      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-chip\" aria-pressed=\"false\">Media<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button><button class=\"ds-chip\" aria-pressed=\"true\">Sort: Top<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button></div>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-chip{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;background:var(--panel);color:var(--fg);box-shadow:inset 0 0 0 1px var(--hair)}.ds-chip svg{color:var(--muted)}.ds-chip:hover{background:#1A3762}.ds-chip[aria-pressed=true]{background:var(--raised-hi);box-shadow:inset 0 0 0 1.5px var(--gold)}.ds-chip[aria-pressed=true] svg{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "Panel capsule with top light, 36 tall. Selected: Raised Highlight with a 1.5 gold ring. Shrinks to 96% when pressed; no lip.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"false\">Media<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button> <button class=\"ds-chip\" aria-pressed=\"true\">Videos<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button> <button class=\"ds-chip\" aria-pressed=\"true\">Hide favorited</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-chip{height:36px;display:inline-flex;align-items:center;gap:4px;padding:0 14px;border-radius:999px;background:var(--panel);box-shadow:var(--lit);color:var(--fg);font:500 15px/20px var(--f-r);white-space:nowrap;transition:transform .1s ease-out}.ds-chip svg{color:var(--muted);margin-right:-4px}.ds-chip:active{transform:scale(.96)}.ds-chip[aria-pressed=true]{background:var(--raised-hi);box-shadow:var(--lit),inset 0 0 0 1.5px var(--gold)}.ds-chip[aria-pressed=true] svg{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Follow Pill",
       "kind": "chip",
       "refersTo": "follow-pill",
-      "description": "Raised navy with gold plus and a 2 px lip; Following = outline with green check. Toggling wiggles 360 ms.",
-      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-follow ds-lip-s\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Follow</button><button class=\"ds-follow ds-on\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button></div>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-follow{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;background:var(--raised);color:var(--fg)}.ds-follow svg{color:var(--gold)}.ds-follow.ds-on{background:transparent;box-shadow:inset 0 0 0 1px var(--hair)}.ds-follow.ds-on svg{color:var(--score)}.ds-wig{animation:ds-wig .36s ease-out}@keyframes ds-wig{25%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}100%{transform:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "Raised 36 capsule with a gold plus and a 2 lip. Following: outlined, green check. Toggling wiggles; following also throws six dots from the artist mark.",
+      "html": "<div class=\"ds-frow\"><span class=\"ds-av \"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M-0.658 -0.239A0.7 0.7 0 1 1 0.239 0.658\" fill=\"none\" stroke=\"#5EC06A\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M0.314 0.264A0.41 0.41 0 1 1 -0.264 -0.314\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#78DCA5\"/></svg></span><button class=\"ds-follow ds-lip\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Follow</button><button class=\"ds-follow ds-on\" aria-pressed=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-frow{display:inline-flex;align-items:center;gap:12px;padding:12px;background:var(--panel);border-radius:24px}.ds-follow{height:36px;display:inline-flex;align-items:center;gap:4px;padding:0 14px 0 10px;border-radius:999px;background:var(--raised);color:var(--fg);font:500 13px/18px var(--f-r);--lip:2px}.ds-follow svg{color:var(--gold)}.ds-follow.ds-on{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);padding:0 10px 0 8px}.ds-follow.ds-on:active{transform:none}.ds-follow.ds-on svg{color:var(--score)}.ds-wig{animation:ds-wig .36s ease-out}@keyframes ds-wig{25%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}100%{transform:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Play Button",
       "kind": "button",
       "refersTo": "play-fab",
-      "description": "56 gold circle bottom right with a count badge; the floating main action.",
-      "html": "<button class=\"ds-fab ds-lip\" aria-label=\"Play 12 new posts\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg><span class=\"ds-n\" aria-hidden=\"true\">12</span></button>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-fab{position:relative;width:56px;height:56px;border-radius:999px;border:0;display:grid;place-items:center;background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);cursor:pointer}.ds-fab svg{margin-left:3px}.ds-n{position:absolute;top:-4px;right:-4px;height:20px;min-width:20px;padding:0 6px;border-radius:999px;background:var(--ground);color:var(--fg);font:700 11px/20px var(--f-r);font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "Floating 56 gold circle at the bottom left: 4 lip, soft shadow, count badge ringed in gold.",
+      "html": "<button class=\"ds-fab\" aria-label=\"Play 12 new posts\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.25 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L7.75 3.64A1 1 0 0 0 6.25 4.5Z\"/></svg><span>12</span></button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-fab{position:relative;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:var(--gold);color:var(--on-gold);box-shadow:var(--lit-gold),0 4px 0 var(--lip-gold),0 14px 28px rgba(0,0,0,.45);transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-fab:active{transform:translateY(4px);box-shadow:var(--lit-gold),0 0 0 var(--lip-gold),0 8px 18px rgba(0,0,0,.45)}.ds-fab span{position:absolute;top:-6px;right:-6px;height:24px;min-width:24px;box-sizing:border-box;padding:0 6px;border-radius:999px;background:var(--ground);color:var(--fg);font:600 13px/24px var(--f-r);text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Tab Bar",
       "kind": "nav",
       "refersTo": "tab-bar",
-      "description": "Floating chrome-glass capsule; current tab in its own capsule in gold.",
-      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab ds-on\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"/><path d=\"M4 4a16 16 0 0 1 16 16\"/><circle cx=\"5\" cy=\"19\" r=\"1\"/></svg>Following</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l2 7 7 2-7 2-2 7-2-7-7-2 7-2z\"/></svg>For You</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/></svg>Artists</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><circle cx=\"12\" cy=\"12\" r=\"9\"/></svg>Settings</a></nav>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-tabbar{width:343px;height:62px;border-radius:999px;display:grid;grid-template-columns:repeat(4,1fr);padding:4px;background-color:#0B1F3E;background-image:linear-gradient(rgba(21,47,86,.88),rgba(21,47,86,.88));-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 rgba(255,255,255,.10),0 10px 30px rgba(0,0,0,.45)}.ds-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:999px;color:var(--link);font:700 11px/13px var(--f-r);text-decoration:none}.ds-tab:hover{color:var(--fg)}.ds-tab.ds-on{background:rgba(255,255,255,.10);color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+      "description": "One solid tube, 64 thick, bent so the middle rises 10. Tabs lie along the bend; the current tab sits in a Raised Highlight capsule that slides along the curve. In the app it also scrolls to a secret fifth tab and collects goo.",
+      "html": "<nav class=\"ds-tabbar\" aria-label=\"Tabs\"><span class=\"ds-tb-bg\" style=\"clip-path:path('M27.44 10.33A1010.01 1010.01 0 0 1 315.56 10.33A32.0 32.0 0 0 1 306.44 73.67A946.01 946.01 0 0 0 36.56 73.67A32.0 32.0 0 0 1 27.44 10.33Z')\"><span class=\"ds-tb-ind\" style=\"transform:rotate(-0.12805rad)\"></span></span><svg class=\"ds-tb-hi\" width=\"343\" height=\"74\" viewBox=\"0 0 343 74\" aria-hidden=\"true\"><path d=\"M27.44 10.33A1010.01 1010.01 0 0 1 315.56 10.33\" transform=\"translate(0 .5)\"/></svg><button class=\"ds-tab ds-on\" style=\"transform:rotate(-0.12805rad)\" aria-current=\"page\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 11a9 9 0 0 1 9 9\"/><path d=\"M4 4a16 16 0 0 1 16 16\"/><circle cx=\"5\" cy=\"19\" r=\"1\"/></svg><span>Following</span></button><button class=\"ds-tab\" style=\"transform:rotate(-0.04268rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"/></svg><span>For You</span></button><button class=\"ds-tab\" style=\"transform:rotate(0.04268rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg><span>Artists</span></button><button class=\"ds-tab\" style=\"transform:rotate(0.12805rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg><span>Settings</span></button></nav>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-tabbar{position:relative;width:343px;height:74px;--R:978.01px;--tw:83.49px}.ds-tb-bg{position:absolute;inset:0;background:var(--bar)}.ds-tb-hi{position:absolute;left:0;top:0;fill:none;stroke:rgba(255,255,255,.16);stroke-width:1;stroke-linecap:round;pointer-events:none}.ds-tb-ind,.ds-tab{position:absolute;top:5px;left:50%;height:54px;width:var(--tw);margin-left:calc(var(--tw) / -2);transform-origin:50% calc(27px + var(--R));border-radius:999px}.ds-tb-ind{background:var(--raised-hi);box-shadow:var(--lit);transition:transform .5s cubic-bezier(.3,1.35,.5,1)}.ds-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--link);font:500 11px/13px var(--f-r)}.ds-tab:hover{color:var(--fg)}.ds-tab.ds-on{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "44 field on the ground colour inside a sheet, 12 radius, hairline; label in rounded footnote.",
+      "description": "Carried over from v5.3 in v6 tokens: 44 field sunk into a sheet (Well fill, 12 radius), label in rounded footnote, gold ring on focus.",
       "html": "<label class=\"ds-field\"><span>Username</span><input class=\"ds-input\" value=\"wolfie\"></label>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-field{display:flex;flex-direction:column;gap:4px;width:311px;padding:16px;background:var(--panel);border-radius:24px}.ds-field span{font:700 13px/18px var(--f-r);color:var(--muted)}.ds-input{height:44px;border:0;border-radius:12px;background:var(--ground);box-shadow:inset 0 0 0 1px var(--hair);padding:0 12px;color:var(--fg);font:400 15px/20px var(--f)}.ds-input:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--gold)}"
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-field{display:flex;flex-direction:column;gap:4px;width:311px;padding:16px;background:var(--panel);box-shadow:var(--lit);border-radius:24px}.ds-field span{font:500 13px/18px var(--f-r);color:var(--muted)}.ds-input{height:44px;border:0;border-radius:12px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);padding:0 12px;color:var(--fg);font:400 15px/20px var(--f)}.ds-input:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     },
     {
       "name": "Settings Row",
       "kind": "custom",
-      "refersTo": "settings-row",
-      "description": "iOS-style grouped row: navy tile, rounded label, muted subtitle and value, chevron.",
-      "html": "<div class=\"ds-group\"><div class=\"ds-row\"><span class=\"ds-tile\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg></span><span class=\"ds-lbl\"><b>Slideshow</b><small>Style, timing, videos</small></span><span class=\"ds-val\">6 s</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 18 6-6-6-6\"/></svg></div></div>",
-      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-group{width:343px;border-radius:16px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--hair);overflow:hidden;color:var(--fg)}.ds-row{min-height:52px;display:flex;align-items:center;gap:12px;padding:0 12px 0 16px}.ds-row:hover{background:rgba(255,255,255,.03)}.ds-tile{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--link);background:var(--raised)}.ds-lbl{flex:1;display:flex;flex-direction:column}.ds-lbl b{font:700 15px/20px var(--f-r)}.ds-lbl small,.ds-val{font:400 13px/18px var(--f);color:var(--muted)}.ds-row>svg{color:var(--muted)}"
+      "refersTo": "settings-action-row",
+      "description": "A settings row with an action, as drawn for Tab bar goo: title, count underneath, compact tonal button.",
+      "html": "<div class=\"ds-set\"><div><b>Tab bar goo</b><small>23 favourites</small></div><button class=\"ds-btn ds-c ds-tonal ds-lip\">Wipe clean</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-set{width:343px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 16px;border-radius:24px;background:var(--panel);box-shadow:var(--lit);color:var(--fg)}.ds-set b{display:block;font:600 17px/22px var(--f-r)}.ds-set small{display:block;font:500 13px/18px var(--f-r);color:var(--muted)}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal:hover{background:var(--raised-hi)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
     }
   ],
   "narrative": {
     "northStar": "The e621 Reading Room",
-    "overview": "**Creative North Star: \"The e621 Reading Room\"**\n\nA calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: the artist line on top, the picture, then favourite, score and tags underneath. Structure is iOS (large titles, round 44 toolbar buttons, a floating glass capsule tab bar, grouped settings, bottom sheets). The playful touch is small and physical: pressable things have a solid darker edge that sinks when tapped, titles and numbers speak in a rounded face, and a short celebration marks \"You're caught up\".\n\nDensity is phone-first and one-handed: a 16 edge, a closed size system (6 spacing steps, 4 control heights, 4 avatar sizes, 3 icon sizes, 4 radii), and the main action in thumb reach at the bottom right. Dark by default for dark rooms; there is no light theme.\n\nThe art is never tinted, framed by gradients or covered. The only things that may sit on top of a picture are the video play glyph and the mute button; the player adds its own controls, which auto-hide.",
+    "overview": "**Creative North Star: \"The e621 Reading Room\"**\n\nA calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: who made it on top, the picture, then tags, score and favourite underneath. Structure is iOS (large title, bottom sheets, a floating tab bar).\n\nThe room is made of three materials, all lit from above. Things you press are **raised**: a light on top and a solid darker edge underneath that closes when pressed. Posts sit in **panels**. The picture and the tags are **sunk** into the panel. There are no outlines doing the work of depth.\n\nThe personality is physical and a little cheeky, and it stays off the art: a rounded voice face (Fredoka), a tab bar that is one bent tube with a capsule that slides along the bend, artist marks that spin when you follow or favourite, and white goo that drips under the heart and slowly builds up on the tab bar as you favourite.\n\nDensity is phone-first and one-handed: a 16 edge, a closed size system (three control heights, five gaps, two nested radii), and the main action in thumb reach at the bottom left. Dark by default; there is no light theme.\n\nThe art is never tinted, framed by gradients or covered. The only things that may sit on a picture are the video play glyph, the video length and the mute button; the player adds its own controls, which auto-hide.",
     "keyCharacteristics": [
       "e621 navies as the neutral; one gold, used sparingly.",
-      "Navy panels around art, never overlays on it.",
-      "Rounded face for voice, system face for reading.",
-      "A 2 to 3 px same-hue lip on pressables, sinking in 100 ms.",
+      "Three materials (raised, panel, sunk), flat fills with a 1 px top light. No gradients, no hairline outlines.",
+      "Fredoka for voice, the system face for reading.",
+      "A solid same-hue lip on pressables, closing in 100 ms.",
       "Colour carries meaning: gold = act / new / here, green = score, pink = favourite, e621 tag category colours on tags.",
-      "Kaleidoscope avatars (e621 has no artist pictures) and a kaleidoscope app mark."
+      "\"Bends\" marks for artists (e621 has no artist pictures); the kaleidoscope is the app mark.",
+      "Goo: white, slow, earned by favouriting, wiped from Settings."
     ],
     "rules": [
       {
@@ -571,34 +870,43 @@
       },
       {
         "name": "The Art Is the Light Rule",
-        "body": "Nothing on the interface is brighter or more saturated than the art. Navy is the neutral; meaning colours appear only as small icons, numbers and tag text.",
+        "body": "Nothing on the interface is more saturated than the art. Navy is the neutral; meaning colours appear only as small icons, numbers and tag text. Goo is white like text, and it never touches a picture.",
         "section": "colors"
       },
       {
         "name": "The Two Voices Rule",
-        "body": "Rounded for what the app says (names, numbers, actions); system for what you read. Nothing in between, and no sizes outside the table.",
+        "body": "Fredoka for what the app says (names, numbers, actions); system for what you read. Nothing in between, and no sizes outside the table.",
         "section": "typography"
       },
       {
         "name": "The Lip Is a Promise Rule",
-        "body": "A lip means \"press me\". It goes on gold and tonal buttons, Follow, the fav pill and both Play buttons. Never on panels, tags, chips, toolbar circles, or anything that sits over art.",
+        "body": "A lip means \"press me, and something happens\". It goes on Play, the fav pill, Follow, the burst row, the new-posts pill and gold or tonal buttons. Never on panels, tags, chips, the tools capsule, tabs, or anything over art. Chips answer a press by shrinking to 96%; tags by darkening.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Light Rule",
+        "body": "Light comes from above on every surface: raised things are lit on top, sunk things are dark on top. Never a gradient fill, never a glow, never an outline around a panel.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** keep every value on the closed size system: spacing 4/8/12/16/24/32, controls 44/32/52/56/62, avatars 24/36/44/80, icons 24/20/16, radii 8/12/16/24/capsule.",
+      "**Do** keep every value on the closed size system: gaps 4/8/12/16/24, an 8 edge inside panels and a 16 edge on the screen, heights 44/36/28, badges 16/20/24, radii 24 with 16 nested inside.",
+      "**Do** make everything pressable a raised thing with a lip, and everything that only sits there a panel or a well.",
       "**Do** fill gold once per screen, for the main action; use gold otherwise only for \"New\", the current tab, a selected chip's ring and the Follow plus.",
-      "**Do** put posts in navy panels with the artist line on top, the one 12 inner edge for picture and text, and stats and tags below.",
-      "**Do** give compact controls a 44 hit area and every number tabular figures.",
-      "**Do** lift any new small-text colour to 4.5:1 on the surface it sits on, keeping its e621 hue.",
-      "**Do** self-host Nunito in the build."
+      "**Do** put the artist on top of a post and the heart at the right end of its footer, with the score beside it.",
+      "**Do** give 36 and 28 controls a 44 touch area, and every number tabular figures.",
+      "**Do** keep any new small-text colour at 4.5:1 on the surface it sits on, keeping its e621 hue."
     ],
     "donts": [
-      "**Don't** put anything on top of the art except the video play glyph and mute (and the player's own auto-hiding controls). No Instagram-style hearts, names or gradients over pictures.",
+      "**Don't** put anything on top of the art except the video play glyph, length and mute (and the player's own auto-hiding controls). The double-tap heart is the one thing that may flash over a picture.",
       "**Don't** tint or frame art with colour washes; navy panels may surround it, never cover it.",
-      "**Don't** put a lip on panels, tags, chips, toolbar circles or anything over art, and never use blurred drop shadows on controls.",
-      "**Don't** use a second accent colour, or meaning colours as fills.",
-      "**Don't** use muted text on Raised Highlight (3.9:1).",
+      "**Don't** draw depth with outlines, gradients or glows. One light, from above.",
+      "**Don't** put a lip on panels, tags, chips, tabs or anything over art, and don't add blurred shadows beyond Play, the new-posts pill and the tab bar.",
+      "**Don't** use Fredoka at 700, or for tags and reading text.",
+      "**Don't** use a second accent colour, meaning colours as large fills, or gold in an artist's mark.",
+      "**Don't** put muted text on Raised Highlight (3.7:1).",
+      "**Don't** let goo touch a picture, hide a label, or be cleaned anywhere but Settings.",
+      "**Don't** throw dots anywhere but Follow.",
       "**Don't** borrow Duolingo's owl, green, streaks, gems or guilt nudges, or AllTrails' green, logo or buttons on photos."
     ]
   }
