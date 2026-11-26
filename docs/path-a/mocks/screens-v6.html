@@ -704,6 +704,209 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .btn6 .ic.popped { animation: pop6 .32s cubic-bezier(.2,.9,.3,1.4); }
 .btns6 { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 20px; }
 @media (prefers-reduced-motion: reduce) { .spin6, .check6 .done .n .ic, .pkrow6.just .chk6 .ic { animation: none; } .chk6 { transition: none; } }
+
+/* ---------- the list as a sheet, toasts, Popular artists ---------- */
+/* toast: a mark, what happened, and at most one way back. It floats, so it has the floating shadow and no lip. */
+.toast6 { position: absolute; z-index: 7; left: var(--inset); right: var(--inset); bottom: 168px; margin: 0 auto; width: fit-content; max-width: calc(100% - 2 * var(--inset));
+  min-height: var(--h); display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 22px; text-align: left;
+  background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); color: var(--text); }
+.toast6.low { bottom: 112px; }
+.toast6.static { position: relative; inset: auto; }
+.tmark6 { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; }
+.tmark6.ok { background: var(--score); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); color: var(--ground); }
+.tmark6.bad { color: var(--danger); }
+.toast6 > .av6 { margin: 0; }
+.tmsg6 { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-right: 8px; }
+.tmsg6 b { font: var(--t-count); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tmsg6 small { font: var(--t-foot); color: var(--link); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tmsg6 .tt { font: 500 15px/20px var(--f); color: var(--t-general); } .tmsg6 .tt.s { color: var(--t-species); }
+.tundo6 { height: var(--h-w); padding: 0 12px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); font: var(--t-foot-r); color: var(--text); flex: none; position: relative; }
+.tundo6::before { content: ""; position: absolute; inset: -8px -8px -8px -4px; }
+.tundo6:active { color: var(--link); }
+.tmsg6:has(+ .tundo6) { padding-right: 4px; }
+/* the ring around Undo empties clockwise in the 6 s the toast stays */
+.tring6 { position: absolute; inset: .75px; width: calc(100% - 1.5px); height: calc(100% - 1.5px); overflow: visible; pointer-events: none; }
+.tring6 rect { fill: none; stroke: var(--link); stroke-width: 1.5; stroke-dasharray: 100 100; animation: tdrain6 6s linear infinite; }
+.toast6:hover .tring6 rect, .toast6:focus-within .tring6 rect { animation-play-state: paused; }
+@keyframes tdrain6 { to { stroke-dashoffset: -100; } }
+.toast6.in { animation: tin6 .32s cubic-bezier(.3,1.35,.5,1) backwards; }
+.toast6.out { animation: tout6 .2s ease-in forwards; }
+@keyframes tin6 { from { opacity: 0; transform: translateY(12px); } }
+@keyframes tout6 { to { opacity: 0; transform: translateY(8px); } }
+.toasts6 { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px 24px; }
+.toasts6 .toast6 { margin: 0; max-width: 100%; }
+
+/* Follow from favorites as a sheet: the list scrolls inside it, the button stays at its foot */
+.fsheet6.in { top: 76px; display: flex; flex-direction: column; padding-bottom: 0; }
+.fsheet6 .sub6 { margin: -4px 0 12px; }
+.fsheet6 .glabel6 { margin: 0 0 4px; padding-left: 0; }
+.fsheet6 .glabel6 button:last-child { margin-right: -12px; }
+.fsheet6 .list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding-bottom: 16px;
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
+.fsheet6 .list::-webkit-scrollbar { display: none; }
+.fsheet6 .qrows6 { --div: 48px; }
+.fsheet6 .srow6 { min-height: 60px; }
+.fsheet6 .srow6 .lbl b { font: var(--t-head); line-height: 20px; }
+.fsheet6 .foot { padding: 4px 0 37px; }
+
+/* Artists, Suggested: the offer row, then one card per artist */
+.sugg6 { display: flex; flex-direction: column; gap: 16px; padding: 0 var(--inset); }
+.sugg6 .acard6 { width: auto; }
+
+/* Popular artists: a state block with a list under it */
+.state6.above { margin: 16px 0 24px; }
+.poprow6 .num { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .tring6 rect, .toast6.in, .toast6.out { animation: none; } }
+
+/* Artists: a suggestion's own menu button, the filter with a match, the proposal note */
+.sugg6 .ph .more6 { margin-left: -4px; }
+.prop6 { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font: 600 13px var(--f-page); color: var(--fg); margin-right: 8px; }
+
+/* ---------- links from outside, the grid tile's menu, the artist page's edges (proposed) ---------- */
+.chip6 > .ic.lead { margin-left: -2px; color: var(--link); }
+.lnote6 { margin: 8px 0 16px; font: var(--t-foot); color: var(--muted); }
+.lnote6.c { margin: 8px 0 0; text-align: center; }
+/* not signed in on this browser: a sunk two-line banner with one raised way out */
+.banner6.two { height: auto; min-height: 52px; border-radius: 22px; padding: 8px 8px 8px 12px; align-items: center; }
+.banner6.two > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.banner6.two b { font: var(--t-foot-r); color: var(--text); font-weight: 500; }
+.banner6.two small { font: var(--t-foot); color: var(--link); }
+.banner6.two .btn6 { --lip: 2px; flex: none; }
+/* the same words over the player, in the player's glass */
+.pnote6 { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 8px 8px 8px 12px; border-radius: 22px; background: rgba(2,15,35,.55); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); color: #fff; }
+.pnote6 > .ic { flex: none; }
+.pnote6 > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pnote6 b { font: var(--t-foot-r); font-weight: 500; }
+.pnote6 small { font: var(--t-foot); color: rgba(255,255,255,.78); }
+.pnote6 button { height: var(--h-c); padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,.16); font: var(--t-foot-r); color: #fff; flex: none; }
+/* a held tile sinks before its menu rises */
+.tile6.held > i { transform: scale(.96); transition: transform .12s ease-out; }
+/* a tag that is not an artist: a tag in a well where the mark would be */
+.tagmark6 { width: 80px; height: 80px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); }
+.hero6 .title6.s { color: var(--t-species); }
+.row6.on .ic { color: var(--heart); fill: currentColor; }
+
+/* ---------- Settings sub-pages: Account, Content, For You, App (proposed) ---------- */
+.srow6 .ico.letter { font: var(--w-v) 15px/20px var(--f-r); }
+.srow6 .ico.letter.s { color: var(--score); } .srow6 .ico.letter.q { color: #E4D24F; } .srow6 .ico.letter.e { color: var(--danger); }
+.gnote6 { margin: -8px var(--inset) 16px; padding: 0 16px; font: var(--t-foot); color: var(--muted); }
+.gnote6.warn { display: flex; gap: 8px; align-items: flex-start; }
+.gnote6.warn .ic { flex: none; color: var(--danger); margin-top: 1px; }
+.blrow6 .lbl { font: 500 15px/20px var(--f); color: var(--t-general); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.blrow6 .lbl .neg { color: var(--muted); }
+.blrow6 .rm { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; position: relative; }
+.blrow6 .rm::before { content: ""; position: absolute; inset: -8px; }
+.addrow6 { display: flex; gap: 8px; margin: 0 var(--inset) 16px; }
+.addrow6 .btn6 { height: var(--h); padding: 0 18px; flex: none; }
+.srow6 > .btn6 { flex: none; }
+.btn6.wide.signout6 { margin: 8px var(--inset) 16px; width: calc(100% - 2 * var(--inset)); }
+.kbd6 + .kbd6 { margin-left: -8px; }
+.kbd6 { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px; background: var(--well); box-shadow: var(--sunk); font: 400 13px/18px var(--f-m); color: var(--text); }
+
+/* ---------- Install, update and the app icon (proposed) ---------- */
+.shp6 { margin: 0 0 16px; font: var(--t-body); color: var(--link); }
+.shn6 { margin: 16px 0 0; font: var(--t-foot); color: var(--muted); }
+.isteps6 { width: 100%; margin: 0; gap: 12px; }
+.isteps6 li { color: var(--text); min-height: var(--h-w); }
+.isteps6 li b { font-weight: 600; }
+.isteps6 small { display: block; font: var(--t-foot); color: var(--muted); }
+.isteps6 .ic { flex: none; color: var(--link); }
+.sheet6 > .btn6.wide { margin-top: 16px; }
+.xwell6 { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; position: relative; }
+.xwell6::before { content: ""; position: absolute; inset: -8px; }
+
+/* the icon: the app mark on navy lit from above. One drawing for every size; the mark stays inside Android's safe circle. */
+.aicon6 { display: block; flex: none; overflow: hidden; position: relative; }
+.aicon6 svg { display: block; width: 100%; height: 100%; }
+.aicon6.ios { border-radius: 22.5%; }
+.aicon6.round { border-radius: 999px; }
+.aicon6.fav { border-radius: 22%; }
+.aicon6.mono { border-radius: 999px; background: var(--raised-hi-a); }
+.aicon6.guide::after { content: ""; position: absolute; inset: 10%; border-radius: 999px; border: 1px dashed rgba(255,255,255,.55); }
+.icons6 { align-items: flex-end; gap: 24px; }
+.icons6 .pair { display: flex; align-items: flex-end; gap: 8px; }
+.tabchip6 { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 8px; border-radius: 10px 10px 0 0; font: 400 12px/16px var(--f); }
+.tabchip6.dk { background: #2B2D31; color: #E8EAED; } .tabchip6.lt { background: #F1F3F4; color: #202124; }
+
+/* a home screen to see it on: plain placeholders, no real apps */
+.phone6.homescr6 { background: linear-gradient(165deg, #2A3448, #0D1320 58%, #1B2334); }
+.hgrid6 { display: grid; grid-template-columns: repeat(4, 60px); justify-content: space-between; gap: 26px 0; padding: 36px 27px 0; }
+.hgrid6 > div { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 12px/14px var(--f); color: #fff; }
+.hgrid6 .ph { width: 60px; height: 60px; border-radius: 22.5%; background: rgba(255,255,255,.13); }
+.hgrid6 .bar { width: 34px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.2); margin: 4px 0; }
+.hdock6 { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 92px; border-radius: 34px; background: rgba(255,255,255,.13); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.hdock6 .ph { width: 60px; height: 60px; border-radius: 22.5%; background: rgba(255,255,255,.16); }
+
+/* ---------- Desktop, 900 px and wider (proposed) ---------- */
+.dframes6 { display: flex; flex-direction: column; gap: 48px; }
+.dfig6 { margin: 0; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.dfig6 figcaption p { color: var(--dim); font-size: 14px; margin: 2px 0 0; max-width: 70ch; }
+.desk-holder { width: 100%; }
+.desk6 { position: relative; width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px #3A3A3F; background: var(--ground); }
+
+/* the sidebar: the tab bar stood on its side. A floating panel, 8 from the window, with the same sliding capsule. */
+.side6 { position: absolute; z-index: 4; top: 8px; left: 8px; bottom: 8px; width: 232px; border-radius: var(--r-panel); background: linear-gradient(var(--panel-a), var(--panel-b) 220px); box-shadow: var(--lit), var(--lit-b); padding: 12px; display: flex; flex-direction: column; }
+.sbrand6 { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 4px; font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); }
+.stabs6 { position: relative; display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.sind6 { position: absolute; left: 0; right: 0; top: 0; height: var(--h); border-radius: 999px; background: var(--raised-hi-a); box-shadow: var(--lit); transform: translateY(calc(var(--k, 0) * 48px)); transition: transform .5s cubic-bezier(.3,1.35,.5,1); }
+.stab6 { position: relative; height: var(--h); display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 999px; color: var(--link); font: var(--w-s) 15px/20px var(--f-r); text-align: left; transition: color .2s ease-out; }
+.stab6.on { color: var(--gold); } .stab6.on .ic { stroke-width: 2.4; }
+.stab6 .badge { margin-left: auto; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: var(--w-v) 13px/20px var(--f-r); text-align: center; font-variant-numeric: tabular-nums; transition: transform .2s ease-out, opacity .2s ease-out; }
+.stab6.on .badge { transform: scale(0); opacity: 0; }
+.stab6:not(.on):hover, .stab6.hov, .sacct6:hover, .srow6.hov { background: rgba(255,255,255,.04); }
+.ssearch6 { margin-top: 12px; flex: none; padding-right: 8px; }
+.ssearch6 > span:first-of-type { flex: 1; }
+.sacct6 { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: var(--r-art); text-align: left; }
+.sacct6 b { display: block; font: var(--t-head); line-height: 20px; } .sacct6 small { font: var(--t-foot); color: var(--muted); }
+/* 900 to 1099: the same panel, icons only */
+.side6.rail { width: 68px; align-items: center; }
+.side6.rail .sbrand6 { padding: 0; } .side6.rail .sbrand6 > span:last-child, .side6.rail .stab6 > span, .side6.rail .ssearch6 > span { display: none; }
+.side6.rail .stabs6 { width: var(--h); } .side6.rail .stab6 { width: var(--h); padding: 0; justify-content: center; }
+.side6.rail .stab6 .badge { display: block; position: absolute; top: -2px; right: -4px; height: 16px; min-width: 16px; padding: 0 4px; font: var(--t-tab); line-height: 16px; box-shadow: 0 0 0 2px var(--panel-a); }
+.side6.rail .ssearch6 { width: var(--h); padding: 0; justify-content: center; flex: none; }
+.side6.rail .sacct6 { padding: 0; } .side6.rail .sacct6 > span:last-child { display: none; }
+.side6.still { position: relative; inset: auto; height: 420px; }
+@media (prefers-reduced-motion: reduce) { .sind6, .stab6, .stab6 .badge { transition: none; } }
+
+/* the content: a 600 column for feeds and lists, the full width for a grid */
+.dmain6 { position: absolute; inset: 0 0 0 248px; overflow: hidden; }
+.dcol6 { width: 600px; margin: 0 auto; padding-top: 18px; --inset: 0px; }
+.dmain6.wide { padding: 18px 24px 0; --inset: 0px; }
+.dmain6.wide .grid6 { grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); padding-bottom: 104px; }
+.dmain6 > .fab6 { left: 24px; bottom: 24px; }
+.dcol6 .group6.flat .srow6.acct { min-height: 72px; }
+.dcol6 .shead6 { margin: 8px 0 12px; padding: 0 16px; }
+
+/* a popover is the sheet, floating: no handle, no close button. A dialog is the sheet, centred, with the dim. */
+.sheet6.pop6 { position: absolute; z-index: 9; width: 300px; border-radius: 24px; padding: 16px; box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); }
+.sheet6.pop6 .grab, .sheet6.pop6 .x6 { display: none; }
+.sheet6.pop6 .shtop { margin-bottom: 4px; } .sheet6.pop6 .ctx { padding-top: 0; }
+.sheet6.pop6.still { position: relative; margin: 0 auto; }
+.sheet6.dlg6 { position: absolute; z-index: 21; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 420px; border-radius: 24px; padding: 16px; box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); }
+.sheet6.dlg6 .grab { display: none; }
+
+/* the player: the picture keeps the window, Post info stands beside it */
+.dplayer6 { background: #000; color: #fff; }
+.dplayer6 .stage { position: absolute; inset: 0 376px 0 0; display: grid; place-items: center; }
+.dplayer6 .stage i { display: block; height: 100%; aspect-ratio: 3 / 4; background: var(--art); }
+.dplayer6 .ts { position: absolute; inset: 0 376px auto 0; height: 110px; background: linear-gradient(rgba(0,0,0,.6), transparent); }
+.dplayer6 .bs { position: absolute; inset: auto 376px 0 0; height: 220px; background: linear-gradient(transparent, rgba(0,0,0,.78) 66%); }
+.dptop6 { position: absolute; z-index: 3; top: 16px; left: 16px; right: 392px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dptop6 .r { display: flex; align-items: center; gap: 12px; }
+.dpbot6 { position: absolute; z-index: 3; left: 24px; right: 400px; bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
+.dpctl6 { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+.dpctl6 .acts { display: flex; gap: 12px; justify-content: flex-end; }
+.dpctl6 .pplay6 { width: 56px; height: 56px; }
+.gl6.ring { box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 0 2px var(--gold); }
+.ipanel6.sheet6 { position: absolute; z-index: 4; top: 8px; right: 8px; bottom: 8px; width: 360px; border-radius: 24px; padding: 16px; overflow: hidden; color: var(--text); }
+.ipanel6 .grab { display: none; }
+
+/* pointer hover: a raised control steps up one material */
+.btn6.hov:not(.gold) { background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); }
+.hovs6 { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.hovs6 .pairs { display: flex; gap: 12px; align-items: center; }
+.hovs6 .pairs > small { font: var(--t-foot); color: var(--muted); width: 56px; flex: none; }
+.hovs6 .group6 { margin: 0; flex: 1; }
 </style>
 
 <div class="wrap" id="root">
@@ -791,6 +994,197 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       </tbody>
     </table></div>
   </section>
+
+  <section id="more" aria-label="Artists, toasts and Popular artists">
+    <h2 class="pg-h2" style="margin-top:40px">Artists, toasts and Popular artists</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>Drawn overnight for the Artists tab. Toasts had not been drawn anywhere in v6, so this is also the first look at them for the whole app. The two toast choices that had switches are set to my picks (a ring around Undo, a toast that hugs its words); the other options are in the table. In the fifth phone, tap Follow on a row.</p>
+    <div class="cols">
+      <section class="col" aria-label="Artists, Suggested">
+        <div class="col-head"><h2 class="pg-h3">1. Artists, Suggested</h2><p>The offer row leads when three or more artists stand out. Under it, each suggestion is the artist card from the feed at full width, with a ⋯ of its own.</p></div>
+        <div class="phone-holder" id="s-sugg"></div>
+        <div class="under" id="u-sugg"></div>
+      </section>
+      <section class="col" aria-label="Follow from favorites as a sheet">
+        <div class="col-head"><h2 class="pg-h3">2. Follow from favorites, as a sheet</h2><p>Opened from the offer row. The same rows and check wells as the first run. A sheet has no tab bar and no Play, so the gold button sits at the sheet's foot and the list scrolls above it.</p></div>
+        <div class="phone-holder" id="s-fsheet"></div>
+        <div class="under" id="u-fsheet"></div>
+      </section>
+      <section class="col" aria-label="Artists, Following: the row menu">
+        <div class="col-head"><h2 class="pg-h3">3. Following: a row's ⋯</h2><p>The app's ⋯ sheet, headed by the artist. Unfollow is not red: red stays for Blacklist and failures.</p></div>
+        <div class="phone-holder" id="s-amenu"></div>
+        <div class="under" id="u-amenu"></div>
+      </section>
+    </div>
+    <div class="cols" style="margin-top:48px">
+      <section class="col" aria-label="After following">
+        <div class="col-head"><h2 class="pg-h3">4. After following</h2><p>The feed loads and a toast says what happened. e621 can skip an artist (renamed, gone, already followed); the second line names them.</p></div>
+        <div class="phone-holder" id="s-toast"></div>
+        <div class="under" id="u-toast"></div>
+      </section>
+      <section class="col" aria-label="Popular artists">
+        <div class="col-head"><h2 class="pg-h3">5. No favorites: Popular artists</h2><p>Goo, the way to Search, then the artists with the most posts on e621. Follow turns in place and a toast offers Undo. In this mock a toast stays put so you can look at it; in the app it leaves after 6 seconds.</p></div>
+        <div class="phone-holder" id="s-pop"></div>
+        <div class="under" id="u-pop"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The toast</th><td>Toasts sit above Play. Not drawn before.</td><td>A floating capsule in Raised Highlight with the floating shadow and no lip: a 28 mark, the message in the rounded voice, at most one action. It hugs its words, centred.</td><td>It floats like the new-posts pill and the tag targets, so it takes their fill and shadow. Other option: full width, edge to edge.</td></tr>
+        <tr><th>The mark</th><td>Nothing</td><td>The artist's own mark when the toast is about one artist. Otherwise an icon in a well: the green check well for "done", red for a failure or a blacklist.</td><td>It says who or what before you read. The green check is the one you just tapped in the list.</td></tr>
+        <tr><th>Undo</th><td>"Following artist_x · Undo", stays 6 s</td><td>A sunk 28 capsule at the right end. A ring around it empties clockwise in the 6 s, and stops while you hover or focus the toast.</td><td>Sunk, so the toast still has no lip. The ring shows how long the way back is open. Other option: no ring.</td></tr>
+        <tr><th>Skipped artists</th><td>toast "2 skipped: …"</td><td>Two lines: "Following 8 artists", then "2 skipped: saffron hare, harbor seal". Past two names it says "and 3 more".</td><td>It leads with what worked. The names tell you who to look for.</td></tr>
+        <tr><th>Where a toast sits</th><td>Above Play</td><td>12 above Play (168 from the bottom). On a screen with no Play it takes Play's place, 16 above the tab bar. One at a time: a new toast replaces the last.</td><td>The same two heights the Follow button and Play already use.</td></tr>
+        <tr><th>The sheet</th><td>"a sheet from Artists › Suggested"</td><td>A tall sheet, 76 from the top. The close button replaces "Skip for now". The list fades out above the gold button at the foot.</td><td>The sign-in sheet already ends in one gold button. A floating button has nothing to float over here.</td></tr>
+        <tr><th>A suggestion's ⋯</th><td>⋯ → Not interested</td><td>A ⋯ after Follow on the card (Suggested only; the feed's card stays as it is). It opens the ⋯ sheet: Not interested, Open on e621.</td><td>The card had no place for it. Other option: hold the card.</td></tr>
+        <tr><th>A followed artist's ⋯</th><td>⋯ → Unfollow (toast + Undo), Share</td><td>The ⋯ sheet headed by the artist: Share artist, Open on e621, Unfollow. Unfollow is not red.</td><td>Red stays for Blacklist and for failures. Unfollowing is an everyday action with Undo.</td></tr>
+        <tr><th>Popular artists</th><td>Search + "Popular artists" (by post count)</td><td>A heading and one panel of rows: mark, name, post count, the feed's Follow button. Following one swaps the button for "Following" in place.</td><td>The Artists list and the feed's Follow button already exist; nothing new is needed.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="edges" aria-label="Links, the grid menu and the artist page's edges">
+    <h2 class="pg-h2" style="margin-top:40px">Links, the grid menu and the artist page's edges</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The pieces of Results, the grid and the artist page that had no drawing: a link that brings its own settings, holding a tile, and what the artist page shows when the name is wrong, is not an artist, or you cannot follow.</p>
+    <div class="cols">
+      <section class="col" aria-label="Opened from a link">
+        <div class="col-head"><h2 class="pg-h3">1. Opened from a link</h2><p>The "From a link" chip leads the row. It opens a sheet that lists what the link set, with one button to go back to your own settings.</p></div>
+        <div class="phone-holder" id="s-link"></div>
+        <div class="under" id="u-link"></div>
+      </section>
+      <section class="col" aria-label="Grid: hold a tile">
+        <div class="col-head"><h2 class="pg-h3">2. Grid: hold a tile</h2><p>The app's ⋯ sheet, headed by the post's artist and number. Four rows; Favorite is first because it is the one you came for.</p></div>
+        <div class="phone-holder" id="s-hold"></div>
+        <div class="under" id="u-hold"></div>
+      </section>
+      <section class="col" aria-label="Artist page: no such artist">
+        <div class="col-head"><h2 class="pg-h3">3. Artist page: no such artist</h2><p>A pasted or mistyped link. The empty shape with Goo looking, the name as it was typed, and Search as the way on.</p></div>
+        <div class="phone-holder" id="s-noart"></div>
+        <div class="under" id="u-noart"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The "From a link" chip</th><td>First in the chips row; lists what the link set, with "Use my settings"</td><td>A chip with a link glyph and the gold ring (it is on). It opens a titled sheet: six rows of name and value, one line saying it is for this visit only, and a tonal "Use my settings".</td><td>A chip that is on already wears the ring. The button is tonal because gold is Play's. Other option: a menu of switches, one per setting.</td></tr>
+        <tr><th>Not signed in on this browser</th><td>A notice over the player for 4 s, then the same strip on Results</td><td>On Results: the sunk banner at two lines with a small raised "Sign in". Over the player: the same words in the player's glass.</td><td>The offline banner is the app's strip for "something about this session"; this one needs a second line and an action. Other option: a toast.</td></tr>
+        <tr><th>Holding a tile</th><td>Menu: Favorite, Open artist, Play from here, Open on e621</td><td>The tile sinks to 96% after 400 ms and the ⋯ sheet rises, headed by the artist and the post number. Favorited already: "Unfavorite" with a filled heart.</td><td>One menu for the whole app. Other option: a small menu at the finger, like the tag targets.</td></tr>
+        <tr><th>No such artist</th><td>"No artist called X on e621" + Search</td><td>The empty shape: Goo looking, "No artist called "inkwel fox"", one sentence, a tonal Search. Back stays in the header.</td><td>It is "nothing found", which is Goo looking everywhere else.</td></tr>
+        <tr><th>A tag that is not an artist</th><td>Works as a tag feed, "Follow tag"</td><td>The hero keeps its shape: a tag glyph in an 80 well, the name in its e621 colour, the raw name and its category, the stats, "Follow tag".</td><td>A drawn mark would say "artist". Other option: no hero at all, only a Results-style header.</td></tr>
+        <tr><th>At 500 follows</th><td>Follow disabled + note</td><td>The disabled button reading "e621 allows 500 follows" and one line: "Unfollow an artist in Artists to follow another."</td><td>The same disabled button the follow list uses.</td></tr>
+        <tr><th>Share and ⋯</th><td>Share → system sheet, fallback copies the link; ⋯ → Open on e621</td><td>⋯ is the app's sheet: Copy link, Open on e621. Copying shows the toast "Link copied".</td><td>Copy link is there for browsers with no share sheet. Results' ⋯ uses the same sheet with "Copy share link".</td></tr>
+        <tr><th>Your favorites</th><td>‹ Your favorites · grid; chips Media, Sort, Score</td><td>A pushed screen like Tune: Back and the grid tool in the top row, the large title under it, then the chips.</td><td>No search field to edit, so it takes the pushed-screen header, not the Results header.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="sets" aria-label="Settings sub-pages">
+    <h2 class="pg-h2" style="margin-top:40px">Settings: Account, Content, For You, App</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The four Settings pages that had no drawing (Slideshow was drawn earlier). Each is a pushed screen built from the list parts: Back, the large title, groups of rows. Switches toggle.</p>
+    <div class="cols">
+      <section class="col" aria-label="Account">
+        <div class="col-head"><h2 class="pg-h3">1. Account</h2><p>Who you are, your favorites, the one risky switch with its warning in plain words, and Sign out as a tonal button at the end.</p></div>
+        <div class="phone-holder" id="s-acct"></div>
+        <div class="under" id="u-acct"></div>
+      </section>
+      <section class="col" aria-label="Content">
+        <div class="col-head"><h2 class="pg-h3">2. Content</h2><p>Ratings are three switches wearing e621's rating letters. The blacklist is a field to add a line and a list of lines, each with a small remove well.</p></div>
+        <div class="phone-holder" id="s-content"></div>
+        <div class="under" id="u-content"></div>
+      </section>
+      <section class="col" aria-label="For You">
+        <div class="col-head"><h2 class="pg-h3">3. For You</h2><p>The way to Tune, and the artists you said "Not interested" to, each with a way back.</p></div>
+        <div class="phone-holder" id="s-fy"></div>
+        <div class="under" id="u-fy"></div>
+      </section>
+      <section class="col" aria-label="App">
+        <div class="col-head"><h2 class="pg-h3">4. App</h2><p>Install, the e621 button, shortcuts, and About. The note under Install says the one surprising thing about iPhone links.</p></div>
+        <div class="phone-holder" id="s-app"></div>
+        <div class="under" id="u-app"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>Sign out</th><td>"Sign out"</td><td>A tonal 44 button at the end of the page, with a glyph. Not red, not a list row.</td><td>It ends the page the way the sign-in sheet ends in its button. Other option: a red row.</td></tr>
+        <tr><th>Sign-in links</th><td>share-sign-in toggle with warning</td><td>A switch named "Sign-in links", off, with the warning under its group in Muted text and a Danger glyph.</td><td>The warning is always visible, not behind the switch. Other option: a confirm sheet when it is turned on.</td></tr>
+        <tr><th>API key row</th><td>Nothing</td><td>A row "API key · Saved on this device" with "Change", which opens the sign-in sheet.</td><td>An added row. A key that stops working needs a way in that is not signing out.</td></tr>
+        <tr><th>Ratings</th><td>Ratings (S/Q/E)</td><td>Three switch rows; the icon well holds the letter in e621's colour (S green, Q yellow, E red). The last one on cannot be turned off; a toast says why.</td><td>Switches, because more than one can be on, like the Media menu. Other option: a three-part segmented control (one at a time).</td></tr>
+        <tr><th>Blacklist editor</th><td>Blacklist (editor, account sync, import defaults)</td><td>A field plus "Add", then one row per line with the tags and a 28 remove well; a line of help; then "Use my e621 blacklist" (switch) and "e621's default list" (Import).</td><td>Lines as rows can be removed one at a time and read like the search pills. Other option: one big text box, as on e621.</td></tr>
+        <tr><th>Hidden artists</th><td>Hidden artists</td><td>The Artists list rows with a tonal "Show" in place of ⋯, and when each was hidden.</td><td>"Show" is the opposite of "Not interested" in plain words.</td></tr>
+        <tr><th>App page</th><td>Install app, e621 button, Keyboard shortcuts, About</td><td>Install is a row that opens the steps (next batch); in the installed app it reads "Installed" with a green check. About is three plain rows and one line saying the app is not run by e621.</td><td>"What's new" and "Source code" are added rows; drop them if you do not want them.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="pwa" aria-label="Install, update and the app icon">
+    <h2 class="pg-h2" style="margin-top:40px">Install, update and the app icon</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The pieces that make it an app on your home screen: how you install it, how it tells you a new version is waiting, and the icon. Nothing new was invented for these: a titled sheet, the checklist's numbered wells, the toast, and the app mark.</p>
+    <div class="cols">
+      <section class="col" aria-label="Install steps">
+        <div class="col-head"><h2 class="pg-h3">1. Install steps</h2><p>Settings › App › Install the app. On an iPhone the browser cannot install for you, so the sheet shows the three taps, each with the glyph to look for.</p></div>
+        <div class="phone-holder" id="s-inst"></div>
+        <div class="under" id="u-inst"></div>
+      </section>
+      <section class="col" aria-label="Update">
+        <div class="col-head"><h2 class="pg-h3">2. A new version</h2><p>The toast from the rest of the app, with "Reload" where Undo sits. It never shows over the player.</p></div>
+        <div class="phone-holder" id="s-upd"></div>
+        <div class="under" id="u-upd"></div>
+      </section>
+      <section class="col" aria-label="The app icon">
+        <div class="col-head"><h2 class="pg-h3">3. The app icon</h2><p>The app mark on navy, lit from above like every surface in the app. Under it the name is "Slideshow", which fits without being cut.</p></div>
+        <div class="phone-holder" id="s-icon"></div>
+        <div class="under" id="u-icon"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>iPhone steps</th><td>Per-platform steps</td><td>A titled sheet: one line of what you get, three numbered steps (Share, Add to Home Screen, Add), and the sign-in note.</td><td>Numbers in wells are the first-run checklist's part, so nothing is new. The "under •••" hint is there because Safari moves Share between versions. Please check it on your phone.</td></tr>
+        <tr><th>Android and desktop</th><td>Per-platform steps</td><td>No sheet. The row ends in a tonal "Install" and the browser shows its own dialog.</td><td>One tap less, and the browser's dialog is the confirmation. Other option: the same sheet with one gold "Install".</td></tr>
+        <tr><th>Other browsers</th><td>(not said)</td><td>In another app's browser: "This browser cannot install apps…" and "Copy link". Where nothing can install (Firefox on a computer) the row is left out.</td><td>A row that leads nowhere is worse than no row.</td></tr>
+        <tr><th>Asking unprompted</th><td>(not said)</td><td>Nothing asks you to install. The browser's own pop-up is held back. Drawn as an option: one closable row at the top of Settings.</td><td>The art is the star and the app does not nag. The option is there if you want installs to be easier to find.</td></tr>
+        <tr><th>Update toast</th><td>Update toast</td><td>"New version ready" with "Reload", 6 s with the ring, once per version, only on a feed (never over the player, a sheet or the keyboard). After that: Settings › App, "Version · 2.1 is ready · Reload".</td><td>It acts like every other action toast, so it cannot sit on the screen for a whole session. Other option: it stays until you tap it.</td></tr>
+        <tr><th>After the reload</th><td>(not said)</td><td>A 4 s toast: "Updated to 2.1".</td><td>Added. It shows the reload did something. Say the word and it goes.</td></tr>
+        <tr><th>The icon</th><td>(not said)</td><td>The app mark reaching 68% of the way from the centre to the edge, on navy that runs from Panel Navy at the top to Ground at the bottom. Tab icon: the mark reaching 84%, with no glow. One-colour version for Android.</td><td>DESIGN.md already says the kaleidoscope is the app mark and that Goo is never the icon. 68% keeps it, glow and all, inside Android's circle. Other option: a flat Ground background.</td></tr>
+        <tr><th>The name</th><td>(not said)</td><td>"Slideshow" under the icon; "e621 Slideshow" as the full name. Launch colour and the status bar's colour are Ground.</td><td>"e621 Slideshow" is cut off under an iPhone icon.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+
+  <section id="desk" aria-label="Desktop">
+    <h2 class="pg-h2" style="margin-top:40px">On a computer (900 px and wider)</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The same screens with the tab bar stood on its side. Nothing new was made: the sidebar is the app's panel with the tab bar's sliding capsule, a popover and a dialog are the phone's sheet, and Post info is that sheet standing beside the picture. Each frame is a 1280 by 800 window, shrunk to fit this page. The sidebar's tabs slide.</p>
+    <div class="dframes6">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">1. Following</h2><p>The sidebar holds the app mark, the four tabs, Search and your account. The feed is a 600 column in the middle of what is left. Play stands beside the column, so it never covers a picture.</p></figcaption><div class="desk-holder" id="d-feed"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">2. Grid, with a chip's popover</h2><p>The grid takes the full width, as many 176 tiles as fit. A chip's sheet opens as a popover under the chip: the same panel, with no handle and no close button.</p></figcaption><div class="desk-holder" id="d-grid"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">3. The player, with Post info</h2><p>The sidebar leaves. Post info is a panel at the right and the picture moves over to make room, so nothing covers it. The controls are one row.</p></figcaption><div class="desk-holder" id="d-player"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">4. Settings</h2><p>All the sub-pages on one page in the 600 column, each under its name. Sign out sits on the account row.</p></figcaption><div class="desk-holder" id="d-settings"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">5. A dialog</h2><p>A titled sheet (shortcuts, Quick settings, sign-in, install steps) opens in the middle of the window, 420 wide, over the dim.</p></figcaption><div class="desk-holder" id="d-dialog"></div></figure>
+    </div>
+    <div class="cols" style="margin-top:48px" id="u-desk-cols"><section class="col" style="width:375px"><div class="under" id="u-desk"></div></section></div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The sidebar</th><td>Left sidebar: logo, 4 tabs, Search, account at the bottom</td><td>A floating panel, 232 wide, 8 from the window. Rows 44 tall with icon and name; the current tab wears the tab bar's raised capsule, which slides. From 900 to 1099 it shows icons only (68 wide).</td><td>It is the tab bar stood on its side, so the two feel like one part. Other option: icons only at every width (the builder's interim rail).</td></tr>
+        <tr><th>Search</th><td>Search in the sidebar; "/" opens it</td><td>A sunk field in the sidebar showing the "/" key. The header's search button is left out on a computer.</td><td>One way in is enough when it is always on screen.</td></tr>
+        <tr><th>Play</th><td>(not said)</td><td>The same gold disc, at the bottom left of the content, 24 from the sidebar and the bottom. Beside the column on a feed; over the tiles on a grid, as on the phone.</td><td>It keeps its shape and its corner. Other option: a gold "Play 12 new" button in the sidebar.</td></tr>
+        <tr><th>Popover or dialog</th><td>Sheets are popovers or centered dialogs</td><td>A sheet opened from a thing on screen (a chip, ⋯, a tile, a tag) is a popover at that thing, 300 wide, no dim. A titled sheet with a job of its own (Quick settings, shortcuts, sign-in, install) is a 420 dialog with the dim.</td><td>One rule decides it, so nobody has to choose each time.</td></tr>
+        <tr><th>The grid tile's menu</th><td>(not said)</td><td>Right-click, or the keyboard's menu key. No ⋯ appears on hover.</td><td>Nothing sits on top of art, on a computer too.</td></tr>
+        <tr><th>The player</th><td>Info is a right panel</td><td>A 360 panel, 8 from the window; the picture is centred in the rest. The four buttons move to the right end of one control row; a full-screen button joins the count at the top.</td><td>A wide window has the room, and one row keeps the controls off the middle of the picture.</td></tr>
+        <tr><th>Tall pictures</th><td>(not said)</td><td>In the feed a picture is never taller than the window less 160, shown whole on the well.</td><td>The phone's cap (1:2) would make a picture taller than the window here.</td></tr>
+        <tr><th>Hover</th><td>(not said)</td><td>Rows get the 4% white wash they already use when pressed. Raised controls step up to Raised Highlight. Gold and art do not change.</td><td>Two rules cover every control.</td></tr>
+        <tr><th>Goo</th><td>(not said)</td><td>Not designed. The sidebar is drawn clean.</td><td>The goo lies along the phone's bent bar. Where it goes on a straight sidebar, and how the secret tab is found, is yours to pick. My suggestion is in the morning list.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
 
 
   <section id="new" aria-label="Menus and sheets">
@@ -881,10 +1275,8 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>Follow from favorites as a sheet (from Artists › Suggested), the "2 skipped" toast after following, and the "Popular artists" list.</li>
-    <li>The "From a link" chip on Results.</li>
-    <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
-    <li>Desktop layouts.</li>
+    <li>The goo and the secret tab on a computer (a question for the owner).</li>
+    <li>Search, Artists and the artist page on a computer. They follow the rules above: the 600 column, and the full width for a grid.</li>
   </ul>
 </div>
 
@@ -1555,7 +1947,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <div class="scrim6"></div><div class="cta6">${goBtn('Follow 10 artists')}</div>${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
   $('u-pick').innerHTML = strip('The button', 'Gold while something is picked. With nothing picked, or past e621\'s limit of 500 follows, it goes flat and says why.',
     `<div class="strip p6 btns6">${goBtn('Follow 10 artists').replace(' data-fgo', '')}${goBtn('Pick artists to follow', true)}${goBtn('e621 allows 500 follows (12 left)', true)}</div>`);
-  const pickSync = phoneEl => { const n = phoneEl.querySelectorAll('[data-pick][aria-checked="true"]').length, b = phoneEl.querySelector('.cta6 .btn6'); if (!b) return;
+  const pickSync = phoneEl => { const n = phoneEl.querySelectorAll('[data-pick][aria-checked="true"]').length, b = phoneEl.querySelector('.cta6 .btn6, .fsheet6 .foot .btn6'); if (!b) return;
     b.disabled = !n; b.classList.toggle('lip6', !!n); b.querySelector('span').textContent = n ? `Follow ${n} artist${n === 1 ? '' : 's'}` : 'Pick artists to follow'; b.querySelector('.ic').style.display = n ? '' : 'none'; };
   document.addEventListener('click', e => {
     const row = e.target.closest('[data-pick]');
@@ -1575,8 +1967,318 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       ${post(POP)}${post(POP2)}
     </div>
     <div class="scrim6"></div>${fab(0)}${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`, '', 'data-compact="120"');
-  $('u-skip').innerHTML = strip('No favorites at all', 'Nothing to suggest from, so it sends you to Search. UX.md puts a "Popular artists" list under it; that list is not drawn.',
+  $('u-skip').innerHTML = strip('No favorites at all', 'Nothing to suggest from, so it sends you to Search. The "Popular artists" list that goes under it is in the next section.',
     `<div class="strip p6">${state('look', 'Find artists to follow', 'You have no favorites yet, so there is nothing to suggest from.', act('Search', 'lip6', 'search'), 'pad')}</div>`);
+
+  /* ================= the list as a sheet, toasts, Popular artists ================= */
+  Object.assign(P, { alert: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>' });
+  // Toast: a mark (the artist's own, or an icon in a 28 well), what happened, and at most one way back.
+  const tmark = o => o.artist ? avatar(o.artist, 'p') : `<span class="tmark6 ${o.kind || ''}">${ic(o.icon || 'check', 16, o.kind === 'ok' ? 3 : 2.4)}</span>`;
+  const toast = (o, cls = '') => `<div class="toast6 ${cls}" role="status" ${o.artist ? `data-artist="${o.artist}"` : ''}>${tmark(o)}<span class="tmsg6"><b>${o.title}</b>${o.sub ? `<small>${o.sub}</small>` : ''}</span>${o.undo || o.action
+    ? `<button class="tundo6" type="button" ${o.action ? 'data-act' : 'data-undo'}>${o.action || 'Undo'}<svg class="tring6" aria-hidden="true"><rect width="100%" height="100%" rx="13.25" pathLength="100"/></svg></button>` : ''}</div>`;
+  const toasts = (...list) => `<div class="strip p6 toasts6">${list.map(o => toast(o, 'static')).join('')}</div>`;
+
+  // Artists, Suggested: the offer row leads, then one card per artist. The sheet opens from the row.
+  const offer = `<div class="group6"><button class="srow6" type="button"><span class="ico pink">${ic('heart', 20, 2.2)}</span><span class="lbl"><b>Follow from your favorites</b><small>30 artists you favorite a lot</small></span>${chev()}</button></div>`;
+  const seg2 = `<div class="seg6 big" style="--n:2;--i:1;margin:8px 0 16px" role="group" aria-label="Which artists"><span class="thumb"></span><button type="button" aria-pressed="false">Following<small>42</small></button><button type="button" aria-pressed="true">Suggested</button></div>`;
+  const scard = (a, s) => acard(a, s).replace('</header>', `<button class="more6" type="button" aria-label="More">${ic('more', 22, 2.4)}</button></header>`);
+  const suggCards = n => `<div class="sugg6">${[['pastelbat', 'You faved 23 of 140'], ['cedar lynx', 'You faved 17 of 77'], ['tidepool newt', 'You faved 14 of 431']].slice(0, n).map(([a, s]) => scard(a, s)).join('')}</div>`;
+  const artHead = `<div class="head6"><div class="titlerow"><h3 class="title6">Artists</h3><div class="tools6"><button type="button" aria-label="Search">${ic('search', 20, 2.2)}</button></div></div>${seg2}</div>`;
+  const rows6 = (...r) => `<div class="rows6">${r.map(([i, t, note = '']) => `<button class="row6" type="button">${ic(i, 20, 2)}${t}${note ? `<small>${note}</small>` : ''}</button>`).join('')}</div>`;
+  const ctx = (a, small) => `<div class="grab"></div><div class="ctx">${avatar(a)}<div><b>${a}</b><small>${small}</small></div></div>`;
+  $('s-sugg').innerHTML = phone(`<div class="scroll6">${artHead}${offer}${suggCards(3)}</div>` + bottom('Artists'));
+  $('u-sugg').innerHTML = [
+    strip('While it reads your favorites', 'The same read as the first run, with no way to skip: there is nothing to show until it ends.', `<div class="strip p6" style="padding:24px 0">${find('').replace(`<div class="acts">${quiet('Skip for now')}</div>`, '')}</div>`),
+    strip('Too few favorites', 'It says where suggestions come from and sends you to Search.', `<div class="strip p6">${state('look', 'Not enough favorites yet', 'Suggestions come from the artists you favorite. Favorite a few more posts, or look for artists yourself.', act('Search', 'lip6', 'search'), 'pad')}</div>`),
+  ].join('');
+  $('s-fsheet').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">${artHead}${offer}${suggCards(2)}</div>
+    <div class="scrim6"></div>${tabbar('Artists', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 fsheet6 in" role="dialog" aria-label="Follow from favorites">${shtop('Follow from favorites')}
+      <p class="sub6">You've favorited these artists a lot.</p>
+      <div class="glabel6"><span>Top 30</span><span class="two"><button type="button" data-pickall="1">Select all</button><button type="button" data-pickall="0">None</button></span></div>
+      <div class="list"><div class="qrows6">${PICKS.map((p, i) => prow(p, i < 10)).join('')}</div></div>
+      <div class="foot">${goBtn('Follow 10 artists')}</div>
+    </div><span class="home6"></span>`);
+  $('u-fsheet').innerHTML = strip('A suggestion\'s ⋯', 'The app\'s ⋯ sheet with two rows. "Not interested" hides the artist from suggestions and a toast offers Undo.',
+    sheetStrip(ctx('pastelbat', 'pastelbat') + rows6(['eyeoff', 'Not interested'], ['ext', 'Open on e621', 'e621.net']))) + `<div class="strip p6 toasts6" style="margin-top:-8px">${toast({ artist: 'pastelbat', title: 'Hidden from suggestions', undo: true }, 'static')}</div>`;
+
+  // Artists, Following: a row's ⋯, Sort, and the filter
+  $('s-amenu').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Artists</h3><div class="tools6"><button type="button" aria-label="Search">${ic('search', 20, 2.2)}</button></div></div>${seg2.replace('--i:1', '--i:0').replace('aria-pressed="false">Following', 'aria-pressed="true">Following').replace('aria-pressed="true">Suggested', 'aria-pressed="false">Suggested').replace('margin:8px 0 16px', 'margin:8px 0 12px')}
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><button class="field6" type="button">${ic('search', 18, 2.2)}Filter your artists</button>${chip('Recent')}</div></div>
+      <div class="group6 who">${arow('inkwell fox', 'posted 2h ago · you faved 48', true)}${arow('mossy otter', 'posted 3h ago · you faved 31', true)}${arow('dune jackal', 'posted yesterday · you faved 22')}${arow('pastelbat', 'posted 3d ago · you faved 12')}${arow('berry wolf', 'posted 5d ago · you faved 9')}${arow('cedar lynx', 'posted 2w ago · you faved 7')}</div>
+    </div>
+    <div class="scrim6"></div>${tabbar('Artists', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="cedar lynx">${ctx('cedar lynx', 'cedar_lynx')}${rows6(['share', 'Share artist'], ['ext', 'Open on e621', 'e621.net'], ['minus', 'Unfollow'])}</div><span class="home6"></span>`);
+  $('u-amenu').innerHTML = [
+    strip('Sort', 'The Recent chip opens the app\'s menu: one capsule slides to the choice.', sheetStrip(`${shtop('Sort')}${menu('Sort', mrow('Recent', true) + mrow('A–Z') + mrow('Most faved'))}`)),
+    strip('Filter your artists', 'Typing narrows the list as you go. With no match the list is one muted line: No artist you follow matches "zz".', `<div class="strip p6" style="padding:16px 0 0"><div style="display:flex;padding:0 16px;margin-bottom:16px"><div class="field6 focus has">${ic('search', 18, 2.2)}<span class="val">ot<span class="caret"></span></span><button class="clr" type="button" aria-label="Clear" style="margin-right:6px">${ic('x', 14, 2.8)}</button></div></div><div class="group6 who">${arow('mossy otter', 'posted 3h ago · you faved 31', true)}</div><p class="foot6">1 of 42</p></div>`),
+  ].join('');
+
+  // After following: the feed loads, and a toast says what happened and who e621 skipped.
+  $('s-toast').innerHTML = phone(`<div class="scroll6">${head()}${post(P1)}${post(P2)}</div>` + bottom('Following', 12).replace('<span class="home6">',
+    toast({ kind: 'ok', title: 'Following 8 artists', sub: '2 skipped: saffron hare, harbor seal' }) + '<span class="home6">'));
+  $('u-toast').innerHTML = strip('Messages', 'One line when it can be. A failure gets the red mark and says what did not happen.',
+    toasts({ icon: 'eye', title: 'Marked as seen on e621' }, { icon: 'alert', title: 'e621 allows 500 follows' }, { kind: 'bad', icon: 'alert', title: "Couldn't follow dune jackal", sub: "e621 didn't answer. Nothing was changed." }));
+
+  // No favorites at all: the way to Search, then e621's artists with the most posts.
+  const POPS = [['velvet moth', '18.2k'], ['tin robin', '14.9k'], ['quill badger', '12.4k'], ['opal gecko', '11k'], ['juniper hare', '9.8k'], ['cobalt finch', '9.1k'], ['marsh heron', '8.7k'], ['ash marten', '8.2k']];
+  const poprow = ([a, n], on = false) => `<div class="srow6 poprow6" data-artist="${a}">${avatar(a)}<span class="lbl"><b>${a}</b><small class="num">${n} posts</small></span>${follow(on)}</div>`;
+  $('s-pop').innerHTML = phone(`
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
+      ${state('look', 'Find artists to follow', 'You have no favorites yet, so there is nothing to suggest from.', act('Search', 'lip6', 'search'), 'above', 96)}
+      <div class="shead6"><b>Popular artists</b></div>
+      <div class="group6 who">${POPS.map((p, i) => poprow(p, i === 2)).join('')}</div>
+      <p class="foot6">The artists with the most posts on e621</p>
+    </div>
+    <div class="scrim6"></div>${toast({ artist: 'quill badger', title: 'Following quill badger', undo: true }, 'low')}${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
+  $('u-pop').innerHTML = strip('With Undo', 'About one artist, the mark is theirs. A tag keeps its e621 colour.',
+    toasts({ artist: 'dune jackal', title: 'Following dune jackal', undo: true }, { artist: 'dune jackal', title: 'Unfollowed dune jackal', undo: true }, { kind: 'bad', icon: 'ban', title: 'Blacklisted <span class="tt s">otter</span>', undo: true }));
+
+  // Follow in the list: the feed's own handler turns the button in place; this adds the toast and its way back.
+  let undoing = false;
+  const putToast = (ph, o, cls = '') => { ph.querySelectorAll('.toast6').forEach(n => n.remove()); ph.querySelector('.home6').insertAdjacentHTML('beforebegin', toast(o, cls + (calm ? '' : ' in'))); };
+  const dropToast = t => { if (calm) return t.remove(); t.classList.remove('in'); t.classList.add('out'); t.addEventListener('animationend', () => t.remove(), { once: true }); };
+  document.addEventListener('click', e => {
+    const fo = e.target.closest('.poprow6 .follow6');
+    if (fo) { const row = fo.closest('.poprow6'), ph = row.closest('.phone6'), a = row.dataset.artist; if (undoing || !ph) return;
+      return putToast(ph, { artist: a, title: `${fo.classList.contains('on') ? 'Unfollowed' : 'Following'} ${a}`, undo: true }, 'low'); }
+    const un = e.target.closest('[data-undo]');
+    if (un) { const t = un.closest('.toast6'); if (t.classList.contains('static')) return;
+      const row = t.parentElement.querySelector(`.poprow6[data-artist="${t.dataset.artist}"]`);
+      if (row) { undoing = true; row.querySelector('.follow6').click(); undoing = false; } dropToast(t); }
+  });
+
+  /* ================= links from outside, the grid tile's menu, the artist page's edges (proposed) ================= */
+  Object.assign(P, {
+    link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    tag: '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/>',
+  });
+  const resTools = `<div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const linkChip = `<button class="chip6" type="button" aria-pressed="true">${ic('link', 16, 2.4, 'lead')}From a link${ic('down', 16, 2.4)}</button>`;
+  const resHead = `<div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'solo')}</span></button>${resTools}</div>
+        <div class="chips6">${linkChip}${chip('Videos', true)}${chip('Top', true)}${chip('Date')}${chip('Score')}</div></div>`;
+  const outBanner = `<div class="banner6 two" role="status">${ic('info', 18, 2.2)}<span><b>Not signed in on this browser</b><small>Your blacklist isn't applied</small></span><button class="btn6 lip6" type="button">Sign in</button></div>`;
+  const lrow = (t, v) => `<div class="srow6"><span class="lbl"><b>${t}</b></span><span class="val">${v}</span></div>`;
+  $('s-link').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">${resHead}${outBanner}${post(P2)}</div>
+    <div class="scrim6"></div>${fab(0)}${tabbar('Following', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="From a link">${shtop('From a link')}
+      <p class="sub6" style="margin:-4px 0 8px">This link came with its own settings.</p>
+      <div class="qrows6">${lrow('Ratings', 'Safe, Questionable')}${lrow('Media', 'Videos')}${lrow('Sort', 'Top')}${lrow('Date', 'This week')}${lrow('Score', '≥ 50')}${lrow('Slideshow', 'Ken Burns · 4 s')}</div>
+      <p class="lnote6">For this visit only. Nothing of yours is changed.</p>
+      <button class="btn6 lip6 wide" type="button">Use my settings</button>
+    </div><span class="home6"></span>`);
+  $('u-link').innerHTML = [
+    strip('Results from a link', 'The chip comes first and is on, so it wears the gold ring like any filter that is on. If this browser has no account, the banner says what that means.', `<div class="strip p6" style="padding:12px 0 16px">${resHead}${outBanner}</div>`),
+    strip('Over the player, for its first 4 seconds', 'The same words in the player\'s glass. Signing in pauses the show and it carries on after.', `<div class="strip p6 art" style="--art:${art('mossy otter', 1)};height:auto;padding:16px 16px 72px"><div class="pnote6" role="status">${ic('info', 18, 2.2)}<span><b>Not signed in on this browser</b><small>Your blacklist isn't applied</small></span><button type="button">Sign in</button></div></div>`),
+  ].join('');
+
+  // Grid: hold a tile
+  const rows6c = (...r) => `<div class="rows6">${r.map(([i, t, note = '', cls = '']) => `<button class="row6 ${cls}" type="button">${ic(i, 20, 2)}${t}${note ? `<small>${note}</small>` : ''}</button>`).join('')}</div>`;
+  const tileRows = faved => rows6c(['heart', faved ? 'Unfavorite' : 'Favorite', '', faved ? 'on' : ''], ['users', 'Open artist'], ['play', 'Play from here'], ['ext', 'Open on e621', 'e621.net']);
+  $('s-hold').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div><div class="chips6">${chip('Media')}${chip('Hide favorited', false, false, true)}</div></div>
+      <div class="grid6">${tiles('mossy otter', 3, 0, 3)}<div class="gridrule6">${caught()}</div>${tiles('dune jackal', 9, 4, 0)}</div>
+    </div>
+    <div class="scrim6"></div>${fab(3)}${tabbar('Following', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Post by mossy otter">${ctx('mossy otter', '#4512290')}${tileRows(false)}</div><span class="home6"></span>`);
+  $('u-hold').innerHTML = [
+    strip('While you hold', 'After 400 ms the tile sinks to 96% and the sheet rises. No callout and no selection, the same as a picture in the feed.', `<div class="strip p6" style="padding:20px 0 0"><div class="grid6">${tiles('mossy otter', 3, 0, 0)}</div></div>`),
+    strip('A post you already favorited', 'The first row becomes "Unfavorite" and its heart is filled.', sheetStrip(ctx('mossy otter', '#4512291') + tileRows(true))),
+    strip('Your favorites', 'A pushed screen like Tune: Back and the grid tool, then the title, then its chips (Media, Sort, Score).', `<div class="strip p6" style="padding:8px 0 0"><div class="head6"><div class="titlerow">${back()}<div class="tools6"><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button></div></div><h3 class="title6">Your favorites</h3><div class="chips6">${chip('Media')}${chip('New')}${chip('Score')}</div></div></div>`),
+  ].join('');
+  { const t = document.querySelectorAll('#u-hold .grid6 .tile6')[1]; if (t) t.classList.add('held'); }
+
+  // Artist page: the edges
+  $('s-noart').innerHTML = phone(`
+    <div class="scroll6"><div class="head6"><div class="titlerow">${back()}</div></div>
+      ${state('look', 'No artist called "inkwel fox"', 'e621 has no tag with this name. Check the spelling, or search for it.', act('Search', 'lip6', 'search'), 'screen')}
+    </div>` + bottom('Following'));
+  $('u-noart').innerHTML = [
+    strip('A tag that is not an artist', 'The page still works as a feed of that tag. A tag stands in the well, the name takes its e621 colour, and the button says "Follow tag".', `<div class="strip p6" style="padding:20px 16px 24px"><div class="hero6" style="padding:0"><span class="tagmark6">${ic('tag', 36, 2)}</span><h3 class="title6 s">red fox</h3><span class="handle">red_fox · species</span>
+      <div class="stats6"><div class="stat6"><b>${ic('image', 16, 2.4)}182k</b><small>posts</small></div><div class="stat6 pink"><b>${ic('heart', 16, 2.6)}48</b><small>you faved</small></div><div class="stat6 green"><b>${ic('clock', 16, 2.4)}4m</b><small>last post</small></div></div>
+      ${hfollow(false).replace('Follow</button>', 'Follow tag</button>')}</div></div>`),
+    strip('At 500 follows', 'The button goes flat and says why, and one line says what to do.', `<div class="strip p6" style="padding:20px 16px 24px"><button class="btn6 wide" type="button" disabled>e621 allows 500 follows</button><p class="lnote6 c">Unfollow an artist in Artists to follow another.</p></div>`),
+    strip('Share and ⋯', 'Share opens the system share sheet. Where there is none, the link is copied and a toast says so. ⋯ is the app\'s sheet.', sheetStrip(ctx('inkwell fox', 'inkwell_fox') + rows6c(['link', 'Copy link'], ['ext', 'Open on e621', 'e621.net'])) + `<div class="strip p6 toasts6" style="margin-top:-8px">${toast({ icon: 'link', title: 'Link copied' }, 'static')}</div>`),
+  ].join('');
+
+  /* ================= Settings sub-pages: Account, Content, For You, App (proposed) ================= */
+  Object.assign(P, {
+    out: '<path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3"/><path d="m16 7 3 3"/>',
+    keys: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h.01"/><path d="M10 9h.01"/><path d="M14 9h.01"/><path d="M18 9h.01"/><path d="M7 15h10"/>',
+    dl: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  });
+  const subHead = (t, sub = '') => `<div class="head6"><div class="titlerow">${back()}</div><h3 class="title6">${t}</h3>${sub ? `<p class="sub6">${sub}</p>` : ''}</div>`;
+  const swr = (i, t, s, on, cls = '') => `<div class="srow6"><span class="ico ${cls}">${i.length === 1 ? i : ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
+  const glab = (t, right = '') => `<div class="glabel6"><span>${t}</span>${right ? `<span style="padding-right:16px">${right}</span>` : ''}</div>`;
+
+  // Account
+  $('s-acct').innerHTML = phone(`
+    <div class="scroll6">${subHead('Account')}
+      <div class="group6 flat" style="margin-top:16px"><div class="srow6 acct">${avatar('wolfie', 'l')}<span class="lbl"><b>wolfie</b><small>Signed in to e621 · 42 follows</small></span></div></div>
+      <div class="group6">${srow('heart', 'Your favorites', '1,284 posts', '', 'pink')}</div>
+      <div class="group6">${swr('link', 'Sign-in links', 'Links can sign in as you', false)}</div>
+      <p class="gnote6 warn">${ic('alert', 16, 2.2)}<span>Anyone with such a link can use your e621 account until you make a new API key. Leave this off unless the link is for you.</span></p>
+      <div class="group6">${srow('key', 'API key', 'Saved on this device', 'Change')}</div>
+      <button class="btn6 lip6 wide signout6" type="button">${ic('out', 18, 2.4)}Sign out</button>
+    </div>` + bottom('Settings'));
+  $('u-acct').innerHTML = strip('Signed out', 'The same page with one job. Gold, because here it is the screen\'s one action.', `<div class="strip p6" style="padding:24px 16px">${state('wave', 'Not signed in', 'Sign in to follow artists, favorite posts and use your blacklist.', '<button class="btn6 gold lip6" type="button">Sign in with e621</button>', '', 96).replace('class="state6 "', 'class="state6 " style="padding:0"')}</div>`);
+
+  // Content
+  const bl = (...tags) => `<div class="srow6 blrow6"><span class="lbl">${tags.map(t => t[0] === '−' ? `<span class="neg">${t}</span>` : t).join(' <span class="neg">·</span> ')}</span><button class="rm" type="button" aria-label="Remove">${ic('x', 14, 2.8)}</button></div>`;
+  $('s-content').innerHTML = phone(`
+    <div class="scroll6">${subHead('Content')}
+      ${glab('Ratings').replace('class="glabel6"', 'class="glabel6" style="margin-top:16px"')}
+      <div class="group6">${swr('S', 'Safe', '', true, 'letter s')}${swr('Q', 'Questionable', '', true, 'letter q')}${swr('E', 'Explicit', '', false, 'letter e')}</div>
+      ${glab('Blacklist', '3 lines')}
+      <div class="addrow6"><div class="field6"><span>Tags to hide</span></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div>
+      <div class="group6 flat">${bl('spider')}${bl('clown', '−comedy')}${bl('jump scare', 'video')}</div>
+      <p class="gnote6">A post is hidden when it has every tag on a line. A minus means "but not with".</p>
+      <div class="group6">${swr('refresh', 'Use my e621 blacklist', 'Synced with your account', true)}<div class="srow6"><span class="ico">${ic('dl', 20, 2)}</span><span class="lbl"><b>e621's default list</b><small>For new e621 accounts</small></span><button class="btn6 lip6" type="button">Import</button></div></div>
+    </div>` + bottom('Settings'));
+  $('u-content').innerHTML = [
+    strip('Adding a line', 'The field keeps e621 syntax, like Search. Add goes gold-ringed with the field; the line lands at the top.', `<div class="strip p6" style="padding:16px 0 0"><div class="addrow6"><div class="field6 focus has"><span class="val">gore -rating:s<span class="caret"></span></span><button class="clr" type="button" aria-label="Clear" style="margin-right:6px">${ic('x', 14, 2.8)}</button></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div></div>`),
+    strip('All three ratings off', 'Nothing could show, so the last switch will not turn off. A toast says why.', `<div class="strip p6 toasts6">${toast({ icon: 'alert', title: 'Keep at least one rating on' }, 'static')}</div>`),
+  ].join('');
+
+  // For You
+  const hid = (a, when) => `<div class="srow6">${avatar(a)}<span class="lbl"><b>${a}</b><small>${when}</small></span><button class="btn6 lip6" type="button">Show</button></div>`;
+  $('s-fy').innerHTML = phone(`
+    <div class="scroll6">${subHead('For You')}
+      <div class="group6" style="margin-top:16px">${srow('sliders', 'Tune', 'Breadth, pinned and muted tags')}</div>
+      ${glab('Hidden artists', '3')}
+      <div class="group6 who">${hid('plum raven', 'Hidden 2 days ago')}${hid('frost ermine', 'Hidden last week')}${hid('ember kit', 'Hidden in October')}</div>
+      <p class="gnote6">They do not show in suggestions. Their posts still show if you follow them or search.</p>
+    </div>` + bottom('Settings'));
+  $('u-fy').innerHTML = strip('No hidden artists', 'One muted line in place of the list, saying how artists get here.', `<div class="strip p6" style="padding:16px 0 4px">${glab('Hidden artists')}<p class="gnote6" style="margin-top:0">None. "Not interested" on a suggestion puts an artist here.</p></div>`);
+
+  // App
+  $('s-app').innerHTML = phone(`
+    <div class="scroll6">${subHead('App')}
+      <div class="group6" style="margin-top:16px">${srow('app', 'Install the app', 'Add it to your home screen')}</div>
+      <p class="gnote6">Links you open will still go to Safari, not the installed app, and the two keep separate sign-ins.</p>
+      <div class="group6">${srow('ext', 'e621 button', 'Adds a Slideshow button to e621')}${srow('keys', 'Keyboard shortcuts', 'On a computer')}</div>
+      ${glab('About')}
+      <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>What's new</b></span>${chev()}</button><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
+      <p class="gnote6">Not run by e621. It reads e621 with your own account and key.</p>
+    </div>` + bottom('Settings'));
+  const kb1 = (k, t) => `<div class="srow6"><span class="lbl"><b>${t}</b></span>${k.split(' ').map(x => `<span class="kbd6">${x}</span>`).join('')}</div>`;
+  $('u-app').innerHTML = [
+    strip('Installed', 'In the installed app the row says so and stops being a button.', `<div class="strip p6" style="padding:16px 0 0"><div class="group6"><div class="srow6"><span class="ico green">${ic('check', 20, 2.6)}</span><span class="lbl"><b>Installed</b><small>You are using the installed app</small></span></div></div></div>`),
+    strip('Keyboard shortcuts', 'A titled sheet (a dialog on a computer). Keys sit in small wells.', sheetStrip(`${shtop('Keyboard shortcuts')}<div class="qrows6">${kb1('J K', 'Next and previous post')}${kb1('L', 'Favorite')}${kb1('Enter', 'Play from this post')}${kb1('G', 'Grid view')}${kb1('/', 'Search')}${kb1('Esc', 'Back')}</div>`)),
+  ].join('');
+
+  /* ================= Install, update and the app icon (proposed) ================= */
+  Object.assign(P, { addsq: '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/>', dots: '<path d="M5 12h.01"/><path d="M12 12h.01"/><path d="M19 12h.01"/>' });
+  const isteps = (...l) => `<ol class="check6 isteps6">${l.map(([t, sub, g], i) => `<li><span class="n">${i + 1}</span><span>${t}${sub ? `<small>${sub}</small>` : ''}</span>${g ? ic(g, 20, 2) : ''}</li>`).join('')}</ol>`;
+  const instSheet = `${shtop('Install the app')}<p class="shp6">Slideshow on your home screen, full screen, without the browser's bars.</p>${isteps(['Tap <b>Share</b>', 'In Safari it can be under •••', 'share'], ['Choose <b>Add to Home Screen</b>', '', 'addsq'], ['Tap <b>Add</b>', '', ''])}<p class="shn6">The installed app keeps its own sign-in, so you sign in once more there.</p>`;
+  // the steps open over Settings › App
+  $('s-inst').innerHTML = $('s-app').innerHTML;
+  $('s-inst').querySelector('.home6').insertAdjacentHTML('beforebegin', `<div class="dim6"></div><div class="sheet6 in" role="dialog" aria-label="Install the app">${instSheet}</div>`);
+  $('u-inst').innerHTML = [
+    strip('Where the browser can install by itself', 'Android, and Chrome or Edge on a computer. The row ends in a button and the browser shows its own dialog. No sheet.',
+      `<div class="strip p6" style="padding:16px 0 0"><div class="group6"><div class="srow6"><span class="ico">${ic('app', 20, 2)}</span><span class="lbl"><b>Install the app</b><small>Add it to your home screen</small></span><button class="btn6 lip6" type="button">Install</button></div></div></div>`),
+    strip('Inside another app\'s browser', 'A link opened inside a chat or social app cannot install anything. The sheet says so and gives the way out.',
+      sheetStrip(`${shtop('Install the app')}<p class="shp6" style="margin-bottom:0">This browser cannot install apps. Open the page in Safari, then come back to Settings.</p><button class="btn6 lip6 wide" type="button">${ic('link', 18, 2.4)}Copy link</button>`)),
+    strip('Optional: a one-time offer', 'Not in the plan; drawn so you can say yes or no. One row at the top of Settings until you install or close it. Never in a feed.',
+      `<div class="strip p6" style="padding:16px 0 0"><div class="group6"><div class="srow6"><span class="ico">${ic('app', 20, 2)}</span><span class="lbl"><b>Install the app</b><small>Full screen, on your home screen</small></span><button class="xwell6" type="button" aria-label="Not now">${ic('x', 14, 2.8)}</button></div></div></div>`),
+  ].join('');
+
+  // Update: a new version is downloaded and waiting. An action toast like any other: 6 s, with the ring.
+  $('s-upd').innerHTML = phone(`<div class="scroll6">${head()}${post(P1)}${post(P2)}</div>` + bottom('Following', 12).replace('<span class="home6">',
+    toast({ icon: 'refresh', title: 'New version ready', action: 'Reload' }) + '<span class="home6">'));
+  $('u-upd').innerHTML = [
+    strip('If you let it pass', 'The toast shows once per version. After that the way to it is Settings › App. The next time the app starts cold it is on the new version anyway.',
+      `<div class="strip p6" style="padding:16px 0 0"><div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b><small>2.1 is ready</small></span><button class="btn6 lip6" type="button">${ic('refresh', 16, 2.6)}Reload</button></div></div></div>`),
+    strip('After the reload', 'A plain confirmation, 4 s. "What\'s new" stays in Settings › App.', toasts({ kind: 'ok', title: 'Updated to 2.1' })),
+  ].join('');
+
+  // The app icon: the app mark (the kaleidoscope) on navy, lit from above.
+  const ICONK = kspec('e621 slideshow', MARK);
+  const EXT = Math.max(...ICONK.shapes.map(s => (s.x || s.y ? Math.hypot(s.x, s.y) : 0) + s.r + (s.width || 0) / 2)); // how far the mark reaches in its own box
+  const kshapes = (a, glow, one) => { const sh = one ? a.shapes.map(s => ({ ...s, color: one })) : a.shapes; return (glow ? HALOS.map(([sp, f]) => sh.map(s => dot(s, a.glow * sp, f)).join('')).join('') : '') + sh.map(s => dot(s)).join(''); };
+  const appIcon = (size, cls = 'ios', o = {}) => `<span class="aicon6 ${cls}" style="width:${size}px;height:${size}px"><svg viewBox="-1 -1 2 2" aria-hidden="true">${o.mono ? '' : '<defs><linearGradient id="aig6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#152F56"/><stop offset="1" stop-color="#020F23"/></linearGradient></defs><rect x="-1" y="-1" width="2" height="2" fill="url(#aig6)"/>'}<g transform="scale(${Math.round((o.reach || .68) / EXT * 1e4) / 1e4})">${kshapes(ICONK, !o.flat && !o.mono, o.mono ? '#fff' : '')}</g></svg></span>`;
+  const ph = (n = 1) => Array.from({ length: n }, () => '<div><span class="ph"></span><span class="bar"></span></div>').join('');
+  $('s-icon').innerHTML = phone(`<div class="hgrid6">${ph(9)}<div>${appIcon(60)}<span>Slideshow</span></div>${ph(2)}</div><div class="hdock6">${'<span class="ph"></span>'.repeat(4)}</div>`, 'homescr6');
+  $('u-icon').innerHTML = [
+    strip('One drawing, three masks', 'iPhone cuts a rounded square, Android a circle (the dashed ring is its safe area), a browser tab shows it at 32 and 16.',
+      `<div class="strip p6 row icons6"><div>${appIcon(120)}<span>iPhone, 180</span></div><div>${appIcon(96, 'round guide')}<span>Android, 192 and 512</span></div><div><span class="pair">${appIcon(32, 'fav', { reach: .84, flat: true })}${appIcon(16, 'fav', { reach: .84, flat: true })}</span><span>Tab, 32 and 16</span></div></div>`),
+    strip('In a browser tab', 'On a dark and a light tab strip. The navy square keeps the gold readable on both.',
+      `<div class="strip p6 row" style="gap:12px;padding:20px 16px 0;align-items:flex-end"><span class="tabchip6 dk">${appIcon(16, 'fav', { reach: .84, flat: true })}Following</span><span class="tabchip6 lt">${appIcon(16, 'fav', { reach: .84, flat: true })}Following</span></div>`),
+    strip('One colour', 'For Android\'s themed icons: the same mark in one colour on a clear ground. The phone picks the colours.',
+      `<div class="strip p6 row"><div>${appIcon(72, 'mono', { mono: true })}<span>Monochrome</span></div></div>`),
+  ].join('');
+
+  /* ================= Desktop, 900 px and wider (proposed) ================= */
+  Object.assign(P, { full: '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>' });
+  const desk = (inner, cls = '') => `<div class="desk6 p6 ${cls}">${inner}</div>`;
+  const side = (active, cls = '', n = 12) => `<nav class="side6 ${cls}" aria-label="Tabs"><div class="sbrand6">${mark('')}<span>Slideshow</span></div>
+    <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
+    <button type="button" class="field6 ssearch6" aria-label="Search">${ic('search', 18, 2.2)}<span>Search</span><span class="kbd6">/</span></button>
+    <button type="button" class="sacct6" aria-label="Account: wolfie">${avatar('wolfie')}<span><b>wolfie</b><small>42 follows</small></span></button></nav>`;
+  const dtools = `<div class="tools6"><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const dhead = () => head().replace(tools(), dtools);
+  const PD = { ...P1, ar: '3/2' };
+  const feedMain = `<div class="dmain6"><div class="dcol6">${dhead()}${post(PD)}${post(P2)}</div>${fab(12)}</div>`;
+
+  // 1. Following: the sidebar, the 600 column, Play beside it
+  $('d-feed').innerHTML = desk(side('Following') + feedMain);
+
+  // 2. Grid: the full width; a chip's sheet becomes a popover under the chip
+  $('d-grid').innerHTML = desk(side('Following', '', 5) + `<div class="dmain6 wide">${dhead().replace('<b>12 new</b> from 5 artists', '<b>5 new</b> from 2 artists')}
+    <div class="grid6">${tiles('mossy otter', 5, 0, 5)}<div class="gridrule6">${caught()}</div>${tiles('dune jackal', 15, 5, 0)}</div>${fab(5)}
+    <div class="sheet6 pop6" role="dialog" aria-label="Media" style="left:24px;top:162px"><div class="shtop"><b>Media</b></div><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div></div>`);
+
+  // 3. The player: Post info is a panel beside the picture, not a sheet over it
+  const sinfo = $('s-info').querySelector('.sheet6').innerHTML;
+  $('d-player').innerHTML = desk(`<div class="stage"><i style="--art:${art('mossy otter', 1)}"></i></div><div class="ts"></div><div class="bs"></div>
+    <div class="dptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="r"><span class="pcount6">12 / 300+</span><button class="gl6" type="button" aria-label="Full screen">${ic('full', 20, 2.2)}</button></span></div>
+    <div class="dpbot6"><div class="pbar6"><i></i><span>4 s</span></div>
+      <div class="dpctl6"><div class="pwho6">${avatar('mossy otter')}<div class="idn"><b>mossy otter</b><small>3h ago · #4512290</small></div></div>
+        <div class="ptrans6"><button class="gl6" type="button" aria-label="Previous">${ic('prev', 20, 2.2, 'solid')}</button><button class="pplay6 lip6" type="button" aria-label="Play" data-playing="0">${ic('play', 26, 0, 'solid')}</button><button class="gl6" type="button" aria-label="Next">${ic('next', 20, 2.2, 'solid')}</button></div>
+        <div class="acts"><button class="gl6 pfav" type="button" aria-pressed="false" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6 ring" type="button" aria-pressed="true" aria-label="Post info">${ic('info', 22, 2.2)}</button><button class="gl6" type="button" aria-label="Slideshow settings">${ic('sliders', 20, 2.2)}</button><button class="gl6" type="button" aria-label="Share">${ic('share', 20, 2.2)}</button></div></div></div>
+    <aside class="sheet6 ipanel6" aria-label="Post info" data-targets="foryou">${sinfo}</aside>`, 'dplayer6');
+
+  // 4. Settings: every sub-page on one page, in the 600 column
+  $('d-settings').innerHTML = desk(side('Settings') + `<div class="dmain6"><div class="dcol6">
+    <div class="head6"><div class="titlerow"><h3 class="title6">Settings</h3></div></div>
+    <div class="shead6" style="margin-top:16px"><b>Account</b></div>
+    <div class="group6 flat"><div class="srow6 acct">${avatar('wolfie', 'l')}<span class="lbl"><b>wolfie</b><small>Signed in to e621 · 42 follows</small></span><button class="btn6 lip6" type="button">${ic('out', 16, 2.4)}Sign out</button></div></div>
+    <div class="group6">${srow('heart', 'Your favorites', '1,284 posts', '', 'pink')}${swr('link', 'Sign-in links', 'Links can sign in as you', false)}${srow('key', 'API key', 'Saved on this device', 'Change')}</div>
+    <div class="shead6"><b>Content</b></div>
+    ${glab('Ratings')}
+    <div class="group6">${swr('S', 'Safe', '', true, 'letter s')}${swr('Q', 'Questionable', '', true, 'letter q')}${swr('E', 'Explicit', '', false, 'letter e')}</div>
+    ${glab('Blacklist', '3 lines')}
+    <div class="addrow6"><div class="field6"><span>Tags to hide</span></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div>
+  </div></div>`);
+
+  // 5. A titled sheet becomes a dialog in the middle of the window
+  $('d-dialog').innerHTML = desk(side('Following') + feedMain + `<div class="dim6"></div>
+    <div class="sheet6 dlg6" role="dialog" aria-label="Keyboard shortcuts">${shtop('Keyboard shortcuts')}<div class="qrows6">${kb1('J K', 'Next and previous post')}${kb1('L', 'Favorite')}${kb1('Enter', 'Play from this post')}${kb1('G', 'Grid view')}${kb1('/', 'Search')}${kb1('Esc', 'Back')}</div></div>`);
+
+  $('u-desk').innerHTML = [
+    strip('A tile\'s menu', 'Right-click a tile (or the menu key). The same rows as the phone\'s hold menu, as a popover at the pointer.', `<div class="strip p6" style="padding:20px 0"><div class="sheet6 pop6 still">${ctx('mossy otter', '#4512290').replace('<div class="grab"></div>', '')}${tileRows(false)}</div></div>`),
+    strip('Narrower windows, 900 to 1099', 'The same panel with icons only. The label shows as a tooltip. Under 900 it is the phone layout.', `<div class="strip p6" style="padding:8px;display:flex;justify-content:center">${side('Following', 'rail still')}</div>`),
+    strip('Under the pointer', 'A row gets a faint wash. A raised button steps up to the lighter navy. Gold and pictures do not change.',
+      `<div class="strip p6 hovs6"><div class="pairs"><small>Rest</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist')}</div></div><div class="pairs"><small>Hover</small><div class="group6">${srow('eye', 'Content', 'Ratings, blacklist').replace('class="srow6"', 'class="srow6 hov"')}</div></div><div class="pairs"><small>Rest</small><button class="btn6 lip6" type="button">Import</button><small style="margin-left:24px">Hover</small><button class="btn6 lip6 hov" type="button">Import</button></div></div>`),
+  ].join('');
+
+  // the sidebar's capsule slides to the tab you pick
+  document.addEventListener('click', e => { const t = e.target.closest('[data-stab]'); if (!t) return; const box = t.parentElement;
+    [...box.querySelectorAll('.stab6')].forEach((b, k) => { const on = b === t; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); if (on) box.style.setProperty('--k', k); }); });
+  // a desktop frame is 1280 wide; it shrinks to fit the page
+  const dfit = () => document.querySelectorAll('.desk-holder').forEach(h => { const z = Math.min(1, h.clientWidth / 1280), el = h.firstElementChild; h.style.height = (800 * z) + 'px'; if (el) el.style.zoom = z; });
+  dfit(); addEventListener('resize', dfit);
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;

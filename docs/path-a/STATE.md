@@ -71,6 +71,7 @@ stats, Settings sub-pages and the sign-in sheet move to slices 5–7 (built with
 - [x] Design update: filter menus, player sheets, tag targets in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [x] Design update: Goo the mascot; landing, empty, error and offline states in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [x] Design update: first run after sign-in (the read, Follow from favorites, the skipped state) in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-26)
+- [ ] Design, proposed overnight 2026-11-26, waiting for the owner (MORNING-DESIGN.md): batch 1 = toasts, Artists › Suggested, Follow from favorites as a sheet, Artists row menus, Popular artists; batch 2 = "From a link" chip and sheet, the signed-out-here banner, the grid tile hold menu, artist page edges (no such artist, a tag, 500 follows, share and ⋯), Your favorites header; batch 3 = Settings › Account, Content, For You, App, the keyboard shortcuts sheet; batch 4 = install steps, the update toast, the app icon; batch 5 = the layout on a computer (sidebar, column, grid, player with Post info, Settings on one page, popovers and dialogs)
 - [ ] Phase 5: slices 1–9 (1, 2a, 2b, 3a, 3b, 4, R1, R2a, R2b, R3, 5 done; slice 6 next)
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over

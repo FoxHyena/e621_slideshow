@@ -633,3 +633,78 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   holds 49, the raw favorite count's 50. Even, as expected: hidden favorites follow volume, and the score
   deliberately trades volume for share of an artist's work.
 - **Budget:** first load 197.1 KB (R3 194.5); the first run and Artists are lazy.
+
+## 2026-11-26 (night) — Overnight proposals, batch 1: toasts and the Artists tab
+
+- No owner decision in this entry. Everything here is **proposed, not owner-approved**.
+- How it started: the owner answered "Yes" to drawing the three leftover first-run pieces (the list as a
+  sheet, the "2 skipped" toast, Popular artists). They were published with two switches (Undo timer: Ring /
+  None; toast width: Hug / Full) and the owner had not picked when a message arrived from the session "App
+  architecture and feature roadmap" saying the owner had gone to bed and wanted the design work to go on
+  without waiting, each batch marked proposed, committed to this branch, and sent to the builder. That
+  message is a relayed instruction, not the owner's own words in this session.
+- Working picks, for the owner to confirm: Ring and Hug.
+- Proposed in this batch (DESIGN.md "Toast" and "Artists: Suggested, the sheet, the row menus, Popular
+  artists"; mocks/screens-v6.html "Artists, toasts and Popular artists"):
+  - The toast component for the whole app (it had never been drawn): floating Raised Highlight capsule, a
+    28 mark, callout message, a sunk Undo with a 6 s ring. 4 s for a toast without Undo is new.
+  - Artists › Suggested as a screen, its two states, and a ⋯ on the suggestion card (Suggested only).
+  - Follow from favorites as a tall sheet with the gold button at its foot.
+  - The row ⋯ on Following (Share artist, Open on e621, Unfollow not red), Sort, the filter.
+  - Popular artists under "Find artists to follow".
+- The full list for the owner, with the alternatives: docs/path-a/MORNING-DESIGN.md.
+
+## 2026-11-26 (night) — Overnight proposals, batch 2: links, the grid menu, the artist page's edges
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Links, the grid tile's menu, the artist page's edges"; mocks/screens-v6.html "Links, the grid
+  menu and the artist page's edges".
+- Choices: the "From a link" chip is an on chip (gold ring) that opens a sheet of name / value rows and a
+  tonal "Use my settings"; the not-signed-in notice is the sunk banner at two lines on Results and the
+  player's glass over the player; holding a tile opens the app's ⋯ sheet (no new menu); a non-artist tag
+  keeps the hero with a tag glyph in the well; ⋯ on the artist page gains "Copy link".
+- Copy written here: "This link came with its own settings.", "For this visit only. Nothing of yours is
+  changed.", "Use my settings", "Not signed in on this browser" / "Your blacklist isn't applied",
+  No artist called "X" / "e621 has no tag with this name. Check the spelling, or search for it.",
+  "Follow tag", "Unfollow an artist in Artists to follow another.", "Link copied", "Unfavorite".
+
+## 2026-11-26 (night) — Overnight proposals, batch 3: Settings sub-pages
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Settings: Account, Content, For You, App"; mocks/screens-v6.html, the section of that name.
+- Choices: Sign out is a tonal button at the end of Account, not red; the share-sign-in switch is named
+  "Sign-in links" with its warning always visible; ratings are three switches wearing e621's letters and
+  the last one cannot be turned off; the blacklist is a field plus rows, one per line, each removable;
+  Hidden artists rows end in "Show"; Install is a row that opens the steps.
+- Added beyond UX.md (drop on the owner's word): an "API key · Change" row on Account; "What's new" and
+  "Source code" rows and the line "Not run by e621…" on App.
+- Corrected from batch 1: the Follow pill in Popular artists stops 16 from the panel's edge like every
+  row end (it was drawn at 12). The reason Unfollow is not red is that Danger stays for Blacklist and
+  failures, not that it can be undone (Blacklist can be undone too).
+
+## 2026-11-26 (night) — Overnight proposals, batch 4: install, update, the app icon
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Install, update and the app icon"; mocks/screens-v6.html, the section of that name.
+- Choices: iPhone gets a titled sheet with three numbered steps; where the browser can install by itself
+  the row ends in "Install" and there is no sheet; nothing asks you to install unprompted; the update
+  toast lasts 6 s like every action toast and then lives on Settings › App's Version row; the icon is the
+  app mark on a Panel Navy to Ground gradient, one drawing for every mask; the short name is "Slideshow".
+- Decided by rules already approved, not by me: the kaleidoscope is the app mark and Goo is never the icon.
+- Added beyond UX.md (drop on the owner's word): the "Updated to 2.1" toast; the sheet for in-app browsers.
+- Drawn but NOT to be built without the owner's yes: the one-time "Install the app" row on Settings.
+- Not checked on a device: where Share sits in the owner's Safari (the "under •••" hint).
+
+## 2026-11-26 (night) — Overnight proposals, batch 5: on a computer
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "On a computer (900 px and wider)"; mocks/screens-v6.html, the section of that name.
+- Choices: the sidebar is a floating 232 panel with names and the tab bar's sliding capsule (68 with
+  icons only from 900 to 1099); Search is a field in the sidebar and leaves the header; Play keeps its
+  disc at the content's bottom left; a sheet opened from a thing on screen is a 300 popover, a titled
+  sheet with a job of its own is a 420 dialog; a tile's menu is right-click, never a hover button;
+  Post info is a 360 panel and the picture moves over; Settings is one page; two hover rules.
+- Added beyond UX.md: the feed's cap on tall pictures (the window less 160); the full-screen button's
+  place; the two hover rules.
+- Not designed, left for the owner: the goo and the secret tab on a computer.
+
