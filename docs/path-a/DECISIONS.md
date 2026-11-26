@@ -327,3 +327,17 @@ Format: date — decision. Why. Rejected alternatives.
   No artist called "X" / "e621 has no tag with this name. Check the spelling, or search for it.",
   "Follow tag", "Unfollow an artist in Artists to follow another.", "Link copied", "Unfavorite".
 
+## 2026-11-26 (night) — Overnight proposals, batch 3: Settings sub-pages
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Settings: Account, Content, For You, App"; mocks/screens-v6.html, the section of that name.
+- Choices: Sign out is a tonal button at the end of Account, not red; the share-sign-in switch is named
+  "Sign-in links" with its warning always visible; ratings are three switches wearing e621's letters and
+  the last one cannot be turned off; the blacklist is a field plus rows, one per line, each removable;
+  Hidden artists rows end in "Show"; Install is a row that opens the steps.
+- Added beyond UX.md (drop on the owner's word): an "API key · Change" row on Account; "What's new" and
+  "Source code" rows and the line "Not run by e621…" on App.
+- Corrected from batch 1: the Follow pill in Popular artists stops 16 from the panel's edge like every
+  row end (it was drawn at 12). The reason Unfollow is not red is that Danger stays for Blacklist and
+  failures, not that it can be undone (Blacklist can be undone too).
+

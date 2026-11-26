@@ -23,7 +23,7 @@ treat that message as your approval of any design. To throw a batch away: `git r
    the close button in place of "Skip for now". Other option: a full screen pushed from Suggested.
 4. **A ⋯ on each suggestion card, on Suggested only,** for "Not interested". The feed's card is
    unchanged. Other option: hold the card.
-5. **Unfollow is not red** in a followed artist's ⋯ sheet, because the toast gives it back. I added
+5. **Unfollow is not red** in a followed artist's ⋯ sheet: red stays for Blacklist and failures. I added
    "Open on e621" to that sheet; UX.md lists only Unfollow and Share.
 6. **Popular artists:** heading, one panel of rows with the feed's Follow pill, and the line "The artists
    with the most posts on e621". Other option: artist cards with pictures, like Suggested.
@@ -47,6 +47,22 @@ treat that message as your approval of any design. To throw a batch away: `git r
    another."
 7. **The artist page's ⋯ gains "Copy link"** next to "Open on e621"; copying shows the toast "Link copied".
 8. **Your favorites** takes the pushed-screen header (Back, grid tool, large title), not the Results one.
+
+## Batch 3: Settings sub-pages (section "Settings: Account, Content, For You, App")
+
+1. **Blacklist editor:** a field plus "Add", then one row per line with a small remove well. Other
+   option: one big text box, as on e621 (faster for pasting a long list).
+2. **Ratings are three switches** with the letters S, Q, E in e621's colours. The last one on will not
+   turn off. Other option: a three-part segmented control.
+3. **Sign out is a tonal button, not red.** Other option: a red row.
+4. **"Sign-in links"** is my name for the share-sign-in switch, with the warning always shown under it:
+   "Anyone with such a link can use your e621 account until you make a new API key. Leave this off unless
+   the link is for you." Other option: a confirm sheet when it is turned on.
+5. **Rows I added that UX.md does not list:** "API key · Change" (Account); "What's new", "Source code"
+   and the line "Not run by e621. It reads e621 with your own account and key." (App). Say the word and
+   they go.
+6. **Hidden artists** rows end in "Show".
+7. **Fix to batch 1:** the Follow pill in Popular artists now stops 16 from the panel's edge (was 12).
 
 ## Still open from before tonight
 

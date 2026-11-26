@@ -755,7 +755,6 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
 /* Popular artists: a state block with a list under it */
 .state6.above { margin: 16px 0 24px; }
-.poprow6 .follow6 { margin-right: -4px; }
 .poprow6 .num { font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { .tring6 rect, .toast6.in, .toast6.out { animation: none; } }
 
@@ -786,6 +785,23 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .tagmark6 { width: 80px; height: 80px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); }
 .hero6 .title6.s { color: var(--t-species); }
 .row6.on .ic { color: var(--heart); fill: currentColor; }
+
+/* ---------- Settings sub-pages: Account, Content, For You, App (proposed) ---------- */
+.srow6 .ico.letter { font: var(--w-v) 15px/20px var(--f-r); }
+.srow6 .ico.letter.s { color: var(--score); } .srow6 .ico.letter.q { color: #E4D24F; } .srow6 .ico.letter.e { color: var(--danger); }
+.gnote6 { margin: -8px var(--inset) 16px; padding: 0 16px; font: var(--t-foot); color: var(--muted); }
+.gnote6.warn { display: flex; gap: 8px; align-items: flex-start; }
+.gnote6.warn .ic { flex: none; color: var(--danger); margin-top: 1px; }
+.blrow6 .lbl { font: 500 15px/20px var(--f); color: var(--t-general); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.blrow6 .lbl .neg { color: var(--muted); }
+.blrow6 .rm { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; position: relative; }
+.blrow6 .rm::before { content: ""; position: absolute; inset: -8px; }
+.addrow6 { display: flex; gap: 8px; margin: 0 var(--inset) 16px; }
+.addrow6 .btn6 { height: var(--h); padding: 0 18px; flex: none; }
+.srow6 > .btn6 { flex: none; }
+.btn6.wide.signout6 { margin: 8px var(--inset) 16px; width: calc(100% - 2 * var(--inset)); }
+.kbd6 + .kbd6 { margin-left: -8px; }
+.kbd6 { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 8px; background: var(--well); box-shadow: var(--sunk); font: 400 13px/18px var(--f-m); color: var(--text); }
 </style>
 
 <div class="wrap" id="root">
@@ -889,7 +905,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <div class="under" id="u-fsheet"></div>
       </section>
       <section class="col" aria-label="Artists, Following: the row menu">
-        <div class="col-head"><h2 class="pg-h3">3. Following: a row's ⋯</h2><p>The app's ⋯ sheet, headed by the artist. Unfollow is not red: a toast gives it back with Undo.</p></div>
+        <div class="col-head"><h2 class="pg-h3">3. Following: a row's ⋯</h2><p>The app's ⋯ sheet, headed by the artist. Unfollow is not red: red stays for Blacklist and failures.</p></div>
         <div class="phone-holder" id="s-amenu"></div>
         <div class="under" id="u-amenu"></div>
       </section>
@@ -917,7 +933,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <tr><th>Where a toast sits</th><td>Above Play</td><td>12 above Play (168 from the bottom). On a screen with no Play it takes Play's place, 16 above the tab bar. One at a time: a new toast replaces the last.</td><td>The same two heights the Follow button and Play already use.</td></tr>
         <tr><th>The sheet</th><td>"a sheet from Artists › Suggested"</td><td>A tall sheet, 76 from the top. The close button replaces "Skip for now". The list fades out above the gold button at the foot.</td><td>The sign-in sheet already ends in one gold button. A floating button has nothing to float over here.</td></tr>
         <tr><th>A suggestion's ⋯</th><td>⋯ → Not interested</td><td>A ⋯ after Follow on the card (Suggested only; the feed's card stays as it is). It opens the ⋯ sheet: Not interested, Open on e621.</td><td>The card had no place for it. Other option: hold the card.</td></tr>
-        <tr><th>A followed artist's ⋯</th><td>⋯ → Unfollow (toast + Undo), Share</td><td>The ⋯ sheet headed by the artist: Share artist, Open on e621, Unfollow. Unfollow is not red.</td><td>It can be undone, and red is kept for what cannot (Blacklist).</td></tr>
+        <tr><th>A followed artist's ⋯</th><td>⋯ → Unfollow (toast + Undo), Share</td><td>The ⋯ sheet headed by the artist: Share artist, Open on e621, Unfollow. Unfollow is not red.</td><td>Red stays for Blacklist and for failures. Unfollowing is an everyday action with Undo.</td></tr>
         <tr><th>Popular artists</th><td>Search + "Popular artists" (by post count)</td><td>A heading and one panel of rows: mark, name, post count, the feed's Follow button. Following one swaps the button for "Following" in place.</td><td>The Artists list and the feed's Follow button already exist; nothing new is needed.</td></tr>
       </tbody>
     </table></div>
@@ -955,6 +971,46 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <tr><th>At 500 follows</th><td>Follow disabled + note</td><td>The disabled button reading "e621 allows 500 follows" and one line: "Unfollow an artist in Artists to follow another."</td><td>The same disabled button the follow list uses.</td></tr>
         <tr><th>Share and ⋯</th><td>Share → system sheet, fallback copies the link; ⋯ → Open on e621</td><td>⋯ is the app's sheet: Copy link, Open on e621. Copying shows the toast "Link copied".</td><td>Copy link is there for browsers with no share sheet. Results' ⋯ uses the same sheet with "Copy share link".</td></tr>
         <tr><th>Your favorites</th><td>‹ Your favorites · grid; chips Media, Sort, Score</td><td>A pushed screen like Tune: Back and the grid tool in the top row, the large title under it, then the chips.</td><td>No search field to edit, so it takes the pushed-screen header, not the Results header.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="sets" aria-label="Settings sub-pages">
+    <h2 class="pg-h2" style="margin-top:40px">Settings: Account, Content, For You, App</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The four Settings pages that had no drawing (Slideshow was drawn earlier). Each is a pushed screen built from the list parts: Back, the large title, groups of rows. Switches toggle.</p>
+    <div class="cols">
+      <section class="col" aria-label="Account">
+        <div class="col-head"><h2 class="pg-h3">1. Account</h2><p>Who you are, your favorites, the one risky switch with its warning in plain words, and Sign out as a tonal button at the end.</p></div>
+        <div class="phone-holder" id="s-acct"></div>
+        <div class="under" id="u-acct"></div>
+      </section>
+      <section class="col" aria-label="Content">
+        <div class="col-head"><h2 class="pg-h3">2. Content</h2><p>Ratings are three switches wearing e621's rating letters. The blacklist is a field to add a line and a list of lines, each with a small remove well.</p></div>
+        <div class="phone-holder" id="s-content"></div>
+        <div class="under" id="u-content"></div>
+      </section>
+      <section class="col" aria-label="For You">
+        <div class="col-head"><h2 class="pg-h3">3. For You</h2><p>The way to Tune, and the artists you said "Not interested" to, each with a way back.</p></div>
+        <div class="phone-holder" id="s-fy"></div>
+        <div class="under" id="u-fy"></div>
+      </section>
+      <section class="col" aria-label="App">
+        <div class="col-head"><h2 class="pg-h3">4. App</h2><p>Install, the e621 button, shortcuts, and About. The note under Install says the one surprising thing about iPhone links.</p></div>
+        <div class="phone-holder" id="s-app"></div>
+        <div class="under" id="u-app"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>Sign out</th><td>"Sign out"</td><td>A tonal 44 button at the end of the page, with a glyph. Not red, not a list row.</td><td>It ends the page the way the sign-in sheet ends in its button. Other option: a red row.</td></tr>
+        <tr><th>Sign-in links</th><td>share-sign-in toggle with warning</td><td>A switch named "Sign-in links", off, with the warning under its group in Muted text and a Danger glyph.</td><td>The warning is always visible, not behind the switch. Other option: a confirm sheet when it is turned on.</td></tr>
+        <tr><th>API key row</th><td>Nothing</td><td>A row "API key · Saved on this device" with "Change", which opens the sign-in sheet.</td><td>An added row. A key that stops working needs a way in that is not signing out.</td></tr>
+        <tr><th>Ratings</th><td>Ratings (S/Q/E)</td><td>Three switch rows; the icon well holds the letter in e621's colour (S green, Q yellow, E red). The last one on cannot be turned off; a toast says why.</td><td>Switches, because more than one can be on, like the Media menu. Other option: a three-part segmented control (one at a time).</td></tr>
+        <tr><th>Blacklist editor</th><td>Blacklist (editor, account sync, import defaults)</td><td>A field plus "Add", then one row per line with the tags and a 28 remove well; a line of help; then "Use my e621 blacklist" (switch) and "e621's default list" (Import).</td><td>Lines as rows can be removed one at a time and read like the search pills. Other option: one big text box, as on e621.</td></tr>
+        <tr><th>Hidden artists</th><td>Hidden artists</td><td>The Artists list rows with a tonal "Show" in place of ⋯, and when each was hidden.</td><td>"Show" is the opposite of "Not interested" in plain words.</td></tr>
+        <tr><th>App page</th><td>Install app, e621 button, Keyboard shortcuts, About</td><td>Install is a row that opens the steps (next batch); in the installed app it reads "Installed" with a green check. About is three plain rows and one line saying the app is not run by e621.</td><td>"What's new" and "Source code" are added rows; drop them if you do not want them.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -1048,7 +1104,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>Settings sub-pages (Account, Content, For You, App), the install steps and the update toast.</li>
+    <li>The install steps, the update toast and the app icon.</li>
     <li>Desktop layouts.</li>
   </ul>
 </div>
@@ -1882,6 +1938,73 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       ${hfollow(false).replace('Follow</button>', 'Follow tag</button>')}</div></div>`),
     strip('At 500 follows', 'The button goes flat and says why, and one line says what to do.', `<div class="strip p6" style="padding:20px 16px 24px"><button class="btn6 wide" type="button" disabled>e621 allows 500 follows</button><p class="lnote6 c">Unfollow an artist in Artists to follow another.</p></div>`),
     strip('Share and ⋯', 'Share opens the system share sheet. Where there is none, the link is copied and a toast says so. ⋯ is the app\'s sheet.', sheetStrip(ctx('inkwell fox', 'inkwell_fox') + rows6c(['link', 'Copy link'], ['ext', 'Open on e621', 'e621.net'])) + `<div class="strip p6 toasts6" style="margin-top:-8px">${toast({ icon: 'link', title: 'Link copied' }, 'static')}</div>`),
+  ].join('');
+
+  /* ================= Settings sub-pages: Account, Content, For You, App (proposed) ================= */
+  Object.assign(P, {
+    out: '<path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3"/><path d="m16 7 3 3"/>',
+    keys: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M6 9h.01"/><path d="M10 9h.01"/><path d="M14 9h.01"/><path d="M18 9h.01"/><path d="M7 15h10"/>',
+    dl: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  });
+  const subHead = (t, sub = '') => `<div class="head6"><div class="titlerow">${back()}</div><h3 class="title6">${t}</h3>${sub ? `<p class="sub6">${sub}</p>` : ''}</div>`;
+  const swr = (i, t, s, on, cls = '') => `<div class="srow6"><span class="ico ${cls}">${i.length === 1 ? i : ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
+  const glab = (t, right = '') => `<div class="glabel6"><span>${t}</span>${right ? `<span style="padding-right:16px">${right}</span>` : ''}</div>`;
+
+  // Account
+  $('s-acct').innerHTML = phone(`
+    <div class="scroll6">${subHead('Account')}
+      <div class="group6 flat" style="margin-top:16px"><div class="srow6 acct">${avatar('wolfie', 'l')}<span class="lbl"><b>wolfie</b><small>Signed in to e621 · 42 follows</small></span></div></div>
+      <div class="group6">${srow('heart', 'Your favorites', '1,284 posts', '', 'pink')}</div>
+      <div class="group6">${swr('link', 'Sign-in links', 'Links can sign in as you', false)}</div>
+      <p class="gnote6 warn">${ic('alert', 16, 2.2)}<span>Anyone with such a link can use your e621 account until you make a new API key. Leave this off unless the link is for you.</span></p>
+      <div class="group6">${srow('key', 'API key', 'Saved on this device', 'Change')}</div>
+      <button class="btn6 lip6 wide signout6" type="button">${ic('out', 18, 2.4)}Sign out</button>
+    </div>` + bottom('Settings'));
+  $('u-acct').innerHTML = strip('Signed out', 'The same page with one job. Gold, because here it is the screen\'s one action.', `<div class="strip p6" style="padding:24px 16px">${state('wave', 'Not signed in', 'Sign in to follow artists, favorite posts and use your blacklist.', '<button class="btn6 gold lip6" type="button">Sign in with e621</button>', '', 96).replace('class="state6 "', 'class="state6 " style="padding:0"')}</div>`);
+
+  // Content
+  const bl = (...tags) => `<div class="srow6 blrow6"><span class="lbl">${tags.map(t => t[0] === '−' ? `<span class="neg">${t}</span>` : t).join(' <span class="neg">·</span> ')}</span><button class="rm" type="button" aria-label="Remove">${ic('x', 14, 2.8)}</button></div>`;
+  $('s-content').innerHTML = phone(`
+    <div class="scroll6">${subHead('Content')}
+      ${glab('Ratings').replace('class="glabel6"', 'class="glabel6" style="margin-top:16px"')}
+      <div class="group6">${swr('S', 'Safe', '', true, 'letter s')}${swr('Q', 'Questionable', '', true, 'letter q')}${swr('E', 'Explicit', '', false, 'letter e')}</div>
+      ${glab('Blacklist', '3 lines')}
+      <div class="addrow6"><div class="field6"><span>Tags to hide</span></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div>
+      <div class="group6 flat">${bl('spider')}${bl('clown', '−comedy')}${bl('jump scare', 'video')}</div>
+      <p class="gnote6">A post is hidden when it has every tag on a line. A minus means "but not with".</p>
+      <div class="group6">${swr('refresh', 'Use my e621 blacklist', 'Synced with your account', true)}<div class="srow6"><span class="ico">${ic('dl', 20, 2)}</span><span class="lbl"><b>e621's default list</b><small>For new e621 accounts</small></span><button class="btn6 lip6" type="button">Import</button></div></div>
+    </div>` + bottom('Settings'));
+  $('u-content').innerHTML = [
+    strip('Adding a line', 'The field keeps e621 syntax, like Search. Add goes gold-ringed with the field; the line lands at the top.', `<div class="strip p6" style="padding:16px 0 0"><div class="addrow6"><div class="field6 focus has"><span class="val">gore -rating:s<span class="caret"></span></span><button class="clr" type="button" aria-label="Clear" style="margin-right:6px">${ic('x', 14, 2.8)}</button></div><button class="btn6 lip6" type="button">${ic('plus', 16, 2.8)}Add</button></div></div>`),
+    strip('All three ratings off', 'Nothing could show, so the last switch will not turn off. A toast says why.', `<div class="strip p6 toasts6">${toast({ icon: 'alert', title: 'Keep at least one rating on' }, 'static')}</div>`),
+  ].join('');
+
+  // For You
+  const hid = (a, when) => `<div class="srow6">${avatar(a)}<span class="lbl"><b>${a}</b><small>${when}</small></span><button class="btn6 lip6" type="button">Show</button></div>`;
+  $('s-fy').innerHTML = phone(`
+    <div class="scroll6">${subHead('For You')}
+      <div class="group6" style="margin-top:16px">${srow('sliders', 'Tune', 'Breadth, pinned and muted tags')}</div>
+      ${glab('Hidden artists', '3')}
+      <div class="group6 who">${hid('plum raven', 'Hidden 2 days ago')}${hid('frost ermine', 'Hidden last week')}${hid('ember kit', 'Hidden in October')}</div>
+      <p class="gnote6">They do not show in suggestions. Their posts still show if you follow them or search.</p>
+    </div>` + bottom('Settings'));
+  $('u-fy').innerHTML = strip('No hidden artists', 'One muted line in place of the list, saying how artists get here.', `<div class="strip p6" style="padding:16px 0 4px">${glab('Hidden artists')}<p class="gnote6" style="margin-top:0">None. "Not interested" on a suggestion puts an artist here.</p></div>`);
+
+  // App
+  $('s-app').innerHTML = phone(`
+    <div class="scroll6">${subHead('App')}
+      <div class="group6" style="margin-top:16px">${srow('app', 'Install the app', 'Add it to your home screen')}</div>
+      <p class="gnote6">Links you open will still go to Safari, not the installed app, and the two keep separate sign-ins.</p>
+      <div class="group6">${srow('ext', 'e621 button', 'Adds a Slideshow button to e621')}${srow('keys', 'Keyboard shortcuts', 'On a computer')}</div>
+      ${glab('About')}
+      <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>What's new</b></span>${chev()}</button><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
+      <p class="gnote6">Not run by e621. It reads e621 with your own account and key.</p>
+    </div>` + bottom('Settings'));
+  const kb1 = (k, t) => `<div class="srow6"><span class="lbl"><b>${t}</b></span>${k.split(' ').map(x => `<span class="kbd6">${x}</span>`).join('')}</div>`;
+  $('u-app').innerHTML = [
+    strip('Installed', 'In the installed app the row says so and stops being a button.', `<div class="strip p6" style="padding:16px 0 0"><div class="group6"><div class="srow6"><span class="ico green">${ic('check', 20, 2.6)}</span><span class="lbl"><b>Installed</b><small>You are using the installed app</small></span></div></div></div>`),
+    strip('Keyboard shortcuts', 'A titled sheet (a dialog on a computer). Keys sit in small wells.', sheetStrip(`${shtop('Keyboard shortcuts')}<div class="qrows6">${kb1('J K', 'Next and previous post')}${kb1('L', 'Favorite')}${kb1('Enter', 'Play from this post')}${kb1('G', 'Grid view')}${kb1('/', 'Search')}${kb1('Esc', 'Back')}</div>`)),
   ].join('');
 
   /* ---------- behaviour ---------- */
