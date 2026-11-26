@@ -79,3 +79,10 @@ Format: date — decision. Why. Rejected alternatives.
   rounded art and three fixed lines under it (artist / e621 stats with favourite pill / coloured tags), no
   card boxes, nothing on top of art except video controls. System font (SF Pro) replaces Verdana; the
   owner didn't answer the font question, so this follows "iOS standards".
+
+## 2026-11-25 — Duolingo study (owner)
+- Owner: "study and pull on duolingo design for a more playful feel and do research about their design."
+  Same rule as AllTrails: a study, not a copy. Observations from owner-shared screens are in
+  research/duolingo-study.md. Published-source research is in research/duolingo-research.md (agent).
+  v5 mocks will apply: tactile lips on pressables, rounded type (ui-rounded), coloured stat icons, meaning
+  colours on navy, chunky progress, celebration moments off the art, our own mascot.
