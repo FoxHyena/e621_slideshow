@@ -462,6 +462,22 @@ components:
     rounded: "{rounded.full}"
     padding: "0 12px"
     height: "28px"
+  check-well:
+    backgroundColor: "{colors.well}"
+    rounded: "{rounded.full}"
+    size: "28px"
+  check-well-on:
+    backgroundColor: "{colors.score}"
+    textColor: "{colors.ground}"
+    rounded: "{rounded.full}"
+    size: "28px"
+  button-disabled:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.muted}"
+    typography: "{typography.headline}"
+    rounded: "{rounded.full}"
+    padding: "0 24px"
+    height: "44px"
   goo-mascot:
     backgroundColor: "{colors.goo}"
     textColor: "{colors.ground}"
@@ -477,9 +493,9 @@ components:
 
 # Design System: e621 Slideshow
 
-Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, and Goo the mascot. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
+Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, Goo the mascot, and the first run after sign-in. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
 
-Still not drawn in v6: the "From a link" chip, the hold menu on a grid tile, the first run after sign-in (the "Finding artists you love" loader and "Follow from favorites") and desktop. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
+Still not drawn in v6: the "From a link" chip, the hold menu on a grid tile, Follow from favorites as a sheet, the "2 skipped" toast, the "Popular artists" list and desktop. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
 
 ## Overview
 
@@ -611,7 +627,7 @@ Depth is three materials lit from one direction (above). Fills are flat; the onl
 3 by default; **4** on Play and the player's Play / Pause; **2** on Follow pills and the stepper's − and +.
 
 ### Real shadows (four, each with a job)
-- **Play:** `0 14px 28px rgba(0,0,0,.45)` under the lip (`0 8px 18px` when pressed). It floats over the feed.
+- **Play:** `0 14px 28px rgba(0,0,0,.45)` under the lip (`0 8px 18px` when pressed). It floats over the feed. The first run's "Follow N artists" button stands in Play's place and wears the same shadow; the two are never on screen together.
 - **New-posts pill:** `0 12px 24px rgba(0,0,0,.4)` under its lip. It floats over the feed.
 - **Tag targets:** the same `0 12px 24px rgba(0,0,0,.4)`, no lip. They float over whatever the tag sits on.
 - Goo the mascot stands on a flat ellipse of 28% black. It is not blurred, so it is not a fifth one.
@@ -669,6 +685,7 @@ The **app mark** is the kaleidoscope (the generator in `src/lib/avatar.ts`, fixe
 ### Buttons
 - **Gold** (main action): gold fill with the strong top light, ink label, gold lip. 44 tall (headline, 24 padding) or 36 compact (callout, 18 padding).
 - **Tonal**: Raised Navy, white label, navy lip. Same two sizes. Paired buttons share a row equally.
+- **Disabled** (a button that cannot be pressed right now): Panel fill, Muted label, the panel's top light, no lip, and no icon. It says why in its own label ("Pick artists to follow"), never just greyed-out words. Only things you can press are raised.
 - **Quiet** (the second, lesser way out of a state: "Search instead"): no fill, Link Blue callout, 44 tall, 16 padding. No lip; a 4% white wash while pressed. Only ever under a gold or tonal button.
 - **Burst row** ("6 more from mossy otter ⌄"): full-width tonal capsule, 44 tall, 24 mark, callout label, link-blue chevron at the right end. A run of 5 or more posts from one artist folds after three.
 - **Tools capsule**: one 44 tall Panel capsule with top light holding the screen's tools (Search, Grid view, More) as 40 wide buttons with link-blue glyphs. No lip. In the compact bar the same buttons sit without the capsule.
@@ -811,7 +828,7 @@ A drop of the app's own goo with a face. It is drawn the way the tab bar's goo a
 - **Spill:** three ellipses the filter melts into the body: a skirt (centre 60, 99; 42 × 5.5 radii), one lobe on the right (91, 102.5; 11 × 4) and one drop that got away (109, 104.4; 3.4). It is thin and it runs out of the body with a curved join. A thick slab with a hard edge reads as snow.
 - **Underside:** the same shapes in Goo Shade, drawn first and lower: the body and arm 4 lower, the spill 2.4 lower. Under that, a flat ellipse of 28% black (centre 60, 109.5; 46 × 4.5).
 - **Face,** drawn on top and never filtered, in Ground navy: two eyes (4.2 × 5.6 ellipses, 14.5 either side of x = 59, at y = 72, each with a 1.5 white glint up and to the left), a `:3` mouth at y = 83 (two 6.5 wide scoops, 2.8 stroke, round ends) and two Heart Pink cheeks at 50% (5 × 3, 26 either side, level with the mouth).
-- **Four moods,** which are the whole vocabulary:
+- **Five moods,** which are the whole vocabulary:
 
 | Mood | Says | What changes |
 |---|---|---|
@@ -819,10 +836,11 @@ A drop of the app's own goo with a face. It is drawn the way the tab bar's goo a
 | Snooze | Nothing here yet; waiting | The body squashes to 108% wide and 86% tall about its base. Eyes shut (two 10 wide arcs). A smaller mouth. Two Link Blue "z" above its right side. |
 | Look | Nothing found; needs more | Eyes move 3 right and 2 up; the mouth follows 2.5. A Link Blue "?" (Fredoka 600, 24) above its right side. |
 | Oops | Something failed | Eyes squeeze shut (> <), a wavy mouth, one Link Blue sweat drop above its right side. |
+| Busy | Working on it; a wait with a count | The plain face (open eyes, `:3`, no tongue) looks left and right: the whole face slides 3.5 either way. Three Link Blue dots rise from its right shoulder (at 86, 38; 8.5 apart, each 3 higher and 0.5 bigger than the last, from r 2.4) and take turns lighting up. |
 
 - **Sizes:** 112 on the ground (an empty or needs-sign-in screen), 104 in the landing card, 96 in an error panel. Never under 72: the face stops reading.
-- **Where:** the landing, needs sign-in, empty states and errors. One per screen. Never over art, never in the feed's chrome, never next to a post, never as an app icon stand-in.
-- **Motion:** the wave turns the arm 16° about its shoulder and back, 900 ms ease-in-out, three times, starting 400 ms after it appears; the ticks fade in and out with it. The "z" drift 2 px right and 3 px up and back every 3.2 s. Nothing else moves by itself.
+- **Where:** the landing, needs sign-in, empty states, errors, and the first read of your favorites. One per screen. Never over art, never in the feed's chrome, never next to a post, never as an app icon stand-in.
+- **Motion:** the wave turns the arm 16° about its shoulder and back, 900 ms ease-in-out, three times, starting 400 ms after it appears; the ticks fade in and out with it. The "z" drift 2 px right and 3 px up and back every 3.2 s. Busy: the face holds left, slides right, holds, and slides back every 3.2 s; each dot goes from 35% to full and 2 px up for a moment, 0.2 s after the one before, every 1.2 s. Nothing else moves by itself.
 - **Tap it:** Goo is a toy. It squashes under the finger (107% wide, 90% tall about its base, in 100 ms, like a lip closing) and on release springs back through 94% × 109% and 103% × 97% in 420 ms. As it stretches, 120 ms after the tap, **one to three drops** (picked at random, 70 ms apart) leave its tip, rise 22 to 40 px and fall to the tab bar on a ballistic arc, stretched along their speed like the Goo tab's. Flight takes 70 + 17(√rise + √(rise + fall)) ms. They come down on the goo that is already on the bar, or 90% along a clean one. Each drop that lands is one more on the goo count, exactly like a drop from the Goo tab: no favourite is made. Taps less than 260 ms apart are ignored. Where no tab bar is on screen the drops land beside Goo and soak away in 200 ms. A drop in flight may cross a picture, as the drop from the heart does; it never rests on one.
 - Goo is not focusable and has no label. It is a pointer-only toy and nothing in the app depends on it. With reduced motion there is no squash and no flight: the drops are added to the bar in place.
 
@@ -852,8 +870,28 @@ The words, as drawn:
 
 The sentence always names the cause in plain words and the numbers are real: how many filters, how many hidden, how many artists. † The headline is drawn; the sentence is proposed and the owner has not seen it. The same goes for "No posts match" with no filter on: the sentence drops the filter clause, and its action is not drawn (proposed: a tonal "Edit search" that puts the caret in the field).
 
+### First run after sign-in
+What Following shows the first time you sign in, before you follow anyone. Three screens in order; each is the Following tab, with the tab bar and no badge.
+
+**1. The read.** The state block (see States) with Goo busy at 112, 64 below the header: "Finding artists you love", then what is happening now on two lines (the step, then its count and the time left in tabular figures: "Reading your favorites" / "640 of 1,284 · about 20 s"), then the checklist 16 below, then a quiet "Skip for now" 16 below that. No Play, no chips.
+- **Checklist:** 248 wide, centred, left-aligned, rows 8 apart. Each row is a 28 well, 12, the step in body type, and a count at the right end in post-id mono once the step is done. Done: Score Green check (16, popping in like the heart) and Muted text. Running: a 14 spinner (2 px ring, 22% white with a white head, one turn in 0.8 s) and white text. To do: the step's number in Muted footnote-rounded and Muted text.
+- **Steps, as drawn** (the wording is proposed; it follows the checklist For You already shows): "Read your favorites", "Count your artists", "See who still posts".
+- **If it fails:** the error panel with Goo oops, "Couldn't read your favorites", "e621 didn't answer. Nothing was changed.", a tonal "Try again" and a quiet "Skip for now".
+
+**2. Follow from favorites.** The list is the screen.
+- **Header:** the large title with a quiet "Skip for now" at its right end (its words end on the 16 inset). 2 below, in Muted body: "You've favorited these artists a lot. Follow them?"
+- **Group label,** 16 below: "Top 30" at the left; "Select all" and "None" at the right, Link Blue footnote-rounded, 28 tall.
+- **Rows** in one Panel group, 60 tall: the artist's 36 mark, the name in headline, "you faved 48 · 312 posts" in Muted footnote, and a check well at the right end, 16 from the panel's edge. The whole row is the checkbox (`role="checkbox"`); it takes a 4% white wash while pressed. The top 10 start picked.
+- **Check well:** a 28 round well, empty when the row is not picked. Picked: Score Green fill, a light top edge (`inset 0 1px 0 rgba(255,255,255,.35)`), and a Ground navy check (16, 3 stroke) that pops in. Green already means "on" (the switch) and "following" (the Following check). This is the app's only checkbox; do not use it where one switch would do.
+- **The Follow button:** one gold 44 button on the 16 inset, full width, floating 112 from the bottom of the screen (16 above the tab bar's highest point) with Play's shadow. A heart and "Follow 10 artists"; the number follows the rows, and "artist" loses its s at one. It is the screen's one gold fill. With nothing picked it is the disabled button, "Pick artists to follow". Past e621's limit it is the disabled button, "e621 allows 500 follows (12 left)". Pressing it pops the heart, sends one bulk request, and the feed loads.
+- The list scrolls under the button and the tab bar; leave 196 of room at its end so the last row clears both.
+
+**3. After "Skip for now".** The list folds into one row above a real feed: a Panel group holding one list row, 8 below the header and 24 above "Popular today". A Heart Pink heart in the 32 icon well, "Follow from your favorites" in callout, "30 artists you favorite a lot" in Muted footnote, a chevron. It opens the list. It is a row you press, so it is raised chrome, not the sunk offline banner. Under it the landing's feed: the "Popular today" header, posts with Follow pills, and Play.
+
+**No favorites at all:** the state block with Goo looking: "Find artists to follow", "You have no favorites yet, so there is nothing to suggest from.", a tonal "Search". UX.md puts a "Popular artists" list under it; that list is not drawn.
+
 ### Not drawn yet
-The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯ sheet: Favorite, Open artist, Play from here, Open on e621); the first run after sign-in (the "Finding artists you love" loader and "Follow from favorites"); desktop. Build them from UX.md with the parts above, and show the owner before they ship.
+The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯ sheet: Favorite, Open artist, Play from here, Open on e621); Follow from favorites as a sheet from Artists › Suggested (the same list in the app's sheet); the "2 skipped" toast after following; the "Popular artists" list; desktop. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |
@@ -888,6 +926,9 @@ The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯
 | Goo's wave | 900 ms ease-in-out, three times, 400 ms after it appears | the arm turns 16° about its shoulder; two ticks fade in and out | mock |
 | Goo's squash | 100 ms ease-out down; 420 ms back | 107% × 90% about its base under the finger; back through 94% × 109% and 103% × 97% | mock |
 | Goo's spurt | 120 ms after the tap; 1 to 3 drops 70 ms apart, each 70 + 17(√rise + √(rise + fall)) ms | drops rise 22 to 40 px from the tip, then fall to the tab bar, stretched along their speed | mock |
+| Goo busy | 3.2 s looping glance; dots 1.2 s, 0.2 s apart | the face slides 3.5 left and right with a hold at each end; three dots light up in turn | mock |
+| Checklist | spinner 0.8 s a turn; check 320 ms pop | the running step spins; a finished step's check pops in like the heart | mock |
+| Check well | 150 ms ease-out fill; check 320 ms pop | the well turns Score Green and its check pops in | mock |
 | Goo's snooze | 3.2 s ease-in-out, looping | the "z" drift 2 px right and 3 px up, to 60% | mock |
 | Slow-down count | once a second | the number in the sentence | mock |
 | New-posts pill | slides in under the header; posts insert with a slide-down, keeping the reading position | translateY, opacity | spec (not in mock) |
@@ -900,7 +941,7 @@ The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯
 | Toasts | stay 6 s, pause on hover or focus, `role="status"` | opacity, translateY | spec (not in mock) |
 
 Grammar: two speeds. **Touch feedback** is 100 to 200 ms, ease-out, no overshoot (press, hide, fade). **Celebrations** (favourite, follow, tab change) overshoot once and are done within 720 ms. **Goo** is the one slow thing. Everything animates transform and opacity only, except the goo's shapes.
-**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab, segmented and menu capsules, the switch knob and Play move instantly; tag targets appear without the pop; Goo holds still, and a tap adds its drops to the bar in place; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
+**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab, segmented and menu capsules, the switch knob and Play move instantly; tag targets appear without the pop; Goo holds still, and a tap adds its drops to the bar in place; the checklist's spinner stands still and checks appear without the pop; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
 
 ## Build rulings (where the mock leaves a gap)
 
@@ -932,11 +973,11 @@ The two v6 mocks are approved; these rulings win over them when building.
 - **Don't** put anything on top of the art except the video play glyph, length and mute (and the player's own auto-hiding controls). The double-tap heart is the one thing that may flash over a picture.
 - **Don't** tint or frame art with colour washes; navy panels may surround it, never cover it.
 - **Don't** draw depth with outlines, gradients or glows. One light, from above.
-- **Don't** put a lip on panels, rows, fields, tags, chips, toggles, menus, tabs, tag targets or anything over art, and don't add blurred shadows beyond Play, the new-posts pill, tag targets and the tab bar. Don't give an offline banner or a state's panel a lip either.
+- **Don't** put a lip on panels, rows, fields, tags, chips, toggles, menus, tabs, tag targets or anything over art, and don't add blurred shadows beyond Play (and the Follow button that stands in its place), the new-posts pill, tag targets and the tab bar. Don't give an offline banner or a state's panel a lip either.
 - **Don't** use Fredoka at 700, or for tags and reading text.
 - **Don't** use a second accent colour, meaning colours as large fills, gold in an artist's mark, or a second gold fill on a screen (the artist page has no "Play all").
 - **Don't** put muted text on Raised Highlight (3.7:1).
-- **Don't** let goo touch a picture, hide a label, or be cleaned anywhere but Settings, and don't put Goo the mascot anywhere but the landing, needs sign-in, empty states and errors.
+- **Don't** let goo touch a picture, hide a label, or be cleaned anywhere but Settings, and don't put Goo the mascot anywhere but the landing, needs sign-in, empty states, errors and the first read of your favorites.
 - **Don't** throw dots anywhere but Follow.
 - **Don't** borrow Duolingo's owl, green, streaks, gems or guilt nudges, or AllTrails' green, logo or buttons on photos.
 

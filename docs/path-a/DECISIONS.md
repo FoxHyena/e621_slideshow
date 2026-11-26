@@ -262,3 +262,33 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md (Goo the mascot; States; Quiet button; the end of a feed; Goo Shade; One Gold
   and Lip rules; motion rows; build ruling 10), .impeccable/design.json (Goo, State, Error Panel, Landing
   Card, Offline Banner), the surface brief, docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+
+## 2026-11-26 — First run after sign-in in v6 (mocks/screens-v6.html)
+
+- Owner: "Yes" (draw the first run after sign-in: the "Finding artists you love" loader and "Follow from
+  favorites"). Artifact: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1.
+- Two switches (loader Goo / Ring; pick with Check / Switch). Owner: "Good, check. Sounds good otherwise".
+  Read as Goo and Check: "Good" taken as "Goo", the first of the two answers offered ("Goo, Check"). The
+  owner has been told how it was read. The ring loader and a switch on every row are dropped.
+- **Goo has a fifth mood, busy** (it looks about while three dots take turns), used for the first read of
+  your favorites. The 2026-11-25 entry said four moods were the whole vocabulary; it is five now.
+- **The app's one checkbox is the check well:** a 28 well that turns Score Green with a navy check. The
+  whole row is the target.
+- Decided by the designer, shown in the mock's table, covered by "Sounds good otherwise":
+  - The checklist has three steps, wording proposed: Read your favorites, Count your artists, See who
+    still posts.
+  - "Follow N artists" is one gold button that floats where Play stands, 16 above the tab bar, with Play's
+    shadow. With nothing picked, or past e621's 500 follows, it is disabled and says why. A disabled
+    button is Panel fill, muted label, no lip.
+  - "Skip for now" is a quiet button in the title row (UX.md had it under the button).
+  - After skipping, the banner is a pressable list row in a panel, worded "Follow from your favorites" /
+    "30 artists you favorite a lot" (UX.md: "Follow artists from your favorites ›", which did not fit).
+  - If the read fails: the error panel, "Couldn't read your favorites", Try again, Skip for now.
+  - No favorites at all: Goo looking, "Find artists to follow", a tonal Search.
+- Fixed while writing up: two gaps were off the spacing scale (20 under the sentence, now 16; the button
+  17 above the bar, now 16).
+- Not drawn: Follow from favorites as a sheet from Artists › Suggested, the "2 skipped" toast, the
+  "Popular artists" list, the "From a link" chip, the hold menu on a grid tile, desktop.
+- Updated to match: DESIGN.md ("First run after sign-in"; Goo's busy mood; Disabled button; motion rows),
+  .impeccable/design.json (Checklist, Pick Row, Disabled Button; Goo with five moods), the surface brief,
+  docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
