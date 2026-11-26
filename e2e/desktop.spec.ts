@@ -65,6 +65,9 @@ test("the sidebar: brand, tabs with names, the capsule on the current one, Searc
   await page.goBack();
   await side(page).getByTestId("tab-artists").click();
   await expect(side(page).getByTestId("tab-artists")).toHaveAttribute("aria-current", "page");
+  // Artists' tools held only Search, which is in the sidebar: no empty capsule left by the title
+  await expect(page.getByTestId("artists-screen").getByRole("heading", { name: "Artists" })).toBeVisible();
+  await expect(page.getByTestId("artists-screen").locator(".tools")).toBeHidden();
   await side(page).getByTestId("side-account").click();
   await expect(page).toHaveURL(/\/settings/);
 });

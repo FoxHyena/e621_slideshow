@@ -1342,8 +1342,9 @@ html {
   .screen-frame[data-grid] > .chips {
     margin-inline: calc(max(0px, (100% - 600px) / 2) - var(--spacing-inset));
   }
-  /* Search is in the sidebar */
-  .tool-search {
+  /* Search is in the sidebar; a tools capsule that held only Search goes with it (Artists) */
+  .tool-search,
+  .tools:not(:has(> :not(.tool-search))) {
     display: none;
   }
   /* toasts centre on the column and float 24 from the bottom; in the player, centred on the window
@@ -4880,6 +4881,12 @@ button.field6:focus-visible {
   background: var(--color-panel);
   box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
   text-align: center;
+}
+/* the wordmark under Goo (owner: "Approve"): 4 under Goo, 22 above the headline */
+.state-hello .wm {
+  margin: 4px 0 10px;
+  font-size: 28px;
+  line-height: 34px;
 }
 .state-hello .state-head {
   margin-top: 12px;

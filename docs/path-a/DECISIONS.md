@@ -1321,3 +1321,14 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Goo only adds. Only "Wipe clean" empties it. This is how the app is built already, so there is
   nothing to change in the mock or the code.
 - Mine, not approved: favouriting the same post again adds goo again.
+
+## 2026-11-26 — Built: the wordmark under Goo; goo only adds (designs 18a04f9, 999a183)
+
+- **Landing card (owner: "Approve"):** the wordmark under Goo, 28/34, 4 under Goo and 22 above
+  "Follow the artists you love". All three places the wordmark sits are now built.
+- **"Goo stays" (owner):** already so. Un-favoriting takes nothing off; only Wipe clean empties it.
+  One difference from the designer's note, told to them: a post counts once per page session
+  (`addFav`), so un-favoriting and favoriting it again adds no second drop until the page reloads.
+- **Fix, owner's report:** on a computer Artists showed an empty sliver at the top right. Its tools
+  capsule held only Search, which is in the sidebar there; the capsule now goes with it.
+

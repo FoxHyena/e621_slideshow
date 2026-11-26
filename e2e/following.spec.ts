@@ -63,6 +63,15 @@ test("signed out, Following says what it's for, and shows what's popular", async
   const mock = await mockE621(page);
   await page.goto("/following");
   await expect(page.getByTestId("following-signed-out")).toBeVisible();
+  // the wordmark under Goo (owner: "Approve"), 28/34, 4 under Goo and 22 above the headline
+  const hello = page.getByTestId("following-signed-out");
+  const wm = hello.getByRole("img", { name: "eLicks21" });
+  await expect(wm).toHaveText("eLicks21");
+  const gaps = await hello.evaluate((h) => {
+    const [goo, w, head] = [h.firstElementChild!, h.querySelector(".wm")!, h.querySelector(".state-head")!].map((e) => e.getBoundingClientRect());
+    return [Math.round(w.top - goo.bottom), Math.round(head.top - w.bottom), Math.round(w.height), getComputedStyle(h.querySelector(".wm")!).fontSize];
+  });
+  expect(gaps).toEqual([4, 22, 34, "28px"]);
   await expect(page.getByTestId("post-card").first()).toBeVisible();
   expect(mock.searches[0].tags).toContain("order:rank");
   await shot(page, "following-signed-out");

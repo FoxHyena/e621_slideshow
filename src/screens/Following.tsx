@@ -9,6 +9,7 @@
  */
 import { ArrowUp, MoreHorizontal, Search } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import { Wordmark } from "@/components/Wordmark";
 import { DEFAULT_FILTERS, filtersOn, isDefaultFilters, type Filters } from "@/lib/feed/filters";
 import type { Post } from "@/lib/e621/types";
 import { dividerIndex, feedRows, isNew, newCountLabel } from "@/lib/following/feed";
@@ -458,6 +459,7 @@ function Landing({ grid }: { grid: boolean }) {
     <>
       <div ref={card} className="state-hello" data-testid="following-signed-out">
         <Goo mood="wave" size={104} />
+        <Wordmark />
         <h2 className="state-head">Follow the artists you love</h2>
         <p className="state-text">See their new posts first, all in one feed.</p>
         <button type="button" className="btn-gold" onClick={openSignIn} data-testid="following-sign-in">
