@@ -94,3 +94,25 @@ irreversible marker), which is now an owner question (Q8). UX.md → v3.1.
 | 13 | minor | Hidden Play pill; overlap with ♥ row | **Changed.** ⋯ always has Play; bottom padding. |
 | 14 | minor | "More in Settings" from inside the player | **Changed.** Closes the player, then pushes `/settings/slideshow`. |
 | 15 | nit | Memory model too heavy | **Changed.** Keep tabs + current stack; rebuild others from anchors. |
+
+## Design review round 1 — v4 mocks (fresh senior-designer subagent, 2026-11-25)
+
+Rendered at 1:1 with Playwright; screenshots in the session scratchpad (not committed).
+
+| # | Finding | Sev | Outcome (v5) |
+|---|---|---|---|
+| 1 | Play pill and tab bar cover the first post's metadata at rest; toast and pill share a slot; "Play" clashes with the video ▶ | High | Fixed: Play pill hides on scroll-down and returns on scroll-up/idle; toast replaces it in the same slot; scroll padding 156; label "Play 12" (plays the new posts). |
+| 2 | Gold fill on 4–6 objects per screen; artist names #F2AC08 read as gold | High | Fixed: one gold fill per screen (Play / Play all / Review). Follow = tonal navy pill with gold plus. Selected chip = raised fill + gold ring. Artist names white; e621 artist colour only on tags and the handle. |
+| 3 | Post internal gaps ≈ the gap between posts, so grouping is weak | High | Fixed: picture→name 12, name→stats 4, stats→tags 4; 32 between posts. |
+| 4 | Tags not tappable at 44, duplicate the artist, "+14" not a control | High | Fixed: one scrolling row of 32 tags with 44 hit, artist tag dropped, "+N" is a button. |
+| 5 | Tab bar at 12 vs toast at 16; glass label contrast over bright art ≈3.2:1 | Med | Fixed: all floating chrome at 16; glass alpha .88 on a #0B1F3E base. |
+| 6 | Segmented control 32 hit, no button semantics | Med | Fixed: buttons with 44 hit. |
+| 7 | UX fidelity: burst shows 2 not 3; suggestions not one-at-a-time and lack Not interested; subtitle ambiguous; Follow toast contradicts UX | Med | Fixed: 3 burst posts; carousel kept as the swipe form of "one artist at a time" (each card is one artist; peek = Next) with ⋯ Not interested; subtitle "You faved 23 of 140 · posted 4d ago"; no toast on Follow (only on unfollow). UX.md note added in Phase 4. |
+| 8 | Artist page: no compact header; toast covers thumbs; hero inline override; avatar ring past 16 | Med | Fixed: compact bar shown as a second state; toast removed; hero cleaned; ring inset. |
+| 9 | Size-system breaks (28 title, 18 glyph, 6/10/2 spacings, 52 toast, two collage heights, dead CSS) | Med | Fixed: every value mapped to the table; table lists collage and toast sizes. |
+| 10 | Suggestion card name truncates at ~15 chars | Med | Fixed: two-line card body (name + ⋯ / subtitle + Follow). |
+| 11 | Generic iOS; kaleidoscope gone from the feed | Med | Fixed: 24 kaleidoscope avatar leads the post's name line (gold ring = new); kaleidoscope mark on the caught-up moment and empty states. |
+| 12 | Structural clone of AllTrails | Med | Partly: Play pill carries a count; stat row uses coloured icon trophies (Duolingo study). The rest are platform conventions, kept. |
+| 13 | Mute control 32 hit, a span | Low | Fixed: 44-hit button. |
+| 14 | Artist actions leave dead space; badge duplicates subtitle; new dot colour-only | Low | Fixed: buttons flex:1; badge only when off Following; dot has a "New" label for assistive tech. |
+| 15 | "Explicit" on every post is noise; fav pill accessible name | Low | Fixed: rating shown only when it differs from the user's default; aria-label "Favorite, 1.2k". |
