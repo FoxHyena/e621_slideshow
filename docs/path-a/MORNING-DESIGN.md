@@ -64,6 +64,25 @@ treat that message as your approval of any design. To throw a batch away: `git r
 6. **Hidden artists** rows end in "Show".
 7. **Fix to batch 1:** the Follow pill in Popular artists now stops 16 from the panel's edge (was 12).
 
+## Batch 4: install, update, the app icon (section "Install, update and the app icon")
+
+1. **The app icon:** the app mark (the kaleidoscope) on navy that runs from Panel Navy at the top to
+   Ground at the bottom. DESIGN.md already said the kaleidoscope is the app mark and Goo is never the
+   icon, so only the background and the size are mine. Other options: a flat Ground background; a
+   simpler mark for the 16 px tab icon (at 16 it reads as a gold ring, not as dots).
+2. **Update toast:** "New version ready" with "Reload", 6 s, once per version, never over the player.
+   After that Settings › App shows "Version · 2.1 is ready · Reload". Other option: the toast stays until
+   you tap it.
+3. **iPhone install steps:** a sheet with three numbered steps. Please check one thing on your phone:
+   the hint "In Safari it can be under •••". I could not check where Share sits in your Safari.
+4. **Android and desktop Chrome:** the row ends in "Install" and the browser shows its own dialog. Other
+   option: a sheet with one gold "Install".
+5. **Nothing asks you to install.** I drew one option for you to say yes or no to: a closable row at the
+   top of Settings. The builder is told not to build it until you say yes.
+6. **Added:** an "Updated to 2.1" toast after the reload; a sheet for links opened inside another app
+   ("This browser cannot install apps…" with "Copy link").
+7. **Name under the icon:** "Slideshow" ("e621 Slideshow" is cut off on an iPhone).
+
 ## Still open from before tonight
 
 - The checklist step names: "Read your favorites", "Count your artists", "See who still posts".

@@ -341,3 +341,16 @@ Format: date — decision. Why. Rejected alternatives.
   row end (it was drawn at 12). The reason Unfollow is not red is that Danger stays for Blacklist and
   failures, not that it can be undone (Blacklist can be undone too).
 
+## 2026-11-26 (night) — Overnight proposals, batch 4: install, update, the app icon
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Install, update and the app icon"; mocks/screens-v6.html, the section of that name.
+- Choices: iPhone gets a titled sheet with three numbered steps; where the browser can install by itself
+  the row ends in "Install" and there is no sheet; nothing asks you to install unprompted; the update
+  toast lasts 6 s like every action toast and then lives on Settings › App's Version row; the icon is the
+  app mark on a Panel Navy to Ground gradient, one drawing for every mask; the short name is "Slideshow".
+- Decided by rules already approved, not by me: the kaleidoscope is the app mark and Goo is never the icon.
+- Added beyond UX.md (drop on the owner's word): the "Updated to 2.1" toast; the sheet for in-app browsers.
+- Drawn but NOT to be built without the owner's yes: the one-time "Install the app" row on Settings.
+- Not checked on a device: where Share sits in the owner's Safari (the "under •••" hint).
+
