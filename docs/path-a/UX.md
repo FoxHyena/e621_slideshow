@@ -1,6 +1,7 @@
 # UX plan
 
-Status: **v3.1** (2026-11-25), revised after UX review rounds 1–3 (see REVIEWS.md).
+Status: **v3.2, signed off** (2026-11-25) after UX review rounds 1–3 (see REVIEWS.md) and the owner's
+suggestion-card change. Spacing and visual polish continue in DESIGN.md (Phase 3).
 Phone first (375×812 reference). Desktop is the same screens with a sidebar.
 
 ## 1. Principles
@@ -255,9 +256,15 @@ Header: **Following** · search · grid · ⋯ (Refresh, Mark all as seen). Subt
 - **Bursts (exact):** among new posts, a run is consecutive posts that share their first artist. Runs of
   **5+** show their first 3, then "+N more from <artist> ▾". Runs never cross the divider. Expanding is in
   place and lasts the session. Collapsed posts still play in the player.
-- **Suggestions card:** once per session, right after the divider (or after the 10th post when nothing is
-  new): 8 artists in a row with avatar, name, "you faved 23", **Follow**. "See all" → Artists › Suggested.
-  ⋯ on one → Not interested (undo in Settings › For You › Hidden artists).
+- **Suggestion card** (owner design): once per session, right after the divider (or after the 10th post
+  when nothing is new). **One artist at a time**: header "Artists you might like", then that artist's row
+  (avatar, name, "you faved 23 · posted 4d ago", **Follow**) over a tiled strip of 3 of their recent
+  posts (tap a tile → their artist page at that post). A "Next artist ›" control (and a sideways swipe on
+  the card) shows the next of up to 8; "See all" → Artists › Suggested. ⋯ → Not interested (undo in
+  Settings › For You › Hidden artists).
+- **Thumbnails for suggestions** respect Settings › Content ratings and the blacklist, and use preview
+  images. They come from one batched request for several suggested artists at once
+  (`~artist_a ~artist_b … order:id_desc`, grouped by artist on our side), not one request per artist.
 - Pull to refresh and the new-posts pill as in §4.
 
 | State | Content |
@@ -327,8 +334,9 @@ Header: **Artists** · search. Segmented: **Following (42)** · **Suggested**.
 - Sort: Recent (default) / A–Z / Most faved. Row tap → artist page. ⋯ → Unfollow (toast + Undo), Share.
 - Pull to refresh re-reads the subscription list and that page.
 
-**Suggested:** ranked artists you don't follow: "you faved 23 of their 140 posts · posted 4d ago", with
-**Follow** per row. A **Follow from favorites** banner on top when there are 3+ strong ones. ⋯ → Not
+**Suggested:** ranked artists you don't follow. Each is a section: the artist's row ("you faved 23 of
+their 140 posts · posted 4d ago", **Follow**) with a tiled strip of 3 of their recent posts under it
+(same batching and filtering as the suggestion card; tiles load as sections scroll into view). A **Follow from favorites** banner on top when there are 3+ strong ones. ⋯ → Not
 interested. States: reading favorites (loader); too few favorites (explain + Search).
 
 **Signed out:** mascot + Sign in + Search.

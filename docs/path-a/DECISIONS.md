@@ -36,3 +36,10 @@ Format: date — decision. Why. Rejected alternatives.
   dwell 1.5 s, toast "Marked as seen on e621". Manual ⋯ › Mark all as seen too.
 - UX not yet signed off (Q9): spacing/hierarchy research first, all wireframe values tokenized, fix card
   header alignment and suggestion tiles. Research lives in `docs/path-a/research/`.
+
+## 2026-11-25 — UX signed off (Phase 2 gate)
+- Owner: UX okay; spacing/hierarchy work continues as visual design (Phase 3), informed by the three
+  research files in `docs/path-a/research/`.
+- Suggestions (Following card and Artists › Suggested) show one artist per section with 3 tiled recent
+  posts, filtered by ratings + blacklist, fetched in one batched `~a ~b …` request. Rejected: a
+  horizontal row of small avatar tiles (owner found it janky).

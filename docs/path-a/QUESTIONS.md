@@ -53,3 +53,6 @@ Format: id — question. Options (recommendation first). Status.
   notes: the card's artist avatar and the ⋯ icon feel too far right / unevenly placed; the artist
   suggestion tiles look janky. Research well-reviewed component libraries and indie designers' work for
   inspiration; run research subagents that write findings to disk. Then re-ask sign-off.
+  **Follow-up (owner):** spacing/visual feedback can move to visual design; UX-wise it's okay. Change:
+  "Artists you might like" shows one artist at a time with a few tiled recent posts, as part of each
+  artist row section. → **UX signed off** with that change (UX.md v3.2).

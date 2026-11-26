@@ -1,17 +1,16 @@
 # State
-Phase: 2 — UX plan                 Updated: 2026-11-25
+Phase: 3 — Visual design           Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
-Three research agents running (spacing/hierarchy, component libraries, indie designers) → files in
-docs/path-a/research/. Then: write spacing/size tokens, rebuild the wireframe artifact
-(https://claude.ai/artifact/VLu8URSVsrVfC3zrx38c2a, source in scratchpad ux-wireframes.html — copy to
-docs/path-a/wireframes.html) on those tokens, fix card header + suggestion tiles, re-ask UX sign-off (Q9).
+Wait for the 3 research files (docs/path-a/research/), then load design skills (impeccable,
+emil-design-eng, apple-design, mobile-native, animate), write DESIGN.md with tokens (spacing, sizes,
+radii, type, color, motion), build 1:1 mocks of key screens as an Artifact, design review rounds.
 ## Checklist
 - [x] GOAL.md copied and committed (a08df93)
 - [x] Phase 1: ENGINEERING.md current state
 - [x] Phase 1: peripheral feature brainstorm
 - [x] Phase 1: owner questions answered, scope frozen (DECISIONS 2026-11-25) — GATE MET
-- [ ] Phase 2: UX.md v3.1, 3 review rounds done; owner: "almost" — spacing research + tokenized wireframes, then re-ask
+- [x] Phase 2: UX.md v3.2, 3 review rounds, owner signed off — GATE MET
 - [ ] Phase 3: DESIGN.md + mocks + ≥2 review rounds + owner OK
 - [ ] Phase 4: ENGINEERING.md target + Plan review
 - [ ] Phase 5: slices 1–9
