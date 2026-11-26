@@ -656,3 +656,10 @@ Format: date — decision. Why. Rejected alternatives.
 - The three places: beside the 36 mark in the sidebar (20/25), under the 56 mark at the foot of
   Settings (17/22), under Goo on the landing card (28/34). Nothing about the name or the wordmark is
   open now.
+
+## 2026-11-26 — Un-favouriting: the goo stays
+
+- Owner, asked whether a post's goo stays or goes when it is un-favourited: "Goo stays".
+- Goo only adds. Only "Wipe clean" empties it. This is how the app is built already, so there is
+  nothing to change in the mock or the code.
+- Mine, not approved: favouriting the same post again adds goo again.
