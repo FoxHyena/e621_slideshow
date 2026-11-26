@@ -1,24 +1,55 @@
 "use client";
 
 /**
- * A bottom sheet (DESIGN.md "Sheet"): dim behind, Panel Navy, 24 top corners, grabber, a section
- * title and a close circle. It's a history entry (nav.openSheet), so Back, Esc, the close button,
- * a tap on the dim and a swipe down all close it the same way: by going back.
+ * A bottom sheet (DESIGN.md "Sheets with a title", "Sheet (⋯ menu)"): the dim, the Panel sheet with
+ * 24 top corners, the grabber, then a title row (Section title, the ✕ well on the 16 inset) or a head
+ * of the caller's own (the ⋯ menu's context line, Post info's artist). It's a history entry
+ * (nav.openSheet), so Back, Esc, the ✕, a tap on the dim and a swipe down all close it the same way:
+ * by going back.
  */
-import { X } from "lucide-react";
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { X, type LucideIcon } from "lucide-react";
+import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { getNav } from "@/nav/history";
 
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
 
+const close = () => void getNav().back();
+
+/** The ✕: a 36 round well with a link-blue cross. */
+export function SheetClose() {
+  return (
+    <button type="button" className="sheet-x" aria-label="Close" onClick={close} data-testid="sheet-close">
+      <X aria-hidden strokeWidth={2.6} />
+    </button>
+  );
+}
+
+/** A row of a titled sheet's actions: an icon well and the label, straight on the sheet. */
+export function SheetAction({ icon: Icon, label, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { icon: LucideIcon; label: string }) {
+  return (
+    <button type="button" className="list-row" {...rest}>
+      <span className="row-well" aria-hidden>
+        <Icon />
+      </span>
+      <span className="row-text">
+        <b>{label}</b>
+      </span>
+    </button>
+  );
+}
+
 export function Sheet({
   title,
+  head,
   children,
   footer,
   testId,
   full,
 }: {
+  /** the sheet's name; shown as its title unless `head` takes the title row's place */
   title: string;
+  /** replaces the title row (it should carry its own SheetClose when it wants one) */
+  head?: ReactNode;
   children: ReactNode;
   /** pinned under the content (a Done button) */
   footer?: ReactNode;
@@ -28,7 +59,6 @@ export function Sheet({
 }) {
   const id = useId();
   const box = useRef<HTMLDivElement>(null);
-  const close = () => void getNav().back();
 
   // Focus the first control; keep Tab inside; Esc closes (wherever focus is: after a tap on the dim
   // it may be outside the sheet).
@@ -45,7 +75,8 @@ export function Sheet({
     window.addEventListener("keydown", onEsc);
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
-      const all = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.getClientRects().length > 0);
+      // Real tab stops only: a menu's other rows are -1 (roving), so the last row isn't always one.
+      const all = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.tabIndex >= 0 && n.getClientRects().length > 0);
       if (all.length === 0) return;
       const [a, z] = [all[0], all[all.length - 1]];
       if (e.shiftKey && document.activeElement === a) {
@@ -100,19 +131,20 @@ export function Sheet({
         data-full={full || undefined}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={id}
+        aria-labelledby={head ? undefined : id}
+        aria-label={head ? title : undefined}
       >
         <div className="sheet-grab" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
           <span aria-hidden />
         </div>
-        <div className="sheet-head">
-          <h2 id={id} className="sheet-title">
-            {title}
-          </h2>
-          <button type="button" className="toolbar-circle" aria-label="Close" onClick={close}>
-            <X aria-hidden />
-          </button>
-        </div>
+        {head ?? (
+          <div className="sheet-head">
+            <h2 id={id} className="sheet-title">
+              {title}
+            </h2>
+            <SheetClose />
+          </div>
+        )}
         <div className="sheet-body">{children}</div>
         {footer && <div className="sheet-foot">{footer}</div>}
       </div>

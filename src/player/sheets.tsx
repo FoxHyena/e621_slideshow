@@ -1,137 +1,345 @@
 "use client";
 
 /**
- * The player's sheets (UX §5 "Player"): quick settings (⚙) and the post's info (ⓘ).
+ * The player's sheets (DESIGN.md "Player sheets"): Quick settings (the sliders button) and Post info
+ * (ⓘ). Both are the app's Panel sheet, not glass; opening one pauses the slideshow.
  */
-import { ExternalLink } from "lucide-react";
-import { TagActionsOverlay, useTagHold } from "@/components/TagActions";
+import { ArrowUp, ChevronRight, ExternalLink, Heart, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import Avatar from "@/components/Avatar";
+import { Menu, MenuRow } from "@/components/Menu";
+import { TagActionsOverlay, tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
+import { Seg, Stepper } from "@/components/v6";
 import { postPageUrl } from "@/lib/e621/client";
-import { TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
+import { TAG_CATEGORY_COLORS, type Post, type Rating, type TagCategoryName } from "@/lib/e621/types";
 import { decodeResults } from "@/lib/feed/filters";
-import { STYLE_LABELS, type PlaybackSettings, type SlideStyle } from "@/lib/settings";
+import { ago, artists, compact } from "@/lib/feed/format";
+import { type PlaybackSettings, type SlideStyle } from "@/lib/settings";
 import { getNav, type Entry } from "@/nav/history";
-import { Sheet } from "@/shell/Sheet";
+import { blacklistLine, openArtist, openResults } from "@/screens/actions";
+import { Sheet, SheetClose } from "@/shell/Sheet";
 import { getPrefs } from "@/state/prefs";
+import { getRec, weightsOf } from "@/state/rec";
+import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
-import { blacklistLine, openResults } from "@/screens/actions";
+import { setVisitPlayback, visitTarget, type VisitTarget } from "./visit";
 
-const STYLES = Object.keys(STYLE_LABELS) as SlideStyle[];
-const SECONDS = [3, 6, 10, 15, 30];
-const FITS: { id: PlaybackSettings["fit"]; label: string }[] = [
-  { id: "contain", label: "Fit" },
-  { id: "cover", label: "Fill" },
-  { id: "original", label: "1:1" },
+/** The styles, in Settings' order, with the short names the previews carry. */
+const STYLES: { value: SlideStyle; label: string }[] = [
+  { value: "classic", label: "Classic" },
+  { value: "kenburns", label: "Ken Burns" },
+  { value: "collage", label: "Collage" },
+  { value: "prints", label: "Prints" },
+  { value: "reflections", label: "Reflections" },
+];
+const FITS: { value: PlaybackSettings["fit"]; label: string }[] = [
+  { value: "contain", label: "Fit" },
+  { value: "cover", label: "Fill" },
+  { value: "original", label: "1:1" },
+];
+const QUALITY: { value: PlaybackSettings["quality"]; label: string }[] = [
+  { value: "sample", label: "Sample" },
+  { value: "original", label: "Original" },
+];
+const TARGETS: { value: VisitTarget; label: string }[] = [
+  { value: "visit", label: "This visit only" },
+  { value: "default", label: "Save as default" },
 ];
 
-function Segments<T extends string | number>({
-  label,
-  value,
-  options,
-  onChange,
-  testId,
-}: {
-  label: string;
-  value: T;
-  options: { id: T; label: string }[];
-  onChange: (v: T) => void;
-  testId: string;
-}) {
+/** A share link's visit: its own playback is showing. */
+const linkVisit = (base: Entry) => base.route.screen.kind === "results" && decodeResults(base.route.screen.params).link?.kind === "share";
+
+/** Change playback: your defaults, or on a link, this visit (and your defaults too when asked). */
+function usePlaybackSetter(base: Entry) {
+  const target = useStore(visitTarget, (t) => t[base.key] ?? "visit");
+  const fromLink = linkVisit(base);
+  const set = (patch: Partial<PlaybackSettings>) => {
+    if (fromLink) setVisitPlayback(base.key, patch);
+    if (!fromLink || target === "default") getPrefs().setPlayback({ ...getPrefs().store.get().playback, ...patch });
+  };
+  return { set, fromLink, target };
+}
+
+/** A tiny picture of what each style does, drawn in CSS (no posts in it). */
+function StylePreview({ style }: { style: SlideStyle }) {
   return (
-    <div className="sheet-group">
-      <p className="sheet-label">{label}</p>
-      <div className="segments" role="radiogroup" aria-label={label} data-testid={testId}>
-        {options.map((o) => (
-          <button key={o.id} type="button" role="radio" aria-checked={o.id === value} className="segment" onClick={() => onChange(o.id)}>
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </div>
+    <i className="style-pic" data-style={style} aria-hidden>
+      <u />
+      {(style === "collage" || style === "reflections") && <u />}
+      {style === "collage" && <u />}
+    </i>
   );
 }
 
-/**
- * Style, speed, fit, mute and quality. Saved as your defaults; on a share link's visit the link's
- * playback is what's showing, so a change here becomes yours from then on.
- */
-export function QuickSettingsSheet({ base }: { base: Entry }) {
-  const p = useStore(getPrefs().store, (s) => s.playback);
-  const fromLink = base.route.screen.kind === "results" && decodeResults(base.route.screen.params).link?.kind === "share";
-  const set = (patch: Partial<PlaybackSettings>) => getPrefs().setPlayback({ ...p, ...patch });
+/** Style, speed, fit, mute and quality, straight on the sheet. */
+export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
+  const { set, fromLink, target } = usePlaybackSetter(base);
+  const p = playback;
   return (
-    <Sheet title="Slideshow" testId="sheet-quick-settings">
-      {fromLink && <p className="feed-note sheet-intro">This link brought its own slideshow settings. A change here saves yours.</p>}
-      <Segments
-        label="Style"
-        value={p.style}
-        options={STYLES.map((s) => ({ id: s, label: STYLE_LABELS[s] }))}
-        onChange={(style) => set({ style })}
-        testId="quick-style"
-      />
-      <Segments
-        label="Seconds per slide"
-        value={p.intervalSec}
-        options={[...new Set([...SECONDS, p.intervalSec])].sort((a, b) => a - b).map((n) => ({ id: n, label: `${n}s` }))}
-        onChange={(intervalSec) => set({ intervalSec })}
-        testId="quick-seconds"
-      />
-      {p.style === "classic" && <Segments label="Fit" value={p.fit} options={FITS} onChange={(fit) => set({ fit })} testId="quick-fit" />}
-      <Segments
-        label="Quality"
-        value={p.quality}
-        options={[
-          { id: "sample", label: "Faster" },
-          { id: "original", label: "Original" },
-        ]}
-        onChange={(quality) => set({ quality })}
-        testId="quick-quality"
-      />
-      <label className="sheet-option">
-        <span>Mute videos</span>
-        <input type="checkbox" className="switch" checked={p.videoMuted} onChange={(e) => set({ videoMuted: e.target.checked })} />
-      </label>
+    <Sheet title="Quick settings" testId="sheet-quick-settings">
+      {fromLink && (
+        <Seg
+          label="Where changes go"
+          big
+          className="quick-target"
+          options={TARGETS}
+          value={target}
+          onChange={(t) => visitTarget.set((all) => ({ ...all, [base.key]: t }))}
+          testId="quick-target"
+        />
+      )}
+      <div
+        className="style-row"
+        role="radiogroup"
+        aria-label="Style"
+        data-testid="quick-style"
+        onKeyDown={(e) => {
+          const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+          if (!d) return;
+          e.preventDefault();
+          const i = Math.max(0, STYLES.findIndex((s) => s.value === p.style));
+          const n = (i + d + STYLES.length) % STYLES.length;
+          set({ style: STYLES[n].value });
+          e.currentTarget.querySelectorAll<HTMLButtonElement>(".style-pick")[n]?.focus();
+        }}
+      >
+        {STYLES.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            role="radio"
+            aria-checked={p.style === s.value}
+            tabIndex={p.style === s.value ? 0 : -1}
+            className="style-pick"
+            onClick={() => set({ style: s.value })}
+          >
+            <StylePreview style={s.value} />
+            {s.label}
+          </button>
+        ))}
+      </div>
+      <div className="sheet-rows">
+        <div className="list-row">
+          <span className="row-text">
+            <b>Seconds per slide</b>
+          </span>
+          <Stepper
+            label="seconds per slide"
+            value={p.intervalSec}
+            min={1}
+            max={60}
+            format={(v) => `${v} s`}
+            onChange={(intervalSec) => set({ intervalSec })}
+            testId="quick-seconds"
+          />
+        </div>
+        {p.style === "classic" && (
+          <div className="list-row">
+            <span className="row-text">
+              <b>Fit</b>
+            </span>
+            <Seg label="Fit" className="quick-fit" options={FITS} value={p.fit} onChange={(fit) => set({ fit })} testId="quick-fit" />
+          </div>
+        )}
+        <label className="list-row">
+          <span className="row-text">
+            <b>Mute videos</b>
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            className="switch"
+            checked={p.videoMuted}
+            onChange={(e) => set({ videoMuted: e.target.checked })}
+            data-testid="quick-mute"
+          />
+        </label>
+        <button type="button" className="list-row" onClick={() => getNav().openSheet("player-quality")} data-testid="quick-quality">
+          <span className="row-text">
+            <b>Quality</b>
+          </span>
+          <span className="row-value">{QUALITY.find((q) => q.value === p.quality)?.label}</span>
+          <ChevronRight aria-hidden className="row-chev" />
+        </button>
+      </div>
+      <button
+        type="button"
+        className="link-row sheet-more"
+        onClick={async () => {
+          await getNav().back();
+          getNav().push({ screen: { kind: "settings", section: "slideshow" }, play: null }, { from: "settings" });
+        }}
+      >
+        More in Settings <ChevronRight aria-hidden />
+      </button>
     </Sheet>
   );
 }
 
-const CATEGORIES: [TagCategoryName, string][] = [
+/** Quality, as a menu over Quick settings; Back returns to it. */
+export function QualitySheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
+  const { set } = usePlaybackSetter(base);
+  return (
+    <Sheet title="Quality" testId="sheet-quality">
+      <Menu label="Quality">
+        {QUALITY.map((q) => (
+          <MenuRow
+            key={q.value}
+            on={playback.quality === q.value}
+            onPick={() => {
+              set({ quality: q.value });
+              void getNav().back();
+            }}
+            testId={`quality-${q.value}`}
+          >
+            {q.label}
+          </MenuRow>
+        ))}
+      </Menu>
+    </Sheet>
+  );
+}
+
+/** e621's order; an Artists group only when a post credits more than one artist. */
+const KINDS: [TagCategoryName, string][] = [
   ["artist", "Artists"],
   ["copyright", "Copyrights"],
   ["character", "Characters"],
   ["species", "Species"],
   ["general", "General"],
-  ["lore", "Lore"],
   ["meta", "Meta"],
+  ["lore", "Lore"],
 ];
+const RATING: Record<Rating, string> = { s: "Safe", q: "Questionable", e: "Explicit" };
 
-/** Tags by category; tap one for Search this tag or Blacklist. */
-export function PlayerInfoSheet({ post }: { post: Post; base: Entry }) {
-  const act = async (tag: string, action: "search" | "blacklist") => {
-    if (action === "blacklist") {
-      blacklistLine(tag);
-      return;
+/** "For you because you fav otter and cozy a lot": the post's two strongest profile tags. */
+function useWhy(post: Post, forYou: boolean): string[] {
+  const rec = useStore(getRec().store, (r) => r);
+  const weights = useMemo(() => (forYou ? weightsOf(rec) : null), [forYou, rec]);
+  if (!weights) return [];
+  return Object.values(post.tags)
+    .flat()
+    .filter((t): t is string => !!t && (weights.get(t) ?? 0) > 0)
+    .sort((a, b) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0))
+    .slice(0, 2);
+}
+
+const size = (bytes: number) => (bytes >= 1 << 20 ? `${(bytes / (1 << 20)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+
+/** Who, three stats, why For You picked it, every tag by kind, and the file. Tap a tag for its targets. */
+export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
+  const screen = base.route.screen;
+  // For You's ranked feed (signed in with your own account); signed out it shows Popular, no profile
+  const signedIn = useStore(getSession().store, (s) => !!s.creds && !!s.user && !s.link);
+  const forYou = signedIn && screen.kind === "tab" && screen.tab === "for-you";
+  const by = artists(post)[0];
+  const name = by?.replaceAll("_", " ");
+  const why = useWhy(post, forYou);
+  const act = async (tag: string, action: TagAction) => {
+    if (action === "blacklist") return blacklistLine(tag);
+    if (action === "pin") {
+      if (getRec().store.get().overrides.pinned.includes(tag)) return void toast(`${tag.replaceAll("_", " ")} is already pinned`);
+      getRec().togglePin(tag);
+      return void toast(`Pinned ${tag.replaceAll("_", " ")}. Update ranking to use it.`);
     }
-    // Close the sheet and the player, then search.
+    // Close the sheet and the player, then go.
     await getNav().back();
     await getNav().back();
-    openResults(tag);
+    if (action === "open") openArtist(tag);
+    else openResults(tag);
   };
   const hold = useTagHold((t, a) => void act(t, a));
+  const credited = artists(post);
+  const multi = credited.length > 1;
+  const [now] = useState(() => Date.now());
+  const f = post.files;
   return (
-    <Sheet title={`Post #${post.id}`} testId="sheet-info">
-      {CATEGORIES.map(([c, label]) => {
-        const tags = post.tags[c] ?? [];
+    <Sheet
+      title={`Post ${post.id}${name ? ` by ${name}` : ""}`}
+      testId="sheet-info"
+      head={
+        <div className="sheet-head info-head">
+          {by ? (
+            <button type="button" className="info-who" onClick={() => void act(by, "open")} data-testid="info-artist">
+              <Avatar seed={by} className="post-avatar" />
+              <span className="row-text">
+                <b>
+                  {name}
+                  <ChevronRight aria-hidden />
+                </b>
+                <small>
+                  #{post.id} · {ago(post.created_at, now)}
+                </small>
+              </span>
+            </button>
+          ) : (
+            <span className="info-who">
+              <Avatar seed={`post:${post.id}`} className="post-avatar" />
+              <span className="row-text">
+                <b>unknown artist</b>
+                <small>
+                  #{post.id} · {ago(post.created_at, now)}
+                </small>
+              </span>
+            </span>
+          )}
+          <SheetClose />
+        </div>
+      }
+    >
+      <div className="stat-wells">
+        <div className="stat-well">
+          <b>
+            <ArrowUp aria-hidden className="stat-up" />
+            {compact(post.stats.score.total)}
+          </b>
+          <small>score</small>
+        </div>
+        <div className="stat-well">
+          <b>
+            <Heart aria-hidden className="stat-heart" />
+            {compact(post.stats.fav_count)}
+          </b>
+          <small>favs</small>
+        </div>
+        <div className="stat-well">
+          <b data-rating={post.rating}>{RATING[post.rating]}</b>
+          <small>rating</small>
+        </div>
+      </div>
+      {why.length > 0 && (
+        <p className="info-why" data-testid="info-why">
+          <Sparkles aria-hidden />
+          <span>
+            For you because you fav <b>{why[0].replaceAll("_", " ")}</b>
+            {why[1] && (
+              <>
+                {" "}
+                and <b>{why[1].replaceAll("_", " ")}</b>
+              </>
+            )}{" "}
+            a lot.
+          </span>
+        </p>
+      )}
+      {KINDS.map(([c, label]) => {
+        const tags = c === "artist" ? (multi ? credited : []) : (post.tags[c] ?? []);
         if (!tags.length) return null;
         return (
-          <div key={c} className="sheet-group">
-            <p className="sheet-label">{label}</p>
-            <div className="chips chips-wrap">
+          <section key={c} className="info-kind" aria-label={label}>
+            <h3 className="info-label">
+              {label}
+              <span>{tags.length}</span>
+            </h3>
+            <div className="info-tags">
               {tags.map((t) => (
                 <button
                   key={t}
                   type="button"
                   className="post-tag"
                   style={{ color: `var(--color-tag-${c}, ${TAG_CATEGORY_COLORS[c]})` }}
+                  data-picked={hold.held?.tag === t || undefined}
                   onPointerDown={(e) => hold.onPointerDown(e, t, c)}
                   onClick={(e) => hold.onClick(e, t, c)}
                   onContextMenu={(e) => e.preventDefault()}
@@ -143,14 +351,18 @@ export function PlayerInfoSheet({ post }: { post: Post; base: Entry }) {
                 </button>
               ))}
             </div>
-          </div>
+          </section>
         );
       })}
-      <a className="sheet-option sheet-wide" href={postPageUrl(post.id)} target="_blank" rel="noopener">
-        <span>Open on e621</span>
-        <ExternalLink aria-hidden />
-      </a>
-      <TagActionsOverlay hold={hold} recommended={false} onAction={(t, a) => void act(t, a)} />
+      <div className="info-foot">
+        <small>
+          {f.original.width} × {f.original.height} · {f.meta.ext.toUpperCase()} · {size(f.meta.size)}
+        </small>
+        <a className="link-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
+          Open on e621 <ExternalLink aria-hidden />
+        </a>
+      </div>
+      <TagActionsOverlay hold={hold} recommended={false} onAction={(t, a) => void act(t, a)} targets={tagTargets(forYou, true)} />
     </Sheet>
   );
 }

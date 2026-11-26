@@ -5,7 +5,7 @@
  * queue (the feed registry's, by history entry), so paging here grows the feed too. All five
  * stages, the timer, preloading and stall skip are today's, moved from the legacy App.
  */
-import { ChevronLeft, ChevronRight, Heart, Info, Maximize, Minimize, Pause, Play, Settings2, Share, X } from "lucide-react";
+import { Heart, Info, Maximize, Minimize, Pause, Play, Share, SkipBack, SkipForward, SlidersHorizontal, X } from "lucide-react";
 import { turnMark } from "@/feed/motion";
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -29,8 +29,9 @@ import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { copyText, sharePost } from "@/screens/actions";
 import { takePaused } from "./intent";
-import { PlayerInfoSheet, QuickSettingsSheet } from "./sheets";
+import { PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
 import { shareUrlFor } from "./share";
+import { visitPlayback } from "./visit";
 
 const HIDE_CONTROLS_MS = 2500;
 /** A second tap this soon is a double tap (toggles nothing, favorites). */
@@ -48,11 +49,12 @@ const FIND_PAGES = 5;
 const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
-/** A link's playback applies for this visit (videos start muted: autoplay needs it). */
 /** Link screens already told "videos start muted", so a reopen doesn't say it again. */
 const mutedNoted = new Set<string>();
 
-function usePlayback(base: Entry): PlaybackSettings {
+/** A link's playback applies for this visit (videos start muted: autoplay needs it), with any change
+ * made for this visit in Quick settings on top. */
+export function usePlayback(base: Entry): PlaybackSettings {
   const saved = useStore(getPrefs().store, (p) => p.playback);
   const screen = base.route.screen;
   useEffect(() => {
@@ -62,12 +64,13 @@ function usePlayback(base: Entry): PlaybackSettings {
     mutedNoted.add(base.key);
     toast("Videos start muted: unmute in settings");
   }, [base.key, screen]);
+  const visit = useStore(visitPlayback, (v) => v[base.key]);
   return useMemo(() => {
     if (screen.kind !== "results") return saved;
     const link = decodeResults(screen.params).link;
     if (link?.kind !== "share") return saved;
-    return { ...DEFAULT_PLAYBACK, ...link.playback, preloadCount: saved.preloadCount, videoMuted: true };
-  }, [saved, screen]);
+    return { ...DEFAULT_PLAYBACK, ...link.playback, preloadCount: saved.preloadCount, videoMuted: true, ...visit };
+  }, [saved, screen, visit]);
 }
 
 export function Player({ base, top }: { base: Entry; top: Entry }) {
@@ -391,6 +394,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
     box.current?.focus({ preventScroll: true });
   }, []);
 
+  const bar = useRef<HTMLDivElement>(null);
   const by = current ? artists(current)[0] : undefined;
   const count = `${index + 1} / ${posts.length}${queue && !queue.exhausted ? "+" : ""}`;
 
@@ -468,8 +472,12 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
           {current && (
             <div className="player-who">
               <Avatar seed={by ?? `post:${current.id}`} className="post-avatar" />
-              <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
-              <span className="post-time">{ago(current.created_at, now)}</span>
+              <span className="player-idn">
+                <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
+                <span className="post-time">
+                  {ago(current.created_at, now)} · #{current.id}
+                </span>
+              </span>
               {by && <FollowPill key={by} name={by} art />}
             </div>
           )}
@@ -490,7 +498,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
               <Info aria-hidden />
             </button>
             <button type="button" className="art-circle" aria-label="Slideshow settings" onClick={() => nav.openSheet("player-settings")} data-testid="quick-settings-button">
-              <Settings2 aria-hidden />
+              <SlidersHorizontal aria-hidden />
             </button>
             <button type="button" className="art-circle" aria-label="Share" onClick={share} data-testid="share-button">
               <Share aria-hidden />
@@ -498,7 +506,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
           </div>
           <div className="player-transport">
             <button type="button" className="art-circle" aria-label="Previous" onClick={prev} disabled={index === 0}>
-              <ChevronLeft aria-hidden />
+              <SkipBack aria-hidden className="solid" />
             </button>
             <button
               type="button"
@@ -510,24 +518,50 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
               {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
             </button>
             <button type="button" className="art-circle" aria-label="Next" onClick={() => void next()} data-testid="next-button">
-              <ChevronRight aria-hidden />
+              <SkipForward aria-hidden className="solid" />
             </button>
           </div>
-          <div className="player-progress">
-            {current && isReady && (
-              <div
-                key={timerKey}
-                className="progress-bar"
-                data-testid="progress"
-                style={{ animationDuration: `${durationMs}ms`, animationPlayState: running ? "running" : "paused" }}
-              />
-            )}
+          <div className="player-bar">
+            <div className="player-progress">
+              {current && isReady && (
+                <div
+                  key={timerKey}
+                  ref={bar}
+                  className="progress-bar"
+                  data-testid="progress"
+                  style={{ animationDuration: `${durationMs}ms`, animationPlayState: running ? "running" : "paused" }}
+                />
+              )}
+            </div>
+            <TimeLeft bar={bar} />
           </div>
         </div>
       </div>
 
-      {sheet === "player-settings" && <QuickSettingsSheet base={base} />}
+      {sheet === "player-settings" && <QuickSettingsSheet base={base} playback={playback} />}
+      {sheet === "player-quality" && <QualitySheet base={base} playback={playback} />}
       {sheet === "player-info" && current && <PlayerInfoSheet post={current} base={base} />}
     </div>
+  );
+}
+
+/** How long this slide has left ("4 s", "1:20"), read off the progress bar's own animation. */
+function TimeLeft({ bar }: { bar: React.RefObject<HTMLDivElement | null> }) {
+  const [left, setLeft] = useState<number | null>(null);
+  useEffect(() => {
+    const read = () => {
+      const a = bar.current?.getAnimations()[0];
+      const d = a?.effect?.getComputedTiming().duration;
+      setLeft(a && typeof d === "number" ? Math.ceil(Math.max(0, d - Number(a.currentTime ?? 0)) / 1000) : null);
+    };
+    read();
+    const id = setInterval(read, 250);
+    return () => clearInterval(id);
+  }, [bar]);
+  if (left === null) return <span className="player-left" />;
+  return (
+    <span className="player-left" data-testid="time-left">
+      {left < 60 ? `${left} s` : `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`}
+    </span>
   );
 }

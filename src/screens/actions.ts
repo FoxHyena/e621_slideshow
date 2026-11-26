@@ -37,6 +37,18 @@ export function openResults(tags: string, filters?: Filters): void {
   getNav().push(resultsRoute(tags, filters));
 }
 
+/** Open an artist's page. */
+export function openArtist(name: string): void {
+  getNav().push({ screen: { kind: "artist", name }, play: null });
+}
+
+/** What a held tag's target does on a feed: open the artist, search the tag, or blacklist it. */
+export function onFeedTag(tag: string, action: "open" | "search" | "pin" | "blacklist"): void {
+  if (action === "blacklist") blacklistLine(tag);
+  else if (action === "open") openArtist(tag);
+  else openResults(tag);
+}
+
 /** Add a line to this browser's blacklist, with Undo. Your e621 account blacklist isn't touched. */
 export function blacklistLine(line: string, label = line.replaceAll("_", " ")): void {
   const prefs = getPrefs();

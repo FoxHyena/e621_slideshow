@@ -507,3 +507,38 @@ modules and the Settings home into a lazy chunk: **199.1 KB** (≤ 200), 241.0 K
 12 cards in the DOM; CLS 0.0000; first feed content 0.41 s; scroll at 4× CPU: 0 long tasks. Still about
 1 KB of headroom: R2b's player and sheet code is lazy already, but anything new the feed screens import
 counts.
+
+## Slice R2b review (2026-11-25): player, its sheets, menus, tag targets
+
+**code-review skill (high), 5 findings: 4 fixed, 1 skipped**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The filter menus are a new lazy chunk with no error boundary: a failed download (offline, or a deploy replaced it) would take the app down | Med | `LoadFailed` boundary in Chips: closes the sheet, toasts, and makes a fresh `lazy()` so the next tap retries; e2e aborts the chunk |
+| 2 | Post info offered Pin (and the why line) on signed-out For You, which shows Popular, not a profile | Med | For You in Post info needs your own sign-in (creds, user, not a link's); e2e |
+| 3 | Score › Custom… didn't focus its field (Sheet's autofocus runs only when the sheet opens) | Low | Ref callback focuses it as it appears; `data-autofocus` kept for a sheet that opens on Custom; e2e |
+| 4 | The style picker radiogroup had five tab stops and no arrow keys | Low | Roving tab stop and arrows, like `Seg`; e2e |
+| 5 | A single-artist post shows no artist tag in Post info, so it can't be held for Blacklist there | Low | **Skipped**: the design puts the artist in the head (DESIGN.md "Post info"); Blacklist this artist stays in the card's ⋯ (DECISIONS) |
+
+**Fresh reviewer, 7 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Sheet's Tab trap counted a menu's `tabindex=-1` rows as the last stop, so Tab could leave the dialog | Med | The trap uses real tab stops only (`tabIndex >= 0`); e2e Tabs round Sort |
+| 2 | "Artists" counted `conditional_dnp` and the other warning tags as artists | Low | The group shows when `artists(post)` has more than one, and lists only those |
+| 3 | Open on the artist's own page does nothing | Low | **No change**: cards don't show artist tags; from Post info on that page, Open closes the player onto the page, which is what it asks for |
+| 4 | Lazy filter menus have no failure path | Med | Same as code-review 1 |
+| 5 | Menu's layout effect runs every render | Low | **No change**: 3–9 rows; it is what keeps the thumb right after a Custom… row opens |
+| 6 | Reshuffle is a non-radio inside the radiogroup | Low | **No change**: it is the chosen row's action and only shows while Random is on |
+| 7 | TimeLeft polls every 250 ms while paused | Low | **No change**: `setState` bails out when the value is the same |
+
+**Gates:** typecheck and lint clean; unit tests pass; full e2e 157 passed, 2 skipped, 1 failed: the legacy
+"prints: one colour print…" timing test under four workers (passes 3 of 3 alone; R2b doesn't touch the
+stages). New e2e: Sort/Date/Media/⋯ sheets (R2b part 1), player chrome, Post info (stats, kinds, targets
+8 above the tag), Quick settings (stepper, Fit only for Classic, mute, Quality menu), share-link Quick
+settings (this visit vs your default), card tag targets, two-artist Post info with Open first, and the
+review fixes. Visual check at 375×812: player, Post info with targets, Quick settings, card targets.
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` **198.6 KB** (≤ 200; R2a
+199.1: the old sheets left the first load with the filter menus), 250.9 KB with the idle prefetch; 12 cards
+in the DOM; CLS 0.0000; first feed content 0.36 s; scroll at 4× CPU: 0 long tasks.

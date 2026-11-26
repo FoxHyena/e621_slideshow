@@ -18,7 +18,7 @@ import { PullToRefresh } from "@/feed/PullToRefresh";
 import { getNav } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
-import { Sheet } from "@/shell/Sheet";
+import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFeeds, feedQuery, type Feed, type FeedSpec } from "@/state/feeds";
 import { getFollowing, RETRY_FAILED_MS, type FollowingState } from "@/state/following";
 import { FEED_HEAD_POSTS, storage } from "@/lib/storage";
@@ -26,9 +26,8 @@ import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { shallow, useStore } from "@/state/store";
-import type { TagAction } from "@/components/TagActions";
 import { AppMark } from "@/components/Avatar";
-import { blacklistLine, openResults, openSignIn } from "./actions";
+import { onFeedTag, openSignIn } from "./actions";
 import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./FeedScreens";
 
 const CHIPS: ChipId[] = ["media", "hideFaved"];
@@ -63,7 +62,7 @@ function expandRun(id: number): Set<number> {
   return new Set(expandedRuns);
 }
 
-const onTag = (tag: string, action: TagAction) => (action === "blacklist" ? blacklistLine(tag) : openResults(tag));
+const onTag = onFeedTag;
 
 function toTop(visible: boolean) {
   if (!visible) return;
@@ -391,31 +390,27 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
       />
       {sheet === "menu" && (
         <Sheet title="Following" testId="sheet-following-menu">
-          <button
-            type="button"
-            className="sheet-option"
-            onClick={async () => {
-              await getNav().back();
-              refresh();
-            }}
-            data-testid="following-refresh"
-          >
-            <span>Refresh</span>
-            <RotateCw aria-hidden />
-          </button>
-          <button
-            type="button"
-            className="sheet-option"
-            disabled={newCount === 0 || fs.marked !== null || fs.marking}
-            onClick={async () => {
-              await getNav().back();
-              getNav().openSheet("mark-all");
-            }}
-            data-testid="following-mark-all"
-          >
-            <span>Mark all as seen</span>
-            <CheckCheck aria-hidden />
-          </button>
+          <div className="sheet-rows" data-wells>
+            <SheetAction
+              icon={RotateCw}
+              label="Refresh"
+              onClick={async () => {
+                await getNav().back();
+                refresh();
+              }}
+              data-testid="following-refresh"
+            />
+            <SheetAction
+              icon={CheckCheck}
+              label="Mark all as seen"
+              disabled={newCount === 0 || fs.marked !== null || fs.marking}
+              onClick={async () => {
+                await getNav().back();
+                getNav().openSheet("mark-all");
+              }}
+              data-testid="following-mark-all"
+            />
+          </div>
         </Sheet>
       )}
       {sheet === "mark-all" && (

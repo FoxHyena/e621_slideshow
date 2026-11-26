@@ -13,6 +13,7 @@ const forYou = () => import("@/screens/ForYou");
 const tune = () => import("@/screens/Tune");
 const player = () => import("@/player/Player");
 const settingsHome = () => import("@/screens/SettingsHome");
+const filterSheets = () => import("@/feed/FilterSheets");
 /** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
 export const motionFx = () => import("@/feed/motionFx");
 
@@ -28,7 +29,7 @@ export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, motionFx]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, filterSheets, motionFx]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

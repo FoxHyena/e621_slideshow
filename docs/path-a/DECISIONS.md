@@ -474,3 +474,26 @@ Format: date — decision. Why. Rejected alternatives.
   (src/components/TagText.tsx) are their own modules, and the Settings home (src/screens/SettingsHome.tsx)
   is a lazy chunk prefetched at idle. Rule going forward: the feed screens module is in the first load
   (Following imports it), so it imports only small, single-purpose modules.
+
+## 2026-11-25 — Slice R2b build (player, sheets, menus, tag targets)
+- **The filter menus are their own lazy chunk** (src/feed/FilterSheets.tsx), prefetched at idle with the
+  screens; Chips only imports their types. A failed download closes the sheet with a toast and retries on
+  the next tap.
+- **Menus** (Sort, Date, Score, Quality): tapping a row applies it and closes the sheet; only Custom…
+  needs Apply. Arrow keys move focus only, since choosing a row closes the sheet. Score's first row is
+  "Any". Date's Custom… adds "Last N days / weeks / months / years" (years too: e621 takes it).
+- **Media stays three switches with Done** (one reload for any mix); Done says "Pick at least one" when
+  all are off.
+- **Quick settings**: Fit shows only for Classic (the other styles fill the screen themselves); Quality
+  is a row that opens a Quality menu over the sheet; the style previews are drawn in CSS (no posts).
+- **Share links: per-visit playback.** On a link the link's playback plays; Quick settings changes "This
+  visit only" (default) or also "Save as default". Visit changes live in memory by the link screen's
+  history key (src/player/visit.ts) and end with the page.
+- **Tag targets**: up to three raised capsules 8 above the held tag (below when there's no room), kept 8
+  inside the screen, no dim behind them. An artist's tag gets Open, Search, Blacklist; For You (signed in,
+  your own account) pins instead of searching; Post info in For You offers Search and Pin both.
+- **Post info**: the artist is the head (tap opens their page); an Artists group only when a post credits
+  more than one artist (warning tags such as `conditional_dnp` don't count). Blacklisting a single artist
+  is in the card's ⋯ ("Blacklist this artist"), not Post info.
+- **The ⋯ sheet** has a context line (avatar, artist, #id) instead of a title row and no ✕; dim, Esc,
+  Back and swipe close it.

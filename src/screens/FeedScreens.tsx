@@ -5,7 +5,8 @@
  * and the round Play button (UX §5). Their filters live in the URL, so a reload, Back and a copied
  * link agree; a filter change replaces this history entry and starts the feed over.
  */
-import { ChevronLeft, ExternalLink, Heart, LayoutGrid, Link2, MoreHorizontal, Play, Rows3, Search, Star, UserX } from "lucide-react";
+import { ChevronLeft, ExternalLink, Heart, LayoutGrid, Link2, MoreHorizontal, Play, Rows3, Search, Share, Star, UserX } from "lucide-react";
+import Avatar from "@/components/Avatar";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { postPageUrl } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
@@ -19,14 +20,14 @@ import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { getNav } from "@/nav/history";
 import type { Route } from "@/nav/routes";
 import { useScreen } from "@/shell/context";
-import { Sheet } from "@/shell/Sheet";
+import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFavs } from "@/state/favs";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { TagText, tagText } from "@/components/TagText";
 import { useStore } from "@/state/store";
-import { blacklistLine, copyText, openResults, openSignIn, sharePost } from "./actions";
+import { blacklistLine, copyText, onFeedTag, openArtist, openSignIn, sharePost } from "./actions";
 import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import { openPaused } from "@/player/intent";
@@ -167,41 +168,58 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
   if (!post) return null;
   const artist = artists(post)[0];
   const close = () => getNav().back();
+  const name = artist?.replaceAll("_", " ");
   return (
-    <Sheet title={`Post #${post.id}`} testId="sheet-post">
-      <button
-        type="button"
-        className="sheet-option"
-        onClick={async () => {
-          await close();
-          openPaused(false);
-          getNav().push({ screen: entry.route.screen, play: String(post.id) });
-        }}
-      >
-        <span>Play from this post</span>
-        <Play aria-hidden />
-      </button>
-      <button type="button" className="sheet-option" onClick={() => void sharePost(post)}>
-        <span>Share post</span>
-        <Link2 aria-hidden />
-      </button>
-      <a className="sheet-option" href={postPageUrl(post.id)} target="_blank" rel="noopener">
-        <span>Open on e621</span>
-        <ExternalLink aria-hidden />
-      </a>
-      {artist && (
+    <Sheet
+      title={`Post ${post.id}${name ? ` by ${name}` : ""}`}
+      testId="sheet-post"
+      head={
+        <div className="sheet-ctx">
+          <Avatar seed={artist ?? `post:${post.id}`} className="post-avatar" />
+          <span className="row-text">
+            <b>{name ?? "unknown artist"}</b>
+            <small>#{post.id}</small>
+          </span>
+        </div>
+      }
+    >
+      <div className="well-group">
         <button
           type="button"
-          className="sheet-option sheet-danger"
+          className="well-row"
           onClick={async () => {
             await close();
-            blacklistLine(artist);
+            openPaused(false);
+            getNav().push({ screen: entry.route.screen, play: String(post.id) });
           }}
         >
-          <span>Blacklist {artist.replaceAll("_", " ")}</span>
-          <UserX aria-hidden />
+          <Play aria-hidden />
+          <span>Play from this post</span>
         </button>
-      )}
+        <button type="button" className="well-row" onClick={() => void sharePost(post)}>
+          <Share aria-hidden />
+          <span>Share post</span>
+        </button>
+        <a className="well-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
+          <ExternalLink aria-hidden />
+          <span>Open on e621</span>
+          <small>e621.net</small>
+        </a>
+        {artist && (
+          <button
+            type="button"
+            className="well-row"
+            data-danger
+            onClick={async () => {
+              await close();
+              blacklistLine(artist);
+            }}
+          >
+            <UserX aria-hidden />
+            <span>Blacklist this artist</span>
+          </button>
+        )}
+      </div>
     </Sheet>
   );
 }
@@ -277,6 +295,7 @@ export function ResultsScreen({ params }: { params: string }) {
   };
   const onTag = (tag: string, action: TagAction) => {
     if (action === "blacklist") blacklistLine(tag);
+    else if (action === "open") openArtist(tag);
     else if (!r.tags.split(" ").includes(tag)) search(`${r.tags} ${tag}`);
   };
 
@@ -386,10 +405,9 @@ function ResultsMenu() {
   };
   return (
     <Sheet title="Results" testId="sheet-results-menu">
-      <button type="button" className="sheet-option" onClick={copy} data-testid="copy-share-link">
-        <span>{url?.withSignIn ? "Copy share link (with your sign-in)" : "Copy share link"}</span>
-        <Link2 aria-hidden />
-      </button>
+      <div className="sheet-rows" data-wells>
+        <SheetAction icon={Link2} label={url?.withSignIn ? "Copy share link (with your sign-in)" : "Copy share link"} onClick={copy} data-testid="copy-share-link" />
+      </div>
     </Sheet>
   );
 }
@@ -462,7 +480,7 @@ export function FavoritesScreen({ params }: { params: string }) {
                 )}
               </>
             }
-            onTag={(tag, action) => (action === "blacklist" ? blacklistLine(tag) : openResults(tag))}
+            onTag={onFeedTag}
           />
           <PlayFab feed={feed} route={route} />
           <FilterSheet sheet={sheet} filters={filters} apply={go} />
@@ -497,7 +515,7 @@ export function ArtistScreen({ name }: { name: string }) {
         grid={grid}
         route={route}
         empty={<p className="feed-empty-title">No posts by {name.replaceAll("_", " ")}.</p>}
-        onTag={(tag, action) => (action === "blacklist" ? blacklistLine(tag) : openResults(tag))}
+        onTag={onFeedTag}
       />
       <PlayFab feed={feed} route={route} />
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}

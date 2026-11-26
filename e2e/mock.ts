@@ -21,6 +21,8 @@ export interface MockPostSpec {
   duration?: number;
   /** the artist tag (default `mock_artist`) */
   artist?: string;
+  /** more than one artist tag (overrides `artist`) */
+  artists?: string[];
 }
 
 export function mockPost(spec: MockPostSpec) {
@@ -42,7 +44,7 @@ export function mockPost(spec: MockPostSpec) {
       fav_count: 3,
       is_favorited: spec.is_favorited ?? false,
     },
-    tags: { general: spec.tags ?? ["solo"], artist: [spec.artist ?? "mock_artist"], species: ["wolf"] },
+    tags: { general: spec.tags ?? ["solo"], artist: spec.artists ?? [spec.artist ?? "mock_artist"], species: ["wolf"] },
     rating: spec.rating ?? "s",
     uploader_id: 1,
     uploader_name: "uploader",

@@ -10,7 +10,7 @@ import { ArrowUp, ChevronDown, Heart, Play, RotateCw } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
-import { TagActionsOverlay, useTagHold, type TagAction } from "@/components/TagActions";
+import { TagActionsOverlay, tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
 import type { Feed } from "@/state/feeds";
 import { useStore } from "@/state/store";
 import { favCountOf, favedOf, getFavs } from "@/state/favs";
@@ -429,7 +429,7 @@ export function FeedView({
           <span className="feed-spinner" role="status" aria-label="Loading more" />
         ) : null}
       </div>
-      <TagActionsOverlay hold={hold} recommended={recommended} onAction={onTag} />
+      <TagActionsOverlay hold={hold} recommended={recommended} onAction={onTag} targets={tagTargets(recommended)} />
     </>
   );
 }

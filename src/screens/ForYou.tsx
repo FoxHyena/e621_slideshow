@@ -23,7 +23,7 @@ import { PullToRefresh } from "@/feed/PullToRefresh";
 import { getNav } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
-import { Sheet } from "@/shell/Sheet";
+import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getRec, learnedOf, signatureOf, weightsOf, type RecState } from "@/state/rec";
@@ -32,7 +32,7 @@ import { shallow, useStore } from "@/state/store";
 import type { TagAction } from "@/components/TagActions";
 import type { Route } from "@/nav/routes";
 import { toast } from "sonner";
-import { blacklistLine, openResults, openSignIn } from "./actions";
+import { onFeedTag, openSignIn } from "./actions";
 import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./FeedScreens";
 
 /** How long a saved ranking is shown again instead of ranking afresh (UX §3). */
@@ -290,7 +290,7 @@ export function ForYouScreen() {
   const route = entry.route;
   // Holding a tag here offers Pin (UX §5 "Hold a tag").
   const onTag = (tag: string, action: TagAction) => {
-    if (action === "blacklist") return blacklistLine(tag);
+    if (action !== "pin") return onFeedTag(tag, action);
     if (rec.store.get().overrides.pinned.includes(tag)) return void toast(`${tag.replaceAll("_", " ")} is already pinned`);
     rec.togglePin(tag);
     toast(`Pinned ${tag.replaceAll("_", " ")}. Update ranking to use it.`);
@@ -363,10 +363,9 @@ export function ForYouScreen() {
           />
           {sheet === "menu" && (
             <Sheet title="For You" testId="sheet-for-you-menu">
-              <button type="button" className="sheet-option" onClick={() => void doRefresh()} disabled={!choice || busy} data-testid="for-you-refresh">
-                <span>Refresh</span>
-                <RotateCw aria-hidden />
-              </button>
+              <div className="sheet-rows" data-wells>
+                <SheetAction icon={RotateCw} label="Refresh" onClick={() => void doRefresh()} disabled={!choice || busy} data-testid="for-you-refresh" />
+              </div>
             </Sheet>
           )}
           {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
@@ -487,7 +486,7 @@ function SignedOut({ grid }: { grid: boolean }) {
         route={entry.route}
         anchorKey={feed ? `for-you:${feed.key}` : undefined}
         empty={<p className="feed-empty-title">Nothing popular right now.</p>}
-        onTag={(tag, action) => (action === "blacklist" ? blacklistLine(tag) : openResults(tag))}
+        onTag={onFeedTag}
       />
       <PlayFab feed={feed} route={entry.route} />
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
