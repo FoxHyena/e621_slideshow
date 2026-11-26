@@ -70,6 +70,7 @@ stats, Settings sub-pages and the sign-in sheet move to slices 5–7 (built with
 - [x] Design update: the other screens in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [x] Design update: filter menus, player sheets, tag targets in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [x] Design update: Goo the mascot; landing, empty, error and offline states in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
+- [x] Design update: first run after sign-in (the read, Follow from favorites, the skipped state) in v6 (mocks/screens-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-26)
 - [ ] Phase 5: slices 1–9 (1, 2a, 2b, 3a, 3b, 4, R1, R2a, R2b, R3 done; slice 5 next)
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over

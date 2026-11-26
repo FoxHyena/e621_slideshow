@@ -666,6 +666,44 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .gsheet6 .mas6 { width: min(136px, 100%); height: auto; }
 @media (max-width: 520px) { .gsheet6 { grid-template-columns: repeat(2, 1fr); gap: 20px 8px; } }
 @media (prefers-reduced-motion: reduce) { .mas6 * { animation: none !important; transition: none !important; } }
+
+/* ---------- first run after sign-in: the read, the follow list, the skipped state ---------- */
+
+/* Goo, busy: it looks about while three dots take turns */
+.mas6 .gl, .mas6 .dd circle { transform-box: view-box; }
+.mas6 .gl { animation: mglance6 3.2s cubic-bezier(.5,0,.3,1) infinite; }
+.mas6 .dd circle { opacity: .35; animation: mdot6 1.2s ease-in-out infinite; }
+@keyframes mglance6 { 0%, 38% { transform: translate(-3.5px, 0); } 50%, 88% { transform: translate(3.5px, 0); } 100% { transform: translate(-3.5px, 0); } }
+@keyframes mdot6 { 0%, 60%, 100% { opacity: .35; transform: none; } 30% { opacity: 1; transform: translateY(-2px); } }
+
+/* the read: a state block whose way out is the checklist finishing */
+.find6 > p .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.check6 { list-style: none; margin: 16px 0 0; padding: 0; width: 248px; max-width: 100%; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.check6 li { display: flex; align-items: center; gap: 12px; font: var(--t-body); color: var(--muted); }
+.check6 li.now { color: var(--text); }
+.check6 .n { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; font: var(--t-foot-r); color: var(--muted); flex: none; }
+.check6 .done .n { color: var(--score); }
+.check6 .done .n .ic { animation: pop6 .32s cubic-bezier(.2,.9,.3,1.4); }
+.check6 li > span:nth-child(2) { flex: 1; min-width: 0; }
+.check6 em { font: 400 12px/16px var(--f-m); font-style: normal; color: var(--muted); }
+.spin6 { width: 14px; height: 14px; border-radius: 999px; border: 2px solid rgba(255,255,255,.22); border-top-color: #fff; animation: spin6 .8s linear infinite; }
+@keyframes spin6 { to { transform: rotate(360deg); } }
+
+/* the follow list: a row is a checkbox; the button floats where Play stands */
+.titlerow > .quiet6 { margin-right: -16px; flex: none; }
+.glabel6 .two { display: inline-flex; }
+.pkrow6:active { background: rgba(255,255,255,.04); }
+.chk6 { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: transparent; flex: none; transition: background-color .15s ease-out; }
+.pkrow6[aria-checked="true"] .chk6 { background: var(--score); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); color: var(--ground); }
+.pkrow6.just .chk6 .ic { animation: pop6 .32s cubic-bezier(.2,.9,.3,1.4); }
+/* 16 above the bar's highest point: the bar bends up in the middle, where Play's 100 would leave this wide button 4 */
+.cta6 { position: absolute; z-index: 6; left: var(--inset); right: var(--inset); bottom: 112px; }
+.cta6 .btn6 { box-shadow: var(--lit-gold), 0 var(--lip) 0 var(--lip-gold), 0 14px 28px rgba(0,0,0,.45); }
+.cta6 .btn6:active { box-shadow: var(--lit-gold), 0 0 0 var(--lip-gold), 0 8px 18px rgba(0,0,0,.45); }
+.btn6[disabled], .cta6 .btn6[disabled] { background: var(--panel-a); color: var(--muted); box-shadow: var(--lit), var(--lit-b); transform: none; cursor: default; }
+.btn6 .ic.popped { animation: pop6 .32s cubic-bezier(.2,.9,.3,1.4); }
+.btns6 { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 20px; }
+@media (prefers-reduced-motion: reduce) { .spin6, .check6 .done .n .ic, .pkrow6.just .chk6 .ic { animation: none; } .chk6 { transition: none; } }
 </style>
 
 <div class="wrap" id="root">
@@ -685,7 +723,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <section id="states" aria-label="Landing, empty and error states">
     <h2 class="pg-h2" style="margin-top:40px">Landing, empty and error states</h2>
-    <p class="pg-p dimtxt">Goo is the mascot (picked): a dewdrop of goo with a :3 face, flat white, on a small spill. It is built the way the app's own goo is, white shapes melted together by the same filter as the drip under the heart, so the body, its base and its waving arm are one liquid. It has four moods. <b>Tap Goo:</b> it squashes, springs back and spurts one to three drops onto the tab bar. Try it on any of the three phones.</p>
+    <p class="pg-p dimtxt">Goo is the mascot (picked): a dewdrop of goo with a :3 face, flat white, on a small spill. It is built the way the app's own goo is, white shapes melted together by the same filter as the drip under the heart, so the body, its base and its waving arm are one liquid. It has four moods here, and a fifth, busy, in the first run further down. <b>Tap Goo:</b> it squashes, springs back and spurts one to three drops onto the tab bar. Try it on any of the three phones.</p>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="gooM" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="2.4"/><feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter></defs></svg>
     <div id="u-goo"></div>
     <div class="cols">
@@ -716,6 +754,40 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <tr><th>Where a state sits</th><td>Not said</td><td>Empty states sit on the ground. Errors sit in a panel where the first post would be.</td><td>Empty is the whole screen's answer. An error is one thing that failed, and it can be retried in place.</td></tr>
         <tr><th>The end of a feed</th><td>"That's everything ✿"</td><td>The app mark between two rules, like the caught-up moment</td><td>The icons are drawn, not typed. The same moment already ends Following.</td></tr>
         <tr><th>Offline</th><td>A banner under the header</td><td>A sunk capsule: it tells you something, it is not a button</td><td>Only things you press are raised.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="first" aria-label="First run after sign-in">
+    <h2 class="pg-h2" style="margin-top:40px">First run after sign-in</h2>
+    <p class="pg-p dimtxt">What Following shows the first time you sign in, before you follow anyone: the app reads your favorites, then offers the artists you favorite most. Goo stands over the loader and a row is picked with a check (both picked). The loader counts, the rows toggle and the button keeps the count.</p>
+    <div class="cols">
+      <section class="col" aria-label="Reading your favorites">
+        <div class="col-head"><h2 class="pg-h3">1. Reading your favorites</h2><p>The state shape again: who, a headline, what is happening now. The checklist is the progress. "Skip for now" is the quiet way out.</p></div>
+        <div class="phone-holder" id="s-find"></div>
+        <div class="under" id="u-find"></div>
+      </section>
+      <section class="col" aria-label="Follow from favorites">
+        <div class="col-head"><h2 class="pg-h3">2. Follow from favorites</h2><p>The list is the screen. The top 10 are picked for you. One gold button follows them all, and it stands where Play stands on a feed.</p></div>
+        <div class="phone-holder" id="s-pick"></div>
+        <div class="under" id="u-pick"></div>
+      </section>
+      <section class="col" aria-label="Skipped">
+        <div class="col-head"><h2 class="pg-h3">3. After "Skip for now"</h2><p>The list folds into one row above a real feed, so the app is useful straight away and the offer is one tap away.</p></div>
+        <div class="phone-holder" id="s-skip"></div>
+        <div class="under" id="u-skip"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><th>The loader</th><td>Progress loader with checklist</td><td>Goo (picked over a progress ring): it looks about while three dots take turns. This is a fifth mood, "busy".</td><td>Goo makes the wait part of the same family as the empty and error states. The checklist and the count say how far along it is.</td></tr>
+        <tr><th>The checklist</th><td>A checklist, steps not named</td><td>Three steps: Read your favorites, Count your artists, See who still posts. A done step gets a green check and its count; the running one a spinner.</td><td>The wording is proposed. It follows the checklist the app already shows for For You.</td></tr>
+        <tr><th>Picking a row</th><td>Checkboxes</td><td>A check (picked over a switch on every row): a 28 well that turns Score Green with a check. The whole row is the target.</td><td>v6 had no checkbox. Green already means "on" (the switch) and "following" (the Following check), so it adds no colour.</td></tr>
+        <tr><th>The Follow button</th><td>A button under the list</td><td>One gold button that floats where Play stands, with Play's shadow. It keeps the count. With nothing picked, or past 500 follows, it goes flat and says why.</td><td>The list is 30 rows long, so a button at its end is out of sight. There is no feed here, so Play's place is free and gold stays one fill.</td></tr>
+        <tr><th>Skip for now</th><td>Under the button</td><td>A quiet button in the title row</td><td>Under a floating button it would float too. In the title row it is always in reach and clearly the lesser choice.</td></tr>
+        <tr><th>After skipping</th><td>A banner "Follow artists from your favorites ›"</td><td>A list row in a panel: pink heart in a well, the line, how many, a chevron</td><td>It is something you press, so it is the app's pressable row, not the sunk offline banner.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -809,7 +881,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>First run after sign-in: the "Finding artists you love" loader and "Follow from favorites".</li>
+    <li>Follow from favorites as a sheet (from Artists › Suggested), the "2 skipped" toast after following, and the "Popular artists" list.</li>
     <li>The "From a link" chip on Results.</li>
     <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
     <li>Desktop layouts.</li>
@@ -1333,21 +1405,23 @@ button.srow6:active { background: rgba(255,255,255,.04); }
   const sweat = (x, y) => `<path class="sw" d="M${x} ${y}c3.4 4.6 5 7 5 9.4a5 5 0 0 1-10 0c0-2.4 1.6-4.8 5-9.4Z" fill="#B4C7D9"/>`;
   // Goo is made the way the app's goo is (the drip under the heart, the tab bar): white shapes under a blur-and-threshold filter,
   // so the body, its base, the arm and the drop that got away read as one liquid. A darker copy underneath is its lip. The face is drawn on top.
+  // busy (a wait): three dots that take turns
+  const dots = (x, y) => `<g class="dd" fill="#B4C7D9">${[0, 1, 2].map(i => `<circle cx="${x + i * 8.5}" cy="${y - i * 3}" r="${2.4 + i * .5}" style="animation-delay:${i * .2}s"/>`).join('')}</g>`;
   const el6 = (cx, cy, rx, ry = rx) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>`;
   const GOO = {
     // a drop that has just landed: the tip is what is left of the neck it fell from
     body: '<path d="M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z"/>',
     // a short skirt, one lobe, and one drop that got away
     base: el6(60, 99, 42, 5.5) + el6(91, 102.5, 11, 4) + el6(109, 104.4, 3.4),
-    arm: 'M89 78Q102 72 104 59', hand: [104, 57, 7.4], face: [59, 72, 14.5, 83], zs: [94, 36], q: [98, 38], sweat: [98, 28],
+    arm: 'M89 78Q102 72 104 59', hand: [104, 57, 7.4], face: [59, 72, 14.5, 83], zs: [94, 36], q: [98, 38], sweat: [98, 28], dots: [86, 38],
   };
   const gooSVG = (m) => {
     const sq = m === 'snooze' ? ` transform="translate(60 100) scale(1.08 .86) translate(-60 -100)"` : '', [hx, hy, hr] = GOO.hand;
     const arm = m === 'wave' ? `<g class="arm" style="transform-origin:89px 78px"><path d="${GOO.arm}" fill="none" stroke-width="9.5" stroke-linecap="round"/>${el6(hx, hy, hr)}</g>` : '';
     const liquid = (c, dy, by) => `<g fill="${c}" stroke="${c}" stroke-width="0" filter="url(#gooM)"><g transform="translate(0 ${by})">${GOO.base}</g><g transform="translate(0 ${dy})"><g class="bd"><g${sq}>${GOO.body}${arm}</g></g></g></g>`;
     const tick = m === 'wave' ? `<g class="tick" fill="none" stroke="#B4C7D9" stroke-width="2.4" stroke-linecap="round"><path d="M${hx + 11} ${hy - 9}q4 6 2 12"/><path d="M${hx - 7} ${hy - 14}q5-3 10-1" opacity=".7"/></g>` : '';
-    return `<ellipse cx="60" cy="109.5" rx="46" ry="4.5" fill="#000" opacity=".28"/>${liquid(GL, 4, 2.4)}${liquid(GW, 0, 0)}<g class="bd"><g${sq}>${face(m, ...GOO.face)}</g></g>${tick}
-      ${m === 'snooze' ? zs(...GOO.zs) : m === 'look' ? ques(...GOO.q) : m === 'oops' ? sweat(...GOO.sweat) : ''}`;
+    return `<ellipse cx="60" cy="109.5" rx="46" ry="4.5" fill="#000" opacity=".28"/>${liquid(GL, 4, 2.4)}${liquid(GW, 0, 0)}<g class="bd"><g${sq}${m === 'busy' ? ' class="gl"' : ''}>${face(m, ...GOO.face)}</g></g>${tick}
+      ${m === 'snooze' ? zs(...GOO.zs) : m === 'look' ? ques(...GOO.q) : m === 'oops' ? sweat(...GOO.sweat) : m === 'busy' ? dots(...GOO.dots) : ''}`;
   };
   /* Tap Goo: it squashes under the finger, springs back, and one to three drops leave its tip for the tab bar. Each drop that
      lands is one more on the bar's goo count, like a drop from the secret Goo tab. They come down on the goo that is already there. With no bar on screen they land beside it and soak away. */
@@ -1438,6 +1512,71 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     strip('Offline', 'A sunk banner under the header. It turns green for 2 s when the connection is back, then leaves.', `<div class="strip p6" style="padding:16px 0">${banner('wifioff', "You're offline. Showing what's loaded.")}${banner('wifi', 'Back online', 'ok')}</div>`),
     strip('The end of a feed', 'Loading more failed: one row, one button. And the real end, with what was left out.', `<div class="strip p6" style="padding:20px 0 4px"><div class="more6row"><span>Couldn't load more posts</span>${act('Try again', 'lip6')}</div><div class="caught6 end"><div class="rule">${mark('l')}</div><b>That's everything</b><small>3 hidden by your blacklist · 2 need you signed in</small></div></div>`),
   ].join('');
+
+  /* ================= first run after sign-in: the read, the follow list, the skipped state ================= */
+  // The read: Goo (busy), a headline, what is happening now, the checklist, and the quiet way out.
+  const FAVS = 1284, FOUND = 86;
+  const ck = (state, n, label, note = '') => `<li class="${state}"><span class="n">${state === 'done' ? ic('check', 16, 2.8) : state === 'now' ? '<i class="spin6"></i>' : n}</span><span>${label}</span>${note ? `<em>${note}</em>` : ''}</li>`;
+  const STEPS = [['Read your favorites', FAVS.toLocaleString('en-US')], ['Count your artists', FOUND + ''], ['See who still posts', '']];
+  const checkRows = at => STEPS.map(([l, note], i) => ck(i < at ? 'done' : i === at ? 'now' : 'todo', i + 1, l, i < at ? note : '')).join('');
+  const findSub = (at, c) => at === 0 ? `Reading your favorites<br><span class="num">${c.toLocaleString('en-US')} of ${FAVS.toLocaleString('en-US')} · about ${Math.max(1, Math.round((FAVS - c) / 32))} s</span>`
+    : at === 1 ? `Counting your artists<br><span class="num">${FOUND} so far</span>` : `Seeing who still posts<br><span class="num">${c} of ${FOUND}</span>`;
+  const find = (cls = 'screen') => `<div class="state6 find6 ${cls}" role="status">${mascot('busy', 112)}<b>Finding artists you love</b><p data-fsub>${findSub(0, 640)}</p><ol class="check6" data-check>${checkRows(0)}</ol><div class="acts">${quiet('Skip for now')}</div></div>`;
+  $('s-find').innerHTML = phone(`
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
+      ${find()}
+    </div>
+    <div class="scrim6"></div>${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
+  $('u-find').innerHTML = strip('The read fails', 'The error panel, with the same quiet way out. Nothing has been followed yet, and it says so.',
+    `<div class="strip p6" style="padding:16px 0 0"><div class="err6">${state('oops', "Couldn't read your favorites", "e621 didn't answer. Nothing was changed.", act('Try again', 'lip6', 'refresh') + quiet('Skip for now'), '', 96)}</div></div>`);
+  // the loader runs: favorites count up, then the two short steps, then it starts over
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { let at = 0, c = 640, hold = 0;
+    setInterval(() => {
+      if (at === 0) { c = Math.min(FAVS, c + 23); if (c === FAVS) { at = 1; hold = 14; } }
+      else if (at === 1) { if (--hold <= 0) { at = 2; c = 0; } }
+      else if (c < FOUND) c = Math.min(FOUND, c + 4); else if (++hold > 12) { at = 0; c = 0; hold = 0; }
+      document.querySelectorAll('[data-fsub]').forEach(el => { el.innerHTML = findSub(at, c); });
+      document.querySelectorAll('[data-check]').forEach(el => { if (el.dataset.at !== at + '') { el.dataset.at = at; el.innerHTML = checkRows(at); } });
+    }, 110); }
+
+  // Follow from favorites: the list is the screen. A row is a checkbox; the top 10 start picked.
+  const PICKS = [['inkwell fox', 48, '312'], ['mossy otter', 31, '90'], ['pastelbat', 23, '140'], ['dune jackal', 22, '1.2k'], ['berry wolf', 19, '208'], ['cedar lynx', 17, '77'], ['tidepool newt', 14, '431'],
+    ['saffron hare', 12, '56'], ['lantern moth', 11, '164'], ['harbor seal', 10, '39'], ['plum raven', 9, '1.2k'], ['frost ermine', 7, '95'], ['clover stoat', 6, '310'], ['ember kit', 5, '48']];
+  const prow = ([a, faved, posts], on) => `<button class="srow6 pkrow6" type="button" role="checkbox" aria-checked="${on}" data-pick>${avatar(a)}<span class="lbl"><b>${a}</b><small>you faved ${faved} · ${posts} posts</small></span><span class="chk6" aria-hidden="true">${ic('check', 16, 3)}</span></button>`;
+  const goBtn = (t, off = false) => `<button class="btn6 gold wide ${off ? '' : 'lip6'}" type="button" ${off ? 'disabled' : 'data-fgo'}>${off ? '' : ic('heart', 18, 2.6)}<span>${t}</span></button>`;
+  $('s-pick').innerHTML = phone(`
+    <div class="scroll6" style="padding-bottom:196px">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${quiet('Skip for now')}</div><p class="sub6" style="margin-bottom:16px">You've favorited these artists a lot. Follow them?</p></div>
+      <div class="glabel6"><span>Top 30</span><span class="two"><button type="button" data-pickall="1">Select all</button><button type="button" data-pickall="0">None</button></span></div>
+      <div class="group6 who">${PICKS.map((p, i) => prow(p, i < 10)).join('')}</div>
+      <p class="foot6">14 of 30 shown in this mock</p>
+    </div>
+    <div class="scrim6"></div><div class="cta6">${goBtn('Follow 10 artists')}</div>${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
+  $('u-pick').innerHTML = strip('The button', 'Gold while something is picked. With nothing picked, or past e621\'s limit of 500 follows, it goes flat and says why.',
+    `<div class="strip p6 btns6">${goBtn('Follow 10 artists').replace(' data-fgo', '')}${goBtn('Pick artists to follow', true)}${goBtn('e621 allows 500 follows (12 left)', true)}</div>`);
+  const pickSync = phoneEl => { const n = phoneEl.querySelectorAll('[data-pick][aria-checked="true"]').length, b = phoneEl.querySelector('.cta6 .btn6'); if (!b) return;
+    b.disabled = !n; b.classList.toggle('lip6', !!n); b.querySelector('span').textContent = n ? `Follow ${n} artist${n === 1 ? '' : 's'}` : 'Pick artists to follow'; b.querySelector('.ic').style.display = n ? '' : 'none'; };
+  document.addEventListener('click', e => {
+    const row = e.target.closest('[data-pick]');
+    if (row) { const on = row.getAttribute('aria-checked') !== 'true'; row.setAttribute('aria-checked', on); row.classList.toggle('just', on); return pickSync(row.closest('.phone6')); }
+    const all = e.target.closest('[data-pickall]');
+    if (all) { const ph = all.closest('.phone6'); ph.querySelectorAll('[data-pick]').forEach(r => { r.setAttribute('aria-checked', all.dataset.pickall === '1'); r.classList.remove('just'); }); return pickSync(ph); }
+    const go = e.target.closest('[data-fgo]'); if (go && !calm) { const h = go.querySelector('.ic'); h.classList.remove('popped'); h.getBoundingClientRect(); h.classList.add('popped'); }
+  });
+
+  // After "Skip for now": the list folds into one row above a real feed.
+  $('s-skip').innerHTML = phone(`
+    <div class="cbar6"><div class="in"><b>Following</b><span></span>${tools()}</div></div>
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
+      <div class="group6" style="margin-top:8px;margin-bottom:24px"><button class="srow6" type="button"><span class="ico pink">${ic('heart', 20, 2.2)}</span><span class="lbl"><b>Follow from your favorites</b><small>30 artists you favorite a lot</small></span>${chev()}</button></div>
+      <div class="shead6"><b>Popular today</b></div>
+      ${post(POP)}${post(POP2)}
+    </div>
+    <div class="scrim6"></div>${fab(0)}${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`, '', 'data-compact="120"');
+  $('u-skip').innerHTML = strip('No favorites at all', 'Nothing to suggest from, so it sends you to Search. UX.md puts a "Popular artists" list under it; that list is not drawn.',
+    `<div class="strip p6">${state('look', 'Find artists to follow', 'You have no favorites yet, so there is nothing to suggest from.', act('Search', 'lip6', 'search'), 'pad')}</div>`);
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;

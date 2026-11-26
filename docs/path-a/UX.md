@@ -151,7 +151,7 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 | Offline | Banner under the header: "You're offline. Showing what's loaded." → "Back online" (2 s), retries |
 | Needs sign-in | Mascot, why, **Sign in**, **Search instead** |
 
-- As drawn (DESIGN.md "Goo" and "States", mocks/screens-v6.html): the mascot is Goo, a drop of the tab bar's goo with four moods (wave, snooze, look, oops). Tapping Goo makes it spurt 1 to 3 drops onto the tab bar, where they add to the goo. Every state is Goo, a headline, one sentence that says why, then the way out; DESIGN.md has the words for each. Empty states sit on the ground with no card; an error sits in a panel where the first post would be, with what e621 said in a small mono capsule; the offline banner is a sunk capsule, not a button. With filters on, the empty state is headed "No posts match" and its sentence counts the filters and the blacklisted posts, in place of "Filters are on". The end of a feed is the caught-up moment with the app's mark and "That's everything", with no typed ✿. A failed "load more" is one row with a compact **Try again**.
+- As drawn (DESIGN.md "Goo" and "States", mocks/screens-v6.html): the mascot is Goo, a drop of the tab bar's goo with five moods (wave, snooze, look, oops, and busy for a wait). Tapping Goo makes it spurt 1 to 3 drops onto the tab bar, where they add to the goo. Every state is Goo, a headline, one sentence that says why, then the way out; DESIGN.md has the words for each. Empty states sit on the ground with no card; an error sits in a panel where the first post would be, with what e621 said in a small mono capsule; the offline banner is a sunk capsule, not a button. With filters on, the empty state is headed "No posts match" and its sentence counts the filters and the blacklisted posts, in place of "Filters are on". The end of a feed is the caught-up moment with the app's mark and "That's everything", with no typed ✿. A failed "load more" is one row with a compact **Try again**.
 
 ### Feed card (all feeds)
 
@@ -295,6 +295,7 @@ Header: **Following** · search · grid · ⋯ (Refresh, Mark all as seen). Subt
 - Top 10 by affinity pre-checked. One bulk request. The button's heart pops, then the feed loads.
 - e621 skips (renamed, gone, already followed) → toast "2 skipped: …".
 - Past 500 total, the button says "e621 allows 500 follows (N left)" and disables.
+- As drawn (DESIGN.md "First run after sign-in", mocks/screens-v6.html): the read is Goo, busy, over a three-step checklist (the step names are proposed: Read your favorites, Count your artists, See who still posts). In the list a row is the checkbox, with a check well at its right end in place of a box at the left. **Follow N artists** is one gold button that floats where Play stands. **Skip for now** is a quiet button in the title row, not under the button. With nothing picked the button is disabled and reads "Pick artists to follow". After skipping, the banner is a list row, "Follow from your favorites" over "30 artists you favorite a lot". The list as a sheet, the "2 skipped" toast and the "Popular artists" list are not drawn.
 
 ### For You `/for-you`
 
