@@ -86,3 +86,15 @@ Format: date — decision. Why. Rejected alternatives.
   research/duolingo-study.md. Published-source research is in research/duolingo-research.md (agent).
   v5 mocks will apply: tactile lips on pressables, rounded type (ui-rounded), coloured stat icons, meaning
   colours on navy, chunky progress, celebration moments off the art, our own mascot.
+
+## 2026-11-25 — Visual direction signed off (v5.2)
+
+- Owner on v5.1: "Yes, want artist name/info at top of card tho, with faving and other things below. Maybe
+  play button is a circle with play logo inside on bottom right of screen instead of center".
+- v5.2 applies both: the artist line (avatar, name, New · time, ⋯) heads each navy post panel, as UX.md's
+  card sketch already showed; favourite, score, post number and tags sit under the picture. Play is a
+  56 px gold circle at the bottom right above the tab bar, with a small count badge. UX.md bottom stack
+  updated to match.
+- Kept from review round 2 (owner didn't object): e621 tag category colours, "Media" / "Hide favorited"
+  labels.
+- Phase 3 gate: two design review rounds done (REVIEWS.md) + owner OK. Archived: mocks/direction-a-v5-2.html.

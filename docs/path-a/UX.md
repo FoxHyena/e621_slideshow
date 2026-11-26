@@ -124,19 +124,20 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
   "Update ranking"). Posts go in only on pill tap (smooth-scroll to top,
   then insert with a slide-down) or pull to refresh. Inserting keeps the card under the header in place
   (measure, insert, `scrollBy` the difference), since Safari has no `overflow-anchor`.
-- **Chrome on scroll:** the large title collapses to a 44 px bar; the chips row and the Play pill hide on
+- **Chrome on scroll:** the large title collapses to a 44 px bar; the chips row and the Play button hide on
   scroll down and return on scroll up.
-- **Bottom stack** (bottom to top, each above `env(safe-area-inset-bottom)`): tab bar → Play pill
-  (centered, 12 px above the bar) → toasts (above the pill). The pill is 36 px tall and hides while
-  scrolling down; "Play from this post" is always in each card's ⋯ menu, so a hidden pill never blocks
-  anything. Feeds get bottom padding so the last card's ♥ row clears the pill. The offline banner and new-posts pill sit
+- **Bottom stack** (bottom to top, each above `env(safe-area-inset-bottom)`): tab bar → Play button
+  (56 px gold circle with ▶, right edge at 16, 12 px above the bar; a small count badge shows how many new
+  posts it plays; owner, 2026-11-25 visual sign-off) → toasts (above it). It fades while scrolling down;
+  "Play from this post" is always in each card's ⋯ menu, so a hidden button never blocks anything. Feeds
+  get bottom padding so the last card's ♥ row clears it. The offline banner and new-posts pill sit
   under the header at the top. The PTR spinner sits under the header. On Search, with the keyboard up,
   the tab bar is hidden and anything bottom-pinned follows `visualViewport`.
 
 ## 5. Screens
 
 Every feed screen shares one layout: **header** (title, actions on the right), **chips row**, the
-**feed or grid**, a **floating ▶ Play pill**, and a **footer** state.
+**feed or grid**, a **floating round ▶ Play button** (bottom right), and a **footer** state.
 
 ### Shared feed states
 
