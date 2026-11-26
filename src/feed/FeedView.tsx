@@ -6,13 +6,15 @@
  * DOM, placed from `layout.ts` so nothing jumps as pictures load. Where you were (a post and an
  * offset into it) is saved for a day, so a reload comes back to the same post.
  */
-import { ChevronDown, Play, RotateCw } from "lucide-react";
+import { ArrowUp, ChevronDown, Heart, Play, RotateCw } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
-import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, visibleRange, GRID_GAP, type FeedRow } from "@/lib/feed/layout";
+import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
 import { TagActionsOverlay, useTagHold, type TagAction } from "@/components/TagActions";
 import type { Feed } from "@/state/feeds";
 import { useStore } from "@/state/store";
+import { favCountOf, favedOf, getFavs } from "@/state/favs";
+import { compact } from "@/lib/feed/format";
 import { isLocked, registerRevealer, scrollY } from "@/nav/scroll";
 import { applyTuck } from "./tuck";
 import { AppMark } from "@/components/Avatar";
@@ -304,7 +306,7 @@ export function FeedView({
         const docTop = el.getBoundingClientRect().top + scrollY();
         const r = g.layout.rowOf[i];
         const [top, h] = g.grid
-          ? [Math.floor(i / g.tiles.cols) * (g.tiles.tile + GRID_GAP), g.tiles.tile]
+          ? [tileAt(g.tiles, i).top, g.tiles.cell]
           : [g.layout.tops[r], g.layout.heights[r]];
         return docTop + top + h / 2 - window.innerHeight / 2;
       }),
@@ -323,7 +325,7 @@ export function FeedView({
   else if (dividerRow >= 0) {
     const after = rows.slice(dividerRow).find((r) => r.kind === "post");
     const first = after?.kind === "post" ? after.index : posts.length;
-    dividerTop = Math.floor(first / tiles.cols) * (tiles.tile + GRID_GAP);
+    dividerTop = tileAt(tiles, first).top;
   }
   const report = useRef(onView);
   useLayoutEffect(() => {
@@ -344,14 +346,12 @@ export function FeedView({
         {grid
           ? posts.slice(start, end).map((p, k) => {
               const i = start + k;
-              const row = Math.floor(i / tiles.cols);
-              const col = i % tiles.cols;
               return (
                 <Tile
                   key={p.id}
                   post={p}
                   fresh={fresh?.(p) ?? false}
-                  style={{ top: row * (tiles.tile + GRID_GAP), left: col * (tiles.tile + GRID_GAP), width: tiles.tile, height: tiles.tile }}
+                  style={tileAt(tiles, i)}
                   onOpen={() => onOpen(p, i)}
                 />
               );
@@ -460,26 +460,43 @@ function Skeletons() {
   );
 }
 
+/** A grid tile (DESIGN.md "Grid view"): the picture cropped square, the score and favs under it. */
 function Tile({ post, fresh, style, onOpen }: { post: Post; fresh: boolean; style: React.CSSProperties; onOpen: () => void }) {
   const src = post.files.preview.jpg ?? post.files.sample.jpg;
+  const favs = getFavs();
+  const faved = useStore(favs.store, (s) => favedOf(s, post));
+  const count = useStore(favs.store, (s) => favCountOf(s, post));
+  const score = post.stats.score.total;
   return (
     <button
       type="button"
       className="feed-tile"
       style={style}
       onClick={onOpen}
-      aria-label={`Post ${post.id}${fresh ? ", new" : ""}`}
+      aria-label={`Post ${post.id}${fresh ? ", new" : ""}, score ${score}, ${count} ${count === 1 ? "favorite" : "favorites"}${faved ? ", favorited" : ""}`}
       data-testid="grid-tile"
       data-post-id={post.id}
       data-new={fresh || undefined}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- remote CDN thumbnails */}
-      {src && <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />}
-      {mediaKind(post) === "video" && (
-        <span className="tile-video" aria-hidden>
-          <Play />
+      <span className="tile-art" style={{ height: (style.width as number) || undefined }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- remote CDN thumbnails */}
+        {src && <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />}
+        {mediaKind(post) === "video" && (
+          <span className="tile-video" aria-hidden>
+            <Play />
+          </span>
+        )}
+      </span>
+      <span className="tile-nums" aria-hidden>
+        <span className="tile-up">
+          <ArrowUp />
+          {compact(score)}
         </span>
-      )}
+        <span className="tile-favs" data-on={faved || undefined}>
+          <Heart />
+          {compact(count)}
+        </span>
+      </span>
     </button>
   );
 }

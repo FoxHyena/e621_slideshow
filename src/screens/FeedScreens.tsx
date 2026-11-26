@@ -24,9 +24,10 @@ import { getFavs } from "@/state/favs";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
+import { TagText, tagText } from "@/components/TagText";
 import { useStore } from "@/state/store";
 import { blacklistLine, copyText, openResults, openSignIn, sharePost } from "./actions";
-import { SearchForm } from "./SearchScreen";
+import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import { openPaused } from "@/player/intent";
 import { isLocked, scrollY, setLockedY } from "@/nav/scroll";
@@ -57,14 +58,15 @@ export function useFeed(spec: FeedSpec, ratingsOverride: SearchSettings["ratings
   return feed;
 }
 
-function Toolbar({ children }: { children?: ReactNode }) {
+/** A pushed screen's header row: back, an optional middle (Results' search), the tools capsule. */
+function Toolbar({ children, middle }: { children?: ReactNode; middle?: ReactNode }) {
   return (
-    <div className="screen-toolbar">
+    <div className="head-row">
       <button type="button" className="toolbar-circle" aria-label="Back" onClick={() => void getNav().back()}>
         <ChevronLeft aria-hidden />
       </button>
-      <div className="flex-1" />
-      {children}
+      <div className="grow">{middle}</div>
+      {children && <div className="tools">{children}</div>}
     </div>
   );
 }
@@ -318,7 +320,24 @@ export function ResultsScreen({ params }: { params: string }) {
 
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
-      <Toolbar>
+      <Toolbar
+        middle={
+          <h1 tabIndex={-1} className="results-title">
+            <button
+              type="button"
+              className="field6"
+              onClick={() => getNav().openSheet("edit")}
+              aria-label={`Search: ${tagText(r.tags)}. Edit`}
+              data-testid="query-pill"
+            >
+              <Search aria-hidden />
+              <span>
+                <TagText tags={r.tags} />
+              </span>
+            </button>
+          </h1>
+        }
+      >
         <button
           type="button"
           className="toolbar-circle"
@@ -334,12 +353,6 @@ export function ResultsScreen({ params }: { params: string }) {
           <MoreHorizontal aria-hidden />
         </button>
       </Toolbar>
-      <h1 tabIndex={-1} className="results-title">
-        <button type="button" className="query-pill" onClick={() => getNav().openSheet("edit")} aria-label={`Search: ${r.tags || "all posts"}. Edit`} data-testid="query-pill">
-          <Search aria-hidden />
-          <span>{r.tags || "All posts"}</span>
-        </button>
-      </h1>
       <ChipsRow filters={r.filters} chips={RESULTS_CHIPS} onChange={(f) => go({ ...r, filters: f })} link={r.link ? "From a link" : null} />
       <FeedBody feed={feed} grid={grid} route={route} empty={empty} onTag={onTag} follow />
       <PlayFab feed={feed} route={route} />

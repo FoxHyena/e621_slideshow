@@ -444,3 +444,33 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md (Sheets with a title, Menu, Media menu, Player sheets, Tag targets; `menu`
   radius; list-row padding 8 / 16), .impeccable/design.json (Menu, Tag Targets; List Row), the surface brief,
   docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+
+## 2026-11-25 — Slice R2a build (v6 lists, Search, Tune, Settings, grid)
+- **R2 splits into R2a and R2b**, each a full slice (tests, code-review high + fresh reviewer, docs,
+  budgets, commit). R2a: the shared parts (list group and row, icon well, field, segmented control,
+  switch, stepper, slider, toggle), Settings home, Search and its suggestions, the Results header, Tune,
+  the grid. R2b: the player chrome, Quick settings and Post info sheets, Menu (vertical segmented), the
+  Media menu, titled sheets, the ⋯ sheet, tag targets, and the old `.segments` / `.sheet-panel` uses.
+- **Artists, the artist hero and stats, the Settings sub-pages and the sign-in sheet stay with slices 5–7**,
+  which build those screens for real; they use the v6 parts from R2a rather than restyling interim pages
+  that get replaced. The Follow button on the interim artist page got the v6 shape now (one wide tonal
+  button, a constant name with `aria-pressed`).
+- `Seg` and `Stepper` are built and styled in R2a but have no callers until R2b (Menu, Quick settings) and
+  slice 6 (Settings › Slideshow).
+- **Search keeps a compact gold Search button**, shown beside the field only once there is text (the mock
+  has none; Enter alone is hard to find on desktop and with some phone keyboards).
+- **A saved search's trailing button is a Trash delete, not ⋯**: it is the row's only action. When the ⋯
+  sheet lands (R2b) it can move there if a second action appears. A search named after its tags shows them
+  once (as the name); the line under it carries only the sort and "Dated", or nothing.
+- **Tune**: the title is "Tune" (the lede says what it tunes). A tag row's line keeps "· weight 1.2" after
+  the favourite count (spec: count only): the weight is what orders the list and dims the cut-off, and a
+  pinned tag with no favourites has nothing else to show. The Breadth card's value stays "N tags" (spec: a
+  named step) because breadth is a number of tags, not a set of named levels.
+- **Grid**: 8 between columns, 12 between rows, a 4 + 18 foot under each square for score and favourites.
+  The caught-up moment in the grid is still the divider position the screen draws; a full-width row of its
+  own (DESIGN.md "Grid view") waits for slice 5 with the rest of Following's grid.
+- The app version in Settings comes from package.json through `next.config.ts` `env` (inlined at build).
+- **First-load split** (budget): `SearchForm` (src/screens/SearchForm.tsx) and `TagText`
+  (src/components/TagText.tsx) are their own modules, and the Settings home (src/screens/SettingsHome.tsx)
+  is a lazy chunk prefetched at idle. Rule going forward: the feed screens module is in the first load
+  (Following imports it), so it imports only small, single-purpose modules.

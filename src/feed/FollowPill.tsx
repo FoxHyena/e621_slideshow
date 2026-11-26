@@ -82,12 +82,16 @@ export function FollowButton({ name }: { name: string }) {
       <button
         type="button"
         className="btn-tonal follow-button"
+        // one name, the state in aria-pressed: "Follow fox, toggle button, pressed"
+        aria-label={`Follow ${name.replaceAll("_", " ")}`}
+        aria-pressed={f.on}
         aria-busy={waiting || undefined}
         aria-describedby={blocked ? note : undefined}
         disabled={waiting || blocked}
         data-wiggle={wiggle % 2 === 1 ? "a" : wiggle > 0 ? "b" : undefined}
         onClick={() => {
-          if (!f.on) setWiggle((w) => w + 1);
+          // toggling either way wiggles it (DESIGN.md "Artist page")
+          setWiggle((w) => w + 1);
           f.set(!f.on);
         }}
         data-testid="follow-button"

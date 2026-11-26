@@ -4,11 +4,10 @@
  * Screens that land in later slices (ENGINEERING.md §11). Each has its real heading, so
  * navigation, focus and Back can be tested now; the content arrives with its slice.
  */
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
-import { SETTINGS_SECTIONS, type Screen, type SettingsSection } from "@/nav/routes";
-import { getGoo, gooLabel } from "@/state/goo";
-import { useStore } from "@/state/store";
+import { ChevronLeft } from "lucide-react";
+import { Suspense, type ReactNode } from "react";
+import type { Screen, SettingsSection } from "@/nav/routes";
+import { SettingsHome } from "./lazy";
 
 export const SECTION_LABEL: Record<SettingsSection, string> = {
   account: "Account",
@@ -37,23 +36,6 @@ export function Frame({ title, onBack, children }: { title: string; onBack?: () 
 }
 
 const Soon = ({ children }: { children: ReactNode }) => <p className="screen-note">{children}</p>;
-
-/** Settings' one action row (DESIGN.md "Tab bar goo"): how much goo, and Wipe clean. */
-function GooRow() {
-  const goo = getGoo();
-  const n = useStore(goo.store, (s) => s.count);
-  return (
-    <div className="settings-group settings-action" data-testid="goo-row">
-      <div>
-        <b>Tab bar goo</b>
-        <small data-testid="goo-count">{gooLabel(n)}</small>
-      </div>
-      <button type="button" className="btn-wipe" onClick={() => goo.wipe()} disabled={n === 0} data-testid="goo-wipe">
-        Wipe clean
-      </button>
-    </div>
-  );
-}
 
 export function PlaceholderScreen({
   screen,
@@ -85,31 +67,13 @@ export function PlaceholderScreen({
           </Frame>
         );
       return (
-        <Frame title="Settings">
-          <ul className="settings-group" aria-label="Settings">
-            {SETTINGS_SECTIONS.map((s) => (
-              <li key={s}>
-                <a
-                  href={`/settings/${s}`}
-                  className="settings-row"
-                  onClick={(e) => {
-                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                    e.preventDefault();
-                    onSection(s);
-                  }}
-                >
-                  <span>{SECTION_LABEL[s]}</span>
-                  <ChevronRight aria-hidden className="settings-chevron" />
-                </a>
-              </li>
-            ))}
-          </ul>
-          <GooRow />
-        </Frame>
+        <Suspense fallback={null}>
+          <SettingsHome onSection={onSection} />
+        </Suspense>
       );
     case "tune":
       return (
-        <Frame title="Tune For You" onBack={onBack}>
+        <Frame title="Tune" onBack={onBack}>
           <Soon>Choose what For You leans towards. Coming with the For You screen.</Soon>
         </Frame>
       );

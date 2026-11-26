@@ -36,7 +36,7 @@ test("every route serves the shell and opens its screen", async ({ page }) => {
     ["/following", "Following"],
     ["/settings/account", null],
     ["/for-you", "For You"],
-    ["/for-you/tune", "Tune For You"],
+    ["/for-you/tune", "Tune"],
     ["/artists", "Artists"],
     ["/artist/some%20one", "some one"],
     ["/search", "Search"],
@@ -235,7 +235,7 @@ test("the legacy show keeps its place across a tab round-trip", async ({ page })
   await tab(page, "Artists").click();
   await expect(heading(page, "Artists")).toBeVisible();
   await tab(page, "Settings").click();
-  await page.getByRole("link", { name: "Account" }).click();
+  await page.getByTestId("settings-account").click();
   await expect(page.getByTestId("play-button")).toHaveText(/Resume/);
   await page.getByTestId("play-button").click();
   await expect(slide).toHaveAttribute("data-post-id", id!);

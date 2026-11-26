@@ -90,25 +90,39 @@ export function visibleRange(
 
 // ---- grid ------------------------------------------------------------------
 
-export const GRID_GAP = 4;
+/** DESIGN.md "Grid view": 8 between columns, 12 between rows, and under each square the score
+ * and favs (4 below it, 18 tall). Pinned in CSS too (`.tile-nums`). */
+export const GRID = { colGap: 8, rowGap: 12, foot: 4 + 18 } as const;
 
 export interface GridLayout {
   cols: number;
+  /** the square's side */
   tile: number;
+  /** a tile with its numbers */
+  cell: number;
+  /** from one row's top to the next */
+  pitch: number;
   rows: number;
   total: number;
 }
 
 /** Square tiles: 3 across on a phone, more as the width grows (about 180 px each). */
 export function layoutGrid(count: number, width: number): GridLayout {
-  const cols = Math.max(3, Math.floor((width + GRID_GAP) / (180 + GRID_GAP)));
-  const tile = Math.max(0, (width - GRID_GAP * (cols - 1)) / cols);
+  const cols = Math.max(3, Math.floor((width + GRID.colGap) / (180 + GRID.colGap)));
+  const tile = Math.max(0, (width - GRID.colGap * (cols - 1)) / cols);
+  const cell = tile + GRID.foot;
+  const pitch = cell + GRID.rowGap;
   const rows = Math.ceil(count / cols);
-  return { cols, tile, rows, total: rows ? rows * tile + (rows - 1) * GRID_GAP : 0 };
+  return { cols, tile, cell, pitch, rows, total: rows ? rows * pitch - GRID.rowGap : 0 };
+}
+
+/** Where tile i sits. */
+export function tileAt(g: GridLayout, i: number) {
+  return { top: Math.floor(i / g.cols) * g.pitch, left: (i % g.cols) * (g.tile + GRID.colGap), width: g.tile, height: g.cell };
 }
 
 export function gridRange(g: GridLayout, scrollTop: number, viewport: number, overscan = 2): [number, number] {
-  const row = g.tile + GRID_GAP;
+  const row = g.pitch;
   if (row <= 0) return [0, 0];
   const first = Math.max(0, Math.floor((scrollTop - overscan * viewport) / row));
   const last = Math.min(g.rows, Math.ceil((scrollTop + viewport + overscan * viewport) / row));

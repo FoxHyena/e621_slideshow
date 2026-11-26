@@ -4,51 +4,36 @@
  * Search (`/search`, UX §5): the tag box with autocomplete, recent and saved searches, and a way to
  * your favorites. Submitting opens Results.
  */
-import { ChevronLeft, ChevronRight, ExternalLink, Heart, Search, Star, Trash2 } from "lucide-react";
-import { useState } from "react";
-import TagInput from "@/components/TagInput";
-import { normTags } from "@/lib/feed/filters";
-import { buildQuery, DEFAULT_TAG_LIMIT } from "@/lib/query/build";
-import { DEFAULT_SEARCH } from "@/lib/settings";
+import { ChevronRight, ExternalLink, Heart, Star, Trash2 } from "lucide-react";
+import { TagText, tagText } from "@/components/TagText";
+import { SORT_LABEL } from "@/lib/feed/filters";
+import type { Order } from "@/lib/settings";
 import { getNav } from "@/nav/history";
 import { getPrefs } from "@/state/prefs";
-import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { defaultFilters, openResults } from "./actions";
+import { SearchForm } from "./SearchForm";
 
-/** Show the tag counter once a search uses this many. */
-const COUNT_FROM = 30;
-
-export function SearchForm({ initial, onSubmit }: { initial: string; onSubmit: (tags: string) => void }) {
-  const [tags, setTags] = useState(initial);
-  const { creds, user } = useStore(getSession().store, (s) => s);
-  const limit = user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
-  const used = buildQuery({ ...DEFAULT_SEARCH, tags }, limit).tagCount;
-  const over = used > limit;
-  const submit = () => {
-    if (!over) onSubmit(normTags(tags));
-  };
+/** A saved search's line: its tags and whatever it sorts or limits by. */
+function savedLine(s: { name: string; tags: string; order: Order; date: { enabled: boolean } }) {
+  const bits = [s.order !== "newest" ? SORT_LABEL[s.order] : null, s.date.enabled ? "Dated" : null].filter((b): b is string => !!b);
+  // a search named after its tags already shows them as its name
+  const tags = s.name !== s.tags;
+  if (!tags && bits.length === 0) return null;
   return (
-    <form
-      className="search-form"
-      role="search"
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit();
-      }}
-    >
-      <TagInput value={tags} onChange={setTags} creds={creds} label="Tags" placeholder="wolf solo -feral" onSubmit={submit} testId="search-tags" />
-      {used > COUNT_FROM && (
-        <p className="search-count" data-over={over || undefined} aria-live="polite">
-          {used} / {limit} tags{over && ": take some out to search"}
-        </p>
-      )}
-      <button type="submit" className="btn-gold search-go" disabled={over} data-testid="search-submit">
-        <Search aria-hidden /> Search
-      </button>
-    </form>
+    <small>
+      {tags && <TagText tags={s.tags} />}
+      {bits.map((b, i) => (
+        <span key={b}>
+          {(tags || i > 0) && <span className="tag-dot"> · </span>}
+          {b}
+        </span>
+      ))}
+    </small>
   );
 }
+
+const plain = (e: React.MouseEvent) => !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0);
 
 export function SearchScreen() {
   const nav = getNav();
@@ -56,30 +41,23 @@ export function SearchScreen() {
   const saved = useStore(getPrefs().store, (p) => p.saved);
   return (
     <div className="screen-frame">
-      <div className="screen-toolbar">
-        <button type="button" className="toolbar-circle" aria-label="Back" onClick={() => void nav.back()}>
-          <ChevronLeft aria-hidden />
-        </button>
-      </div>
-      <h1 tabIndex={-1} className="screen-title">
+      <h1 tabIndex={-1} className="sr-only">
         Search
       </h1>
-      <SearchForm initial="" onSubmit={(t) => openResults(t)} />
+      <SearchForm initial="" onSubmit={(t) => openResults(t)} onBack={() => void nav.back()} />
 
       {history.length > 0 && (
-        <section className="search-section" aria-labelledby="recent-h">
-          <div className="search-section-head">
-            <h2 id="recent-h" className="group-label">
-              Recent
-            </h2>
-            <button type="button" className="text-btn" onClick={() => getPrefs().clearHistory()}>
+        <section aria-labelledby="recent-h">
+          <div className="list-label">
+            <h2 id="recent-h">Recent</h2>
+            <button type="button" onClick={() => getPrefs().clearHistory()}>
               Clear
             </button>
           </div>
-          <div className="chips chips-wrap">
+          <div className="chips search-recent">
             {history.map((h) => (
               <button key={h.tags} type="button" className="chip" onClick={() => openResults(h.tags)} data-testid="recent-search">
-                {h.tags}
+                <TagText tags={h.tags} />
               </button>
             ))}
           </div>
@@ -87,28 +65,30 @@ export function SearchScreen() {
       )}
 
       {saved.length > 0 && (
-        <section className="search-section" aria-labelledby="saved-h">
-          <h2 id="saved-h" className="group-label">
+        <section aria-labelledby="saved-h">
+          <h2 id="saved-h" className="list-label">
             Saved
           </h2>
-          <ul className="settings-group">
+          <ul className="list-group">
             {saved.map((s) => (
-              <li key={s.id} className="saved-row">
+              <li key={s.id} className="list-row saved-row">
                 <button
                   type="button"
-                  className="settings-row saved-open"
+                  className="saved-open"
                   onClick={() => openResults(s.tags, { ...defaultFilters(), order: s.order, date: s.date })}
                   data-testid="saved-search"
                 >
-                  <Star aria-hidden className="saved-star" />
-                  <span className="saved-text">
-                    <span className="saved-name">{s.name}</span>
-                    {s.name !== s.tags && <span className="saved-tags">{s.tags}</span>}
+                  <span className="row-well" aria-hidden>
+                    <Star />
+                  </span>
+                  <span className="row-text">
+                    <b>{s.name === s.tags ? tagText(s.tags) : s.name}</b>
+                    {savedLine(s)}
                   </span>
                 </button>
                 <button
                   type="button"
-                  className="saved-delete"
+                  className="row-more"
                   aria-label={`Delete ${s.name}`}
                   onClick={() => getPrefs().setSaved(saved.filter((x) => x.id !== s.id))}
                 >
@@ -120,32 +100,31 @@ export function SearchScreen() {
         </section>
       )}
 
-      <ul className="settings-group search-section">
+      <ul className={`list-group${history.length || saved.length ? "" : " search-first"}`}>
         <li>
           <a
             href="/favorites"
-            className="settings-row"
+            className="list-row"
             onClick={(e) => {
-              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+              if (!plain(e)) return;
               e.preventDefault();
               nav.push({ screen: { kind: "favorites", params: "" }, play: null });
             }}
             data-testid="open-favorites"
           >
-            <span className="row-with-icon">
-              <Heart aria-hidden className="text-heart" /> Your favorites
+            <span className="row-well" data-tone="pink" aria-hidden>
+              <Heart />
             </span>
-            <ChevronRight aria-hidden className="settings-chevron" />
-          </a>
-        </li>
-        <li>
-          <a href="https://e621.net/help/cheatsheet" target="_blank" rel="noopener" className="settings-row">
-            <span>Search cheatsheet</span>
-            <ExternalLink aria-hidden className="settings-chevron" />
+            <span className="row-text">
+              <b>Your favorites</b>
+            </span>
+            <ChevronRight aria-hidden className="row-chev" />
           </a>
         </li>
       </ul>
+      <a href="https://e621.net/help/cheatsheet" target="_blank" rel="noopener" className="link-row">
+        Search cheatsheet <ExternalLink aria-hidden />
+      </a>
     </div>
   );
 }
-

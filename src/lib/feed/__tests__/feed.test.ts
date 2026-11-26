@@ -7,6 +7,7 @@ import {
   indexAt,
   layoutFeed,
   layoutGrid,
+  tileAt,
   mediaHeight,
   visibleRange,
 } from "../layout";
@@ -56,9 +57,13 @@ describe("feed layout", () => {
     const g = layoutGrid(30, 343);
     expect(g.cols).toBe(3);
     expect(g.rows).toBe(10);
-    expect(g.tile).toBeCloseTo((343 - 8) / 3);
-    expect(layoutGrid(30, 1100).cols).toBe(6);
-    const [a, b] = gridRange(g, 0, g.tile + 4, 0);
+    expect(g.tile).toBeCloseTo((343 - 16) / 3);
+    expect(g.cell).toBeCloseTo(g.tile + 22);
+    expect(g.pitch).toBeCloseTo(g.tile + 34);
+    expect(g.total).toBeCloseTo(10 * g.pitch - 12);
+    expect(tileAt(g, 4)).toEqual({ top: g.pitch, left: g.tile + 8, width: g.tile, height: g.cell });
+    expect(layoutGrid(30, 1100).cols).toBe(5);
+    const [a, b] = gridRange(g, 0, g.pitch, 0);
     expect(a).toBe(0);
     expect(b).toBe(3);
   });

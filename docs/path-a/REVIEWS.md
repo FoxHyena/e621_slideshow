@@ -466,3 +466,44 @@ e2e failures found by the gate: Play covered the desktop rail (4 tests); it now 
 237.5 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first feed content 0.37 s; scroll at
 4× CPU: 0 long tasks. **Risk for R2**: 0.7 KB of headroom; the R2 list parts must stay out of the first
 load or something else must move out.
+
+## Slice R2a review (2026-11-25): v6 lists, Search, Tune, Settings home, grid
+
+**code-review skill (high), 3 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The artist page's Follow button flipped its label and had `aria-pressed` ("Following, pressed") | Low | Constant name "Follow <artist>", state in `aria-pressed` |
+| 2 | The Clear button sat inside the Recent `h2` ("Recent Clear, heading") | Low | The label row is a `div` holding the `h2` and the button |
+| 3 | Dead `--radius-thumb` token and `.group-label` rule | Low | Deleted (`.sheet-label` kept for R2b) |
+
+**Fresh reviewer, 12 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | No gap between the Settings title and the account group (mock: 8) | Med | `.title-row + .list-group { margin-top: 8px }`; e2e measures it |
+| 2 | Search autofocus might lose to the screen's heading focus | Med | Real once Search's code is loaded: the pushed screen's h1 took focus from the field. `focusScreen` now leaves focus alone when the screen already holds it; e2e (fails without the fix) |
+| 3 | `.tune-tag { gap: 4px }` overridden by `.list-row` | Low | Deleted |
+| 4 | Old `.switch` blocks superseded; two `.panel-card .tune-note` rules; `.group-label` | Low | Old switch removed (its focus ring kept); tune-note merged; `.group-label` gone with finding 3 above |
+| 5 | `Seg` and `Stepper` unused | Low | **No change**: R2b and slice 6 use them (DECISIONS) |
+| 6 | Clear inside the heading; two buttons both named "Clear" | Low | Heading fixed (above); the field's is "Clear search", `Field`'s is "Clear <its label>" |
+| 7 | Follow button state announced twice | Low | Same as code-review 1 |
+| 8 | Saved row: Trash, not ⋯; name shown twice when it is the tags; no "Videos" | Low | Line drops the tags when the name is the tags (e2e); Trash kept (DECISIONS); saved searches have no media filter to show |
+| 9 | Grid caught-up isn't a full-width row; "1 favorites" | Low | Singular fixed; the full-width row waits for slice 5 (pre-existing, DECISIONS) |
+| 10 | Tune: "Find a tag" copy, "· weight", "N tags" value; `Field` didn't refocus after Clear | Low | Copy is "Filter tags to find the rest"; `Field` refocuses; weight and "N tags" kept (DECISIONS) |
+| 11 | Slider fill ended up to 14 px from the thumb's centre | Low | `--p` is a 0–1 fraction; the fill stops at `14px + (100% − 28px) × p` |
+| 12 | Hard-coded "Version 0.1.0" | Low | From package.json via `next.config.ts` `env`; e2e checks the pattern |
+
+e2e failures found by the gate: two tests opened Settings › Account by the link's old name; they use the
+row's test id now.
+
+**Gates:** 293 unit tests, 150 e2e passed (2 skipped), typecheck and lint clean. Visual check at 375×812
+(Settings, Search, Results, grid, Tune) and 1280 (Settings, grid).
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` first measured 201.2 KB
+(over). Cause: Following imports the feed screens module, which imported the whole Search screen (for
+`SearchForm`) and all of `v6.tsx` (for `TagText`). Fixed by moving `SearchForm` and `TagText` into their own
+modules and the Settings home into a lazy chunk: **199.1 KB** (≤ 200), 241.0 KB with the idle prefetch;
+12 cards in the DOM; CLS 0.0000; first feed content 0.41 s; scroll at 4× CPU: 0 long tasks. Still about
+1 KB of headroom: R2b's player and sheet code is lazy already, but anything new the feed screens import
+counts.

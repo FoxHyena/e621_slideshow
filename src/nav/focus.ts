@@ -24,6 +24,8 @@ function heading(screen: HTMLElement | null): HTMLElement | null {
 
 /** After a push: focus the new screen's heading. */
 export function focusScreen(screen: HTMLElement | null): void {
+  // The screen put focus somewhere itself (Search's field, autofocused to raise the keyboard).
+  if (screen?.contains(document.activeElement)) return;
   const h = heading(screen);
   if (h || !screen) return h?.focus({ preventScroll: true });
   // A screen whose code is still loading (lazy): focus its heading when it lands, unless the
