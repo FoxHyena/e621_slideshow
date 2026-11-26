@@ -122,7 +122,7 @@ function rowLine(r: Row, now: number): string {
 }
 
 export function sortRows(rows: Row[], sort: Sort): Row[] {
-  const az = (a: Row, b: Row) => a.name.localeCompare(b.name);
+  const az = (a: Row, b: Row) => a.name.localeCompare(b.name, "en", { numeric: true });
   const out = [...rows];
   if (sort === "az") return out.sort(az);
   if (sort === "faved") return out.sort((a, b) => b.favs - a.favs || az(a, b));
@@ -174,7 +174,24 @@ function FollowingList({ sort }: { sort: Sort }) {
         <StateBlock mood="oops" size={96} head="Couldn't read who you follow" text="e621 didn't answer." actions={<TryAgain onClick={() => void follows.ensure("user", true)} testId="state-retry" />} />
       </div>
     );
-  if (f.status !== "ready") return <div className="feed-list" data-testid="feed-waiting" />;
+  // (reading the list can queue behind For You's lookups: show its shape meanwhile)
+  if (f.status !== "ready")
+    return (
+      <div className="feed-list" aria-busy="true" data-testid="feed-waiting">
+        <span className="sr-only">Loading who you follow</span>
+        <ul className="list-group" aria-hidden>
+          {[0, 1, 2, 3].map((i) => (
+            <li key={i} className="list-row popular-row">
+              <span className="sk-dot" />
+              <span className="row-text popular-sk">
+                <span className="sk-line" />
+                <span className="sk-line" />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   if (f.followed.size === 0)
     return (
       <StateBlock

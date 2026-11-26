@@ -258,7 +258,7 @@ function Hero({ name, info, isArtist, visible }: { name: string; info: Info; isA
             </span>
           )}
         </span>
-        <h1 tabIndex={-1} className="screen-title hero-title" style={cat ? { color: `var(--color-tag-${cat})` } : undefined}>
+        <h1 tabIndex={-1} className="screen-title hero-title" data-long={label(name).length > 24 || undefined} style={cat ? { color: `var(--color-tag-${cat})` } : undefined}>
           {label(name)}
         </h1>
         <span className="hero-handle" data-testid="artist-handle">

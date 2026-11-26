@@ -5088,6 +5088,12 @@ li[data-state="done"] .first-step-n svg,
 }
 .hero-title {
   margin-top: 12px;
+  text-wrap: balance;
+}
+/* a very long name steps down one size on the closed scale, so it takes two lines, not five */
+.hero-title[data-long] {
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
 }
 .hero-handle {
   font-family: var(--font-mono);
