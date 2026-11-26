@@ -29,7 +29,7 @@ const slideId = async (page: Page) => Number(await slide(page).getAttribute("dat
 async function start(page: Page, specs?: MockPostSpec[], s: Seed = {}) {
   const mock = await mockE621(page, specs);
   await seed(page, s);
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
   return mock;
 }
@@ -462,7 +462,8 @@ test("prints: one colour print over a grey heap; each slide dips to black and ar
   });
   expect(pose.scale).toBeCloseTo(1, 5);
   expect(pose.opacity).toBe("1");
-  expect(await scene(1149).evaluate((el) => getComputedStyle(el).transitionDelay)).toBe("0.7s");
+  // (once its picture is in, it waits out the old scene's fade to black)
+  await expect.poll(() => scene(1149).evaluate((el) => getComputedStyle(el).transitionDelay)).toBe("0.7s");
   await expect.poll(() => scene(1150).evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
   await expect.poll(() => scene(1149).evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
   // The old scene keeps its own heap while it fades.
@@ -875,7 +876,7 @@ async function startRecommended(page: Page) {
   mock.setFavorites([{ id: 1120, tags: ["pawpads"] }, ...Array.from({ length: 9 }, (_, i) => ({ id: 2000 + i, tags: ["pawpads", "solo"] }))]);
   mock.tagCounts = { pawpads: 5 };
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await expect(page.getByTestId("signed-in")).toBeVisible();
   await page.getByRole("radio", { name: "Recommended" }).click();
   await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
@@ -1005,7 +1006,7 @@ test("recommended ORs the profile tags into one paged search and starts once it'
   // the last page is slow, so the wait is observable
   mock.searchDelay = (tags, n) => (tags.startsWith("~") && n === 3 ? 3000 : 0);
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   await expect(page.getByTestId("rec-tags")).toContainText("toebeans");
   await expect(page.getByTestId("query-preview")).toContainText("~pawpads ~toebeans date:>=7_days_ago order:score");
@@ -1030,7 +1031,7 @@ test("the scroll view builds a big Recommended result set a page of cards at a t
   mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads"] })));
   mock.tagCounts = { pawpads: 5 };
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   await expect(page.getByTestId("rec-tags")).toContainText("pawpads");
   await page.getByTestId("scroll-button").click();
@@ -1045,7 +1046,7 @@ test("recommended can start during the first read of the favorites, and shows ea
   mock.tagCounts = { pawpads: 5, toebeans: 5 };
   mock.favoritesDelay = 2500;
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   await expect(page.getByTestId("rec-status")).toContainText("Reading your favorites");
   await page.getByTestId("play-button").click();
@@ -1065,7 +1066,7 @@ test("the profile list shows every weighted tag in a scrollable box", async ({ p
   mock.setFavorites(Array.from({ length: 5 }, (_, i) => ({ id: 9000 + i, tags: niche })));
   mock.tagCounts = Object.fromEntries(niche.map((t) => [t, 5]));
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   const list = page.getByTestId("rec-tags");
   await expect(list.getByTestId("rec-tag")).toHaveCount(45);
@@ -1082,7 +1083,7 @@ test("the profile filter narrows the list and Esc clears it", async ({ page }) =
   mock.setFavorites(Array.from({ length: 5 }, (_, i) => ({ id: 9000 + i, tags })));
   mock.tagCounts = Object.fromEntries(tags.map((t) => [t, 5]));
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   const rows = page.getByTestId("rec-tags").getByTestId("rec-tag");
   await expect(rows).toHaveCount(5);
@@ -1114,7 +1115,7 @@ test("the highest-weight tags are searched, the rest dimmed, and pinning promote
   // site counts keep every ratio under the 50× lift cap, so the ratios (not just n) set the order
   mock.tagCounts = { tag_a: 200, tag_b: 100, tag_c: 40, tag_d: 20 };
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, search: { source: "recommended", breadth: 2 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   const rows = page.getByTestId("rec-tags").getByTestId("rec-tag");
   await expect(rows).toHaveCount(4);
   const searchedRows = rows.and(page.locator("[data-searched=true]"));
@@ -1148,7 +1149,7 @@ async function startMuteCase(page: Page) {
   mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 9000 + i, tags: ["pawpads", "rope"] })));
   mock.tagCounts = { pawpads: 5, rope: 5 };
   await seed(page, { creds: { username: "tester", apiKey: "goodkey" }, playback: { intervalSec: 60 } });
-  await page.goto("/");
+  await page.goto("/settings/classic");
   await page.getByRole("radio", { name: "Recommended" }).click();
   await expect(page.getByTestId("rec-tags")).toContainText("rope");
 }
@@ -1224,20 +1225,24 @@ test.describe("touch", () => {
 
 // ---- Share links ----------------------------------------------------------
 
-test("a share link plays straight away without touching saved settings", async ({ page }) => {
+test("a share link opens its Results and plays them, without touching saved settings", async ({ page }) => {
   const mock = await mockE621(page, defaultSpecs().map((s) => (s.id === 1150 ? { ...s, tags: ["badtag"] } : s)));
   const own = { tags: "my_search", blacklist: "badtag" };
   await seed(page, { search: own, playback: { intervalSec: 60 } });
   await page.goto("/?v=1&tags=wolf&style=kenburns&int=30&mute=0");
 
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(slide(page)).toBeVisible();
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1149"); // the visitor's own blacklist still applies
   expect(mock.searches[0].tags).toContain("wolf");
-  expect(await slideId(page)).toBe(1149); // the visitor's own blacklist still applies
-  await expect(page.getByTestId("toast")).toContainText("Videos start muted");
-  expect(new URL(page.url()).search).toBe("");
+  await expect(page.getByText("Videos start muted")).toBeVisible();
+  await expect(page).toHaveURL(/\/search\?v=1&tags=wolf&.*play=1149$/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!))).toEqual(own);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({ intervalSec: 60 });
+  // Back steps down: the link's Results, then Following.
+  await page.goBack();
+  await expect(page.getByTestId("player")).toHaveCount(0);
+  await expect(page.getByText("From a link")).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/following$/);
 });
 
 test("the share button copies a link to what's playing", async ({ page, context }) => {
@@ -1286,11 +1291,20 @@ test("with the account toggle on, a share link signs the visitor in for that tab
     localStorage.setItem("e6ss:v1:sections", JSON.stringify({ account: true }));
   });
   await p2.goto(url);
-  await expect(slide(p2)).toBeVisible();
+  await expect(p2.getByTestId("player")).toHaveAttribute("data-post-id", /\d+/);
   expect(mock2.searches[0].auth).toBe(`Basic ${Buffer.from("tester:goodkey").toString("base64")}`);
   expect(p2.url()).not.toContain("goodkey");
-  await p2.keyboard.press("s");
-  await expect(p2.getByTestId("signed-in")).toContainText("tester");
+  // Close the player, leave the link's Results: the home's settings show the borrowed sign-in.
+  await p2.keyboard.press("Escape");
+  await expect(p2.getByTestId("player")).toHaveCount(0);
+  await p2.keyboard.press("Escape");
+  await expect(p2).toHaveURL(/\/following$/);
+  // Following never uses a borrowed sign-in; Settings › Account shows it.
+  await expect(p2.getByTestId("following-sign-in")).toBeVisible();
+  // (on a computer Settings is one page, Account first)
+  await p2.getByTestId("tab-settings").click();
+  await expect(p2.getByTestId("account-name")).toHaveText("tester");
+  await expect(p2.getByTestId("settings-page-account")).toContainText("On a shared link, for this tab");
   await expect(p2.getByTestId("share-sign-in")).toHaveCount(0); // a borrowed key can't be re-shared
   expect(await p2.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:creds")!))).toEqual({ username: "mine", apiKey: "goodkey" });
   await visitor.close();
@@ -1318,12 +1332,10 @@ test("a ?tags= link plays the e621 search as-is, with the visitor's playback and
   await seed(page, { search: own, playback: { intervalSec: 60, style: "kenburns" } });
   await page.goto("/?tags=wolf++solo");
 
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(slide(page)).toBeVisible();
-  expect(mock.searches[0].tags).toBe("wolf solo"); // no saved filters added
-  expect(await slideId(page)).toBe(1149); // saved blacklist still applies
-  expect(new URL(page.url()).search).toBe("");
-  // nothing saved: a reload is a plain visit with the visitor's own search
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1149"); // saved blacklist still applies
+  expect(mock.searches[0].tags).toBe("wolf solo"); // no saved filters or ratings added
+  await expect(page).toHaveURL(/\/search\?l=1&tags=wolf\+solo&play=1149$/);
+  // nothing saved: a later visit has the visitor's own search
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!))).toEqual(own);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({
     intervalSec: 60,
@@ -1339,5 +1351,9 @@ test("settings link to the userscript and explain how to install it", async ({ p
   await expect(install).toHaveAttribute("href", "/e621-slideshow.user.js");
   const res = await request.get("/e621-slideshow.user.js");
   expect(res.ok()).toBe(true);
-  expect(await res.text()).toContain("// ==UserScript==");
+  const script = await res.text();
+  expect(script).toContain("// ==UserScript==");
+  // the button on e621 says the app's name; the script keeps its name in the manager, so it updates
+  expect(script).toContain('play.textContent = "▶ eLicks21"');
+  expect(script).toContain("// @name         e621 Slideshow button");
 });

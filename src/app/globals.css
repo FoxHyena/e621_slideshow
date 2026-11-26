@@ -1,19 +1,157 @@
 @import "tailwindcss";
 
 @theme {
+  /* Legacy palette: the settings-panel home until slices 3–7 replace it. */
   --color-accent: #fcb328;
   --color-accent-strong: #ffd479;
-  --color-panel: #0f1a2b;
+  --color-panel-old: #0f1a2b;
   --color-panel-2: #16243a;
   --color-line: #263a57;
+
+  /* DESIGN.md v6 tokens (Tailwind mapping section). Three materials: raised (lit + lip), panel
+     (lit top, dark bottom), sunk (wells). No hairline outlines on panels. */
+  --color-ground: #020f23;
+  --color-well: #0a1d3b;
+  --color-panel: #152f56;
+  --color-bar: #1a3660;
+  --color-raised: #1f3c67;
+  --color-raised-hi: #2b4d80;
+  --color-outline: rgba(180, 199, 217, 0.22);
+  /* The quiet outline, kept under its old name for the screens still on token swaps. */
+  --color-hairline: rgba(180, 199, 217, 0.14);
+  --color-fg: #ffffff;
+  --color-link: #b4c7d9;
+  --color-muted: #a0adc1;
+  --color-gold: #e8c446;
+  --color-on-gold: #020f23;
+  --color-lip-gold: #a8871f;
+  --color-lip-navy: #0a1b38;
+  --color-fav-on: #553659;
+  --color-lip-fav: #291a35;
+  --color-glass: rgba(21, 47, 86, 0.88);
+  --color-glass-base: #0b1f3e;
+  --color-glass-art: rgba(2, 15, 35, 0.55);
+  --color-score: #5ec06a;
+  --color-heart: #ff8a95;
+  --color-danger: #ed9393;
+  --color-rating-q: #e4d24f;
+  --color-goo: #ffffff;
+  --color-goo-aged: #f3e6a8;
+  --color-goo-ink: #35527f;
+  --color-goo-shade: #9fb3cc;
+  --color-tag-artist: #f2ac08;
+  --color-tag-character: #00c900;
+  --color-tag-species: #f3946b;
+  --color-tag-general: #b4c7d9;
+  --color-tag-meta: #ffffff;
+  --color-tag-copyright: #ee7bee;
+  --color-tag-lore: #5fdb5f;
+  --color-tag-contributor: #c8c8c8;
+  --color-tag-invalid: #ff8f8f;
+
+  /* Fredoka (next/font, 500 and 600 only; never 700) for voice, the system face for reading. */
+  --font-rounded: var(--font-fredoka), ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-large-title: 34px;
+  --text-large-title--line-height: 41px;
+  --text-large-title--font-weight: 600;
+  --text-large-title--letter-spacing: -0.005em;
+  --text-section: 20px;
+  --text-section--line-height: 25px;
+  --text-section--font-weight: 600;
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline--font-weight: 600;
+  --text-callout: 15px;
+  --text-callout--line-height: 20px;
+  --text-callout--font-weight: 600;
+  --text-label: 15px;
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 500;
+  --text-body: 15px;
+  --text-body--line-height: 20px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-tag-list: 15px;
+  --text-tag-list--line-height: 20px;
+  --text-tag-list--font-weight: 500;
+  --text-tab: 11px;
+  --text-tab--line-height: 13px;
+  --text-tab--font-weight: 500;
+
+  --spacing-edge: 8px;
+  --spacing-inset: 16px;
+  --spacing-control: 44px;
+  --spacing-control-compact: 36px;
+  --spacing-control-well: 28px;
+  --spacing-row: 52px;
+  --spacing-list-row: 56px;
+  --spacing-fab: 56px;
+  --spacing-bar: 64px;
+  --spacing-avatar-s: 24px;
+  --spacing-avatar-pile: 28px;
+  --spacing-avatar: 36px;
+  --spacing-avatar-row: 44px;
+  --spacing-avatar-l: 56px;
+  --spacing-avatar-hero: 80px;
+  /* content starts right of the sidebar on a computer: 8 + 68 + 8, or 8 + 232 + 8 */
+  --spacing-rail: 84px;
+
+  --radius-badge: 6px;
+  --radius-field: 12px;
+  --radius-art: 16px;
+  --radius-menu: 26px;
+  --radius-panel: 24px;
+  --radius-sheet: 24px;
+
+  --inset-shadow-lit: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --inset-shadow-lit-gold: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --inset-shadow-lit-fav: inset 0 1px 0 rgba(255, 190, 200, 0.22);
+  --inset-shadow-lit-b: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  /* Panels used to carry a hairline; v6 lights their top edge instead. */
+  --inset-shadow-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --shadow-sunk: inset 0 1px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-sunk-art: 0 0 0 1px rgba(2, 15, 35, 0.6), 0 1.5px 0 rgba(255, 255, 255, 0.06);
+  --shadow-float: 0 14px 28px rgba(0, 0, 0, 0.45);
+  --shadow-bar: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 24px rgba(0, 0, 0, 0.4);
+
+  --blur-glass: 24px;
+  --blur-glass-art: 12px;
+
+  --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  --ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --ease-slide: cubic-bezier(0.3, 1.35, 0.5, 1);
+  --animate-pop: pop 320ms var(--ease-pop);
+  --animate-wiggle: wiggle 360ms ease-out;
+  --animate-hop: hop 420ms var(--ease-spring);
+  @keyframes pop {
+    0% { transform: scale(0.7); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  @keyframes wiggle {
+    25% { transform: rotate(-3deg); }
+    60% { transform: rotate(2deg); }
+    100% { transform: none; }
+  }
+  @keyframes hop {
+    40% { transform: translateY(-5px) scale(1.12); }
+  }
 }
 
 html,
 body {
   background: #000;
   color-scheme: dark;
+}
+/* Screens scroll the document (UX §4), so Safari's toolbars still collapse; the browser's own
+   pull-to-refresh is off. */
+html {
+  overscroll-behavior-y: none;
+  /* The scroll lock fixes the body; keep the scrollbar's room so the feed doesn't re-lay out. */
+  scrollbar-gutter: stable;
 }
 
 @keyframes progress {
@@ -361,25 +499,5805 @@ body {
   user-select: none;
 }
 
-@keyframes tag-actions-in {
+/* Tag targets (DESIGN.md "Tag targets"): raised capsules that pop up over a held tag. */
+.tag-catch {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+.tag-catch[data-drag] {
+  pointer-events: none;
+}
+.tag-targets {
+  position: fixed;
+  z-index: 71;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+.tag-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  box-shadow:
+    var(--inset-shadow-lit),
+    var(--shadow-float);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+  white-space: nowrap;
+  pointer-events: auto;
+  transition: transform 120ms ease-out;
+  animation: tag-target 320ms cubic-bezier(0.3, 1.35, 0.5, 1) backwards;
+}
+.tag-target:nth-child(2) {
+  animation-delay: 40ms;
+}
+.tag-target:nth-child(3) {
+  animation-delay: 80ms;
+}
+.tag-target svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-link);
+}
+.tag-target[data-danger],
+.tag-target[data-danger] svg {
+  color: var(--color-danger);
+}
+.tag-target[data-hot="true"],
+.tag-target:active {
+  transform: scale(1.06);
+  box-shadow:
+    var(--inset-shadow-lit),
+    inset 0 0 0 1.5px var(--color-gold),
+    var(--shadow-float);
+}
+.tag-target[data-danger][data-hot="true"],
+.tag-target[data-danger]:active {
+  box-shadow:
+    var(--inset-shadow-lit),
+    inset 0 0 0 1.5px var(--color-danger),
+    var(--shadow-float);
+}
+.tag-target:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+@keyframes tag-target {
   from {
     opacity: 0;
-    scale: 0.85;
+    transform: translateY(10px) scale(0.6);
   }
-}
-.tag-actions {
-  animation: tag-actions-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 @media (prefers-reduced-motion: reduce) {
-  .tag-actions {
-    animation-duration: 1ms;
+  .tag-target {
+    animation: none;
+    transition: none;
   }
 }
-@keyframes tag-actions-dim-in {
+
+/* Inline, so `shadow-lip` reads --lip-c on the control itself rather than on :root. */
+@theme inline {
+  --shadow-lip: 0 var(--lip, 3px) 0 var(--lip-c, var(--color-lip-navy));
+  --shadow-lip-s: 0 2px 0 var(--lip-c, var(--color-lip-navy));
+}
+
+/* ---- shell (src/shell) ------------------------------------------------- */
+
+:root {
+  /* DESIGN.md bottom stack: the bar sits 22 from the bottom, above any larger safe area. */
+  --bar-bottom: max(22px, calc(env(safe-area-inset-bottom) - 12px));
+  /* the tube's middle stands 10 above its ends */
+  --bar-top: calc(var(--bar-bottom) + var(--spacing-bar) + 10px);
+  /* the top of the bottom stack: Play's disc, 100 from the bottom and 56 tall */
+  --stack-top: calc(var(--bar-bottom) + 134px);
+  /* toasts sit 12 above the stack: Play when it shows, else the bar (Play steps aside on scroll) */
+  --toast-bottom: calc(var(--stack-top) + 12px);
+}
+@media (min-width: 1100px) {
+  :root {
+    --spacing-rail: 248px;
+  }
+}
+:root:not(:has(.play-fab:not([data-away]))) {
+  --toast-bottom: calc(var(--bar-top) + 16px);
+}
+
+::selection {
+  background: var(--color-raised-hi);
+  color: var(--color-fg);
+}
+
+.btn-gold:focus-visible,
+.toolbar-circle:focus-visible,
+.post-by:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* The sidebar on a computer (DESIGN.md "On a computer", proposed): the tab bar stood on its side. */
+.side {
+  position: fixed;
+  z-index: 50;
+  top: 8px;
+  left: 8px;
+  bottom: 8px;
+  width: 232px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--shadow-float);
+  view-transition-name: tabbar;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.side[data-hidden] {
+  opacity: 0;
+  transform: translateX(-24px);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out,
+    visibility 0s 200ms;
+}
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding-left: 4px;
+}
+.side-mark {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.side-name {
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+}
+.side-tabs {
+  position: relative;
+  flex: none;
+  margin-top: 8px;
+}
+.side-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* The secret tab (DESIGN.md, owner-picked "Scroll"): the rail is clipped to the four rows (3 spare for
+   the focus ring); scrolled, it slides up one row and "Goo" shows under Settings. */
+.side-tabs[data-secret] {
+  height: 188px;
+  clip-path: inset(-3px -4px round 24px);
+}
+.side-tabs[data-secret] .side-rail {
+  transition: transform 500ms var(--ease-slide);
+}
+.side-tabs[data-open] .side-rail {
+  transform: translateY(-48px);
+}
+.side-secret {
+  color: var(--color-fg);
+  text-align: left;
+}
+/* the wordmark (DESIGN.md "The wordmark", owner-picked "Two-tone"): "e" and "21" in Link */
+.wm {
+  font-family: var(--font-rounded);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--color-fg);
+}
+.wm i {
+  font-style: normal;
+  color: var(--color-link);
+}
+.side-ind {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  box-shadow: var(--inset-shadow-lit);
+  transition: transform 500ms var(--ease-slide);
+}
+.side-tab,
+.side-search,
+.side-account {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  border-radius: 999px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.side-tab {
+  height: 44px;
+  padding: 0 12px;
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.side-tab[aria-current="page"] {
+  color: var(--color-gold);
+}
+.side-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  stroke-width: 1.9;
+}
+.side-tab[aria-current="page"] .side-icon {
+  stroke-width: 2.4;
+}
+.side-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.side-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-rounded);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.side-search {
+  height: 44px;
+  margin-top: 12px;
+  padding: 0 8px 0 14px;
+  border-radius: var(--radius-field);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-muted);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.side-search-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.side-key {
+  margin-left: auto;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 7px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+.side-account {
+  margin-top: auto;
+  padding: 6px 8px 6px 4px;
+  border-radius: 12px;
+  color: var(--color-fg);
+}
+.side-avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.side-nobody {
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--color-well);
+  color: var(--color-link);
+  stroke-width: 1.75;
+}
+.side-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.side-who b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+}
+.side-who small {
+  color: var(--color-muted);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+}
+/* The goo's pools (DESIGN.md "The goo on a computer", "The pool on a phone"; src/components/Pool.tsx):
+   over what's under them, taking no clicks; the copy under the goo is drawn again in Goo Ink, cut to
+   the goo's shape by a mask. */
+.pool {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pool > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.pool-ink,
+.pool-ink :is(.side-account, .list-row, b, small) {
+  color: var(--color-goo-ink);
+}
+.pool-ink {
+  position: absolute;
+  inset: 0;
+}
+.pool-ring {
+  border-radius: 999px;
+  background: rgb(53 82 127 / 0.16);
+  box-shadow: inset 0 0 0 3px var(--color-goo-ink);
+}
+/* on a computer: the sidebar's foot, 120 tall, cut to its 24 bottom corners */
+.side-pool {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 120px;
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+}
+.side-pool-ink {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  margin: 0;
+}
+/* on a phone: the Settings goo row's card is the jar; Wipe clean stays above the goo */
+.goo-jar {
+  position: relative;
+}
+.jar-pool {
+  inset: 0;
+}
+.goo-jar .list-row > .btn-tonal {
+  position: relative;
+  z-index: 3;
+}
+.jar-pool .row-well.pool-ring {
+  background: rgb(53 82 127 / 0.16);
+  box-shadow: inset 0 0 0 2px var(--color-goo-ink);
+}
+.jar-pool .row-well svg {
+  color: var(--color-goo-ink);
+}
+.side-tab:focus-visible,
+.side-search:focus-visible,
+.side-account:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* 900 to 1099: icons only, names as tooltips */
+@media (max-width: 1099px) {
+  .side {
+    width: 68px;
+    align-items: center;
+  }
+  .side-brand {
+    padding: 0;
+  }
+  .side-name,
+  .side-key {
+    display: none;
+  }
+  /* hidden from sight, not from screen readers */
+  .side-label,
+  .side-who {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .side-ind,
+  .side-tab,
+  .side-search {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .side-badge {
+    position: absolute;
+    top: 3px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .side-account {
+    padding: 4px;
+    border-radius: 999px;
+  }
+}
+.side-tab,
+.side-account,
+.side-search {
+  transition:
+    background-color 100ms ease-out,
+    color 100ms ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
+  .side-tab:hover,
+  .side-account:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .side-tab:hover {
+    color: var(--color-fg);
+  }
+  .side-tab[aria-current="page"]:hover {
+    color: var(--color-gold);
+  }
+  .side-search:hover {
+    color: var(--color-link);
+  }
+}
+
+/* The tab bar on a phone (DESIGN.md v6 "Tab bar"): one solid tube that bends. Its fill is a
+   clipped layer, a blurred copy is the shadow, a stroked outer edge is the light. Tabs and the
+   current-tab capsule ride a rail that turns about the bend's centre, so they stay tangent to it,
+   the capsule slides along the curve, and the rail can scroll one tab further to the secret one. */
+.goo-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tube {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: var(--bar-bottom);
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  view-transition-name: tabbar;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.tube[data-hidden] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+.tube-clip,
+.tube-rail {
+  position: absolute;
+  inset: 0;
+}
+.tube-rail {
+  transform-origin: 50% calc(32px + var(--R));
+  transform: rotate(var(--sc, 0rad));
+}
+.tube-shadow {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  opacity: 0.5;
+  filter: blur(14px);
+  pointer-events: none;
+  overflow: visible;
+}
+.tube-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bar);
+}
+.tube-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  overflow: visible;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.tube-light .ring {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+.tube-ind,
+.tube-tab {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: var(--tw);
+  height: 54px;
+  margin-left: calc(var(--tw) / -2);
+  transform-origin: 50% calc(27px + var(--R));
+  border-radius: 999px;
+}
+.tube-ind {
+  background: var(--color-raised-hi);
+  box-shadow: var(--inset-shadow-lit);
+  transition: transform 500ms var(--ease-slide);
+}
+.tube-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: var(--text-tab);
+  line-height: var(--text-tab--line-height);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 200ms ease-out;
+}
+.tube-tab[aria-current="page"] {
+  color: var(--color-gold);
+}
+.tube-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+.tube-tab[aria-current="page"] .tube-icon {
+  stroke-width: 2.4;
+}
+.tube-icon[data-hop] {
+  animation: var(--animate-hop);
+}
+.tube-secret {
+  color: #fff;
+}
+.tube-tab:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+/* The goo: white shapes under the bar's blur-and-threshold filter, so the bead, necks and drips
+   read as one liquid (src/shell/gooBar.ts). It runs over the tabs; an ink copy of each icon and
+   label, masked to the goo, shows through wherever it covers one. */
+.tube-goo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.goo-ink {
+  transform: rotate(var(--sc, 0rad));
+}
+.goo-ink-tab svg {
+  color: var(--color-goo-ink);
+}
+.goo-ink-tab text {
+  fill: var(--color-goo-ink);
+  font-family: var(--font-rounded);
+  font-size: var(--text-tab);
+  font-weight: 500;
+}
+.goo-ink-tab[data-on] svg {
+  color: #0a1d3b;
+}
+.goo-ink-tab[data-on] text {
+  fill: #0a1d3b;
+}
+.tube-blade {
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 8px;
+  height: 74px;
+  margin-left: -4px;
+  border-radius: 999px;
+  background: #e9f2fa;
+  box-shadow:
+    0 0 0 1.5px rgba(2, 15, 35, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+  transform-origin: 50% calc(37px + var(--R));
+  pointer-events: none;
+  opacity: 0;
+}
+.tube-gleam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 70px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  transform: translateX(-100px);
+  pointer-events: none;
+}
+.tube-fling {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+/* A drop on its way to the bar: from a heart (fixed, over the page) or from the Goo tab. */
+.goo-drop {
+  position: fixed;
+  z-index: 60;
+  width: 8px;
+  height: 10px;
+  margin: -5px 0 0 -4px;
+  border-radius: 999px;
+  background: var(--color-goo);
+  pointer-events: none;
+}
+.goo-drop-bar {
+  position: absolute;
+}
+/* The ground fade behind the bottom stack, so Play and the bar never sit on a hard edge. */
+.bottom-scrim {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(2, 15, 35, 0.86) 62%, var(--color-ground));
+}
+@media (prefers-reduced-motion: reduce) {
+  .tube,
+  .tube-ind,
+  .tube-tab {
+    transition: none;
+  }
+  .tube-icon[data-hop] {
+    animation: none;
+  }
+}
+@media (min-width: 900px) {
+  .bottom-scrim {
+    display: none;
+  }
+}
+
+.screen {
+  position: relative;
+  display: flow-root;
+  min-height: 100dvh;
+  background: var(--color-ground);
+  color: var(--color-fg);
+}
+.screen-frame {
+  max-width: 600px;
+  margin: 0 auto;
+  /* 176 below, so the last post's heart clears the Play button and the tab bar */
+  padding: env(safe-area-inset-top) var(--spacing-inset) 176px;
+}
+/* The grid uses the full width on desktop (DESIGN.md "Layout"). */
+.screen-frame[data-grid] {
+  max-width: 1400px;
+}
+.screen-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--spacing-control);
+  margin-top: 12px;
+}
+.toolbar-circle {
+  display: grid;
+  place-items: center;
+  width: var(--spacing-control);
+  height: var(--spacing-control);
+  border-radius: 999px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+  color: var(--color-link);
+}
+.toolbar-circle svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2;
+}
+.toolbar-circle:active {
+  color: var(--color-fg);
+}
+/* A tab's header (DESIGN.md "Screen header"): the large title and the tools capsule share a row. */
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding-top: 6px;
+}
+.title-row .screen-title {
+  margin: 0;
+  min-width: 0;
+}
+/* The tools capsule: one 44 panel, 40 wide link-blue tools inside it. */
+.tools {
+  display: flex;
+  flex: none;
+  height: var(--spacing-control);
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+}
+.tools .toolbar-circle {
+  width: 40px;
+  background: none;
+  box-shadow: none;
+}
+.tools .toolbar-circle[aria-pressed="true"] {
+  color: var(--color-gold);
+}
+.screen-title {
+  margin-top: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-large-title);
+  line-height: var(--text-large-title--line-height);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+.screen-note {
+  margin-top: 8px;
+  max-width: 65ch;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--spacing-control);
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+}
+
+/* Interim home (slice 1): the legacy app in a box that keeps its fixed layers off the bar.
+   The transform makes the box the containing block for its `position: fixed` children. */
+.screen-legacy {
+  background: #000;
+}
+.legacy-home {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bar-top) + 12px);
+  transform: translateZ(0);
+  overflow: hidden;
+  background: #000;
+}
+.legacy-home[data-immersive] {
+  bottom: 0;
+}
+
+@media (min-width: 900px) {
+  .screen {
+    margin-left: var(--spacing-rail);
+  }
+  /* the 600 column, centred right of the sidebar; 18 above the title */
+  .screen-frame {
+    max-width: calc(600px + 2 * var(--spacing-inset));
+    padding-top: calc(env(safe-area-inset-top) + 18px);
+  }
+  /* a grid's tiles use the full width, 24 at each side, and keep 104 under them for Play */
+  .screen-frame[data-grid] {
+    max-width: none;
+    padding: calc(env(safe-area-inset-top) + 18px) 24px 104px;
+  }
+  /* One head (owner's rule 2026-11-26): the title row, hero, line and chips stay in the 600 column,
+     so nothing above the tiles moves when the view is switched */
+  .screen-frame[data-grid] > :not(.feed-list, .play-fab, .compact-bar, .drop-layer, .sheet-layer) {
+    margin-inline: max(0px, (100% - 600px) / 2);
+  }
+  /* the chips row keeps its bleed to the column's sides */
+  .screen-frame[data-grid] > .chips {
+    margin-inline: calc(max(0px, (100% - 600px) / 2) - var(--spacing-inset));
+  }
+  /* Search is in the sidebar; a tools capsule that held only Search goes with it (Artists) */
+  .tool-search,
+  .tools:not(:has(> :not(.tool-search))) {
+    display: none;
+  }
+  /* toasts centre on the column and float 24 from the bottom; in the player, centred on the window
+     above its controls (set on the shell, so it wins over :root's Play rules whatever their weight) */
+  .shell {
+    --toast-bottom: 24px;
+  }
+  .shell[data-immersive] {
+    --toast-bottom: 120px;
+  }
+  .shell:not([data-immersive]) [data-sonner-toaster][data-x-position="center"] {
+    /* (% of the window less any scrollbar gutter, unlike vw) */
+    left: calc(var(--spacing-rail) + (100% - var(--spacing-rail)) / 2);
+  }
+  .legacy-home {
+    left: var(--spacing-rail);
+    bottom: 0;
+  }
+  .legacy-home[data-immersive] {
+    left: 0;
+  }
+}
+
+@media (hover: hover) {
+  .settings-row:hover {
+    background: var(--color-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side,
+  .side-ind,
+  .btn-gold {
+    transition: none;
+  }
+}
+
+/* Push / Back / tab motion (DESIGN.md Motion), driven by src/nav/transition.ts. */
+@keyframes nav-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes nav-sink {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes nav-fade-in {
   from {
     opacity: 0;
   }
 }
-.tag-actions-dim {
-  animation: tag-actions-dim-in 160ms ease-out;
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+:root[data-nav]::view-transition-group(root) {
+  animation-duration: 150ms;
+}
+:root[data-nav="push"]::view-transition-new(root) {
+  animation: nav-rise 150ms ease-out both;
+}
+:root[data-nav="push"]::view-transition-old(root) {
+  animation: nav-fade-out 150ms ease-out both;
+}
+:root[data-nav="back"]::view-transition-new(root) {
+  animation: nav-fade-in 150ms ease-out both;
+}
+:root[data-nav="back"]::view-transition-old(root) {
+  animation: nav-sink 150ms ease-out both;
+}
+:root[data-nav="tab"]::view-transition-new(root) {
+  animation: nav-fade-in 120ms ease-out both;
+}
+:root[data-nav="tab"]::view-transition-old(root) {
+  animation: nav-fade-out 120ms ease-out both;
+}
+
+/* ---- feeds (src/feed, src/screens) -------------------------------------- */
+
+.feed-list {
+  position: relative;
+  margin-top: 16px;
+}
+/* Under the chips, whose own 16 already separates them from the first panel */
+.chips ~ .feed-list,
+.chips ~ * > .feed-list:first-child {
+  margin-top: 0;
+}
+.feed-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+/* Marks (DESIGN.md "Avatars"): Bends on a raised disc for artists, the kaleidoscope for the app.
+   The svg turns inside the wrapper (`turnMark`); the wrapper holds the size and the New dot. */
+.mark {
+  position: relative;
+  display: block;
+  flex: none;
+  border-radius: 999px;
+}
+.mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: var(--inset-shadow-lit), 0 0 0 1px rgba(2, 15, 35, 0.35);
+  transition: transform 600ms var(--ease-spring);
+}
+/* The app mark is the hexagon itself: no disc, no ring (and no lip or shadow: it isn't a button). */
+.mark-app svg {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+/* It pops (92% to 100%, 360 ms): at "You're all caught up" the first time it comes into view, and
+   in Settings when pressed (owner-approved 2026-11-26). */
+.mark-app[data-pop] svg {
+  animation: mark-pop 360ms cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+@keyframes mark-pop {
+  from {
+    transform: scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-app[data-pop] svg {
+    animation: none;
+  }
+}
+.mark[data-new]::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 2.5px var(--color-panel);
+}
+/* Following: six dots leave the mark's rim (`followBurst`). */
+.mark .dots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.mark .dots i {
+  position: absolute;
+  border-radius: 999px;
+}
+
+/* The post panel (DESIGN.md v6): lit navy, one 8 edge, radii that nest (24 > 16). Its height is
+   set inline from layout.ts. Nothing clips it, so the heart's goo can hang below. */
+.post {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+  contain: layout style;
+}
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  margin-bottom: 8px;
+  flex: none;
+  min-width: 0;
+}
+.post-who {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.post-avatar {
+  width: var(--spacing-avatar);
+  height: var(--spacing-avatar);
+}
+.post-idn {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.post-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: 20px;
+  font-weight: 600;
+}
+.post-name > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.post-name-none {
+  color: var(--color-muted);
+}
+.post-also {
+  flex: none;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--color-well);
+  color: var(--color-link);
+  font-size: var(--text-tab);
+  line-height: 20px;
+  font-weight: 500;
+}
+.post-when {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-footnote);
+  line-height: 16px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.post-new {
+  color: var(--color-gold);
+  font-family: var(--font-rounded);
+  font-weight: 500;
+}
+.post-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+/* The whole who-made-it block is one target; the text under it stays plain text. */
+.post-by {
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+.post-menu {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: -6px;
+  flex: none;
+  border-radius: 999px;
+  color: var(--color-muted);
+}
+.post-menu::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.post-menu svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.4;
+}
+.post-menu:active {
+  background: var(--color-well);
+  color: var(--color-fg);
+}
+/* Material 3, sunk: the picture sits in the panel. */
+.post-media {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+  isolation: isolate;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+  cursor: pointer;
+}
+.post-media > img,
+.post-media > video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.post-media-gone {
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+.post-play {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: rgba(2, 15, 35, 0.5);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  pointer-events: none;
+}
+.post-play svg {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+  translate: 2px 0;
+}
+.post-mute {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: var(--spacing-control-well);
+  height: var(--spacing-control-well);
+  border-radius: 999px;
+  background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.post-mute::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+.post-mute svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.2;
+}
+/* The double tap's one heart: 88, 640 ms. */
+.post-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 88px;
+  height: 88px;
+  fill: var(--color-heart);
+  color: var(--color-heart);
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+  animation-duration: 640ms;
+}
+
+/* Tags: 28 wells in one sideways row. The 8 above and below hold each tag's 44 touch area, so
+   nothing spills and the row never scrolls up or down. An edge fades only while tags hide past it. */
+.post-tags {
+  --fl: 0px;
+  --fr: 28px;
+  display: flex;
+  gap: 8px;
+  flex: none;
+  height: 44px;
+  margin: 0 -8px -8px;
+  padding: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent);
+  touch-action: pan-x pan-y;
+}
+.post-tags::-webkit-scrollbar,
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.post-tag {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: var(--spacing-control-well);
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  white-space: nowrap;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: transform 150ms ease-out;
+}
+.post-tag::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.post-tag:active {
+  background: #071631;
+}
+/* Held: the well darkens and takes the quiet outline while its targets are up. */
+.post-tag[data-picked] {
+  background: #071631;
+  box-shadow:
+    var(--shadow-sunk),
+    inset 0 0 0 1.5px rgba(180, 199, 217, 0.32);
+}
+.post-tag-more {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px rgba(180, 199, 217, 0.18);
+  color: var(--color-muted);
+  font-family: var(--font-rounded);
+}
+
+/* Footer: score, then the favourite pill at the right end, under the thumb. */
+.post-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: none;
+  height: 39px;
+  margin-top: 8px;
+  padding-bottom: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.post-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+}
+.post-score svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-score);
+  fill: currentColor;
+  stroke-width: 1.6;
+}
+
+/* Material 1, raised: lit from above, a solid lip underneath that closes in 100 ms. */
+.fav-pill,
+.follow-pill,
+.btn-tonal,
+.btn-gold,
+.play-fab,
+.top-pill {
+  --lip: 3px;
+  --lip-c: var(--color-lip-navy);
+  --lit: var(--inset-shadow-lit);
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c);
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out;
+}
+.fav-pill:active,
+.follow-pill:active,
+.btn-tonal:active,
+.btn-gold:active,
+.top-pill:active {
+  transform: translateY(var(--lip));
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c);
+}
+.fav-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--spacing-control-compact);
+  padding: 0 14px 0 11px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fg);
+}
+.fav-pill::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0 -7px;
+}
+.fav-pill svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.4;
+  color: var(--color-heart);
+}
+.fav-pill[aria-pressed="true"] {
+  --lip-c: var(--color-lip-fav);
+  --lit: var(--inset-shadow-lit-fav);
+  background: var(--color-fav-on);
+}
+.fav-pill[aria-pressed="true"] svg {
+  fill: currentColor;
+}
+.fav-pop {
+  animation: var(--animate-pop);
+}
+/* The heart's goo: white shapes under the #goo-drip filter. A bead along the pill's bottom edge,
+   blobs that sag out of it on necks (`drip` in src/feed/motion.ts). */
+.drip {
+  position: absolute;
+  left: 0;
+  top: calc(100% + var(--lip) - 3px);
+  width: 100%;
+  height: 48px;
+  pointer-events: none;
+  -webkit-filter: url(#goo-drip);
+  filter: url(#goo-drip);
+}
+.drip span {
+  position: absolute;
+  top: 0;
+  border-radius: 999px;
+  background: var(--color-goo);
+}
+.drip .bead {
+  left: 22%;
+  right: 16%;
+  height: 4px;
+  transform-origin: 50% 0;
+}
+.drip .neck {
+  top: 2px;
+  transform-origin: 50% 0;
+}
+.drip .blob {
+  top: 2px;
+}
+
+/* Follow pill (DESIGN.md "Follow pill"): raised navy, gold plus, a 2 lip. Following, it goes
+   quiet: no fill, an outline, a green check. */
+.follow-pill {
+  --lip: 2px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
+  height: var(--spacing-control-compact);
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-fg);
+  white-space: nowrap;
+}
+.follow-pill::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+.follow-pill svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.6;
+}
+.follow-plus {
+  color: var(--color-gold);
+}
+.follow-check {
+  color: var(--color-score);
+}
+.follow-pill[aria-pressed="true"],
+.follow-pill[aria-pressed="true"]:active {
+  padding: 0 10px 0 8px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-outline);
+  transform: none;
+}
+/* Over art: no lip (the Lip Is a Promise rule), glass behind it for contrast. */
+.follow-pill-art,
+.follow-pill-art[aria-pressed="true"],
+.follow-pill-art:active {
+  background: var(--color-glass-art);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  transform: none;
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+}
+/* The artist page's Follow (DESIGN.md "Artist page"): one full-width 44 button. Not followed:
+   Raised Navy, 3 lip, gold plus. Following: the quiet outline and a green check; it doesn't travel. */
+.follow-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin: 16px 0 4px;
+}
+.follow-button {
+  width: 100%;
+}
+.follow-button svg {
+  width: 18px;
+  height: 18px;
+}
+.follow-button[aria-pressed="true"],
+.follow-button[aria-pressed="true"]:active {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-outline);
+  transform: none;
+}
+/* Two names, so every tap restarts it. */
+[data-wiggle="a"] {
+  animation: follow-wiggle-a 360ms ease-out;
+}
+[data-wiggle="b"] {
+  animation: follow-wiggle-b 360ms ease-out;
+}
+@keyframes follow-wiggle-a {
+  25% { transform: rotate(-3deg); }
+  60% { transform: rotate(2deg); }
+  100% { transform: none; }
+}
+@keyframes follow-wiggle-b {
+  25% { transform: rotate(-3deg); }
+  60% { transform: rotate(2deg); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-pill,
+  .follow-pill,
+  .btn-tonal,
+  .btn-gold,
+  .play-fab,
+  .top-pill,
+  .mark svg {
+    transition: none;
+  }
+  [data-wiggle],
+  .fav-pop {
+    animation: none;
+  }
+}
+
+.post-skeleton {
+  height: auto;
+  margin-bottom: 16px;
+}
+.post-skeleton .post-media {
+  width: 100%;
+}
+.sk-dot,
+.sk-line,
+.sk-block,
+.sk-pill {
+  background: var(--color-raised);
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+}
+.sk-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+.sk-line {
+  width: 40%;
+  height: 12px;
+  border-radius: 6px;
+}
+.sk-pill {
+  width: 72px;
+  height: var(--spacing-control-compact);
+  border-radius: 999px;
+}
+.post-skeleton .post-head {
+  gap: 8px;
+}
+.post-skeleton .sk-block {
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+}
+@keyframes sk-shimmer {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* The grid's skeleton tiles (DESIGN.md "Grid loading"): the same columns and gaps as the tiles */
+.tile-skeletons {
+  display: grid;
+  gap: 12px 8px;
+  pointer-events: none;
+}
+.tile-skeletons[data-more] {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+.sk-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.sk-tile > .sk-band {
+  aspect-ratio: 1;
+  border-radius: var(--radius-art);
+}
+.sk-tile .tile-nums {
+  align-items: center;
+}
+.sk-tile .tile-nums > .sk-band {
+  height: 10px;
+  border-radius: 999px;
+}
+.sk-band {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-well);
+}
+.sk-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(180, 199, 217, 0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: sk-band 1.4s ease-in-out infinite;
+}
+@keyframes sk-band {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.feed-foot {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+.feed-note {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  text-align: center;
+}
+.feed-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 34ch;
+  margin: 32px auto 0;
+  text-align: center;
+}
+.feed-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 3px solid var(--color-raised);
+  border-top-color: var(--color-link);
+  animation: spin 800ms linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.btn-tonal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--spacing-control);
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+}
+.btn-tonal svg,
+.btn-gold svg {
+  width: 20px;
+  height: 20px;
+}
+.btn-gold,
+.play-fab {
+  --lip-c: var(--color-lip-gold);
+  --lit: var(--inset-shadow-lit-gold);
+}
+.btn-gold {
+  gap: 8px;
+}
+.btn-gold:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Filter chips (DESIGN.md "Filter chip") */
+.chips {
+  display: flex;
+  gap: 8px;
+  margin: 0 calc(-1 * var(--spacing-inset));
+  padding: 12px var(--spacing-inset) 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+/* Filter chip (DESIGN.md v6): 36, panel with top light, no lip; a press shrinks it a touch. */
+.chip {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--spacing-control-compact);
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+  font-family: var(--font-rounded);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: 500;
+  color: var(--color-fg);
+  white-space: nowrap;
+  transition: transform 100ms ease-out;
+}
+.chip::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+.chip:active {
+  transform: scale(0.96);
+}
+.chip svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+  color: var(--color-muted);
+  margin-right: -4px;
+}
+.chip[data-on] {
+  background: var(--color-raised-hi);
+  box-shadow:
+    var(--inset-shadow-lit),
+    inset 0 0 0 1.5px var(--color-gold);
+}
+.chip[data-on] svg {
+  color: var(--color-gold);
+}
+/* open: the arrow points up, and a chip that is off steps up to Raised (DESIGN.md "Chip dropdown") */
+.chip[aria-expanded="true"]:not([data-on]) {
+  background: var(--color-raised);
+}
+.chip > svg:last-child {
+  transition: transform 150ms ease-out;
+}
+.chip[aria-expanded="true"] > svg:last-child {
+  transform: rotate(180deg);
+}
+.chip-reset {
+  color: var(--color-link);
+}
+.chip-reset svg {
+  width: 14px;
+  height: 14px;
+  margin: 0 0 0 -4px;
+  color: var(--color-link);
+}
+/* "From a link": on (the gold ring), a link glyph in Link Blue */
+.chip.chip-link .chip-link-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 -2px;
+  color: var(--color-link);
+}
+.link-lede {
+  margin: 0 0 8px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.link-row small {
+  display: block;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.link-note {
+  margin: 8px 0 16px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.link-mine {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: var(--spacing-control);
+}
+/* Not signed in on this browser: the sunk banner grown to two lines */
+.nobody-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  margin: 0 0 12px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 22px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+}
+.nobody-banner > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-muted);
+}
+.nobody-banner > span {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.nobody-banner b {
+  font-weight: 700;
+  color: #fff;
+}
+.nobody-banner small {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-link);
+}
+.nobody-sign-in {
+  flex: none;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: 0 2px 0 var(--color-lip-navy);
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  color: #fff;
+}
+.nobody-sign-in:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+.nobody-sign-in:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* over the player: the same shape in the player's glass */
+.player-nobody {
+  position: absolute;
+  z-index: 11;
+  top: calc(env(safe-area-inset-top) + 68px);
+  left: var(--spacing-inset);
+  right: var(--spacing-inset);
+  pointer-events: none;
+  animation: nobody-out 300ms ease-in 3.7s both;
+}
+.player-nobody .nobody-banner {
+  pointer-events: auto;
+}
+@media (min-width: 900px) {
+  .player-nobody {
+    top: 84px;
+  }
+  .player[data-info] .player-nobody {
+    right: 376px;
+  }
+}
+@keyframes nobody-out {
+  to {
+    opacity: 0;
+  }
+}
+.nobody-banner[data-glass] {
+  margin: 0 auto;
+  max-width: 420px;
+  background: rgba(2, 15, 35, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+.nobody-banner[data-glass] > svg,
+.nobody-banner[data-glass] small {
+  color: rgba(255, 255, 255, 0.78);
+}
+.nobody-banner[data-glass] .nobody-sign-in {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .player-nobody {
+    animation: none;
+  }
+}
+.chip:focus-visible,
+.fav-pill:focus-visible,
+.follow-pill:focus-visible,
+.post-tag:focus-visible,
+.post-menu:focus-visible,
+.post-mute:focus-visible,
+.feed-tile:focus-visible,
+.btn-tonal:focus-visible,
+.play-fab:focus-visible,
+.text-btn:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* The round Play button (DESIGN.md "Play button (floating)"): bottom left, 100 from the bottom
+   (the bar passes 14 under its disc), a 4 lip and a soft shadow. It steps aside while you scroll
+   down. */
+.play-fab {
+  --lip: 4px;
+  position: fixed;
+  z-index: 40;
+  left: var(--spacing-inset);
+  bottom: calc(var(--bar-bottom) + 78px);
+  display: grid;
+  place-items: center;
+  width: var(--spacing-fab);
+  height: var(--spacing-fab);
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    var(--shadow-float);
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out,
+    opacity 200ms ease-out;
+}
+.play-fab svg {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+  translate: 2px 0;
+}
+.play-fab:active {
+  transform: translateY(var(--lip));
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c),
+    0 8px 18px rgba(0, 0, 0, 0.45);
+}
+.play-fab[data-away] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+
+/* Results header: the search as a field-shaped button between back and the tools */
+.results-title {
+  outline: none;
+}
+.results-title .field6 {
+  width: 100%;
+}
+
+/* Sheets (DESIGN.md "Sheets with a title", "Sheet (⋯ menu)"): the Panel sheet over the dim. */
+.sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.sheet-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 15, 35, 0.6);
+  animation: fade-in 200ms ease-out;
+}
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 56px);
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+  color: var(--color-fg);
+  animation: sheet-up 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 200ms ease-out;
+}
+.sheet[data-full] {
+  height: calc(100dvh - env(safe-area-inset-top) - 12px);
+  max-height: none;
+}
+/* the grabber: 8 above it, 10 below */
+.sheet-grab {
+  display: flex;
+  justify-content: center;
+  flex: none;
+  height: 23px;
+  padding-top: 8px;
+  touch-action: none;
+  cursor: grab;
+}
+.sheet-grab span {
+  width: 36px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.sheet-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 0 var(--spacing-inset);
+}
+.sheet-title {
+  min-width: 0;
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+/* The ✕: a 36 round well, its edge on the 16 inset. */
+.sheet-x {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--spacing-control-compact);
+  height: var(--spacing-control-compact);
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+}
+.sheet-x svg {
+  width: 18px;
+  height: 18px;
+}
+.sheet-x::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.sheet-x:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--spacing-inset);
+}
+.sheet-foot {
+  flex: none;
+  padding: 16px var(--spacing-inset) 0;
+}
+.sheet-wide {
+  width: 100%;
+}
+.sheet-note {
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+}
+.sheet-actions > * {
+  flex: 1;
+}
+
+/* Rows straight on a sheet: the sheet is the panel, so no group and no side padding. The divider
+   starts at the text (0, or 44 after an icon well). */
+.sheet-rows {
+  --div: 0px;
+}
+.sheet-rows[data-wells] {
+  --div: 44px;
+}
+.sheet-rows > .list-row {
+  padding-right: 0;
+  padding-left: 0;
+}
+.sheet-rows > .list-row + .list-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--div);
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+.list-row:disabled {
+  opacity: 0.45;
+}
+.row-well[data-tone="danger"] svg,
+.list-row[data-danger] {
+  color: var(--color-danger);
+}
+
+/* The ⋯ menu: a context line, then one Well group of 52 rows. */
+.sheet-ctx {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px var(--spacing-inset) 12px;
+}
+.sheet-ctx .row-text > b {
+  font-size: var(--text-headline);
+  line-height: 20px;
+}
+.sheet-ctx .row-text > small {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+}
+.well-group {
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  overflow: hidden;
+}
+.well-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px 0 12px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+  text-align: left;
+  text-decoration: none;
+}
+.well-row > svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--color-link);
+}
+.well-row > span {
+  flex: 1;
+  min-width: 0;
+}
+.well-row > small {
+  flex: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-footnote);
+  font-weight: 400;
+  color: var(--color-muted);
+}
+.well-row + .well-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 46px;
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+.well-row:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+.well-row[data-danger],
+.well-row[data-danger] > svg {
+  color: var(--color-danger);
+}
+
+/* Menu (one choice from a list): a sunk track; the chosen row rides a raised capsule that slides. */
+.menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-radius: var(--radius-menu);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.menu-thumb {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  left: 4px;
+  height: var(--spacing-control);
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 1px 0 rgba(2, 15, 35, 0.5);
+  transform: translateY(var(--y, 0px));
+  transition: transform 360ms cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+.menu:not([data-placed]) .menu-thumb {
+  transition: none;
+}
+.menu-thumb[hidden] {
+  display: none;
+}
+.menu-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+.menu-row {
+  flex: 1;
+  height: var(--spacing-control);
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 16px;
+  border-radius: 999px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+  text-align: left;
+  transition: color 200ms ease-out;
+}
+.menu-row[aria-checked="true"] {
+  color: var(--color-fg);
+}
+.menu-row:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+/* A row's own action (Reshuffle): beside the row's button, at its right end, while it's chosen. */
+.menu-act {
+  position: absolute;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-link);
+}
+.menu-act svg {
+  width: 16px;
+  height: 16px;
+}
+.menu-act::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.menu-act:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+.menu-sep {
+  position: relative;
+  height: 9px;
+}
+.menu-sep::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 16px;
+  left: 16px;
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+/* What Custom… opens, under the track. */
+.menu-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.field-label > span {
+  padding-left: 14px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.field-n {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.field-n > .field6 {
+  flex: 0 0 88px;
+}
+.field-n > .seg {
+  flex: 1;
+}
+.field6 input[type="date"] {
+  position: relative;
+  color-scheme: dark;
+}
+/* The field's own calendar icon leads; the browser's picker button covers the whole input instead. */
+.field6 input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  opacity: 0;
+  cursor: pointer;
+}
+.field6 .field-icon-score {
+  color: var(--color-score);
+}
+
+/* A sunk capsule (DESIGN.md "Field"); R2 restyles the screens that use it. */
+.field {
+  height: var(--spacing-control);
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-fg);
+}
+.field:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px var(--color-gold);
+}
+.switch:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Search (DESIGN.md "Search") */
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sheet .search-form {
+  margin-top: 8px;
+}
+.search-count {
+  padding-left: 16px;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+.search-count[data-over] {
+  color: var(--color-danger);
+}
+.search-go {
+  display: flex;
+  justify-content: flex-end;
+}
+.search-recent {
+  margin: 0 calc(-1 * var(--spacing-inset));
+  padding: 0 var(--spacing-inset) 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.search-first {
+  margin-top: 16px;
+}
+.list-row.saved-row {
+  padding: 0 16px 0 0;
+}
+.saved-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: var(--spacing-list-row);
+  padding: 8px 0 8px 16px;
+  text-align: left;
+}
+.saved-open:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+.saved-open:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+/* A 44 tall link under a group (callout, Link Blue), 16 in from the panel's edge. */
+.link-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--spacing-control);
+  padding: 0 16px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-link);
+  text-decoration: none;
+}
+.link-row svg {
+  width: 16px;
+  height: 16px;
+}
+.link-row:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+  border-radius: 999px;
+}
+.text-btn {
+  min-height: 44px;
+  padding: 0 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  font-weight: 600;
+  color: var(--color-link);
+}
+
+@media (min-width: 900px) {
+  /* DESIGN.md "On a computer": Play at the content's bottom left, 24 from the sidebar and the bottom */
+  .play-fab {
+    bottom: 24px;
+    left: calc(var(--spacing-rail) + 16px);
+  }
+  .sheet-layer {
+    justify-content: center;
+    align-items: center;
+  }
+  /* a titled sheet is a 420 dialog in the middle of the window, its dim over the sidebar too */
+  .sheet {
+    width: min(420px, calc(100vw - 48px));
+    max-height: calc(100dvh - 48px);
+    padding-bottom: 16px;
+    border-radius: var(--radius-sheet);
+    box-shadow: var(--inset-shadow-lit), var(--shadow-float);
+  }
+  .sheet-grab {
+    display: none;
+  }
+  .sheet-head {
+    padding-top: 16px;
+  }
+  .sheet[data-full] {
+    height: min(720px, calc(100dvh - 48px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet-dim,
+  .fav-pop,
+  .sk-dot,
+  .sk-line,
+  .sk-block,
+  .sk-pill,
+  .sk-band::after {
+    animation: none;
+  }
+  .fav-pill,
+  .btn-tonal,
+  .play-fab {
+    transition: none;
+  }
+}
+
+/* ---- player (src/player, DESIGN.md "Player chrome") ---------------------- */
+
+.player {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  animation: player-in 200ms ease-out;
+}
+@keyframes player-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.player-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: none;
+}
+.player-note {
+  font-size: var(--text-body);
+  color: var(--color-muted);
+}
+.player-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  fill: var(--color-heart);
+  color: var(--color-heart);
+  pointer-events: none;
+}
+.player-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+.player[data-controls] .player-chrome {
+  opacity: 1;
+}
+.player[data-controls] .player-chrome button,
+.player[data-controls] .player-chrome a {
+  pointer-events: auto;
+}
+.player:not([data-controls]) {
+  cursor: none;
+}
+.player-top {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 130px;
+  padding: calc(env(safe-area-inset-top) + 12px) var(--spacing-inset) 0;
+  align-items: flex-start;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), transparent);
+}
+.art-circle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--spacing-control);
+  height: var(--spacing-control);
+  border-radius: 999px;
+  background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  transition: transform 100ms ease-out;
+}
+.art-circle:active {
+  transform: scale(0.94);
+}
+.art-circle svg.solid {
+  fill: currentColor;
+}
+.art-circle svg {
+  width: 20px;
+  height: 20px;
+}
+.art-circle:disabled {
+  opacity: 0.4;
+}
+.art-circle[data-on] svg {
+  color: var(--color-heart);
+  fill: currentColor;
+}
+.count-pill {
+  height: 28px;
+  margin: 8px 0 0 auto;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.player-desktop {
+  display: none;
+}
+.player-bottom {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 104px var(--spacing-inset) max(34px, env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.78) 62%);
+}
+.player-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.player-idn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.player-who .post-avatar {
+  width: var(--spacing-avatar);
+  height: var(--spacing-avatar);
+}
+.player-who .post-name {
+  display: block;
+  overflow: hidden;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.player-who .post-time {
+  font-size: var(--text-footnote);
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.74);
+  font-variant-numeric: tabular-nums;
+}
+.player-rail {
+  display: flex;
+  justify-content: space-between;
+}
+.player-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.player-play {
+  --lip-c: var(--color-lip-gold);
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  box-shadow:
+    var(--inset-shadow-lit-gold),
+    0 4px 0 var(--lip-c);
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out;
+}
+.player-play svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+.player-play:active {
+  transform: translateY(4px);
+  box-shadow:
+    var(--inset-shadow-lit-gold),
+    0 0 0 var(--lip-c);
+}
+.player-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.player-progress {
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.player-left {
+  min-width: 28px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.74);
+  text-align: right;
+}
+.player-progress .progress-bar {
+  height: 100%;
+  background: #fff;
+}
+.art-circle:focus-visible,
+.player-play:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+  .player-desktop {
+    display: grid;
+  }
+  /* DESIGN.md "On a computer" player: ✕ top left; the count and full screen top right, 12 apart */
+  .player-top {
+    gap: 12px;
+    padding: 16px 16px 0;
+  }
+  .count-pill {
+    margin-top: 8px;
+  }
+  /* the progress bar, and 12 under it one row: the artist, the transport, then the four buttons */
+  .player-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      "bar bar bar"
+      "who transport rail";
+    align-items: center;
+    column-gap: 24px;
+    row-gap: 12px;
+    padding: 104px 24px 20px;
+  }
+  .player-bar {
+    grid-area: bar;
+  }
+  .player-who {
+    grid-area: who;
+  }
+  .player-transport {
+    grid-area: transport;
+    gap: 12px;
+  }
+  .player-rail {
+    grid-area: rail;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  /* Post info: a 360 panel at the right; the picture, the shades and the controls end beside it */
+  .player-stage,
+  .player-chrome,
+  .player-center {
+    transition: right 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .player[data-info] .player-stage,
+  .player[data-info] .player-chrome,
+  .player[data-info] .player-center {
+    right: 376px;
+  }
+  .player [aria-expanded="true"].art-circle {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 0 0 2px var(--color-gold);
+  }
+  .sheet-layer[data-side] {
+    inset: 8px 8px 8px auto;
+    width: 360px;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+  .sheet-layer[data-side] .sheet-dim,
+  .sheet-layer[data-side] .sheet-grab {
+    display: none;
+  }
+  .sheet-layer[data-side] .sheet {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    padding: 0 0 16px;
+    box-shadow: var(--inset-shadow-lit), var(--shadow-float);
+    animation: side-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+@keyframes side-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+.player-stage {
+  position: absolute;
+  inset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .player,
+  .player-chrome {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* For You: "Ranked 3 min ago" under the title, the progress loader's room, the Update ranking pill */
+.screen-sub {
+  margin-top: 2px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.feed-loader {
+  display: grid;
+  place-items: center;
+  min-height: 50dvh;
+  padding: 24px 0;
+}
+.section-title {
+  margin: 32px 0 12px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: var(--text-section--font-weight);
+}
+.top-pill-row {
+  position: sticky;
+  z-index: 30;
+  top: 12px;
+  display: flex;
+  justify-content: center;
+  height: 0;
+  overflow: visible;
+}
+/* The new-posts pill (DESIGN.md): Raised Highlight, gold arrow, a lip and a float shadow. */
+.top-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--spacing-control-compact);
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+}
+.top-pill svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.4;
+  color: var(--color-gold);
+}
+.top-pill:active {
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c),
+    0 8px 18px rgba(0, 0, 0, 0.4);
+}
+.top-pill:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Tune: For You's profile (UX §5, DESIGN.md "Tune") */
+.screen-lede + .screen-note,
+.screen-lede + .list-group {
+  margin-top: 16px;
+}
+.tune-error {
+  margin: -8px 0 16px 16px;
+  font-size: var(--text-footnote);
+  color: var(--color-danger);
+}
+.tune-note {
+  max-width: 65ch;
+  margin: 0 0 12px;
+  padding: 0 16px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.panel-card .tune-note {
+  margin: 8px 0 0;
+  padding: 0;
+}
+.tune-tags {
+  margin-top: 8px;
+}
+.tune-find {
+  margin-bottom: 4px;
+}
+/* A kind of tag inside the list ("Pinned", "Searched…"): a label row, no divider under it. */
+.tune-group {
+  padding: 12px 16px 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.list-group > li.tune-group + li.list-row::before {
+  display: none;
+}
+.tune-tag .row-text {
+  margin-right: 8px;
+}
+.tune-tag-name {
+  overflow: hidden;
+  font-size: var(--text-tag-list);
+  line-height: var(--text-tag-list--line-height);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tune-tag[data-dim] .row-text {
+  opacity: 0.5;
+}
+.tune-tag[data-muted] .row-text {
+  opacity: 0.5;
+}
+.tune-tag[data-muted] .tune-tag-name {
+  text-decoration: line-through;
+}
+
+/* Following (UX §5): New on a card, the caught-up divider, a folded run, the Play count */
+.feed-tile[data-new]::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 2px rgba(2, 15, 35, 0.6);
+}
+/* Caught up (DESIGN.md): the 56 app mark between two 2 px rules that fade toward the edges. */
+.feed-caught {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  padding-top: 8px;
+  overflow: hidden;
+  text-align: center;
+  background:
+    linear-gradient(90deg, transparent, rgba(180, 199, 217, 0.22)) 0 35px / calc(50% - 44px) 2px no-repeat,
+    linear-gradient(270deg, transparent, rgba(180, 199, 217, 0.22)) 100% 35px / calc(50% - 44px) 2px no-repeat;
+}
+.feed-caught-mark {
+  width: var(--spacing-avatar-l);
+  height: var(--spacing-avatar-l);
+  margin-bottom: 12px;
+}
+.feed-caught b {
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.feed-caught small {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.feed-burst {
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 14px 0 16px;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+}
+.feed-burst svg {
+  color: var(--color-link);
+}
+.feed-burst span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.play-fab-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--color-ground);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px var(--color-gold);
+}
+.screen-sub b {
+  font-family: var(--font-rounded);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.sheet-note {
+  padding: 8px 4px 0;
+  color: var(--color-link);
+}
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Pull to refresh (UX §4): a round spinner under the header, following the finger at half travel. */
+.ptr {
+  position: fixed;
+  z-index: 35;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  box-shadow: 0 6px 16px rgba(2, 15, 35, 0.5);
+  opacity: 0;
+  transform: translate(-50%, -48px);
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1.2),
+    opacity 200ms ease-out;
+  pointer-events: none;
+}
+.ptr svg {
+  width: 20px;
+  height: 20px;
+}
+.ptr[data-armed="true"] svg {
+  scale: 1.15;
+}
+.ptr[data-busy] svg {
+  animation: ptr-spin 700ms linear infinite;
+}
+@keyframes ptr-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ptr {
+    transition: opacity 200ms ease-out;
+  }
+  .ptr[data-busy] svg {
+    animation-duration: 2s;
+  }
+}
+
+/* ---- v6 parts (DESIGN.md "Lists", "Field", "Segmented control", "Switch, stepper, slider, toggle";
+   mocks/screens-v6.html: group6, srow6, field6, seg6, sw6, step6, range6, tog6, grid6, tile6) ---- */
+
+/* Back: a 44 Panel circle with top light; shrinks to 94% when pressed. */
+.toolbar-circle {
+  transition: transform 100ms ease-out;
+}
+.toolbar-circle:active {
+  transform: scale(0.94);
+}
+.tools .toolbar-circle:active {
+  transform: none;
+}
+/* A pushed screen's header: back, then whatever the screen puts in the row, tools at the right. */
+.head-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--spacing-control);
+  margin-top: 12px;
+}
+.head-row > .grow {
+  flex: 1;
+  min-width: 0;
+}
+.screen-lede {
+  margin-top: 2px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+
+/* Group label: footnote-rounded, muted, 16 in, 8 above its panel; an action ends 16 in. */
+.list-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  margin: 16px 0 8px;
+  padding-left: 16px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.list-label > button,
+.list-label > span:last-child:not(:first-child) {
+  position: relative;
+  height: 28px;
+  padding: 0 16px 0 12px;
+  font: inherit;
+}
+.list-label > button {
+  color: var(--color-link);
+}
+.list-label > button::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+
+/* Group: one Panel, 24 radius, 16 below. Rows divide with a line that starts at the text. */
+.title-row + .list-group {
+  margin-top: 8px;
+}
+.list-group {
+  --div: 60px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+  overflow: hidden;
+}
+.list-group[data-flat] {
+  --div: 16px;
+}
+.list-group > li {
+  list-style: none;
+}
+.list-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--spacing-list-row);
+  padding: 8px 16px;
+  text-align: left;
+  color: var(--color-fg);
+  text-decoration: none;
+}
+.list-group > li + li > .list-row::before,
+.list-group > .list-row + .list-row::before,
+.list-group > li + li.list-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--div);
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+.list-row:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+.row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.row-text > b {
+  overflow: hidden;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-text > small {
+  overflow: hidden;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.row-value {
+  flex: none;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* A chevron's ink, not its box, sits 16 from the edge. */
+.row-chev {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0 -5px 0 -4px;
+  color: var(--color-muted);
+}
+.row-more {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: -10px;
+  border-radius: 999px;
+  color: var(--color-link);
+}
+.row-more::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.row-more svg {
+  width: 20px;
+  height: 20px;
+}
+.row-more:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 0;
+}
+/* Icon well: 32 round, sunk (the row is the button); the glyph is centred (owner, 2026-11-26: the
+   0.5 drop read as off centre). */
+.row-well {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+}
+.row-well svg {
+  width: 20px;
+  height: 20px;
+}
+/* Optical centring (owner, 2026-11-26: "make sure these and others are centered"): glyphs whose
+   weight sits off their box's middle, nudged by a share of their own size. Sign in's arrow and
+   bracket lean right; the feed's arcs sit low left; the second person leaves the users glyph left
+   heavy; the drops sit low. The tab bar's Goo Ink copies take the same (TabBar INK_NUDGE). */
+svg.lucide-log-in {
+  translate: -5% 0;
+}
+svg.lucide-rss {
+  translate: 4% -4%;
+}
+svg.lucide-users {
+  translate: 4% 0;
+}
+svg.lucide-droplets {
+  translate: 2% -4%;
+}
+.row-well[data-tone="pink"] {
+  color: var(--color-heart);
+}
+.row-well[data-tone="gold"] {
+  color: var(--color-gold);
+}
+.list-row .btn-tonal {
+  flex: none;
+}
+
+/* Field: a 44 sunk capsule you type in; 14 left, 16 right. */
+.field6 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: var(--spacing-control);
+  padding: 0 16px 0 14px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-muted);
+}
+.field6:focus-within {
+  box-shadow:
+    var(--shadow-sunk),
+    inset 0 0 0 1.5px var(--color-gold);
+}
+.field6 > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.field6 input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--color-fg);
+  caret-color: var(--color-gold);
+  outline: none;
+}
+.field6 input::placeholder {
+  color: var(--color-muted);
+}
+.field6 input::-webkit-search-cancel-button {
+  display: none;
+}
+.field6[data-has] {
+  padding-right: 10px;
+}
+.field-clear {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  color: var(--color-link);
+}
+.field-clear::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+.field-clear svg {
+  width: 14px;
+  height: 14px;
+}
+.field-value {
+  flex: none;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* A field used as a button: looks the same, opens the real one. */
+button.field6 {
+  text-align: left;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+button.field6 > svg {
+  color: var(--color-muted);
+}
+button.field6 > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+button.field6:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* A search shown as text: tags joined by a muted middle dot. */
+.tag-dot {
+  color: var(--color-muted);
+}
+
+/* Autocomplete under a field: a flat group of 48 rows. */
+.suggest {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 336px;
+  overflow: auto;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow:
+    var(--inset-shadow-lit),
+    var(--shadow-float);
+}
+.suggest > li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+.suggest > li + li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+/* the row under the pointer or the arrow keys: the Inset wash, 4 inside, the panel's 24 less 4 */
+.suggest > li::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+  pointer-events: none;
+}
+.suggest > li::before {
+  transition: opacity 100ms ease-out;
+}
+.suggest > li[aria-selected="true"]::after {
+  opacity: 1;
+}
+.suggest > li[aria-selected="true"]::before,
+.suggest > li[aria-selected="true"] + li::before {
+  opacity: 0;
+}
+.suggest-tag {
+  overflow: hidden;
+  font-size: var(--text-tag-list);
+  line-height: var(--text-tag-list--line-height);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.suggest-was {
+  color: var(--color-muted);
+}
+.suggest-artist {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.suggest-mark {
+  flex: none;
+  width: var(--spacing-avatar-s);
+  height: var(--spacing-avatar-s);
+}
+.suggest-artist .suggest-tag {
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+/* Segmented control: a sunk track; the chosen segment rides a capsule that slides to it. */
+.seg {
+  --i: 0;
+  --n: 2;
+  position: relative;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  height: var(--spacing-control-compact);
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.seg > button {
+  position: relative;
+  z-index: 1;
+  border-radius: 999px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+  white-space: nowrap;
+  transition: color 200ms ease-out;
+}
+.seg > button::before {
+  content: "";
+  position: absolute;
+  inset: -7px 0;
+}
+.seg > button[aria-checked="true"] {
+  color: var(--color-fg);
+}
+.seg > button:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 0;
+}
+.seg-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 1px 0 rgba(2, 15, 35, 0.5);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 360ms var(--ease-slide);
+}
+.seg[data-big] {
+  height: var(--spacing-control);
+}
+.seg[data-big] > button {
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+}
+
+/* Switch: a 51 × 31 well with a link-blue knob; on, a Score Green track and a white knob. */
+.switch {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  transition: background-color 200ms ease-out;
+  cursor: pointer;
+}
+.switch::before {
+  content: "";
+  position: absolute;
+  inset: -7px 0;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 999px;
+  background: var(--color-link);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 2px 0 rgba(2, 15, 35, 0.4);
+  transition:
+    transform 300ms var(--ease-slide),
+    background-color 200ms ease-out;
+}
+.switch:checked {
+  background: var(--color-score);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+.switch:checked::after {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+/* Stepper: two 36 raised circles with a 2 lip around a callout value. */
+.stepper {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+.stepper > button {
+  --lip: 2px;
+  --lip-c: var(--color-lip-navy);
+  --lit: var(--inset-shadow-lit);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--spacing-control-compact);
+  height: var(--spacing-control-compact);
+  border-radius: 999px;
+  background: var(--color-raised);
+  color: var(--color-fg);
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c);
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out;
+}
+.stepper > button::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.stepper > button:active {
+  transform: translateY(var(--lip));
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c);
+}
+.stepper > button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.stepper > button svg {
+  width: 18px;
+  height: 18px;
+}
+.stepper output {
+  min-width: 44px;
+  text-align: center;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slider: a 12 well track filled in Link Blue up to a 28 white thumb; 44 tall to touch. */
+.slider {
+  --p: 0.5;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: var(--spacing-control);
+  margin: 0;
+  background: none;
+  cursor: pointer;
+}
+.slider::-webkit-slider-runnable-track {
+  /* the fill ends under the thumb's centre, which travels the track less one thumb */
+  --fill: calc(14px + (100% - 28px) * var(--p));
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-link) var(--fill), var(--color-well) var(--fill));
+  box-shadow: var(--shadow-sunk);
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -8px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    inset 0 -2px 0 rgba(2, 15, 35, 0.12),
+    0 3px 0 rgba(2, 15, 35, 0.55);
+}
+.slider::-moz-range-track {
+  --fill: calc(14px + (100% - 28px) * var(--p));
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-link) var(--fill), var(--color-well) var(--fill));
+}
+.slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 0 rgba(2, 15, 35, 0.55);
+}
+.slider:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+/* Toggle (Tune's Pin and Mute): a 36 circle, muted icon; on, Raised Highlight with a ring. */
+.toggle {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--spacing-control-compact);
+  height: var(--spacing-control-compact);
+  border-radius: 999px;
+  color: var(--color-muted);
+  transition: transform 100ms ease-out;
+}
+.toggle::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+.toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.toggle:active {
+  transform: scale(0.94);
+}
+.toggle[aria-pressed="true"] {
+  background: var(--color-raised-hi);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 0 0 1.5px var(--color-gold);
+  color: var(--color-fg);
+}
+.toggle[data-danger][aria-pressed="true"] {
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 0 0 1.5px var(--color-danger);
+  color: var(--color-danger);
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* A Panel card (Tune's Breadth): 24 radius, 16 padding. */
+.panel-card {
+  margin-bottom: 16px;
+  padding: 12px 16px 16px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+.panel-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+}
+.panel-card-head > span:last-child {
+  font-size: var(--text-footnote);
+  font-weight: 500;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.slider-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -4px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+
+/* The app mark at the foot of Settings. */
+.app-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 24px;
+  text-align: center;
+}
+.app-foot button {
+  border-radius: 999px;
+}
+.app-foot .mark {
+  width: var(--spacing-avatar-l);
+  height: var(--spacing-avatar-l);
+  margin-bottom: 8px;
+}
+.app-foot .wm {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+}
+.app-foot small {
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+
+/* Grid view: tiles cropped square, 16 radius, the sunk rim; score and favs under each one. */
+.feed-tile {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+.tile-art {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+  transition: transform 100ms ease-out;
+}
+.feed-tile:active .tile-art {
+  transform: scale(0.97);
+}
+.tile-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tile-video {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--spacing-control-well);
+  height: var(--spacing-control-well);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(2, 15, 35, 0.5);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+.tile-video svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  translate: 1px 0;
+}
+.tile-nums {
+  display: flex;
+  justify-content: space-between;
+  height: 18px;
+  padding: 0 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.tile-nums > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.tile-nums svg {
+  width: 14px;
+  height: 14px;
+}
+.tile-up {
+  color: var(--color-score);
+}
+.tile-favs {
+  color: var(--color-heart);
+}
+.tile-favs[data-on] svg {
+  fill: currentColor;
+}
+.feed-tile[data-new]::after {
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 0 2.5px var(--color-ground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seg-thumb,
+  .switch,
+  .switch::after,
+  .stepper > button,
+  .toggle,
+  .toolbar-circle,
+  .tile-art {
+    transition: none;
+  }
+}
+
+/* Compact buttons (DESIGN.md "Buttons"): 36 tall, callout, 18 padding. */
+.btn-tonal[data-size="compact"],
+.btn-gold[data-size="compact"] {
+  height: var(--spacing-control-compact);
+  padding: 0 18px;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+}
+.btn-tonal[data-size="compact"] svg,
+.btn-gold[data-size="compact"] svg {
+  width: 16px;
+  height: 16px;
+}
+.btn-tonal:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* The account row: 72 tall, a 56 mark, the name in headline. */
+.list-row[data-account] {
+  min-height: 72px;
+}
+.list-row[data-account] .row-text > b {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+}
+.row-mark-l {
+  flex: none;
+  width: var(--spacing-avatar-l);
+  height: var(--spacing-avatar-l);
+}
+.list-group:has(.list-row[data-account]) {
+  --div: 84px;
+}
+
+/* Player sheets (DESIGN.md "Player sheets") */
+.quick-target {
+  margin-bottom: 16px;
+}
+/* The style previews bleed to the sheet's sides; the ring's gap is Panel colour here. */
+.style-row {
+  display: flex;
+  gap: 8px;
+  margin: 0 calc(-1 * var(--spacing-inset));
+  padding: 4px var(--spacing-inset) 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.style-row::-webkit-scrollbar {
+  display: none;
+}
+.style-pick {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 76px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.style-pick[aria-checked="true"] {
+  color: var(--color-fg);
+}
+.style-pick:focus-visible {
+  outline: none;
+}
+.style-pick:focus-visible .style-pic {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+}
+.style-pic {
+  position: relative;
+  display: block;
+  width: 76px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: var(--radius-art);
+  background: #000;
+  box-shadow: var(--shadow-sunk-art);
+  transition: transform 100ms ease-out;
+}
+.style-pick:active .style-pic {
+  transform: scale(0.96);
+}
+.style-pick[aria-checked="true"] .style-pic {
+  box-shadow:
+    0 0 0 2px var(--color-panel),
+    0 0 0 3.5px var(--color-gold);
+}
+/* A made-up little picture: a sun over hills, in the artist-mark colours. */
+.style-pic u {
+  position: absolute;
+  background:
+    radial-gradient(circle at 62% 34%, #ffe2a8 0 9%, transparent 10%),
+    radial-gradient(120% 60% at 30% 100%, #2f6f5a 0 45%, transparent 46%),
+    radial-gradient(110% 50% at 80% 100%, #3e8a6b 0 48%, transparent 49%),
+    linear-gradient(#f3946b, #5b9be0 80%);
+}
+.style-pic[data-style="classic"] u {
+  inset: 22px 0;
+}
+.style-pic[data-style="kenburns"] u {
+  inset: -10px -22px -10px -6px;
+}
+.style-pic[data-style="collage"] u:nth-child(1) {
+  inset: 0 27px 0 0;
+}
+.style-pic[data-style="collage"] u:nth-child(2) {
+  inset: 0 0 51px 51px;
+  filter: hue-rotate(140deg);
+}
+.style-pic[data-style="collage"] u:nth-child(3) {
+  inset: 51px 0 0 51px;
+  filter: hue-rotate(250deg);
+}
+.style-pic[data-style="prints"] u {
+  inset: 20px 12px 24px;
+  transform: rotate(-6deg);
+  box-shadow: 0 0 0 3px #f4f1ea;
+}
+.style-pic[data-style="reflections"] u:nth-child(1) {
+  inset: 6px 10px 46px;
+}
+.style-pic[data-style="reflections"] u:nth-child(2) {
+  inset: 56px 10px -4px;
+  transform: scaleY(-1);
+  opacity: 0.3;
+}
+.quick-fit {
+  flex: none;
+  width: 168px;
+}
+.sheet-more {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: -10px;
+}
+.sheet-more svg {
+  color: var(--color-muted);
+}
+
+/* Post info: the artist is the heading. */
+.info-head {
+  margin-bottom: 12px;
+}
+.info-who {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-align: left;
+}
+.info-who .row-text > b {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-headline);
+  line-height: 20px;
+}
+.info-who .row-text > b svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--color-muted);
+}
+.info-who .row-text > small {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+}
+.info-who:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+.stat-wells {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.stat-well {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.stat-well b {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.stat-well b svg {
+  width: 16px;
+  height: 16px;
+}
+.stat-well small {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.stat-up {
+  color: var(--color-score);
+}
+.stat-heart {
+  color: var(--color-heart);
+  fill: currentColor;
+}
+.stat-well b[data-rating="s"] {
+  color: var(--color-score);
+}
+.stat-well b[data-rating="q"] {
+  color: var(--color-gold);
+}
+.stat-well b[data-rating="e"] {
+  color: var(--color-danger);
+}
+.info-why {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.info-why svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--color-link);
+}
+.info-why b {
+  font-weight: 500;
+  color: var(--color-fg);
+}
+.info-label {
+  display: flex;
+  gap: 6px;
+  margin: 16px 0 8px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+.info-label span {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+/* Tags wrap here: 8 apart, 12 between lines, a 40 tall touch area. */
+.info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 8px;
+}
+.info-tags .post-tag::before {
+  inset: -6px 0;
+}
+.info-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 -10px;
+}
+.info-foot small {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-muted);
+}
+.info-foot .link-row {
+  flex: none;
+  padding-right: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-thumb,
+  .menu-row,
+  .style-pic {
+    transition: none;
+  }
+}
+
+/* Goo the mascot (DESIGN.md "Goo (the mascot)"): a toy. Squash under the finger, spring back on
+   release; the arm waves three times, the z's drift. Pointer only. */
+.goo {
+  display: block;
+  flex: none;
+  overflow: visible;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.goo .goo-bd,
+.goo .goo-arm,
+.goo .goo-tick,
+.goo .goo-zz {
+  transform-box: view-box;
+}
+.goo .goo-bd {
+  transform-origin: 60px 100px;
+  transition: transform 100ms ease-out;
+}
+.goo.goo-press .goo-bd {
+  transform: scale(1.07, 0.9);
+}
+.goo.goo-pop .goo-bd {
+  animation: goo-pop 420ms cubic-bezier(0.3, 0, 0.3, 1);
+}
+@keyframes goo-pop {
+  0% {
+    transform: scale(1.07, 0.9);
+  }
+  35% {
+    transform: scale(0.94, 1.09);
+  }
+  65% {
+    transform: scale(1.03, 0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+.goo .goo-arm {
+  transform-origin: 89px 78px;
+  animation: goo-wave 900ms ease-in-out 400ms 3;
+}
+.goo .goo-tick {
+  animation: goo-tick 900ms ease-in-out 400ms 3 both;
+}
+.goo .goo-zz {
+  animation: goo-zz 3.2s ease-in-out infinite;
+}
+@keyframes goo-wave {
+  50% {
+    transform: rotate(16deg);
+  }
+}
+@keyframes goo-tick {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes goo-zz {
+  50% {
+    transform: translate(2px, -3px);
+    opacity: 0.6;
+  }
+}
+/* busy: the face holds left, slides right, holds, slides back every 3.2 s; the dots light in turn */
+.goo[data-mood="busy"] .goo-face {
+  animation: goo-look 3.2s ease-in-out infinite;
+}
+@keyframes goo-look {
+  0%,
+  30% {
+    transform: translateX(-3.5px);
+  }
+  45%,
+  80% {
+    transform: translateX(3.5px);
+  }
+  95%,
+  100% {
+    transform: translateX(-3.5px);
+  }
+}
+.goo .goo-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.35;
+  animation: goo-dot 1.2s ease-in-out infinite;
+}
+.goo .goo-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.goo .goo-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes goo-dot {
+  0%,
+  40%,
+  100% {
+    opacity: 0.35;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .goo *,
+  .goo.goo-pop .goo-bd {
+    animation: none !important;
+    transition: none !important;
+  }
+  .goo .goo-tick {
+    opacity: 0;
+  }
+}
+
+/* States (DESIGN.md "States"): Goo → 12 → headline → 4 → the sentence → 16 → the way out. */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--spacing-inset);
+  text-align: center;
+}
+.state[data-screen] {
+  margin-top: 64px;
+}
+.state > .goo {
+  margin-bottom: 12px;
+}
+.state-head {
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+  text-wrap: balance;
+}
+.state-text {
+  max-width: 30ch;
+  margin-top: 4px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+.state-acts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+}
+.state-acts .btn-gold,
+.state-acts .btn-tonal {
+  height: var(--spacing-control);
+  padding: 0 24px;
+}
+.state-icon {
+  width: 18px !important;
+  height: 18px !important;
+  margin-left: -4px;
+}
+/* What e621 said: a well capsule the size of a tag, 12 above the button. */
+.state-said {
+  max-width: 100%;
+  margin-bottom: 12px;
+  padding: 5px 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The quiet button: the lesser way out, under a gold or tonal one. No fill, no lip. */
+.btn-quiet {
+  height: var(--spacing-control);
+  padding: 0 16px;
+  border-radius: 999px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.btn-quiet:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.btn-quiet:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* An error sits in a panel where the first post would be. */
+.state-panel {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 24px 0;
+  border-radius: 24px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+/* The landing card (Following signed out): the screen's one gold fill. */
+.state-hello {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px 0 24px;
+  padding: 20px 16px 16px;
+  border-radius: 24px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+  text-align: center;
+}
+/* the wordmark under Goo (owner: "Approve"): 4 under Goo, 22 above the headline */
+.state-hello .wm {
+  margin: 4px 0 10px;
+  font-size: 28px;
+  line-height: 34px;
+}
+.state-hello .state-head {
+  margin-top: 12px;
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+}
+.state-hello .state-text {
+  max-width: none;
+  margin-bottom: 16px;
+}
+.state-hello .btn-gold {
+  width: 100%;
+  height: var(--spacing-control);
+}
+.state-hello + .section-title {
+  margin-top: 0;
+}
+/* Offline: a sunk capsule under the header, not a button. */
+.state-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--spacing-control-compact);
+  margin-bottom: 12px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.state-banner svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-muted);
+}
+.state-banner[data-ok] {
+  color: var(--color-fg);
+}
+.state-banner[data-ok] svg {
+  color: var(--color-score);
+}
+/* Loading more failed: one row at the end of the feed. */
+.feed-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding-left: 16px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+  text-align: left;
+}
+.feed-more-row .btn-tonal {
+  flex: none;
+  height: var(--spacing-control-compact);
+  padding: 0 16px;
+  font-size: var(--text-callout);
+}
+/* The end of a feed: the caught-up moment with other words. */
+.feed-caught.feed-end-moment {
+  width: 100%;
+  padding-top: 0;
+}
+/* Play waits until the landing card has scrolled away. */
+.play-fab[data-gated] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+
+/* First run after sign-in (DESIGN.md "First run after sign-in"): the read, the pick list, the gold
+   Follow N artists where Play stands, and the row it folds into after Skip for now. */
+.first-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.first-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 248px;
+  max-width: 100%;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.first-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.first-steps li[data-state="now"] {
+  color: var(--color-fg);
+}
+.first-steps li > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.first-steps em {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+.first-step-n,
+.pick-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-size: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+}
+.first-step-n svg,
+.pick-check svg {
+  width: 16px;
+  height: 16px;
+}
+li[data-state="done"] .first-step-n {
+  color: var(--color-score);
+}
+li[data-state="done"] .first-step-n svg,
+.pick-row[data-just] .pick-check svg {
+  animation: check-pop 320ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+.first-spin {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid var(--color-raised);
+  border-top-color: var(--color-link);
+  animation: spin 800ms linear infinite;
+}
+.first-skipped {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+.first-pick {
+  padding-bottom: 196px;
+}
+.first-sub {
+  margin-bottom: 16px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.list-label > .list-label-two {
+  display: inline-flex;
+  padding: 0 4px 0 0;
+}
+.list-label-two button {
+  position: relative;
+  height: 28px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--color-link);
+}
+.list-label-two button::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.row-mark {
+  width: var(--spacing-avatar);
+  height: var(--spacing-avatar);
+}
+.list-group:has(.row-mark) {
+  --div: 64px;
+}
+.pick-check {
+  color: transparent;
+  transition: background-color 150ms ease-out;
+}
+.pick-row[aria-checked="true"] .pick-check {
+  background: var(--color-score);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: var(--color-ground);
+}
+.first-cta {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: calc(var(--bar-bottom) + 78px);
+  width: min(calc(100% - 2 * var(--spacing-inset)), 480px);
+  translate: -50% 0;
+}
+.first-cta .btn-gold {
+  width: 100%;
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    var(--shadow-float);
+}
+.first-cta .btn-gold svg {
+  width: 18px;
+  height: 18px;
+}
+.first-cta .btn-gold:disabled {
+  opacity: 1;
+  background: var(--color-panel);
+  color: var(--color-muted);
+  box-shadow:
+    var(--inset-shadow-lit),
+    var(--shadow-float);
+}
+@media (prefers-reduced-motion: reduce) {
+  li[data-state="done"] .first-step-n svg,
+  .pick-row[data-just] .pick-check svg,
+  .first-spin {
+    animation: none;
+  }
+  .pick-check {
+    transition: none;
+  }
+}
+
+/* Artists (DESIGN.md "Artists"): the 44 segmented control, the filter row, artist rows, the
+   footnote, and Suggested's artist cards at full width. */
+.artists-seg {
+  margin: 8px 0 12px;
+}
+.seg-count {
+  margin-left: 2px;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.artists-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.artists-tools > .field6 {
+  flex: 1;
+  min-width: 0;
+}
+.artists-tools > .chip {
+  flex: none;
+}
+.artist-row {
+  min-height: 60px;
+  padding: 0 16px 0 0;
+}
+.artist-row-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 8px 0 8px 16px;
+  text-align: left;
+}
+.artist-row-open:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.artist-row-open:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+.artist-row .row-text > b {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+}
+.list-foot {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.artists-banner {
+  margin-bottom: 16px;
+}
+.sugg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+.sugg-card {
+  padding: 8px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+.sugg-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.sugg-tile {
+  aspect-ratio: 1;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.sugg-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sugg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px 0 0;
+}
+.sugg-who {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 0 0 4px;
+  text-align: left;
+}
+.sugg-who:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+.sugg-head .follow-pill {
+  flex: none;
+}
+.sheet-cta .btn-gold {
+  width: 100%;
+}
+.first-pick-sheet .first-sub {
+  margin-top: 0;
+}
+
+/* Popular artists (DESIGN.md "Popular artists"): Following, signed in, nothing to suggest from. */
+.popular-artists {
+  margin-top: 24px;
+}
+.popular-row {
+  min-height: 60px;
+}
+.popular-row .row-text > small {
+  font-variant-numeric: tabular-nums;
+}
+.popular-row .follow-pill {
+  flex: none;
+}
+.popular-sk {
+  gap: 6px;
+}
+.popular-sk .sk-line:first-child {
+  width: 55%;
+}
+.popular-sk .sk-line + .sk-line {
+  width: 30%;
+  height: 10px;
+}
+.popular-done {
+  justify-content: center;
+}
+
+/* Follow from favorites as a sheet: sheet rows (no side padding), 60 tall, divided from 48; the
+   list fades out over its last 24 as it scrolls. */
+.first-pick-sheet .list-group {
+  --div: 48px;
+  margin-bottom: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  /* (the row wash runs 8 past the rows) */
+  overflow: visible;
+}
+.first-pick-sheet .pick-row {
+  min-height: 60px;
+  padding-inline: 0;
+}
+.sheet-body:has(> .first-pick-sheet) {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}
+
+/* The artist page (DESIGN.md "Artist page" and "the artist page's edges"). */
+.artist-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 4px;
+}
+.hero-mark-box {
+  display: block;
+  position: relative;
+}
+.hero-mark,
+.hero-tag {
+  width: 80px;
+  height: 80px;
+}
+.hero-tag {
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+}
+.hero-tag svg {
+  width: 36px;
+  height: 36px;
+}
+.hero-title {
+  margin-top: 12px;
+  text-wrap: balance;
+}
+/* a very long name steps down one size on the closed scale, so it takes two lines, not five */
+.hero-title[data-long] {
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+}
+.hero-handle {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-link);
+  overflow-wrap: anywhere;
+}
+.hero-stats {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  min-height: 72px;
+  margin: 16px 0 0;
+  padding: 8px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+.hero-stats-wait {
+  opacity: 0.5;
+}
+.hero-stat {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.hero-stat-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+.hero-stat b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hero-stat b svg {
+  width: 16px;
+  height: 16px;
+}
+.hero-stat small {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.artist-hero .follow-hero {
+  width: 100%;
+  margin-bottom: 16px;
+}
+.follow-note {
+  text-align: center;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+/* The top bar (DESIGN.md "Top bar", owner-picked 2026-11-26 "Capsule"): once the title has scrolled
+   away, a floating capsule, the tab bar's sibling. The outer layer is the page fading to Ground behind
+   it; the capsule is 52 tall, Raised, 26 round, the floating shadow. On a tab it's the title row itself
+   (`TitleRow`): in the page its two layers are nothing (display: contents). */
+.topbar,
+.topbar .topcap {
+  display: contents;
+}
+.topcap-count {
+  display: none;
+}
+.topbar[data-at],
+.compact-bar {
+  position: fixed;
+  z-index: 40;
+  inset: 0 0 auto;
+  display: block;
+  height: calc(env(safe-area-inset-top) + 84px);
+  padding: calc(env(safe-area-inset-top) + 4px) var(--spacing-inset) 0;
+  /* Ground behind the clock, 80% 13 down the capsule, clear 25 under it */
+  background: linear-gradient(
+    var(--color-ground) max(0px, calc(env(safe-area-inset-top) - 7px)),
+    rgb(2 15 35 / 0.8) calc(env(safe-area-inset-top) + 17px),
+    rgb(2 15 35 / 0) calc(env(safe-area-inset-top) + 81px)
+  );
+  pointer-events: none;
+}
+.topbar[data-at] .topcap,
+.compact-bar .topcap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  border-radius: 26px;
+  background: var(--color-raised);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+/* on a tab: the title in headline 20 from the left end, the count in gold, the tools bare */
+.topbar[data-at] .topcap {
+  padding: 0 4px 0 20px;
+}
+.topbar[data-at] .screen-title {
+  flex: 0 1 auto;
+  margin: 0;
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar[data-at] .topcap-count {
+  display: block;
+  flex: none;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 600;
+  color: var(--color-gold);
+  font-variant-numeric: tabular-nums;
+}
+.topbar[data-at] .tools {
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.topbar[data-at="in"] {
+  animation: top-fade 150ms ease-out;
+}
+.topbar[data-at="in"] .topcap {
+  animation: top-drop 150ms ease-out;
+}
+.topbar[data-at="out"] {
+  animation: top-fade 150ms ease-out reverse both;
+}
+.topbar[data-at="out"] .topcap {
+  pointer-events: none;
+}
+@keyframes top-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes top-drop {
+  from {
+    transform: translateY(-8px);
+  }
+}
+/* on an artist page: bare Back 4 from the left end, the 24 mark, the name, the Follow pill 8 from the
+   right end. It's always there, faded out until the hero has gone. */
+.compact-bar {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.compact-bar .topcap {
+  gap: 8px;
+  padding: 0 8px 0 4px;
+  transform: translateY(-8px);
+  transition: transform 150ms ease-out;
+  pointer-events: none;
+}
+.compact-bar[data-show] {
+  opacity: 1;
+}
+.compact-bar[data-show] .topcap {
+  transform: none;
+  pointer-events: auto;
+}
+.compact-in > b {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.compact-back {
+  margin-right: -4px;
+  background: none;
+  box-shadow: none;
+}
+.compact-mark {
+  width: 24px;
+  height: 24px;
+}
+.compact-mark.hero-tag svg {
+  width: 14px;
+  height: 14px;
+}
+.compact-in .follow-pill {
+  flex: none;
+}
+/* on a computer: 584 wide, centred on the 600 column, 8 from the top, level with the sidebar; it
+   doesn't move when the grid goes wide */
+@media (min-width: 900px) {
+  .topbar[data-at],
+  .compact-bar {
+    left: var(--spacing-rail);
+    height: calc(env(safe-area-inset-top) + 84px);
+    padding: calc(env(safe-area-inset-top) + 8px) 0 0;
+    background: linear-gradient(rgb(2 15 35 / 0.86), rgb(2 15 35 / 0));
+  }
+  .topbar[data-at] .topcap,
+  .compact-bar .topcap {
+    width: 584px;
+    margin: 0 auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .topbar[data-at] .topcap {
+    animation: none;
+  }
+  .compact-bar .topcap {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* A chip's dropdown (DESIGN.md "Chip dropdown", owner-picked 2026-11-26): the sheet's Panel hung 8 under
+   the chip, no dim; one of a list is the Menu's own shape on Panel. */
+.drop-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.drop-catch {
+  position: absolute;
+  inset: 0;
+}
+.drop {
+  position: fixed;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px;
+  border-radius: var(--radius-sheet);
+  background: var(--color-panel);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+  animation: drop-in 150ms ease-out;
+  transform-origin: top left;
+}
+.drop[data-menu-shape] {
+  padding: 0;
+  border-radius: var(--radius-menu);
+}
+.drop .menu {
+  background: none;
+  box-shadow: none;
+}
+.drop .sheet-rows > .list-row {
+  padding-inline: 0;
+}
+.drop .menu-custom {
+  margin: 0;
+  padding: 12px;
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+.drop .link-lede,
+.drop .link-note {
+  margin-inline: 0;
+}
+.drop .link-lede {
+  margin-top: 12px;
+}
+.drop .link-mine {
+  width: 100%;
+  margin: 0 0 12px;
+}
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drop {
+    animation: none;
+  }
+}
+
+/* The sign-in sheet (DESIGN.md "Sign-in sheet"). */
+.signin {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+.signin-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.signin-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 28px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.signin-n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.signin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  font-weight: 600;
+  color: var(--color-link);
+}
+.signin-link svg {
+  width: 16px;
+  height: 16px;
+}
+.signin-label {
+  margin: 8px 0 6px 16px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+.signin-key input {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+.signin-paste.btn-tonal {
+  flex: none;
+  height: 32px;
+  padding: 0 14px;
+  margin-right: -6px;
+  font-size: var(--text-footnote);
+}
+.signin-hint,
+.signin-error {
+  margin: 8px 16px 0;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-danger);
+}
+.signin-hint {
+  color: var(--color-muted);
+}
+.signin-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 16px 4px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.signin-note svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--color-score);
+}
+.signin-remember {
+  padding-inline: 0 4px;
+}
+.signin-go {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Settings' sub-pages (DESIGN.md "Settings: Account, Content, For You, App"). */
+.settings-page .screen-title {
+  margin-bottom: 16px;
+}
+.group-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: -8px 16px 16px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.group-note svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: var(--color-danger);
+}
+.settings-wide {
+  width: 100%;
+  margin-top: 8px;
+}
+.rating-letter {
+  font-family: var(--font-rounded);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.rating-letter[data-rating="s"] {
+  color: var(--color-score);
+}
+.rating-letter[data-rating="q"] {
+  color: var(--color-rating-q);
+}
+.rating-letter[data-rating="e"] {
+  color: var(--color-danger);
+}
+.bl-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.bl-add .field6 {
+  flex: 1;
+  min-width: 0;
+}
+.bl-add .btn-tonal {
+  flex: none;
+  padding: 0 18px;
+}
+.bl-line {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--color-tag-general);
+  overflow-wrap: anywhere;
+}
+.bl-sep,
+.bl-neg {
+  color: var(--color-muted);
+}
+.bl-remove {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+}
+.bl-remove::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+.bl-remove svg {
+  width: 16px;
+  height: 16px;
+}
+.hidden-row {
+  min-height: 60px;
+}
+.hidden-who {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.settings-reset {
+  display: block;
+  margin: 0 auto;
+}
+.keys {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+.keys-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  font-size: var(--text-callout);
+}
+.keys-row dd {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+}
+.keys kbd {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* ---- Install the app (slice 8; DESIGN.md "Install, update and the app icon", proposed) ---- */
+.row-well[data-tone="green"] {
+  color: var(--color-score);
+}
+.install {
+  padding: 0 4px 4px;
+}
+.install-lead {
+  margin: 0 0 16px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-link);
+}
+.install-steps {
+  gap: 12px;
+}
+.install-step {
+  flex: 1;
+  min-width: 0;
+}
+.install-step b {
+  font-weight: 600;
+}
+.install-step small {
+  display: block;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.install-glyph {
+  display: grid;
+  flex: none;
+  color: var(--color-link);
+}
+.install-glyph svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+.install-note {
+  margin: 0;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.install-copy {
+  width: 100%;
+  height: 44px;
+}
+
+/* ---- Toast (slice 9; DESIGN.md "Toast", proposed) ---- */
+@property --undo-left {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+.toast6 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--color-raised-hi);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 12px 24px rgba(0, 0, 0, 0.4);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
+/* sonner centres the list (its --width comes from the Toaster's style); the toast hugs its words,
+   centred inside it, never past the 16 insets */
+@media (max-width: 600px) {
+  [data-sonner-toaster][data-x-position="center"] {
+    width: auto;
+  }
+}
+[data-sonner-toaster] [data-sonner-toast].toast6 {
+  left: 0;
+  right: 0;
+  width: max-content;
+  max-width: 100%;
+}
+/* 1: sonner moves its own ::before while swiping or leaving; the plain toast's mark stays put */
+[data-sonner-toaster] [data-sonner-toast].toast6:not(:has(> .toast6-mark))::before {
+  position: static;
+  inset: auto;
+  width: 28px;
+  height: 28px;
+  z-index: auto;
+  transform: none;
+}
+/* 3: a toast another replaced is gone for the keyboard and screen readers too */
+[data-sonner-toaster] [data-sonner-toast][data-visible="false"] {
+  visibility: hidden;
+}
+/* 7: focus keeps the toast's own light and shadow, with the gold ring */
+[data-sonner-toaster] [data-sonner-toast].toast6:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px var(--color-gold);
+}
+.toast6-undo:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+.toast6:has(.toast6-sub) {
+  min-height: 54px;
+  border-radius: 27px;
+}
+.toast6-mark,
+.toast6:not(:has(> .toast6-mark))::before {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+  overflow: hidden;
+}
+/* a plain toast's mark: the info glyph (lucide "info") in Link Blue on the well */
+.toast6:not(:has(> .toast6-mark))::before {
+  content: "";
+  background: var(--color-well) center / 16px no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4c7d9' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E");
+}
+.toast6-mark svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+}
+.toast6-mark svg[data-tone="danger"],
+.toast6-mark .tone-danger {
+  color: var(--color-danger);
+}
+.toast6-mark:has(svg[data-tone="ok"]) {
+  background: var(--color-score);
+  box-shadow: none;
+  color: var(--color-on-gold);
+}
+/* an artist's own mark fills the well */
+.toast6-mark .mark {
+  width: 28px;
+  height: 28px;
+}
+/* (over sonner's own 16 px icon box, injected after this sheet) */
+[data-sonner-toast].toast6 .toast6-mark {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  justify-content: center;
+}
+[data-sonner-toast].toast6 .toast6-mark svg {
+  margin: 0;
+}
+[data-sonner-toast].toast6 .toast6-mark .mark svg {
+  width: 100%;
+  height: 100%;
+}
+.toast6-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-right: 8px;
+}
+.toast6:has(.toast6-undo) .toast6-text {
+  padding-right: 4px;
+}
+.toast6-title {
+  overflow: hidden;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.toast6-sub {
+  overflow: hidden;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-link);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.toast6-undo {
+  position: relative;
+  flex: none;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+/* the hit area reaches 44 */
+.toast6-undo::before {
+  content: "";
+  position: absolute;
+  inset: -8px -4px;
+}
+/* the ring empties clockwise over the toast's 6 s; held while you hover or focus it */
+.toast6-undo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from -45deg, var(--color-link) var(--undo-left), transparent 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: undo-ring 6s linear forwards;
+  pointer-events: none;
+}
+[data-sonner-toaster]:hover .toast6-undo::after {
+  animation-play-state: paused;
+}
+/* 4: a toast updated in place (Following → Undo → Unfollowed) restarts its ring: two names, alternated */
+.toast6-undo.ring-b::after {
+  animation-name: undo-ring-b;
+}
+@keyframes undo-ring {
+  to {
+    --undo-left: 0%;
+  }
+}
+@keyframes undo-ring-b {
+  to {
+    --undo-left: 0%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast6-undo::after {
+    animation: none;
+  }
+}
+
+/* Settings on one page (a computer): each sub-page's groups under its name */
+.settings-section-title {
+  margin: 32px 16px 10px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.settings-section:first-of-type .settings-section-title {
+  margin-top: 12px;
+}
+.list-row[data-account] .btn-tonal {
+  margin-left: auto;
+  flex: none;
+}
+
+/* Holding a grid tile: the picture sinks to 96% before its menu rises */
+.tile-art {
+  transition: transform 120ms ease-out;
+}
+.feed-tile[data-held] .tile-art {
+  transform: scale(0.96);
+}
+.well-row[data-on] svg {
+  color: var(--color-heart);
+  fill: currentColor;
+}
+
+/* Under the pointer (DESIGN.md "Under the pointer", owner-approved 2026-11-26): only with a mouse or
+   trackpad, 100 ms ease-out, never after a tap. Three rules by what a thing is made of: a lip rises 1,
+   raised without a lip goes one material lighter, flat or sunk gets a 6% wash inside its container.
+   Pictures don't change. Rows are "Inset" (the row wash below). The press's own shrink keeps its
+   timing; with reduced motion the earlier rules stand. */
+@media (prefers-reduced-motion: no-preference) {
+  .chip,
+  .toolbar-circle,
+  .post-menu,
+  .compact-back,
+  .btn-quiet,
+  .field-clear,
+  .sheet-x,
+  .bl-remove,
+  .toast6-undo,
+  button.field6,
+  .art-circle {
+    transition:
+      background-color 100ms ease-out,
+      color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 100ms ease-out;
+  }
+  .post-tag {
+    transition:
+      background-color 100ms ease-out,
+      color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 150ms ease-out;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  /* Lift (owner-picked): a button with a lip rises 1 and its lip grows by 1. No colour change. A press
+     still sinks it (:active wins by being left out here). */
+  :is(.fav-pill, .follow-pill:not([aria-pressed="true"], .follow-pill-art), .btn-tonal:not(.follow-button[aria-pressed="true"]), .btn-gold, .stepper > button):not(:disabled, :active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c);
+  }
+  /* the ones floating over the page: their shadow on it grows by 1 too */
+  .top-pill:not(:active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c),
+      0 13px 24px rgba(0, 0, 0, 0.4);
+  }
+  :is(.first-cta .btn-gold, .play-fab:not([data-away])):not(:disabled, :active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c),
+      0 15px 28px rgba(0, 0, 0, 0.45);
+  }
+  .player-play:not(:active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--inset-shadow-lit-gold),
+      0 5px 0 var(--lip-c);
+  }
+
+  /* Raised, no lip: one step lighter. A chip that is on doesn't change. */
+  .chip:not([data-on]):hover,
+  .toolbar-circle:not(.tools .toolbar-circle, .compact-back):hover {
+    background: var(--color-raised);
+    color: var(--color-fg);
+  }
+  .field-clear:hover {
+    background: var(--color-raised-hi);
+    color: var(--color-fg);
+  }
+  .post-head:has(.post-by:hover) .post-avatar .mark svg {
+    background: var(--color-raised-hi);
+  }
+
+  /* An icon or words with no body: a 6% wash the size of the control, and it turns white. In the tools
+     capsule the wash is 40 by 36, 4 from the capsule on every side. A link only turns white. */
+  .tools .toolbar-circle:not([aria-pressed="true"]):hover {
+    padding-block: 4px;
+    background: rgba(255, 255, 255, 0.06) content-box;
+    color: var(--color-fg);
+  }
+  .post-menu:not(:active):hover,
+  .compact-back:not(:active):hover,
+  .btn-quiet:not(:disabled, :active):hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-fg);
+  }
+  .signin-link:hover {
+    color: var(--color-fg);
+  }
+
+  /* A well: the same wash over the well; an icon turns white. A tag keeps its e621 colour. */
+  /* (the well's colour mixed with 6% white: the same as a wash over it, and it fades) */
+  :is(.sheet-x, .bl-remove, .toast6-undo, .post-tag:not(.post-tag-more)):not(:active, [data-picked]):hover {
+    background-color: color-mix(in srgb, #fff 6%, var(--color-well));
+  }
+  :is(.sheet-x, .bl-remove, .toast6-undo):hover {
+    color: var(--color-fg);
+  }
+  .post-tag-more:hover {
+    box-shadow: inset 0 0 0 1.5px rgba(180, 199, 217, 0.32);
+    color: var(--color-link);
+  }
+  button.field6:hover {
+    background-color: color-mix(in srgb, #fff 6%, var(--color-well));
+    color: var(--color-link);
+  }
+
+  /* One of several: the words turn white, no wash (the capsule already marks the current one). */
+  .seg > button:not([aria-checked="true"]):hover,
+  .menu-row:not([aria-checked="true"]):hover,
+  .tube-tab:not([aria-current="page"]):hover {
+    color: var(--color-fg);
+  }
+
+  /* Glass on a picture: only its rim gets brighter. */
+  .art-circle:not(:disabled):hover {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  }
+}
+/* The row wash, "Inset" (DESIGN.md "Under the pointer", owner-approved 2026-11-26): 5% white,
+   floating 4 inside the row on every side, its corners the container's less 4 (20 in a panel, 12 in a
+   well). On a sheet or a dropdown the row has no side padding, so the wash is 8 wider than it on each
+   side with 16 corners. The same wash under a press and, with a mouse, under the pointer; the
+   dividers above and below it fade out. */
+:where(button.list-row, a.list-row, label.list-row, .well-row)::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+  pointer-events: none;
+}
+.well-row::after {
+  border-radius: 12px;
+}
+:is(.sheet-rows > .list-row, .first-pick-sheet .pick-row)::after {
+  inset: 4px -8px;
+  border-radius: 16px;
+}
+:is(.list-row, .well-row)::before {
+  transition: opacity 100ms ease-out;
+}
+:is(button.list-row, a.list-row, label.list-row, .well-row):not(:disabled, :has(input:disabled)):active::after {
+  opacity: 1;
+}
+:is(button.list-row, a.list-row, label.list-row, .well-row):active::before,
+:is(button.list-row, a.list-row, label.list-row, .well-row):active + :is(.list-row, .well-row)::before,
+li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-row::before {
+  opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(button.list-row, a.list-row, label.list-row, .well-row):not(:disabled, :has(input:disabled)):hover::after {
+    opacity: 1;
+  }
+  :is(button.list-row, a.list-row, label.list-row, .well-row):hover::before,
+  :is(button.list-row, a.list-row, label.list-row, .well-row):hover + :is(.list-row, .well-row)::before,
+  li:has(> :is(button.list-row, a.list-row, label.list-row):hover) + li > .list-row::before {
+    opacity: 0;
+  }
+  /* the empty check well also lifts */
+  .first-pick-sheet .pick-row[aria-checked="false"]:hover .pick-check {
+    background: var(--color-raised);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-art {
+    transition: none;
+  }
 }

@@ -1,4 +1,6 @@
 import type { Credentials } from "./e621/client";
+import { bigStorage } from "./bigStorage";
+import type { CurrentUser, Post, SavedSearchRow } from "./e621/types";
 import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
 import type { Profile } from "./recommend/profile";
@@ -56,6 +58,74 @@ export interface HistoryEntry {
 
 export const HISTORY_MAX = 20;
 
+/** For You's ranked list, so a reload or Back shows the same order (UX §3). */
+export interface RankedList {
+  /** the filters and account it was ranked for */
+  key: string;
+  /** the profile inputs it was ranked from (a later change offers Update ranking) */
+  inputs: string;
+  ids: number[];
+  at: number;
+}
+
+/** Following's "new since" threshold for a session (UX §5), so a reload shows the same dots. */
+export interface MarkerRecord {
+  threshold: number;
+  at: number;
+  /** marked seen since: the next load starts a new session from e621's marker */
+  marked: boolean;
+  /** e621's anchor row as last read, so a reload in the same session paints before asking again */
+  anchor?: SavedSearchRow;
+}
+
+/** Following's first posts as last loaded (instant paint), for one feed key. Remember only. */
+export interface FeedHead {
+  key: string;
+  at: number;
+  posts: Post[];
+  /** the highest id e621 sent for that page, before the blacklist and filters */
+  rawMax?: number;
+}
+export const FEED_HEAD_TTL = 10 * 60_000;
+
+export const FEED_HEAD_POSTS = 24;
+
+/**
+ * The tags you follow, as last read from e621: `[name, subscription id]` (null: followed, id not
+ * known yet). Remember only.
+ */
+export interface SubsRecord {
+  at: number;
+  tags: [string, number | null][];
+}
+
+/**
+ * Per-account records that persist only with Remember on (DECISIONS: signed-in data at rest):
+ * localStorage then, this tab's sessionStorage otherwise, so a reload still finds them.
+ */
+function readAccount<T>(key: string): T | null {
+  for (const s of [() => localStorage, () => sessionStorage]) {
+    try {
+      const raw = s().getItem(PREFIX + key);
+      if (raw !== null) return JSON.parse(raw) as T;
+    } catch {
+      // unreadable or off
+    }
+  }
+  return null;
+}
+function writeAccount(key: string, value: unknown, remember: boolean): void {
+  const stores = [() => localStorage, () => sessionStorage];
+  stores.forEach((s, i) => {
+    try {
+      if (value === null || (i === 0) !== remember) s().removeItem(PREFIX + key);
+      else s().setItem(PREFIX + key, JSON.stringify(value));
+    } catch {
+      // full or off: just not kept
+    }
+  });
+}
+
 export const storage = {
   loadSearch: (): SearchSettings => {
     const s = read("search", DEFAULT_SEARCH);
@@ -78,6 +148,16 @@ export const storage = {
   savePlayback: (p: PlaybackSettings) => write("playback", p),
   /** Only present when the user ticked "remember on this device". */
   loadCredentials: (): Credentials | null => read<Credentials | null>("creds", null),
+  /**
+   * The account as e621 last confirmed it (Remember only), so a reload is signed in at once and
+   * checks the key behind the first paint. No key in it.
+   */
+  loadAccount: (username: string): CurrentUser | null => {
+    const u = read<CurrentUser | null>(`account:${username}`, null);
+    return u && typeof u.id === "number" && u.id > 0 && u.name === username ? u : null;
+  },
+  saveAccount: (username: string, u: CurrentUser | null) =>
+    write(`account:${username}`, u && { id: u.id, name: u.name, blacklisted_tags: u.blacklisted_tags, tag_query_limit: u.tag_query_limit }),
   saveCredentials: (c: Credentials | null) => write("creds", c),
   /** Whether share links carry the sign-in. Off until the user turns it on; cleared on sign-out. */
   loadShareSignIn: (): boolean => read("shareSignIn", false),
@@ -103,10 +183,119 @@ export const storage = {
   saveTagCache: (c: TagCache): boolean => write("tagCache", c),
   loadOverrides: (username: string): Overrides => read(`overrides:${username}`, NO_OVERRIDES),
   saveOverrides: (username: string, o: Overrides) => write(`overrides:${username}`, o),
+  /** For You's filters (media, ranking window, min score): kept across visits. Validated by the caller. */
+  loadForYou: (): unknown => read<unknown>("forYou", null),
+  saveForYou: (f: unknown) => write("forYou", f),
+  /** Following's chips (media, hide favorited). Validated by the caller. */
+  loadFollowing: (): unknown => read<unknown>("following", null),
+  saveFollowing: (f: unknown) => write("following", f),
+  /** For You's last ranked list for an account. Saved only with Remember on; sign-out removes it. */
+  loadRanked: (username: string): RankedList | null => {
+    const r = read<RankedList | null>(`ranked:${username}`, null);
+    return r &&
+      typeof r.key === "string" &&
+      typeof r.inputs === "string" &&
+      Array.isArray(r.ids) &&
+      r.ids.every((id) => Number.isInteger(id) && id > 0) &&
+      typeof r.at === "number"
+      ? r
+      : null;
+  },
+  saveRanked: (username: string, r: RankedList | null) => write(`ranked:${username}`, r),
+  loadMarker: (username: string): MarkerRecord | null => {
+    const m = readAccount<MarkerRecord>(`marker:${username}`);
+    return m && Number.isInteger(m.threshold) && m.threshold >= 0 && typeof m.at === "number" ? { ...m, marked: m.marked === true } : null;
+  },
+  saveMarker: (username: string, m: MarkerRecord | null, remember: boolean) => writeAccount(`marker:${username}`, m, remember),
+  /** Where Following marked seen itself when e621 didn't take it (the local marker fallback). */
+  loadLocalSeen: (username: string): number => {
+    const n = readAccount<number>(`seen:${username}`);
+    return Number.isInteger(n) && (n as number) > 0 ? (n as number) : 0;
+  },
+  saveLocalSeen: (username: string, id: number | null, remember: boolean) => writeAccount(`seen:${username}`, id, remember),
+  loadFeedHead: (username: string, key: string, now: number): FeedHead | null => {
+    const h = readAccount<FeedHead>(`feedHead:${username}`);
+    if (!h || h.key !== key || typeof h.at !== "number" || now - h.at > FEED_HEAD_TTL || !Array.isArray(h.posts)) return null;
+    const posts = h.posts.filter((p) => p && Number.isInteger(p.id) && p.id > 0 && p.files?.original);
+    return posts.length ? { ...h, posts } : null;
+  },
+  /** Kept only with Remember on: a this-tab sign-in keeps nothing about its feed on disk. */
+  saveFeedHead: (username: string, head: FeedHead | null, remember: boolean) =>
+    writeAccount(`feedHead:${username}`, remember ? head : null, remember),
+  loadSubs: (username: string): SubsRecord | null => {
+    const r = readAccount<SubsRecord>(`subs:${username}`);
+    if (!r || typeof r.at !== "number" || !Array.isArray(r.tags)) return null;
+    const tags = r.tags.filter(
+      (t): t is [string, number | null] => Array.isArray(t) && typeof t[0] === "string" && t[0] !== "" && (t[1] === null || Number.isInteger(t[1])),
+    );
+    return { at: r.at, tags };
+  },
+  /** Kept only with Remember on, like the first posts. */
+  saveSubs: (username: string, r: SubsRecord | null, remember: boolean) => writeAccount(`subs:${username}`, remember ? r : null, remember),
+  /** Artists you said "Not interested" to (a choice, kept like pins and mutes). */
+  loadHiddenArtists: (username: string): string[] => {
+    const v = read<unknown>(`hiddenArtists:${username}`, []);
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x !== "") : [];
+  },
+  saveHiddenArtists: (username: string, names: string[]) => write(`hiddenArtists:${username}`, names.length ? names : null),
+  /** Following's first run was skipped ("Skip for now"): kept like the marker. */
+  loadFirstRunSkipped: (username: string): boolean => readAccount<boolean>(`firstRunSkipped:${username}`) === true,
+  saveFirstRunSkipped: (username: string, on: boolean, remember: boolean) => writeAccount(`firstRunSkipped:${username}`, on || null, remember),
+  /** Everything kept for an account (sign-out, or a sign-in without Remember). */
+  purgeAccount: (username: string) => {
+    writeAccount(`subs:${username}`, null, false);
+    write(`account:${username}`, null);
+    writeAccount(`feedHead:${username}`, null, false);
+    write(`ranked:${username}`, null);
+    writeAccount(`marker:${username}`, null, false);
+    writeAccount(`seen:${username}`, null, false);
+    writeAccount(`firstRunSkipped:${username}`, null, false);
+    // For You's read of the favorites, and what it learned from them (IndexedDB)
+    write(`profile:${username}`, null);
+    void bigStorage.del(`favFeatures:${username}`);
+    void bigStorage.del(`learned:${username}`);
+    // feed places name the account's queries (feeds.ts feedKey)
+    dropAnchors();
+  },
 };
+
+/** Where each feed was scrolled to (FeedView), kept a day. */
+/** The sign-in sheet's username, for this tab (a convenience, never the key). */
+export const SIGNIN_DRAFT = "e6ss:signin-username";
+
+export const ANCHOR_PREFIX = "e6ss:anchor:";
+export function dropAnchors(): void {
+  for (const s of [() => localStorage, () => sessionStorage]) {
+    try {
+      const store = s();
+      for (let i = store.length - 1; i >= 0; i--) {
+        const k = store.key(i);
+        if (k?.startsWith(ANCHOR_PREFIX)) store.removeItem(k);
+      }
+    } catch {
+      // storage off: nothing kept
+    }
+  }
+}
 
 export function pushHistory(history: HistoryEntry[], tags: string, now: number): HistoryEntry[] {
   const t = tags.trim();
   if (!t) return history;
   return [{ tags: t, at: now }, ...history.filter((h) => h.tags !== t)].slice(0, HISTORY_MAX);
+}
+
+// ---- tab bar goo ------------------------------------------------------------------------------
+
+/**
+ * How many favourites of goo are on the tab bar (DESIGN.md "Tab bar goo"). Kept like the other
+ * signed-in records (owner, 2026-11-25): on the device only with Remember (a saved key), for
+ * this tab otherwise; sign-out clears it (session.ts).
+ */
+export function loadGoo(): number {
+  const n = readAccount<unknown>("goo");
+  return typeof n === "number" && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+export function saveGoo(n: number, remember: boolean): void {
+  writeAccount("goo", n > 0 ? n : null, remember);
 }

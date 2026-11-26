@@ -126,7 +126,7 @@ export default function Gallery(props: GalleryProps) {
 
   return (
     <div ref={scroller} className="absolute inset-0 z-20 overflow-y-auto bg-black" data-testid="gallery">
-      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-line bg-panel/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-line bg-panel-old/95 px-4 py-3 backdrop-blur">
         <div className="min-w-0 flex-1">
           <p className="font-semibold" data-testid="gallery-count">
             {posts.length}

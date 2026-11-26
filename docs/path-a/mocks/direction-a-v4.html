@@ -1,0 +1,419 @@
+<title>Slideshow Visual Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: three 1:1 phones (375x812 CSS px = iPhone points): e621 colours with iOS structure (large titles,
+   photo-first cards, floating glass tab bar). Then the system as a reference. Page chrome stays neutral. */
+:root {
+  --bg: #1C1C1F; --panel: #252529; --line: rgba(255,255,255,.10); --fg: #EDECE8; --muted: #A9A7A1; --mark: #E8C446;
+  --f-page: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; } }
+:root[data-theme="light"] { --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f-page); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+h1 { font-size: 28px; line-height: 34px; margin: 0 0 8px; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 20px; line-height: 26px; margin: 56px 0 12px; text-wrap: balance; }
+h3 { font-size: 17px; line-height: 22px; margin: 0; }
+p { margin: 0 0 12px; max-width: 72ch; }
+.lede { color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; margin: 20px 0 28px; }
+.toggle { min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px var(--f-page); cursor: pointer; }
+.toggle[aria-pressed="true"] { border-color: var(--mark); }
+button:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.cols { display: flex; flex-wrap: wrap; gap: 40px 32px; justify-content: center; }
+.col { width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.col-head p { color: var(--muted); font-size: 14px; margin: 2px 0 0; }
+.phone-holder { width: 375px; height: 812px; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 20px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+th { font-weight: 600; white-space: nowrap; }
+thead th { color: var(--muted); font-size: 13px; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+ul.plain { margin: 0; padding-left: 20px; max-width: 74ch; }
+ul.plain li { margin-bottom: 8px; }
+.note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+/* ================= Phone mock: e621 colours, iOS structure ================= */
+.phone {
+  /* colour: e621 Hexagon navies and gold; small text lifted to AA */
+  --bg6: #020F23; --card: #152F56; --raised: #1F3C67; --raised-hi: #2A4B7C; --hair: rgba(180,199,217,.14);
+  --text: #FFFFFF; --link: #B4C7D9; --muted6: #A0ADC1; --gold: #E8C446; --on-gold: #020F23;
+  --t-artist: #F2AC08; --t-character: #00C900; --t-species: #F3946B; --t-general: #B4C7D9; --t-meta: #FFFFFF; --t-copyright: #FF77FF;
+  --r-e: #ED9393; --score: #5EC06A; --heart: #FF8A95;
+  --glass: rgba(21,47,86,.72);
+  /* type: iOS system font, iOS text styles */
+  --f: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  --t-large: 700 34px/41px var(--f); --t-section: 700 20px/25px var(--f); --t-head: 600 17px/22px var(--f);
+  --t-body: 400 15px/20px var(--f); --t-body-b: 600 15px/20px var(--f);
+  --t-foot: 400 13px/18px var(--f); --t-foot-b: 600 13px/18px var(--f); --t-tab: 600 11px/13px var(--f);
+  /* sizes */
+  --h-reg: 44px; --h-compact: 32px; --h-bar: 62px; --i: 24px; --i-text: 16px; --av: 36px; --av-hero: 88px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --inset: 16px; --pad: 12px; --r-card: 16px; --r-tile: 8px;
+  position: relative; width: 375px; height: 812px; border-radius: 44px; overflow: hidden;
+  background: var(--bg6); color: var(--text); font: var(--t-body); box-shadow: 0 0 0 10px #0A0A0B, 0 0 0 11px #3A3A3F; -webkit-font-smoothing: antialiased;
+}
+.phone :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; }
+.phone svg { width: var(--i); height: var(--i); fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; display: block; }
+.phone svg.it { width: var(--i-text); height: var(--i-text); stroke-width: 2.2; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 47px 0 120px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.status { position: absolute; z-index: 8; inset: 0 0 auto; height: 47px; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 40px; font: 600 15px/1 var(--f);
+  background: linear-gradient(var(--bg6) 60%, transparent); }
+.status .batt { width: 26px; height: 12px; border: 1.5px solid currentColor; border-radius: 4px; position: relative; }
+.status .batt::after { content: ""; position: absolute; inset: 1.5px 6px 1.5px 1.5px; background: currentColor; border-radius: 1.5px; }
+
+/* iOS nav: toolbar row of glass circle buttons, then the large title */
+.nav { display: flex; align-items: center; justify-content: space-between; height: var(--h-reg); padding: 0 var(--inset); }
+.nav .grp { display: flex; gap: var(--s2); margin-left: auto; }
+.gbtn { width: var(--h-reg); height: var(--h-reg); border-radius: 999px; display: grid; place-items: center; background: var(--card); color: var(--link); box-shadow: inset 0 0 0 1px var(--hair); }
+.gbtn svg { width: 20px; height: 20px; }   /* glyph inside a filled circle: iOS toolbar size */
+.large { padding: var(--s1) var(--inset) 0; }
+.large h1 { margin: 0; font: var(--t-large); letter-spacing: -0.02em; }
+.large .sub { font: var(--t-body); color: var(--muted6); margin-top: 2px; }
+.large .sub b { color: var(--gold); font-weight: 600; }
+
+/* Pills */
+.chips { display: flex; gap: var(--s2); padding: var(--s4) var(--inset) var(--s4); overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
+.chips::-webkit-scrollbar { display: none; }
+.pill { height: var(--h-compact); display: inline-flex; align-items: center; gap: 6px; padding: 0 var(--s3); border-radius: 999px; font: var(--t-foot-b); white-space: nowrap; flex: none; position: relative; }
+.pill::before { content: ""; position: absolute; inset: -6px 0; }
+.filter { background: var(--card); color: var(--text); box-shadow: inset 0 0 0 1px var(--hair); }
+.filter .it { color: var(--muted6); margin-right: -2px; }
+.filter[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); box-shadow: none; }
+.filter[aria-pressed="true"] .it { color: var(--on-gold); }
+.follow { background: var(--gold); color: var(--on-gold); }
+.follow.on { background: var(--raised-hi); color: var(--text); }
+.follow.wig { animation: wig .36s ease-out; }
+@keyframes wig { 25% { transform: rotate(-3deg) } 60% { transform: rotate(2deg) } 100% { transform: none } }
+.btn { height: var(--h-reg); display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); padding: 0 var(--s5); border-radius: 999px; font: var(--t-head); }
+.btn.gold { background: var(--gold); color: var(--on-gold); }
+.btn.gold svg { fill: currentColor; stroke: none; }
+.btn.quiet { background: var(--raised); color: var(--text); }
+
+/* Post: rounded picture, details underneath on the page background (no card box), like a trail listing */
+.post { margin: 0 var(--inset) var(--s5); }
+.post .media { border-radius: var(--r-card); overflow: hidden; }
+.ov { position: absolute; top: var(--s3); right: var(--s3); display: flex; gap: var(--s2); }
+.cbtn { width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; background: rgba(2,15,35,.55); color: #fff; position: relative;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.cbtn::before { content: ""; position: absolute; inset: -4px; }
+.cbtn svg { width: 20px; height: 20px; }
+.cbtn.on { color: var(--heart); } .cbtn.on svg { fill: currentColor; }
+.cbtn.pop svg { animation: pop .3s cubic-bezier(.2,.9,.3,1.4); }
+.post .body { padding: var(--s3) 0 0; gap: var(--s1); }
+.line1 { display: flex; align-items: center; gap: var(--s2); min-height: 24px; }
+.line1 b { font: var(--t-head); color: var(--t-artist); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line1 .t { font: var(--t-foot); color: var(--muted6); white-space: nowrap; }
+.line1 .more { margin-left: auto; }
+.newtxt { color: var(--gold); font-weight: 600; }
+.line2 { min-height: var(--h-compact); margin: 2px 0; display: flex; align-items: center; gap: 6px; font: var(--t-foot); color: var(--muted6); font-variant-numeric: tabular-nums; }
+.line2 .stat { color: var(--text); font-weight: 600; } .line2 .score { color: var(--score); } .line2 .rt { color: var(--r-e); font-weight: 600; }
+.line2 .sep { color: var(--muted6); }
+.post .tags6 { margin-top: var(--s1); }
+.card { margin: 0 var(--inset) var(--s4); background: var(--card); border-radius: var(--r-card); overflow: hidden; box-shadow: inset 0 0 0 1px var(--hair); }
+.media { position: relative; width: 100%; background: var(--art); }
+.media .vid { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; }
+.media .vid span { width: 56px; height: 56px; border-radius: 999px; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.media .vid svg { fill: #fff; stroke: none; margin-left: 3px; }
+.media .mute { position: absolute; right: var(--s3); bottom: var(--s3); width: var(--h-compact); height: var(--h-compact); border-radius: 999px; background: rgba(0,0,0,.55); display: grid; place-items: center; color: #fff; }
+.media .newtag { position: absolute; left: var(--s3); top: var(--s3); height: 28px; line-height: 28px; padding: 0 10px !important; padding: 0 var(--s2); border-radius: 999px; background: var(--gold); color: var(--on-gold); font: var(--t-foot-b); line-height: 24px; }
+.body { padding: var(--pad); display: flex; flex-direction: column; gap: var(--s2); }
+.who-row { display: flex; align-items: center; gap: var(--s3); min-height: var(--av); }
+.av { width: var(--av); height: var(--av); border-radius: 999px; position: relative; flex: none; display: block; }
+.av .k { position: absolute; inset: 0; border-radius: inherit; background:
+  radial-gradient(circle at 50% 50%, var(--c3) 0 18%, transparent 19%),
+  repeating-conic-gradient(from var(--rot), var(--c1) 0 22.5deg, var(--c2) 0 45deg, var(--c4) 0 67.5deg, var(--c2) 0 90deg); }
+.av.hero { width: var(--av-hero); height: var(--av-hero); box-shadow: 0 0 0 3px var(--bg6), 0 0 0 4px var(--hair); }
+.who { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.who b { font: var(--t-head); color: var(--t-artist); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who small { font: var(--t-foot); color: var(--muted6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.more { width: var(--h-reg); height: var(--h-reg); margin: -4px -12px -4px 0; display: grid; place-items: center; color: var(--muted6); flex: none; }
+.stats { display: flex; align-items: center; gap: var(--s4); font: var(--t-foot-b); font-variant-numeric: tabular-nums; min-height: var(--h-compact); }
+.stat { display: inline-flex; align-items: center; gap: var(--s1); }
+.fav { height: var(--h-compact); padding: 0 var(--s3) 0 10px; border-radius: 999px; background: var(--raised); color: var(--text); margin-right: 6px; font: var(--t-foot-b); }
+.fav.on { color: var(--heart); } .fav.on svg { fill: currentColor; }
+.fav.pop svg { animation: pop .3s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes pop { 0% { transform: scale(.8) } 60% { transform: scale(1.2) } 100% { transform: scale(1) } }
+.stats .score { color: var(--score); } .stats .rt { color: var(--r-e); }
+.stats .pid { margin-left: auto; color: var(--muted6); font-weight: 400; }
+.tags6 { display: flex; flex-wrap: wrap; gap: 2px var(--s3); font: var(--t-foot); max-height: 38px; overflow: hidden; }
+.tags6 .a { color: var(--t-artist); } .tags6 .c { color: var(--t-character); } .tags6 .s { color: var(--t-species); } .tags6 .g { color: var(--t-general); }
+.tags6 .m { color: var(--t-meta); } .tags6 .more6 { color: var(--muted6); }
+
+/* Feed rows */
+.burst { margin: calc(-1 * var(--s2)) var(--inset) var(--s4); width: calc(100% - 2 * var(--inset)); justify-content: space-between; padding: 0 var(--s4); font: var(--t-body-b); color: var(--link); background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); }
+.divider { display: flex; align-items: center; gap: var(--s3); height: var(--h-reg); padding: 0 var(--inset); color: var(--gold); font: var(--t-foot-b); }
+.divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid rgba(232,196,70,.4); }
+.divider span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Section header + horizontal card row */
+.shead { display: flex; align-items: center; justify-content: space-between; padding: var(--s5) var(--inset) var(--s3); }
+.shead h2 { margin: 0; font: var(--t-section); }
+.see { display: inline-flex; align-items: center; gap: 2px; height: var(--h-reg); margin-right: -6px; color: var(--link); font: var(--t-body-b); }
+.hrow { display: flex; gap: var(--s3); overflow-x: auto; padding: 0 var(--inset) var(--s4); scroll-snap-type: x mandatory; scroll-padding: 0 var(--inset); scrollbar-width: none; }
+.hrow::-webkit-scrollbar { display: none; }
+.acard { flex: none; width: 280px; scroll-snap-align: start; }
+.acard .collage { border-radius: var(--r-card); overflow: hidden; }
+.collage { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; height: 168px; }
+.collage i { background: var(--art); display: block; }
+.collage i:first-child { grid-row: 1 / 3; }
+.acard .body { padding: var(--s3) 0 0; }
+
+/* Artists screen */
+.segwrap { padding: var(--s4) var(--inset) 0; }
+.seg6 { height: var(--h-compact); display: grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); }
+.seg6 span { display: grid; place-items: center; border-radius: 999px; font: var(--t-foot-b); color: var(--muted6); }
+.seg6 span.on { background: var(--raised-hi); color: var(--text); }
+.banner { margin: var(--s4) var(--inset) 0; padding: var(--s4); border-radius: var(--r-card); background: var(--raised); display: flex; gap: var(--s3); align-items: center; }
+.banner .avs { display: flex; flex: none; }
+.banner .avs .av { width: 28px; height: 28px; box-shadow: 0 0 0 2px var(--raised); }
+.banner .avs .av + .av { margin-left: -10px; }
+.banner div.t { flex: 1; min-width: 0; }
+.banner b { font: var(--t-body-b); display: block; }
+.banner small { font: var(--t-foot); color: var(--link); }
+.stack { padding-top: var(--s4); }
+.stack .acard { width: auto; margin: 0 var(--inset) var(--s5); }
+.stack .collage { height: 200px; }
+
+/* Artist page */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: var(--s2) var(--inset) 0; }
+.hero h1 { margin: var(--s3) 0 0; font: 700 28px/34px var(--f); letter-spacing: -0.01em; }
+.hero .handle { font: var(--t-body-b); color: var(--t-artist); }
+.statrow { display: grid; grid-template-columns: repeat(3, 1fr); margin: var(--s5) var(--inset) 0; text-align: left; }
+.statrow div { display: flex; flex-direction: column; padding: 0 0 0 var(--s3); }
+.statrow div:first-child { padding-left: 0; }
+.statrow div + div { border-left: 1px solid var(--hair); }
+.statrow b { font: var(--t-section); font-variant-numeric: tabular-nums; }
+.statrow small { font: var(--t-foot); color: var(--muted6); }
+.hbtns { display: flex; gap: var(--s2); margin: var(--s5) var(--inset) 0; }
+.hbtns .btn { flex: none; padding: 0 var(--s5); }
+.btn.sec { background: var(--card); color: var(--text); box-shadow: inset 0 0 0 1px var(--hair); }
+.thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3) var(--s2); padding: 0 var(--inset); }
+.thumb { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.thumb i { aspect-ratio: 1; background: var(--art); display: block; border-radius: var(--r-tile); position: relative; }
+.thumb i.new::after { content: ""; position: absolute; right: 6px; top: 6px; width: 10px; height: 10px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 2px rgba(2,15,35,.6); }
+.thumb > span { display: flex; align-items: center; gap: var(--s2); font: var(--t-foot-b); font-variant-numeric: tabular-nums; color: var(--muted6); }
+.thumb > span span { display: inline-flex; align-items: center; gap: 2px; }
+.thumb .sc { color: var(--score); }
+
+/* Floating glass tab bar (iOS 26 style) + round Play button */
+.tabbar { position: absolute; z-index: 7; left: 12px; right: 12px; bottom: 22px; height: var(--h-bar); border-radius: 999px;
+  display: grid; grid-template-columns: repeat(4, 1fr); padding: 4px; background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.45); }
+.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 999px; color: var(--link); font: var(--t-tab); position: relative; }
+.tab.on { background: rgba(255,255,255,.10); color: var(--gold); }
+.tab .badge { position: absolute; top: 4px; left: calc(50% + 6px); height: 16px; min-width: 16px; padding: 0 4px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: 600 11px/16px var(--f); text-align: center; }
+.playpill { position: absolute; z-index: 7; left: 50%; transform: translateX(-50%); bottom: calc(22px + var(--h-bar) + var(--s3)); height: var(--h-reg); padding: 0 var(--s5) 0 var(--s4);
+  border-radius: 999px; display: inline-flex; align-items: center; gap: var(--s2); background: var(--gold); color: var(--on-gold); font: var(--t-head); box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.playpill svg { fill: currentColor; stroke: none; width: 18px; height: 18px; }
+.home { position: absolute; z-index: 9; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #fff; opacity: .85; }
+.toast { position: absolute; z-index: 7; left: var(--inset); right: var(--inset); bottom: calc(22px + var(--h-bar) + var(--s3)); height: 52px; display: flex; align-items: center; gap: var(--s3);
+  padding: 0 var(--s1) 0 var(--s3); border-radius: 999px; background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.45); font: var(--t-body); }
+.toast .msg { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast .msg b { color: var(--t-artist); font-weight: 600; }
+.toast .undo { height: var(--h-reg); padding: 0 var(--s4); color: var(--gold); font: var(--t-body-b); }
+.toast .av { width: 28px; height: 28px; }
+
+.keys { position: absolute; inset: 0; z-index: 9; pointer-events: none; display: none; }
+.show-keys .keys { display: block; }
+.keys i { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed rgba(0,255,200,.8); }
+.keys b { position: absolute; top: 50px; font: 600 10px/12px system-ui, sans-serif; color: #00FFC8; background: rgba(0,0,0,.7); padding: 1px 3px; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) { .fav.pop svg, .follow.wig { animation: none; } }
+</style>
+
+<div class="wrap">
+  <h1>Direction A v4: e621 colours, iOS structure</h1>
+  <p class="lede">Same e621 navies, gold and tag colours as v3. The structure now follows iOS conventions: large titles, a floating glass tab bar and pill buttons. Type is the iPhone's own system font. Spacing and component rules come from a study of AllTrails (docs/path-a/research/alltrails-study.md), applied to our own content rather than copied.</p>
+  <p class="lede">Placeholder art only.</p>
+  <div class="bar"><button class="toggle" id="keys" aria-pressed="false" type="button">Show keylines (16 · 359)</button></div>
+
+  <div class="cols" id="cols"></div>
+
+  <h2>What changed from v3</h2>
+  <ul class="plain">
+    <li><b>Bottom bar.</b> It now floats, the way iOS does it: a navy glass capsule above the content, icons with labels, and the selected tab in a lighter pill with a gold icon. The Play pill from the UX plan floats just above it.</li>
+    <li><b>Posts.</b> The picture comes first, rounded, with nothing on top of it. Underneath are three lines in a fixed order: who made it, e621's stats (with the favourite button), then the coloured tags. There's no box around a post. The space does the grouping.</li>
+    <li><b>Suggestions.</b> Artist cards you swipe sideways, one artist per card: one large and two small recent posts, then the name and Follow.</li>
+    <li><b>Artist page.</b> Big name, the three numbers that matter in a plain row, then one primary gold pill (Play all) and one secondary pill (Following).</li>
+    <li><b>Type.</b> The system font (SF Pro on iPhone) in iOS's own sizes, instead of Verdana.</li>
+  </ul>
+
+  <h2>The size system</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Used for</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Large title</th><td class="num">34 / 41 bold</td><td>Screen name (iOS large title)</td></tr>
+        <tr><th scope="row">Section</th><td class="num">20 / 25 bold</td><td>Section headers ("Artists you might like")</td></tr>
+        <tr><th scope="row">Headline</th><td class="num">17 / 22 semibold</td><td>Artist names, button labels</td></tr>
+        <tr><th scope="row">Body</th><td class="num">15 / 20</td><td>Subtitles, toasts, row buttons</td></tr>
+        <tr><th scope="row">Footnote</th><td class="num">13 / 18</td><td>Times, stats, tags, chips</td></tr>
+        <tr><th scope="row">Tab label</th><td class="num">11 / 13 semibold</td><td>Tab bar only</td></tr>
+        <tr><th scope="row">Controls</th><td class="num">44 regular · 32 compact · 62 bar</td><td>All pills. Compact ones keep a 44 touch area.</td></tr>
+        <tr><th scope="row">Pictures</th><td class="num">radius 16 · thumbnails 8</td><td>Every picture is rounded. Details sit 12 below it, with no box.</td></tr>
+        <tr><th scope="row">Avatars</th><td class="num">36 · 88 · 28</td><td>Cards · artist page · toasts and stacks</td></tr>
+        <tr><th scope="row">Icons</th><td class="num">24 tabs · 20 in round buttons · 16 next to text</td><td></td></tr>
+        <tr><th scope="row">Spacing</th><td class="num">4 · 8 · 12 · 16 · 24 · 32</td><td>16 screen edge and between cards, 12 inside cards, 24 above sections</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Colours and contrast are unchanged from v3 (e621 Hexagon values, small text lifted to 4.5 : 1).</p>
+</div>
+
+<script>
+(() => {
+  const I = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+    more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+    down: '<path d="m6 9 6 6 6-6"/>', right: '<path d="m9 18 6-6-6-6"/>', left: '<path d="m15 18-6-6 6-6"/>', check: '<path d="M20 6 9 17l-5-5"/>',
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>', play: '<polygon points="6 3 20 12 6 21 6 3"/>', plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+    rss: '<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+    spark: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    gear: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    vol: '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>'
+  };
+  const svg = (n, c = '') => `<svg viewBox="0 0 24 24" class="${c}" aria-hidden="true">${I[n]}</svg>`;
+  const ART = {
+    mossy_otter: { p: ['#1F4D4A', '#8FD3C1', '#F2E3C6', '#3B2A3F', '#C96F4A'], rot: '12deg' },
+    inkwell_fox: { p: ['#3A1F2B', '#F0B37E', '#FBE6CF', '#6E3B5C', '#E8743B'], rot: '40deg' },
+    pastelbat:   { p: ['#2A2346', '#C4A8F0', '#F7D9E8', '#5B3F8C', '#8FD0F0'], rot: '70deg' },
+    dune_jackal: { p: ['#1E2C45', '#9CC3F5', '#F3DDB4', '#B5773E', '#45618F'], rot: '20deg' },
+    berry_wolf:  { p: ['#3B1530', '#F59AB8', '#FFE1E8', '#7A2E58', '#F7C873'], rot: '55deg' }
+  };
+  const art = (name, v = 0) => {
+    const p = ART[name].p, s = v % 4;
+    const pos = [['30% 35%', '72% 68%', '62% 18%'], ['65% 30%', '25% 70%', '50% 50%'], ['45% 60%', '78% 25%', '20% 22%'], ['55% 40%', '20% 30%', '80% 80%']][s];
+    return `radial-gradient(55% 45% at ${pos[0]}, ${p[2]} 0, transparent 70%), radial-gradient(50% 55% at ${pos[1]}, ${p[1]} 0, transparent 72%), radial-gradient(35% 35% at ${pos[2]}, ${p[4]} 0, transparent 70%), linear-gradient(${150 + s * 40}deg, ${p[0]}, ${p[3]})`;
+  };
+  const avatar = (name, cls = '') => {
+    const a = ART[name], p = a.p;
+    return `<span class="av ${cls}" style="--c1:${p[0]};--c2:${p[1]};--c3:${p[2]};--c4:${p[4]};--rot:${a.rot}"><span class="k"></span></span>`;
+  };
+  const status = `<div class="status"><span>9:41</span><span class="batt"></span></div>`;
+  const tabbar = (active, play = true) => `<nav class="tabbar" aria-label="Tabs">${[['rss', 'Following'], ['spark', 'For You'], ['users', 'Artists'], ['gear', 'Settings']]
+    .map(([i, l]) => `<span class="tab ${l === active ? 'on' : ''}">${svg(i)}${l}${l === 'Following' ? '<span class="badge">12</span>' : ''}</span>`).join('')}</nav>
+    ${play ? `<button class="playpill" type="button">${svg('play')}Play</button>` : ''}<span class="home"></span>`;
+  const keys = `<div class="keys">${[[16, '16'], [359, '359']].map(([x, l], k) => `<i style="left:${x}px"></i><b style="left:${k >= 2 ? x - 24 : x + 2}px;top:${50 + (k % 2) * 16}px">${l}</b>`).join('')}</div>`;
+
+  const post = (o) => `
+    <article class="post">
+      <div class="media" style="aspect-ratio:${o.ar};--art:${art(o.artist, o.v)}">
+        ${o.video ? `<span class="vid"><span>${svg('play')}</span></span><span class="mute">${svg('vol', 'it')}</span>` : ''}
+      </div>
+      <div class="body">
+        <div class="line1"><b>${o.artist}</b><span class="t">${o.isNew ? '<span class="newtxt">New</span> · ' : '· '}${o.time}</span><button class="more" aria-label="More">${svg('more')}</button></div>
+        <div class="line2"><button class="pill fav ${o.faved ? 'on' : ''}" type="button" aria-pressed="${!!o.faved}">${svg('heart', 'it')}${o.favs}</button><span class="stat score">${svg('up', 'it')}</span><span class="stat score">${o.score}</span><span class="sep">·</span><span class="rt">Explicit</span><span class="sep">·</span><span>#${o.id}</span></div>
+        <div class="tags6">${o.tags.map(([c, t]) => `<span class="${c}">${t}</span>`).join('')}</div>
+      </div>
+    </article>`;
+
+  const followBtn = () => `<button class="pill follow" type="button">${svg('plus', 'it')}Follow</button>`;
+  const acard = (a, line) => `
+    <article class="acard">
+      <div class="collage">${[0, 1, 2].map(v => `<i style="--art:${art(a, v + 1)}"></i>`).join('')}</div>
+      <div class="body"><div class="who-row">${avatar(a)}<span class="who"><b>${a}</b><small>${line}</small></span>${followBtn()}</div></div>
+    </article>`;
+
+  const following = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="nav"><div class="grp"><button class="gbtn" aria-label="Search">${svg('search')}</button><button class="gbtn" aria-label="Grid view">${svg('grid')}</button><button class="gbtn" aria-label="More">${svg('more')}</button></div></div>
+        <div class="large"><h1>Following</h1><div class="sub"><b>12 new</b> since your last visit</div></div>
+        <div class="chips">
+          <button class="pill filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+        </div>
+        ${post({ artist: 'inkwell_fox', time: '2 hours ago', isNew: true, ar: '4/5', v: 0, favs: '1.2k', score: '340', id: '4512345', tags: [['a', 'inkwell_fox'], ['c', 'ember_(inkwell)'], ['s', 'red_fox'], ['s', 'canine'], ['g', 'smile'], ['g', 'outside'], ['m', 'hi_res'], ['more6', '+14']] })}
+        ${post({ artist: 'mossy_otter', time: '3 hours ago', isNew: true, ar: '1/1', v: 1, favs: '486', score: '112', id: '4512290', faved: true, tags: [['a', 'mossy_otter'], ['s', 'otter'], ['s', 'mustelid'], ['g', 'river'], ['g', 'cozy'], ['more6', '+9']] })}
+        ${post({ artist: 'mossy_otter', time: '3 hours ago', isNew: true, ar: '16/9', v: 2, favs: '209', score: '58', id: '4512288', video: true, tags: [['a', 'mossy_otter'], ['s', 'otter'], ['m', 'animated'], ['m', 'loop'], ['more6', '+6']] })}
+        <button class="btn burst" type="button"><span>6 more from mossy_otter</span>${svg('down', 'it')}</button>
+        <div class="divider"><span>${svg('check', 'it')}You're caught up</span></div>
+        <div class="shead"><h2>Artists you might like</h2><button class="see" type="button">See all${svg('right', 'it')}</button></div>
+        <div class="hrow">${acard('pastelbat', 'You faved 23 · 4d ago')}${acard('berry_wolf', 'You faved 17 · 1d ago')}${acard('dune_jackal', 'You faved 12 · 6h ago')}</div>
+        <div style="height:8px"></div>
+        ${post({ artist: 'dune_jackal', time: 'Yesterday', ar: '3/4', v: 0, favs: '3.4k', score: '901', id: '4509876', tags: [['a', 'dune_jackal'], ['s', 'jackal'], ['g', 'desert'], ['g', 'sunset'], ['more6', '+11']] })}
+      </div>
+      ${tabbar('Following')}${keys}
+    </div>`;
+
+  const artists = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="nav"><div class="grp"><button class="gbtn" aria-label="Search">${svg('search')}</button></div></div>
+        <div class="large"><h1>Artists</h1></div>
+        <div class="segwrap"><div class="seg6" role="tablist"><span role="tab">Following · 42</span><span role="tab" class="on" aria-selected="true">Suggested</span></div></div>
+        <div class="banner">
+                    <div class="t"><b>8 artists you fave a lot</b><small>Follow them in one go</small></div>
+          <button class="pill follow" type="button">Review</button>
+        </div>
+        <div class="stack">${acard('pastelbat', 'You faved 23 · 4d ago')}${acard('berry_wolf', 'You faved 17 · 1d ago')}${acard('dune_jackal', 'You faved 12 · 6h ago')}</div>
+      </div>
+      ${tabbar('Artists', false)}${keys}
+    </div>`;
+
+  const thumb = (a, k) => `<div class="thumb"><i class="${k < 2 ? 'new' : ''}" style="--art:${art(a, k)}"></i><span><span class="sc">${svg('up', 'it')}${[340, 112, 58, 901, 77, 230, 45, 610, 19][k % 9]}</span><span>${svg('heart', 'it')}${['1.2k', '486', '209', '3.4k', '150', '702', '96', '2.1k', '40'][k % 9]}</span></span></div>`;
+  const artistPage = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="nav"><button class="gbtn" aria-label="Back">${svg('left')}</button><div class="grp"><button class="gbtn" aria-label="Share">${svg('share')}</button><button class="gbtn" aria-label="More">${svg('more')}</button></div></div>
+        <div class="hero" style="align-items:flex-start;text-align:left">${avatar('inkwell_fox', 'hero')}<h1>Inkwell Fox</h1><span class="handle">inkwell_fox</span></div>
+        <div class="statrow"><div><b>1,204</b><small>Posts</small></div><div><b>48</b><small>You faved</small></div><div><b>2h</b><small>Last post</small></div></div>
+        <div class="hbtns"><button class="btn gold" type="button">${svg('play', 'it')}Play all</button><button class="btn sec" type="button">${svg('check', 'it')}Following</button></div>
+        <div class="chips">
+          <button class="pill filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+          <button class="pill filter" type="button" aria-pressed="true">Top${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Date${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Score${svg('down', 'it')}</button>
+        </div>
+        <div class="thumbs">${Array.from({ length: 9 }, (_, k) => thumb(['inkwell_fox', 'inkwell_fox', 'inkwell_fox', 'berry_wolf'][k % 4], k)).join('')}</div>
+      </div>
+      <div class="toast">${avatar('inkwell_fox')}<span class="msg">Following <b>inkwell_fox</b></span><button class="undo" type="button">Undo</button></div>
+      ${tabbar('Artists', false)}${keys}
+    </div>`;
+
+  const SCREENS = [
+    { name: 'Following', note: 'First view after opening the app. Scroll inside for a burst, the caught-up line and swipeable artist cards.', html: following() },
+    { name: 'Artists › Suggested', note: 'One card per artist: a large and two small recent posts, then the name and Follow.', html: artists() },
+    { name: 'Artist page', note: 'Just after tapping Follow. Grid view with e621\'s score and favourites under each thumbnail.', html: artistPage() }
+  ];
+  document.getElementById('cols').innerHTML = SCREENS.map(x => `
+    <section class="col" aria-label="${x.name}">
+      <div class="col-head"><h3>${x.name}</h3><p>${x.note}</p></div>
+      <div class="phone-holder">${x.html}</div>
+    </section>`).join('');
+
+  document.addEventListener('click', e => {
+    const h = e.target.closest('.fav');
+    if (h) { const on = !h.classList.contains('on'); h.classList.toggle('on', on); h.setAttribute('aria-pressed', on); h.classList.remove('pop'); if (on) { void h.offsetWidth; h.classList.add('pop'); } return; }
+    const f = e.target.closest('.phone .follow');
+    if (f && f.textContent.trim() !== 'Review') { const on = !f.classList.contains('on'); f.classList.toggle('on', on); f.innerHTML = on ? `${svg('check', 'it')}Following` : `${svg('plus', 'it')}Follow`; f.classList.remove('wig'); void f.offsetWidth; f.classList.add('wig'); return; }
+    const c = e.target.closest('.phone [data-toggle]');
+    if (c) { c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true'); return; }
+  });
+  const kb = document.getElementById('keys');
+  kb.addEventListener('click', () => { const on = kb.getAttribute('aria-pressed') !== 'true'; kb.setAttribute('aria-pressed', on); document.body.classList.toggle('show-keys', on); });
+  const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
+    const w = h.parentElement.clientWidth, z = Math.min(1, w / 375);
+    h.style.height = (812 * z) + 'px'; h.firstElementChild.style.zoom = z;
+  });
+  addEventListener('resize', fit); fit();
+})();
+</script>

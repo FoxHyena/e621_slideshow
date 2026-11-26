@@ -1,6 +1,8 @@
 "use client";
 
+import { Search, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import Avatar from "@/components/Avatar";
 import { autocompleteTags, type Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORIES, TAG_CATEGORY_COLORS, type AutocompleteTag } from "@/lib/e621/types";
 
@@ -14,6 +16,10 @@ interface Props {
   onSubmit?: () => void;
   rows?: number;
   testId?: string;
+  /** "field": the v6 sunk capsule with a search icon, a clear button and a flat list of
+   * suggestions (DESIGN.md "Search"); the default is the legacy panel's box */
+  variant?: "legacy" | "field";
+  autoFocus?: boolean;
 }
 
 interface Token {
@@ -53,6 +59,8 @@ export default function TagInput({
   onSubmit,
   rows = 4,
   testId,
+  variant = "legacy",
+  autoFocus,
 }: Props) {
   const listId = useId();
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
@@ -162,8 +170,68 @@ export default function TagInput({
     onClick: (e: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement>) => updateToken(e.currentTarget),
     onBlur: () => setTimeout(() => setOpen(false), 150),
     className:
-      "w-full rounded-md border border-line bg-black/40 px-3 py-2 font-mono text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-accent focus:outline-none",
+      variant === "field"
+        ? undefined
+        : "w-full rounded-md border border-line bg-black/40 px-3 py-2 font-mono text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-accent focus:outline-none",
+    autoFocus,
   };
+
+  if (variant === "field")
+    return (
+      <div className="field6" data-has={value ? "" : undefined}>
+        <Search aria-hidden />
+        <input type="search" enterKeyHint="search" role="combobox" aria-controls={listId} aria-expanded={showList} {...common} />
+        {value && (
+          <button
+            type="button"
+            className="field-clear"
+            aria-label="Clear search"
+            onClick={() => {
+              onChange("");
+              ref.current?.focus();
+            }}
+          >
+            <X aria-hidden strokeWidth={2.6} />
+          </button>
+        )}
+        {showList && (
+          <ul id={listId} role="listbox" data-testid="autocomplete" className="suggest">
+            {results.map((tag, i) => {
+              const cat = TAG_CATEGORIES[tag.category] ?? "general";
+              return (
+                <li
+                  key={tag.id}
+                  role="option"
+                  aria-selected={i === active}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    choose(tag);
+                  }}
+                  onMouseEnter={() => setActive(i)}
+                >
+                  {/* an artist is a 24 mark and the name in callout; any other tag is in its kind's colour */}
+                  {cat === "artist" ? (
+                    <span className="suggest-artist">
+                      <Avatar seed={tag.name} className="suggest-mark" />
+                      <span className="suggest-tag">
+                        {tag.antecedent_name && <span className="suggest-was">{tag.antecedent_name.replaceAll("_", " ")} → </span>}
+                        {tag.name.replaceAll("_", " ")}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="suggest-tag" style={{ color: TAG_CATEGORY_COLORS[cat] }}>
+                      {tag.antecedent_name && <span className="suggest-was">{tag.antecedent_name.replaceAll("_", " ")} → </span>}
+                      {tag.name.replaceAll("_", " ")}
+                    </span>
+                  )}
+                  <span className="row-value">{cat === "artist" ? "artist" : formatCount(tag.post_count)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    );
 
   return (
     <div className="relative">

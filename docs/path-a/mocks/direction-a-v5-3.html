@@ -1,0 +1,630 @@
+<title>Slideshow Visual Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap">
+<style>
+/* Layout: six 1:1 phones (375x812 CSS px = iPhone points) in a wrapping grid, then the system they use.
+   Page chrome stays neutral so it doesn't compete with the mocks. */
+:root {
+  --bg: #1C1C1F; --panel: #252529; --line: rgba(255,255,255,.10); --fg: #EDECE8; --muted: #A9A7A1; --mark: #E8C446;
+  --f-page: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; } }
+:root[data-theme="light"] { --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; }
+:root[data-theme="dark"] { --bg: #1C1C1F; --panel: #252529; --line: rgba(255,255,255,.10); --fg: #EDECE8; --muted: #A9A7A1; --mark: #E8C446; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f-page); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+h1 { font-size: 28px; line-height: 34px; margin: 0 0 8px; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 20px; line-height: 26px; margin: 56px 0 12px; text-wrap: balance; }
+h3 { font-size: 17px; line-height: 22px; margin: 0; }
+p { margin: 0 0 12px; max-width: 72ch; }
+.lede { color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; margin: 20px 0 28px; }
+.toggle { min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 14px var(--f-page); cursor: pointer; }
+.toggle[aria-pressed="true"] { border-color: var(--mark); }
+button:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.cols { display: flex; flex-wrap: wrap; gap: 48px 32px; justify-content: center; }
+.col { width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.col-head p { color: var(--muted); font-size: 14px; margin: 2px 0 0; }
+.phone-holder { width: 375px; height: 812px; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 20px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+th { font-weight: 600; white-space: nowrap; }
+thead th { color: var(--muted); font-size: 13px; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+ul.plain { margin: 0; padding-left: 20px; max-width: 74ch; }
+ul.plain li { margin-bottom: 8px; }
+.note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ================= Phone mock: e621 colours, iOS structure, Duolingo-style tactility ================= */
+.phone {
+  /* colour: e621 Hexagon navies + gold; small text lifted to AA */
+  --bg6: #020F23; --card: #152F56; --raised: #1F3C67; --raised-hi: #2A4B7C; --hair: rgba(180,199,217,.14);
+  --text: #FFFFFF; --link: #B4C7D9; --muted6: #A0ADC1; --gold: #E8C446; --on-gold: #020F23;
+  --lip-gold: #A8871F; --lip-navy: #0B1F3E;
+  --t-artist: #F2AC08; --t-character: #00C900; --t-species: #F3946B; --t-general: #B4C7D9; --t-meta: #FFFFFF;
+  --score: #5EC06A; --heart: #FF8A95;
+  --glass: rgba(21,47,86,.88); --glass-base: #0B1F3E;
+  /* type: rounded face for voice (titles, names, numbers, buttons), system face for reading */
+  --f-r: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif;
+  --f: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  --t-large: 800 34px/41px var(--f-r); --t-section: 800 20px/25px var(--f-r); --t-head: 700 17px/22px var(--f-r);
+  --t-body: 400 15px/20px var(--f); --t-foot: 400 13px/18px var(--f); --t-foot-r: 700 13px/18px var(--f-r); --t-tab: 700 11px/13px var(--f-r);
+  /* sizes */
+  --h-reg: 44px; --h-compact: 32px; --h-bar: 62px; --h-row: 52px; --lip: 3px; --lip-s: 2px;
+  --i: 24px; --i-btn: 20px; --i-text: 16px; --av-s: 24px; --av: 36px; --av-hero: 80px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --inset: 16px; --r-pic: 16px; --r-thumb: 8px; --r-sheet: 24px;
+  --bar-bottom: 22px;
+  position: relative; width: 375px; height: 812px; border-radius: 44px; overflow: hidden;
+  background: var(--bg6); color: var(--text); font: var(--t-body); box-shadow: 0 0 0 10px #0A0A0B, 0 0 0 11px #3A3A3F; -webkit-font-smoothing: antialiased;
+}
+.phone :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; }
+.phone svg { width: var(--i); height: var(--i); fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; display: block; }
+.phone svg.ib20 { width: var(--i-btn); height: var(--i-btn); }
+.phone svg.it { width: var(--i-text); height: var(--i-text); stroke-width: 2.2; }
+.phone svg.fill { fill: currentColor; stroke: none; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 47px 0 156px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.status { position: absolute; z-index: 8; inset: 0 0 auto; height: 47px; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 40px; font: 600 15px/1 var(--f);
+  background: linear-gradient(var(--bg6) 60%, transparent); }
+.status.clear { background: none; }
+.status .batt { width: 26px; height: 12px; border: 1.5px solid currentColor; border-radius: 4px; position: relative; }
+.status .batt::after { content: ""; position: absolute; inset: 1.5px 6px 1.5px 1.5px; background: currentColor; border-radius: 1.5px; }
+
+/* Lip: the pressable edge (Duolingo lesson, our colours). Press closes the edge in 100 ms. */
+.lip { box-shadow: 0 var(--lip) 0 var(--lip-c, var(--lip-navy)); transition: transform .1s ease-out, box-shadow .1s ease-out; }
+.lip:active { transform: translateY(var(--lip)); box-shadow: 0 0 0 var(--lip-c, var(--lip-navy)); }
+.lip-s { box-shadow: 0 var(--lip-s) 0 var(--lip-c, var(--lip-navy)); transition: transform .1s ease-out, box-shadow .1s ease-out; }
+.lip-s:active { transform: translateY(var(--lip-s)); box-shadow: 0 0 0 var(--lip-c, var(--lip-navy)); }
+
+/* Toolbar */
+.nav { display: flex; align-items: center; justify-content: space-between; height: var(--h-reg); padding: 0 var(--inset); }
+.nav .grp { display: flex; gap: var(--s2); margin-left: auto; }
+.gbtn { width: var(--h-reg); height: var(--h-reg); border-radius: 999px; display: grid; place-items: center; background: var(--card); color: var(--link); box-shadow: inset 0 0 0 1px var(--hair); }
+.gbtn.glass { background: rgba(2,15,35,.55); color: #fff; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+.large { padding: var(--s1) var(--inset) 0; }
+.large h1 { margin: 0; font: var(--t-large); letter-spacing: -0.01em; }
+.large .sub { font: var(--t-body); color: var(--muted6); margin-top: 2px; }
+.large .sub b { color: var(--text); font: var(--t-head); font-size: 15px; }
+
+/* Pills */
+.chips { display: flex; gap: var(--s2); padding: var(--s3) var(--inset); overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
+.chips::-webkit-scrollbar { display: none; }
+.pill { height: var(--h-compact); display: inline-flex; align-items: center; gap: var(--s1); padding: 0 var(--s3); border-radius: 999px; font: var(--t-foot-r); white-space: nowrap; flex: none; position: relative; }
+.pill::before { content: ""; position: absolute; inset: -6px 0; }
+.filter { background: var(--card); color: var(--text); box-shadow: inset 0 0 0 1px var(--hair); }
+.filter .it { color: var(--muted6); }
+.filter[aria-pressed="true"] { background: var(--raised-hi); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.filter[aria-pressed="true"] .it { color: var(--gold); }
+.follow { background: var(--raised); color: var(--text); --lip-c: var(--lip-navy); }
+.follow .it { color: var(--gold); }
+.follow.on { background: transparent; box-shadow: inset 0 0 0 1px var(--hair); }
+.follow.on .it { color: var(--score); }
+.follow.wig { animation: wig .36s ease-out; }
+@keyframes wig { 25% { transform: rotate(-3deg) } 60% { transform: rotate(2deg) } 100% { transform: none } }
+.btn { height: var(--h-reg); display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); padding: 0 var(--s5); border-radius: 999px; font: var(--t-head); }
+.btn.gold { background: var(--gold); color: var(--on-gold); --lip-c: var(--lip-gold); }
+.btn.gold svg { fill: currentColor; stroke: none; }
+.btn.tonal { background: var(--raised); color: var(--text); --lip-c: var(--lip-navy); }
+.btn.tonal .it { color: var(--score); }
+
+/* Post: rounded picture, three lines under it (who / stats / tags), no box */
+.post { --pin: var(--s3); margin: 0 var(--inset) var(--s5); padding: 0 var(--pin) var(--pin); border-radius: var(--r-pic); background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); }
+.media { position: relative; width: 100%; background: var(--art); border-radius: var(--r-thumb); overflow: hidden; }
+.media .vid { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; }
+.media .vid span { width: 56px; height: 56px; border-radius: 999px; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.media .vid svg { fill: #fff; stroke: none; margin-left: 3px; }
+.media .mute { position: absolute; right: var(--s3); bottom: var(--s3); width: var(--h-compact); height: var(--h-compact); border-radius: 999px; background: rgba(0,0,0,.55); display: grid; place-items: center; color: #fff; }
+.media .mute::before { content: ""; position: absolute; inset: -6px; }
+.line1.phead { height: var(--h-reg); padding: 0; margin: 0; }
+.line1.phead .more { margin: 0 calc(-1 * var(--pin)) 0 auto; }
+.pbody { padding: var(--s3) 0 0; display: flex; flex-direction: column; gap: var(--s1); }
+.line1 { height: 24px; display: flex; align-items: center; gap: var(--s2); }
+.line1 b { font: var(--t-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line1 .t { font: var(--t-foot); color: var(--muted6); white-space: nowrap; }
+.line1 .t .nw { color: var(--gold); font-weight: 600; }
+.line1 .more { margin: -10px -12px -10px auto; width: var(--h-reg); height: var(--h-reg); display: grid; place-items: center; color: var(--muted6); flex: none; }
+.av { width: var(--av); height: var(--av); border-radius: 999px; position: relative; flex: none; display: block; }
+.av .k { position: absolute; inset: 0; border-radius: inherit; background:
+  radial-gradient(circle at 50% 50%, var(--c3) 0 18%, transparent 19%),
+  repeating-conic-gradient(from var(--rot), var(--c1) 0 22.5deg, var(--c2) 0 45deg, var(--c4) 0 67.5deg, var(--c2) 0 90deg); }
+.av.s { width: var(--av-s); height: var(--av-s); }
+.av.hero { width: var(--av-hero); height: var(--av-hero); }
+.line2 { height: var(--h-compact); display: flex; align-items: center; gap: var(--s3); font: var(--t-foot-r); font-variant-numeric: tabular-nums; }
+.fav { background: var(--raised); color: var(--text); box-shadow: inset 0 0 0 1px var(--hair); padding: 0 var(--s3) 0 var(--s2); }
+.fav .it { color: var(--heart); }
+.fav.on { background: rgba(255,138,149,.16); box-shadow: inset 0 0 0 1px rgba(255,138,149,.45); }
+.fav.on svg { fill: currentColor; }
+.fav.pop svg { animation: pop .3s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes pop { 0% { transform: scale(.8) } 60% { transform: scale(1.25) } 100% { transform: scale(1) } }
+.score { display: inline-flex; align-items: center; gap: var(--s1); color: var(--score); }
+.pid { margin-left: auto; color: var(--muted6); font: var(--t-foot); }
+.tagrow { display: flex; gap: var(--s2); overflow-x: auto; scrollbar-width: none; margin: var(--s2) calc(-1 * var(--pin)) 0; padding: 0 var(--pin);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--pin), #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 var(--pin), #000 calc(100% - 24px), transparent); }
+.tagrow::-webkit-scrollbar { display: none; }
+.tag { height: var(--h-compact); padding: 0 var(--s3); display: inline-flex; align-items: center; border-radius: 999px; background: var(--raised); font: var(--t-foot); white-space: nowrap; flex: none; position: relative; }
+.tag::before { content: ""; position: absolute; inset: -6px 0; }
+.tag.c { color: var(--t-character); } .tag.s { color: var(--t-species); } .tag.g { color: var(--t-general); } .tag.m { color: var(--t-meta); }
+.tag.plus { color: var(--muted6); background: transparent; box-shadow: inset 0 0 0 1px var(--hair); font: var(--t-foot-r); }
+
+/* Feed rows */
+.burst { margin: 0 var(--inset) var(--s6); width: calc(100% - 2 * var(--inset)); justify-content: space-between; padding: 0 var(--s4) 0 var(--s5); }
+.burst .it { color: var(--link); }
+.caught { display: flex; flex-direction: column; align-items: center; gap: var(--s2); padding: var(--s2) var(--inset) var(--s4); text-align: center; }
+.caught .mark { width: 48px; height: 48px; }
+.caught b { font: var(--t-head); color: var(--gold); }
+.caught small { font: var(--t-foot); color: var(--muted6); }
+.shead { display: flex; align-items: center; justify-content: space-between; padding: var(--s5) var(--inset) var(--s3); }
+.shead h2 { margin: 0; font: var(--t-section); }
+.see { display: inline-flex; align-items: center; gap: 2px; height: var(--h-reg); margin-right: -8px; padding: 0 var(--s2); color: var(--link); font: var(--t-head); font-size: 15px; }
+.hrow { display: flex; gap: var(--s3); overflow-x: auto; padding: 0 var(--inset) var(--s6); scroll-snap-type: x mandatory; scroll-padding: 0 var(--inset); scrollbar-width: none; }
+.hrow::-webkit-scrollbar { display: none; }
+.acard { flex: none; width: 280px; scroll-snap-align: start; }
+.collage { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: var(--s1); height: 168px; border-radius: var(--r-pic); overflow: hidden; }
+.collage.tall { height: 200px; }
+.collage i { background: var(--art); display: block; }
+.collage i:first-child { grid-row: 1 / 3; }
+.abody { padding-top: var(--s3); display: flex; flex-direction: column; gap: var(--s1); }
+.abody .sub { font: var(--t-foot); color: var(--muted6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.abody .follow { margin-top: var(--s2); align-self: flex-start; }
+
+/* Artists */
+.segwrap { padding: var(--s4) var(--inset) var(--s1); }
+.seg6 { height: var(--h-compact); display: grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); }
+.seg6 button { position: relative; border-radius: 999px; font: var(--t-foot-r); color: var(--muted6); }
+.seg6 button::before { content: ""; position: absolute; inset: -8px 0; }
+.seg6 button[aria-selected="true"] { background: var(--raised-hi); color: var(--text); }
+.banner { margin: var(--s4) var(--inset) var(--s5); padding: var(--s4); border-radius: var(--r-pic); background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); display: flex; gap: var(--s3); align-items: center; }
+.banner .t { flex: 1; min-width: 0; }
+.banner b { font: var(--t-head); display: block; }
+.banner small { font: var(--t-foot); color: var(--muted6); }
+.banner .btn { height: var(--h-compact); padding: 0 var(--s4); font: var(--t-foot-r); font-size: 15px; }
+.stack .acard { width: auto; margin: 0 var(--inset) var(--s6); }
+
+/* Artist page */
+.hero { padding: var(--s2) var(--inset) 0; }
+.hero h1 { margin: var(--s3) 0 0; font: var(--t-large); letter-spacing: -0.01em; }
+.hero .handle { font: 400 13px/18px ui-monospace, "SF Mono", Menlo, monospace; color: var(--link); }
+.trophies { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); margin: var(--s5) var(--inset) 0; }
+.trophy { display: flex; align-items: center; gap: var(--s2); }
+.trophy .ic { display: grid; place-items: center; flex: none; align-self: flex-start; padding-top: 3px; }
+.trophy b { display: block; font: var(--t-head); font-variant-numeric: tabular-nums; }
+.trophy small { display: block; font: var(--t-foot); color: var(--muted6); }
+.hbtns { display: flex; gap: var(--s2); margin: var(--s5) var(--inset) var(--s1); }
+.hbtns .btn { flex: 1; padding: 0 var(--s4); }
+.thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); padding: 0 var(--inset); }
+.thumb { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+.thumb i { aspect-ratio: 1; background: var(--art); display: block; border-radius: var(--r-thumb); position: relative; }
+.thumb i.new::after { content: ""; position: absolute; right: var(--s2); top: var(--s2); width: 12px; height: 12px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 2px rgba(2,15,35,.6); }
+.thumb > span { display: flex; align-items: center; gap: var(--s2); font: var(--t-foot-r); font-variant-numeric: tabular-nums; color: var(--muted6); }
+.thumb > span span { display: inline-flex; align-items: center; gap: 2px; }
+.thumb .sc { color: var(--score); } .thumb .hv .it { color: var(--heart); }
+
+/* Artist page, compact header (scrolled) */
+.cbar { position: absolute; z-index: 7; inset: 0 0 auto; padding-top: 47px; background-color: var(--glass-base); background-image: linear-gradient(var(--glass), var(--glass));
+  -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); box-shadow: 0 1px 0 var(--hair); }
+.cbar .in { height: var(--h-reg); margin-bottom: var(--s2); display: flex; align-items: center; gap: var(--s2); padding: 0 var(--inset); }
+.cbar b { font: var(--t-head); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cbar .gbtn { background: transparent; box-shadow: none; margin-left: -10px; }
+
+/* Player */
+.player { position: absolute; inset: 0; background: #000; }
+.player .slide { position: absolute; left: 0; right: 0; top: 96px; bottom: 214px; background: var(--art); }
+.player .scrim-t { position: absolute; inset: 0 0 auto; height: 120px; background: linear-gradient(rgba(0,0,0,.55), transparent); }
+.player .scrim-b { position: absolute; inset: auto 0 0; height: 260px; background: linear-gradient(transparent, rgba(0,0,0,.7) 45%); }
+.ptop { position: absolute; top: 47px; left: var(--inset); right: var(--inset); height: var(--h-reg); display: flex; align-items: center; justify-content: space-between; }
+.count { height: var(--h-compact); padding: 0 var(--s3); border-radius: 999px; display: inline-flex; align-items: center; font: var(--t-foot-r); font-variant-numeric: tabular-nums;
+  background: rgba(2,15,35,.55); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+.pinfo { position: absolute; left: var(--inset); right: var(--inset); bottom: 186px; display: flex; align-items: center; gap: var(--s2); }
+.pinfo .ptime { font: var(--t-foot); color: rgba(255,255,255,.75); }
+.pinfo b { font: var(--t-head); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail { position: absolute; left: var(--inset); right: var(--inset); bottom: 126px; display: flex; justify-content: space-between; }
+.rail .gbtn.on { color: var(--heart); }
+.rail .gbtn.on svg { fill: currentColor; }
+.transport { position: absolute; left: var(--inset); right: var(--inset); bottom: 52px; height: var(--h-bar); display: flex; align-items: center; justify-content: center; gap: var(--s6); }
+.bigplay { width: var(--h-bar); height: var(--h-bar); border-radius: 999px; display: grid; place-items: center; background: var(--gold); color: var(--on-gold); --lip-c: var(--lip-gold); }
+.bigplay svg { width: 28px; height: 28px; }
+.prog { position: absolute; left: var(--inset); right: var(--inset); bottom: 36px; height: var(--s1); border-radius: 999px; background: rgba(255,255,255,.18); overflow: hidden; }
+.prog i { position: absolute; inset: 0 auto 0 0; width: 38%; border-radius: inherit; background: #fff; }
+
+/* Settings */
+.group { margin: 0 var(--inset) var(--s5); border-radius: var(--r-pic); background: var(--card); box-shadow: inset 0 0 0 1px var(--hair); overflow: hidden; }
+.glabel { margin: var(--s5) calc(var(--inset) + var(--s4)) var(--s2); font: var(--t-foot-r); color: var(--muted6); }
+.row { min-height: var(--h-row); display: flex; align-items: center; gap: var(--s3); padding: 0 var(--s3) 0 var(--s4); position: relative; }
+.row + .row::before { content: ""; position: absolute; top: 0; right: 0; left: 60px; border-top: 1px solid var(--hair); }
+.row .tile { width: var(--h-compact); height: var(--h-compact); border-radius: var(--r-thumb); display: grid; place-items: center; color: var(--link); background: var(--raised); flex: none; }
+.row.out { justify-content: center; font: var(--t-head); font-size: 15px; color: #ED9393; }
+.row .lbl { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.row .lbl b { font: var(--t-head); font-size: 15px; line-height: 20px; }
+.row .lbl small { font: var(--t-foot); color: var(--muted6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .val { font: var(--t-foot); color: var(--muted6); }
+.row .chev { color: var(--muted6); }
+.row.acct { min-height: 72px; }
+.row.acct .av { width: 44px; height: 44px; }
+
+/* Sign-in sheet over the signed-out landing */
+.landing { padding: var(--s6) var(--inset) 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--s3); }
+.landing .mark { width: 88px; height: 88px; }
+.landing h1 { margin: 0; font: var(--t-section); }
+.landing p { margin: 0; color: var(--muted6); font: var(--t-body); }
+.dim { position: absolute; inset: 0; z-index: 8; background: rgba(0,0,0,.55); }
+.sheet { position: absolute; z-index: 9; left: 0; right: 0; bottom: 0; padding: var(--s2) var(--inset) 34px; border-radius: var(--r-sheet) var(--r-sheet) 0 0; background: var(--card); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.grab { width: 36px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.3); margin: 0 auto var(--s4); }
+.shtop { display: flex; align-items: center; justify-content: space-between; margin: calc(-1 * var(--s2)) 0 var(--s3); }
+.sheet h2 { margin: 0; font: var(--t-section); }
+.keynote { display: flex; gap: var(--s2); align-items: center; font: var(--t-foot); color: var(--muted6); margin: calc(-1 * var(--s1)) 0 var(--s2); }
+.keynote .it { color: var(--score); }
+.steps { display: flex; flex-direction: column; gap: var(--s3); margin-bottom: var(--s4); }
+.step { display: flex; gap: var(--s3); align-items: center; font: var(--t-body); }
+.step .n { width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; background: var(--raised); font: var(--t-foot-r); flex: none; }
+.step a { color: var(--link); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: var(--s1); }
+.field { display: flex; flex-direction: column; gap: var(--s1); margin-bottom: var(--s3); }
+.field > .input { flex: none; }
+.field label { font: var(--t-foot-r); color: var(--muted6); }
+.inrow { display: flex; gap: var(--s2); }
+.input { flex: 1 1 auto; height: var(--h-reg); border-radius: var(--s3); background: var(--bg6); box-shadow: inset 0 0 0 1px var(--hair); display: flex; align-items: center; padding: 0 var(--s3); font: var(--t-body); min-width: 0; }
+.input.dots { letter-spacing: 3px; color: var(--muted6); }
+.inrow .btn { padding: 0 var(--s4); }
+.switchrow { display: flex; align-items: center; justify-content: space-between; height: var(--h-reg); margin-bottom: var(--s3); font: var(--t-body); }
+.switch { width: 51px; height: 31px; border-radius: 999px; background: var(--score); position: relative; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; right: 2px; width: 27px; height: 27px; border-radius: 999px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+.sheet .btn.wide { width: 100%; }
+
+/* Floating glass tab bar + Play pill */
+.tabbar { position: absolute; z-index: 6; left: var(--inset); right: var(--inset); bottom: var(--bar-bottom); height: var(--h-bar); border-radius: 999px;
+  display: grid; grid-template-columns: repeat(4, 1fr); padding: var(--s1); background-color: var(--glass-base);
+  background-image: linear-gradient(var(--glass), var(--glass)); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.45); }
+.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 999px; color: var(--link); font: var(--t-tab); position: relative; }
+.tab.on { background: rgba(255,255,255,.10); color: var(--gold); }
+.tab.on svg { stroke-width: 2.2; }
+.tab .badge { position: absolute; top: var(--s1); left: calc(50% + var(--s2)); height: 16px; min-width: 16px; padding: 0 5px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: var(--t-tab); line-height: 16px; text-align: center; }
+.home { position: absolute; z-index: 10; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #fff; opacity: .85; }
+.playfab { position: absolute; z-index: 6; right: var(--inset); bottom: calc(var(--bar-bottom) + var(--h-bar) + var(--s3)); width: 56px; height: 56px; border-radius: 999px; display: grid; place-items: center;
+  background: var(--gold); color: var(--on-gold); --lip-c: var(--lip-gold); }
+.playfab svg { width: 24px; height: 24px; fill: currentColor; stroke: none; margin-left: 3px; }
+.playfab .n { position: absolute; top: -4px; right: -4px; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--bg6); color: var(--text); font: var(--t-tab); line-height: 20px; text-align: center; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2px var(--gold); }
+.mark { display: block; }
+
+.keys { position: absolute; inset: 0; z-index: 9; pointer-events: none; display: none; }
+.show-keys .keys { display: block; }
+.keys i { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed rgba(0,255,200,.8); }
+.keys b { position: absolute; top: 50px; font: 600 10px/12px system-ui, sans-serif; color: #00FFC8; background: rgba(0,0,0,.7); padding: 1px 3px; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) { .fav.pop svg, .follow.wig { animation: none; } .lip, .lip-s { transition: none; } }
+</style>
+
+<div class="wrap">
+  <h1>Direction A v5.3: e621 colours, iOS structure, a playful touch</h1>
+  <p class="lede">v4 plus three things. (1) The fixes from the first design review. (2) Lessons from the Duolingo study, applied our way: buttons you press have a solid edge that sinks when tapped, titles and numbers use a rounded face, and each stat has its own colour. (3) The rest of the key screens: player, Settings and sign-in.</p>
+  <p class="lede">Gold now means one thing: the main action on each screen (Play, Play all, Review, Sign in) plus where you are (the selected tab and new posts). Placeholder art only.</p>
+  <div class="bar"><button class="toggle" id="keys" aria-pressed="false" type="button">Show keylines (16 · 359)</button></div>
+
+  <div class="cols" id="cols"></div>
+
+  <h2>What changed from v4</h2>
+  <ul class="plain">
+    <li><b>Gold is used once per screen.</b> Follow buttons are navy with a gold plus. A selected filter gets a gold ring instead of a gold fill. Artist names are white.</li>
+    <li><b>Posts sit in navy panels</b>, like e621's own post boxes. The artist line is at the top of the panel (owner, v5.1 sign-off), then the picture, then favourite, score and tags 12 below it. Everything inside the panel sits on one 12 px inner edge (v5.3). 24 between posts. "New" is the only gold on a post.</li>
+    <li><b>Tags are buttons.</b> One row you can swipe, each tag 32 tall with a 44 touch area. The artist tag is gone, since it repeated the name.</li>
+    <li><b>Play is a round button, bottom right</b> (owner, v5.1 sign-off), in thumb reach. A small "12" on it says how many new posts it plays. It fades while you scroll down and comes back when you stop or scroll up.</li>
+    <li><b>Pressable things feel pressable.</b> Main buttons have a 3 px solid edge (2 px on small ones) in a darker shade of their own colour. It closes in 100 ms when pressed.</li>
+    <li><b>Rounded voice.</b> Titles, names, numbers and buttons use the iPhone's rounded system face (Nunito where that isn't available). Reading text stays on the regular face.</li>
+    <li><b>A small celebration.</b> "You're caught up" gets the kaleidoscope mark and a short line. It's shown once per visit, and never on top of art.</li>
+  </ul>
+
+  <h2>The size system</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Used for</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Large title</th><td class="num">34 / 41, rounded heavy</td><td>Screen name, artist name on the artist page</td></tr>
+        <tr><th scope="row">Section</th><td class="num">20 / 25, rounded heavy</td><td>Section headers, sheet titles, landing headline</td></tr>
+        <tr><th scope="row">Headline</th><td class="num">17 / 22, rounded bold</td><td>Names, button labels, stat numbers</td></tr>
+        <tr><th scope="row">Body</th><td class="num">15 / 20, system</td><td>Subtitles, steps, inputs</td></tr>
+        <tr><th scope="row">Footnote</th><td class="num">13 / 18, system or rounded bold</td><td>Times, counts, tags, chips (rounded bold for chips and numbers)</td></tr>
+        <tr><th scope="row">Tab label</th><td class="num">11 / 13, rounded bold</td><td>Tab bar and its badge only</td></tr>
+        <tr><th scope="row">Controls</th><td class="num">44 regular · 32 compact · 62 bar and big play · 52 settings row</td><td>Compact controls keep a 44 touch area</td></tr>
+        <tr><th scope="row">Pressable edge</th><td class="num">3 regular · 2 compact</td><td>Primary and tonal buttons, Follow, Play. Not on toolbar circles or anything over art.</td></tr>
+        <tr><th scope="row">Pictures</th><td class="num">panel radius 16 · picture in a panel 8 · thumbnails 8 · collage 168 (row) / 200 (list)</td><td>Posts: navy panel, one 12 inner edge for picture and text, 44 header, details 12 below the picture, 12 bottom</td></tr>
+        <tr><th scope="row">Avatars</th><td class="num">24 · 36 · 44 · 80</td><td>Name lines · banners and lists · account row · artist page</td></tr>
+        <tr><th scope="row">Icons</th><td class="num">24 tabs · 20 in round buttons · 16 next to text</td><td></td></tr>
+        <tr><th scope="row">Spacing</th><td class="num">4 · 8 · 12 · 16 · 24 · 32</td><td>16 screen edge, 12 picture to text, 4 between lines, 12 above tags, 24 between posts and above sections</td></tr>
+        <tr><th scope="row">Sheets</th><td class="num">radius 24 · grabber 36 × 5</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Colours are e621's Hexagon values, with small text lifted to 4.5 : 1 (as in v3). The tab bar glass is 88% opaque on a dark navy base, so its labels stay readable over bright art.</p>
+</div>
+
+<script>
+(() => {
+  const I = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+    more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+    down: '<path d="m6 9 6 6 6-6"/>', right: '<path d="m9 18 6-6-6-6"/>', left: '<path d="m15 18-6-6 6-6"/>', check: '<path d="M20 6 9 17l-5-5"/>', x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.050 3 5.5l7 7Z"/>',
+    up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>', play: '<polygon points="6 3 20 12 6 21 6 3"/>', plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    pause: '<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+    skipb: '<polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/>', skipf: '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/>',
+    info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+    share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+    image: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    phone: '<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>', ext: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+    rss: '<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+    spark: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.870"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    gear: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    sliders: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+    vol: '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>'
+  };
+  const svg = (n, c = '') => `<svg viewBox="0 0 24 24" class="${c}" aria-hidden="true">${I[n]}</svg>`;
+  const ART = {
+    mossy_otter: { p: ['#1F4D4A', '#8FD3C1', '#F2E3C6', '#3B2A3F', '#C96F4A'], rot: '12deg' },
+    inkwell_fox: { p: ['#3A1F2B', '#F0B37E', '#FBE6CF', '#6E3B5C', '#E8743B'], rot: '40deg' },
+    pastelbat:   { p: ['#2A2346', '#C4A8F0', '#F7D9E8', '#5B3F8C', '#8FD0F0'], rot: '70deg' },
+    dune_jackal: { p: ['#1E2C45', '#9CC3F5', '#F3DDB4', '#B5773E', '#45618F'], rot: '20deg' },
+    berry_wolf:  { p: ['#3B1530', '#F59AB8', '#FFE1E8', '#7A2E58', '#F7C873'], rot: '55deg' },
+    wolfie:      { p: ['#152F56', '#5EC06A', '#FFFFFF', '#1F3C67', '#B4C7D9'], rot: '30deg' }
+  };
+  const art = (name, v = 0) => {
+    const p = ART[name].p, s = v % 4;
+    const pos = [['30% 35%', '72% 68%', '62% 18%'], ['65% 30%', '25% 70%', '50% 50%'], ['45% 60%', '78% 25%', '20% 22%'], ['55% 40%', '20% 30%', '80% 80%']][s];
+    return `radial-gradient(55% 45% at ${pos[0]}, ${p[2]} 0, transparent 70%), radial-gradient(50% 55% at ${pos[1]}, ${p[1]} 0, transparent 72%), radial-gradient(35% 35% at ${pos[2]}, ${p[4]} 0, transparent 70%), linear-gradient(${150 + s * 40}deg, ${p[0]}, ${p[3]})`;
+  };
+  const avatar = (name, cls = '') => {
+    const a = ART[name], p = a.p;
+    return `<span class="av ${cls}" style="--c1:${p[0]};--c2:${p[1]};--c3:${p[2]};--c4:${p[4]};--rot:${a.rot}"><span class="k"></span></span>`;
+  };
+  // The app's own mark: a kaleidoscope in e621 navy and gold (celebration and empty states only)
+  const mark = () => `<span class="mark av" style="--c1:#1F3C67;--c2:#E8C446;--c3:#FFFFFF;--c4:#2A4B7C;--rot:0deg"><span class="k"></span></span>`;
+  const status = (cls = '') => `<div class="status ${cls}"><span>9:41</span><span class="batt"></span></div>`;
+  const tabbar = (active) => `<nav class="tabbar" aria-label="Tabs">${[['rss', 'Following'], ['spark', 'For You'], ['users', 'Artists'], ['gear', 'Settings']]
+    .map(([i, l]) => `<span class="tab ${l === active ? 'on' : ''}">${svg(i)}${l}${l === 'Following' && active !== 'Following' ? '<span class="badge">12</span>' : ''}</span>`).join('')}</nav><span class="home"></span>`;
+  const playpill = (n) => `<button class="lip playfab" type="button" aria-label="Play ${n} new posts">${svg('play')}<span class="n" aria-hidden="true">${n}</span></button>`;
+  const keys = `<div class="keys">${[[16, '16'], [359, '359']].map(([x, l], k) => `<i style="left:${x}px"></i><b style="left:${k ? x - 24 : x + 2}px">${l}</b>`).join('')}</div>`;
+
+  const post = (o) => `
+    <article class="post">
+      <div class="line1 phead">${avatar(o.artist, 's')}<b>${o.artist}</b><span class="t">${o.isNew ? '<span class="nw">New</span> · ' : ''}${o.time}</span><button class="more" aria-label="More">${svg('more')}</button></div>
+      <div class="media" style="aspect-ratio:${o.ar};--art:${art(o.artist, o.v)}">
+        ${o.video ? `<span class="vid"><span>${svg('play')}</span></span><button class="mute" type="button" aria-label="Unmute">${svg('vol', 'it')}</button>` : ''}
+      </div>
+      <div class="pbody">
+        <div class="line2">
+          <button class="pill fav lip-s ${o.faved ? 'on' : ''}" type="button" aria-pressed="${!!o.faved}" aria-label="Favorite, ${o.favs}">${svg('heart', 'it')}${o.favs}</button>
+          <span class="score">${svg('up', 'it')}${o.score}</span>
+          <span class="pid">#${o.id}</span>
+        </div>
+        <div class="tagrow">${o.tags.map(([c, t]) => `<button class="tag ${c}" type="button">${t}</button>`).join('')}<button class="tag plus" type="button">+${o.more}</button></div>
+      </div>
+    </article>`;
+
+  const followBtn = (on = false) => on
+    ? `<button class="pill follow lip-s on" type="button">${svg('check', 'it')}Following</button>`
+    : `<button class="pill follow lip-s" type="button">${svg('plus', 'it')}Follow</button>`;
+  const acard = (a, sub, tall = false) => `
+    <article class="acard">
+      <div class="collage ${tall ? 'tall' : ''}">${[0, 1, 2].map(v => `<i style="--art:${art(a, v + 1)}"></i>`).join('')}</div>
+      <div class="abody">
+        <div class="line1">${avatar(a, 's')}<b>${a}</b><button class="more" aria-label="More: Not interested">${svg('more')}</button></div>
+        <span class="sub">${sub}</span>
+        ${followBtn()}
+      </div>
+    </article>`;
+
+  const following = () => `
+    <div class="phone">
+      ${status()}
+      <div class="scroll">
+        <div class="nav"><div class="grp"><button class="gbtn" aria-label="Search">${svg('search', 'ib20')}</button><button class="gbtn" aria-label="Grid view">${svg('grid', 'ib20')}</button><button class="gbtn" aria-label="More">${svg('more', 'ib20')}</button></div></div>
+        <div class="large"><h1>Following</h1><div class="sub"><b>12 new</b> since your last visit</div></div>
+        <div class="chips">
+          <button class="pill filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+        </div>
+        ${post({ artist: 'inkwell_fox', time: '2h ago', isNew: true, ar: '1/1', v: 0, favs: '1.2k', score: '340', id: '4512345', more: 14, tags: [['c', 'ember_(inkwell)'], ['s', 'red_fox'], ['s', 'canine'], ['g', 'smile'], ['g', 'outside']] })}
+        ${post({ artist: 'mossy_otter', time: '3h ago', isNew: true, ar: '4/5', v: 1, favs: '486', score: '112', id: '4512290', faved: true, more: 9, tags: [['s', 'otter'], ['s', 'mustelid'], ['g', 'river'], ['g', 'cozy']] })}
+        ${post({ artist: 'mossy_otter', time: '3h ago', isNew: true, ar: '16/9', v: 2, favs: '209', score: '58', id: '4512288', video: true, more: 6, tags: [['s', 'otter'], ['m', 'animated'], ['m', 'loop']] })}
+        ${post({ artist: 'mossy_otter', time: '3h ago', isNew: true, ar: '1/1', v: 3, favs: '301', score: '96', id: '4512281', more: 7, tags: [['s', 'otter'], ['g', 'swimming'], ['g', 'night']] })}
+        <button class="btn tonal lip burst" type="button"><span>6 more from mossy_otter</span>${svg('down', 'it')}</button>
+        <div class="caught">${mark()}<b>You're caught up</b><small>Marked as seen on e621</small></div>
+        <div class="shead"><h2>Artists you might like</h2><button class="see" type="button">See all${svg('right', 'it')}</button></div>
+        <div class="hrow">${acard('pastelbat', 'You faved 23 of 140 · posted 4d ago')}${acard('berry_wolf', 'You faved 17 of 96 · posted 1d ago')}${acard('dune_jackal', 'You faved 12 of 310 · posted 6h ago')}</div>
+        ${post({ artist: 'dune_jackal', time: 'Yesterday', ar: '3/4', v: 0, favs: '3.4k', score: '901', id: '4509876', more: 11, tags: [['s', 'jackal'], ['g', 'desert'], ['g', 'sunset']] })}
+      </div>
+      ${playpill(12)}
+      ${tabbar('Following')}${keys}
+    </div>`;
+
+  const artists = () => `
+    <div class="phone">
+      ${status()}
+      <div class="scroll">
+        <div class="nav"><div class="grp"><button class="gbtn" aria-label="Search">${svg('search', 'ib20')}</button></div></div>
+        <div class="large"><h1>Artists</h1></div>
+        <div class="segwrap"><div class="seg6" role="tablist"><button role="tab" aria-selected="false" type="button">Following · 42</button><button role="tab" aria-selected="true" type="button">Suggested</button></div></div>
+        <div class="banner">
+          <div class="t"><b>8 artists you fave a lot</b><small>Follow them in one go</small></div>
+          <button class="btn gold lip" type="button" style="--lip:2px">Review</button>
+        </div>
+        <div class="stack">${acard('pastelbat', 'You faved 23 of 140 · posted 4d ago', true)}${acard('berry_wolf', 'You faved 17 of 96 · posted 1d ago', true)}${acard('dune_jackal', 'You faved 12 of 310 · posted 6h ago', true)}</div>
+      </div>
+      ${tabbar('Artists')}${keys}
+    </div>`;
+
+  const thumb = (a, k) => `<div class="thumb"><i class="${k < 2 ? 'new' : ''}" style="--art:${art(a, k)}">${k < 2 ? '<span class="sr">New</span>' : ''}</i><span><span class="sc">${svg('up', 'it')}${[340, 112, 58, 901, 77, 230, 45, 610, 19][k % 9]}</span><span class="hv">${svg('heart', 'it')}${['1.2k', '486', '209', '3.4k', '150', '702', '96', '2.1k', '40'][k % 9]}</span></span></div>`;
+  const artistPage = () => `
+    <div class="phone">
+      ${status()}
+      <div class="scroll">
+        <div class="nav"><button class="gbtn" aria-label="Back">${svg('left', 'ib20')}</button><div class="grp"><button class="gbtn" aria-label="Share">${svg('share', 'ib20')}</button><button class="gbtn" aria-label="More">${svg('more', 'ib20')}</button></div></div>
+        <div class="hero">${avatar('inkwell_fox', 'hero')}<h1>Inkwell Fox</h1><span class="handle">inkwell_fox</span></div>
+        <div class="trophies">
+          <div class="trophy"><span class="ic" style="color:var(--link)">${svg('image', 'it')}</span><span><b>1,204</b><small>posts</small></span></div>
+          <div class="trophy"><span class="ic" style="color:var(--heart)">${svg('heart', 'it fill')}</span><span><b>48</b><small>you faved</small></span></div>
+          <div class="trophy"><span class="ic" style="color:var(--score)">${svg('clock', 'it')}</span><span><b>2h</b><small>last post</small></span></div>
+        </div>
+        <div class="hbtns"><button class="btn gold lip" type="button">${svg('play', 'it')}Play all</button><button class="btn tonal lip" type="button">${svg('check', 'it')}Following</button></div>
+        <div class="chips">
+          <button class="pill filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+          <button class="pill filter" type="button" aria-pressed="true">Sort: Top${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Date${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Score${svg('down', 'it')}</button>
+        </div>
+        <div class="thumbs">${Array.from({ length: 12 }, (_, k) => thumb(['inkwell_fox', 'inkwell_fox', 'inkwell_fox', 'berry_wolf'][k % 4], k)).join('')}</div>
+      </div>
+      ${tabbar('Artists')}${keys}
+    </div>`;
+
+  const artistCompact = () => `
+    <div class="phone">
+      <div class="cbar">${status('clear')}<div class="in"><button class="gbtn" aria-label="Back">${svg('left', 'ib20')}</button>${avatar('inkwell_fox', 's')}<b>Inkwell Fox</b>${followBtn(true)}</div></div>
+      <div class="scroll" style="padding-top:99px">
+        <div class="chips">
+          <button class="pill filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+          <button class="pill filter" type="button" aria-pressed="true">Sort: Top${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Date${svg('down', 'it')}</button>
+          <button class="pill filter" type="button" aria-pressed="false">Score${svg('down', 'it')}</button>
+        </div>
+        <div class="thumbs">${Array.from({ length: 18 }, (_, k) => thumb(['inkwell_fox', 'berry_wolf', 'inkwell_fox'][k % 3], k + 3)).join('')}</div>
+      </div>
+      ${tabbar('Artists')}${keys}
+    </div>`;
+
+  const player = () => `
+    <div class="phone">
+      <div class="player">
+        <div class="slide" style="--art:${art('inkwell_fox', 2)}"></div>
+        <div class="scrim-t"></div><div class="scrim-b"></div>
+        ${status('clear')}
+        <div class="ptop"><button class="gbtn glass" aria-label="Close">${svg('x', 'ib20')}</button><span class="count">12 / 300+</span></div>
+        <div class="pinfo">${avatar('inkwell_fox', 's')}<b>inkwell_fox</b><span class="ptime">2h ago</span></div>
+        <div class="rail">
+          <button class="gbtn glass on" aria-label="Favorite" aria-pressed="true">${svg('heart', 'ib20')}</button>
+          <button class="gbtn glass" aria-label="Info">${svg('info', 'ib20')}</button>
+          <button class="gbtn glass" aria-label="Slideshow settings">${svg('sliders', 'ib20')}</button>
+          <button class="gbtn glass" aria-label="Share">${svg('share', 'ib20')}</button>
+        </div>
+        <div class="transport">
+          <button class="gbtn glass" aria-label="Previous">${svg('skipb', 'ib20 fill')}</button>
+          <button class="bigplay lip" aria-label="Pause">${svg('pause', 'fill')}</button>
+          <button class="gbtn glass" aria-label="Next">${svg('skipf', 'ib20 fill')}</button>
+        </div>
+        <div class="prog" role="progressbar" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100" aria-label="Time on this slide"><i></i></div>
+        <span class="home"></span>
+      </div>
+      ${keys}
+    </div>`;
+
+  const row = (icon, label, sub, val = '') => `<div class="row"><span class="tile">${svg(icon, 'ib20')}</span><span class="lbl"><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span>${val ? `<span class="val">${val}</span>` : ''}${svg('right', 'it chev')}</div>`;
+  const settings = () => `
+    <div class="phone">
+      ${status()}
+      <div class="scroll">
+        <div class="nav"></div>
+        <div class="large"><h1>Settings</h1></div>
+        <div class="glabel" style="margin-top:16px">Account</div>
+        <div class="group"><div class="row acct">${avatar('wolfie')}<span class="lbl"><b>wolfie</b><small>Signed in with e621</small></span>${svg('right', 'it chev')}</div></div>
+        <div class="glabel">Browsing</div>
+        <div class="group">
+          ${row('shield', 'Content', 'All ratings · 4 blacklisted tags')}
+          ${row('play', 'Slideshow', 'Style, timing, videos', '6 s')}
+          ${row('spark', 'For You', 'Tune, hidden artists')}
+        </div>
+        <div class="glabel">This device</div>
+        <div class="group">
+          ${row('phone', 'App', 'Install, e621 button, about')}
+        </div>
+        <div class="group"><button class="row out" type="button" style="width:100%">Sign out</button></div>
+      </div>
+      ${tabbar('Settings')}${keys}
+    </div>`;
+
+  const signin = () => `
+    <div class="phone">
+      ${status()}
+      <div class="scroll" style="overflow:hidden">
+        <div class="nav"></div>
+        <div class="landing">${mark()}<h1>Follow the artists you love</h1><p>See their new posts first, and play any feed as a slideshow.</p></div>
+      </div>
+      ${tabbar('Following')}
+      <div class="dim"></div>
+      <div class="sheet" role="dialog" aria-label="Sign in with e621">
+        <div class="grab"></div>
+        <div class="shtop"><h2>Sign in with e621</h2><button class="gbtn" aria-label="Close">${svg('x', 'ib20')}</button></div>
+        <div class="steps">
+          <div class="step"><span class="n">1</span><a href="#" onclick="return false">Open your e621 API key page ${svg('ext', 'it')}</a></div>
+          <div class="step"><span class="n">2</span><span>Create a key with any name, then copy it</span></div>
+          <div class="step"><span class="n">3</span><span>Paste it below</span></div>
+        </div>
+        <div class="field"><label>Username</label><div class="input">wolfie</div></div>
+        <div class="field"><label>API key</label><div class="inrow"><div class="input dots">••••••••••••</div><button class="btn tonal lip" type="button" style="--lip:2px">Paste</button></div></div>
+        <div class="keynote">${svg('shield', 'it')}Your key stays in this browser and is only sent to e621.</div>
+        <div class="switchrow"><span>Remember on this device</span><span class="switch" role="switch" aria-checked="true" aria-label="Remember on this device"></span></div>
+        <button class="btn gold lip wide" type="button">Sign in</button>
+      </div>
+      ${keys}
+    </div>`;
+
+  const SCREENS = [
+    { name: 'Following', note: 'At rest after opening. Scroll inside for a burst, the caught-up moment and the artist cards.', html: following() },
+    { name: 'Following, scrolled', note: 'Past the new posts: a burst of more from one artist, the caught-up moment, then suggestions.', html: following(), scrollTo: '.burst' },
+    { name: 'Artists › Suggested', note: 'One card per artist. Gold goes only on Review.', html: artists() },
+    { name: 'Artist page', note: 'Stats as coloured icons with numbers, one gold action.', html: artistPage() },
+    { name: 'Artist page, scrolled', note: 'The header collapses to a compact bar: back, avatar, name, Follow.', html: artistCompact() },
+    { name: 'Player', note: 'Controls showing (they hide after 2.5 s). The thin bar shows time left on this slide.', html: player() },
+    { name: 'Settings', note: 'Grouped like iOS Settings. One navy tile style; colour stays for meaning.', html: settings() },
+    { name: 'Sign in', note: 'Signed out: the landing with the sign-in sheet open.', html: signin() }
+  ];
+  document.getElementById('cols').innerHTML = SCREENS.map(x => `
+    <section class="col" aria-label="${x.name}">
+      <div class="col-head"><h3>${x.name}</h3><p>${x.note}</p></div>
+      <div class="phone-holder">${x.html}</div>
+    </section>`).join('');
+  SCREENS.forEach((x, i) => { if (!x.scrollTo) return; const ph = document.querySelectorAll('.phone')[i], el = ph.querySelector(x.scrollTo); ph.querySelector('.scroll').scrollTop = el.offsetTop - 60; });
+
+  document.addEventListener('click', e => {
+    const h = e.target.closest('.fav');
+    if (h) { const on = !h.classList.contains('on'); h.classList.toggle('on', on); h.setAttribute('aria-pressed', on); h.classList.remove('pop'); if (on) { void h.offsetWidth; h.classList.add('pop'); } return; }
+    const f = e.target.closest('.phone .follow');
+    if (f) { const on = !f.classList.contains('on'); f.classList.toggle('on', on); f.innerHTML = on ? `${svg('check', 'it')}Following` : `${svg('plus', 'it')}Follow`; f.classList.remove('wig'); void f.offsetWidth; f.classList.add('wig'); return; }
+    const c = e.target.closest('.phone [data-toggle]');
+    if (c) { c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true'); return; }
+    const s = e.target.closest('.seg6 button');
+    if (s) { s.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b === s)); return; }
+  });
+  // Play pill hides while scrolling down, returns on scroll up or after 1 s idle
+  document.querySelectorAll('.phone').forEach(ph => {
+    const sc = ph.querySelector('.scroll'), pp = ph.querySelector('.playfab'); if (!sc || !pp) return;
+    let last = 0, t;
+    sc.addEventListener('scroll', () => {
+      const y = sc.scrollTop; pp.style.transition = 'transform .2s ease-out, opacity .2s ease-out';
+      const down = y > last; pp.style.transform = down ? 'translateY(24px)' : ''; pp.style.opacity = down ? 0 : 1; last = y;
+      clearTimeout(t); t = setTimeout(() => { pp.style.transform = ''; pp.style.opacity = 1; }, 1000);
+    }, { passive: true });
+  });
+  const kb = document.getElementById('keys');
+  kb.addEventListener('click', () => { const on = kb.getAttribute('aria-pressed') !== 'true'; kb.setAttribute('aria-pressed', on); document.body.classList.toggle('show-keys', on); });
+  const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
+    const w = h.parentElement.clientWidth, z = Math.min(1, w / 375);
+    h.style.height = (812 * z) + 'px'; h.firstElementChild.style.zoom = z;
+  });
+  addEventListener('resize', fit); fit();
+})();
+</script>

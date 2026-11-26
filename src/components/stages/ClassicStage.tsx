@@ -1,11 +1,12 @@
 "use client";
 
 import { Media } from "../Media";
-import type { StageProps } from "../Stage";
+import { leavingOf, type StageProps } from "../Stage";
 
 /** Full screen, honouring the Fit and Transition settings. */
-export default function ClassicStage({ post, trail, playback, onReady, onError, currentReady }: StageProps) {
-  const previous = trail[0] ?? null;
+export default function ClassicStage(props: StageProps) {
+  const { post, playback, onReady, onError, currentReady } = props;
+  const previous = leavingOf(props);
   // `m-auto` on 1:1 media centers it without clipping the left/top when it overflows.
   const layer =
     playback.fit === "original"

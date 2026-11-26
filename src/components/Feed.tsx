@@ -3,14 +3,16 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ExternalLink, Heart, ImageOff, LayoutGrid, Play, Search, X } from "lucide-react";
 import { postPageUrl } from "@/lib/e621/client";
-import { mediaKind, TAG_CATEGORY_COLORS, type Post, type TagCategoryName } from "@/lib/e621/types";
+import { mediaKind, TAG_CATEGORY_COLORS, type Post } from "@/lib/e621/types";
 import type { PlaybackSettings } from "@/lib/settings";
 import { displayUrl } from "@/lib/slideshow/media";
 import type { QueueStats } from "@/lib/slideshow/queue";
+import { ago, artists, compact, TAG_ORDER } from "@/lib/feed/format";
 import Avatar from "./Avatar";
 import { InlineLoader } from "./Loader";
 import { useShown } from "./useShown";
-import { TagActionsOverlay, TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
+import { TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
+import TagActionsOverlay from "./TagTargets";
 
 interface FeedProps {
   posts: Post[];
@@ -54,40 +56,11 @@ interface FeedProps {
   suspended?: boolean;
 }
 
-/** Artist tags that aren't a person. */
-const NOT_ARTISTS = new Set(["conditional_dnp", "sound_warning", "epilepsy_warning", "avoid_posting", "third-party_edit"]);
-const TAG_ORDER: TagCategoryName[] = ["copyright", "character", "species", "general", "lore", "meta"];
 const RATING: Record<Post["rating"], { label: string; cls: string }> = {
   s: { label: "Safe", cls: "bg-emerald-500/15 text-emerald-300" },
   q: { label: "Questionable", cls: "bg-amber-500/15 text-amber-300" },
   e: { label: "Explicit", cls: "bg-red-500/15 text-red-300" },
 };
-
-function artists(post: Post): string[] {
-  return (post.tags.artist ?? []).filter((t) => !NOT_ARTISTS.has(t));
-}
-
-function ago(iso: string, now: number): string {
-  const sec = Math.max(0, (now - Date.parse(iso)) / 1000);
-  if (!Number.isFinite(sec)) return "";
-  const steps: [number, string][] = [
-    [60, "s"],
-    [60, "m"],
-    [24, "h"],
-    [30, "d"],
-    [12, "mo"],
-  ];
-  let v = sec;
-  for (const [n, unit] of steps) {
-    if (v < n) return `${Math.floor(v)}${unit}`;
-    v /= n;
-  }
-  return `${Math.floor(v)}y`;
-}
-
-function compact(n: number): string {
-  return Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(n);
-}
 
 interface CardProps {
   post: Post;
@@ -194,7 +167,7 @@ function FeedCard({ post, index, active, now, playback, canFavorite, onFavorite,
 
   return (
     <article
-      className="scroll-mt-16 overflow-hidden border-line bg-panel sm:rounded-xl sm:border"
+      className="scroll-mt-16 overflow-hidden border-line bg-panel-old sm:rounded-xl sm:border"
       aria-label={`Post #${post.id}`}
       aria-current={active || undefined}
       data-testid="feed-card"
@@ -435,7 +408,7 @@ export default function Feed(props: FeedProps) {
       data-testid={artist ? "artist-feed" : "feed"}
       data-artist={artist}
     >
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-panel-old/95 px-4 py-3 backdrop-blur">
         {artist && (
           <>
             <button

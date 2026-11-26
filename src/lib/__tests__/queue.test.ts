@@ -28,6 +28,58 @@ function fakeApi(total: number, decorate: (id: number) => Parameters<typeof make
 }
 
 describe("PostQueue", () => {
+  it("starts from a saved first page and pages on below it", async () => {
+    const api = fakeApi(250);
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    const head = Array.from({ length: 24 }, (_, i) => makePost({ id: 250 - i }));
+    expect(q.seed(head)).toBe(true);
+    expect(q.seeded).toBe(true);
+    expect(q.posts.map((p) => p.id).slice(0, 2)).toEqual([250, 249]);
+    expect(q.rawMax).toBe(250);
+    await q.ensure(q.posts.length - 1);
+    expect(api.calls[0]).toBe("b227");
+    expect(new Set(q.posts.map((p) => p.id)).size).toBe(q.posts.length);
+    // Only before anything loaded.
+    expect(q.seed(head)).toBe(false);
+    // e621 sent a newer post the filters hid: "newer" starts above it.
+    const r = new PostQueue(buildQuery(s), s.media, api.fetcher);
+    r.seed(head, 251);
+    expect(r.rawMax).toBe(251);
+  });
+
+  it("counts the posts it would show above the newest loaded", async () => {
+    const all = Array.from({ length: 5 }, (_, i) => makePost({ id: 105 - i, tagList: i === 0 ? ["hidden_tag"] : [] }));
+    const fetcher = vi.fn<PageFetcher>(async (tags) => (tags.includes("id:>100") ? all : [makePost({ id: 100 })]));
+    const s = search();
+    const q = new PostQueue({ ...buildQuery(s), rules: parseBlacklist("hidden_tag") }, s.media, fetcher);
+    await q.ensure(0);
+    expect(await q.countNewer(5)).toEqual({ count: 4, more: true });
+    expect(fetcher).toHaveBeenLastCalledWith(expect.stringContaining("id:>100"), 1, 5, expect.objectContaining({ lane: "user" }));
+    // Counting adds nothing.
+    expect(q.posts.map((p) => p.id)).toEqual([100]);
+  });
+
+  it("treats a cancelled request as no error, and asks again on the next ensure", async () => {
+    let calls = 0;
+    const fetcher: PageFetcher = async (_t, _p, _l, opts) => {
+      calls++;
+      if (calls === 1) {
+        await new Promise((_, reject) => opts?.signal?.addEventListener("abort", () => reject(new DOMException("x", "AbortError"))));
+      }
+      return [makePost({ id: 1 })];
+    };
+    const s = search();
+    const q = new PostQueue(buildQuery(s), s.media, fetcher);
+    const first = q.ensure(0);
+    q.cancel();
+    await first;
+    expect(q.error).toBeNull();
+    expect(q.posts).toHaveLength(0);
+    await q.ensure(0);
+    expect(q.posts).toHaveLength(1);
+  });
+
   it("setRules drops loaded posts the new blacklist hides and filters later pages", async () => {
     const api = fakeApi(250, (id) => ({ tagList: id % 2 ? ["odd"] : ["even"] }));
     const s = search();

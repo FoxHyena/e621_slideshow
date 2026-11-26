@@ -1,0 +1,475 @@
+<title>Slideshow Visual Directions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<style>
+/* Layout: three 1:1 phones (375x812 CSS px = iPhone points) built only from the size system, then the
+   system itself as a reference, then contrast numbers. Page chrome is neutral so it favours no screen. */
+:root {
+  --bg: #1C1C1F; --panel: #252529; --line: rgba(255,255,255,.10); --fg: #EDECE8; --muted: #A9A7A1; --mark: #FCB328;
+  --f-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; } }
+:root[data-theme="light"] { --bg: #EEEDE9; --panel: #FFFFFF; --line: rgba(0,0,0,.10); --fg: #1C1C1F; --muted: #5D5B57; --mark: #8A5A00; color-scheme: light; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f-ui); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+h1 { font-size: 28px; line-height: 34px; margin: 0 0 8px; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 20px; line-height: 26px; margin: 56px 0 12px; text-wrap: balance; }
+h3 { font-size: 17px; line-height: 22px; margin: 0; }
+p { margin: 0 0 12px; max-width: 70ch; }
+.lede { color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; margin: 20px 0 28px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); }
+.seg button, .toggle { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: transparent; color: var(--muted); font: 600 14px var(--f-ui); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.toggle { border: 1px solid var(--line); background: var(--panel); color: var(--fg); min-height: 46px; }
+.toggle[aria-pressed="true"] { border-color: var(--mark); }
+button:focus-visible { outline: 2px solid var(--mark); outline-offset: 2px; }
+.lab-inline { color: var(--muted); font-size: 13px; }
+
+.cols { display: flex; flex-wrap: wrap; gap: 40px 32px; justify-content: center; }
+.col { width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.col-head p { color: var(--muted); font-size: 14px; margin: 2px 0 0; }
+.phone-holder { width: 375px; height: 812px; max-width: 100%; }
+
+table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 20px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+th { font-weight: 600; white-space: nowrap; }
+thead th { color: var(--muted); font-weight: 600; font-size: 13px; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sample { color: var(--fg); white-space: nowrap; }
+.chg { color: var(--muted); font-size: 13px; }
+ul.plain { margin: 0; padding-left: 20px; max-width: 74ch; }
+ul.plain li { margin-bottom: 8px; }
+.note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+/* ============ Phone mock: every value below comes from the size system ============ */
+.phone {
+  /* colour: direction A, e621 colours refined */
+  --ground: #0F1012;            /* neutral: what art sits on */
+  --navy: #0F1A2B;              /* bars */
+  --card: #14213A;              /* cards, banners, toasts */
+  --raised: #1B2B45;            /* tags, segmented track, burst */
+  --line: rgba(150,180,220,.14); --line-strong: rgba(150,180,220,.30);
+  --text: #E8ECF2; --muted: #9AA2AE; --gold: #FCB328; --on-gold: #1B1300; --heart: #FF6B7A;
+  /* type: 5 sizes, 3 weights */
+  --t-title: 700 28px/34px var(--f-ui); --t-section: 600 17px/22px var(--f-ui);
+  --t-body: 400 15px/20px var(--f-ui); --t-body-s: 600 15px/20px var(--f-ui);
+  --t-meta: 400 13px/18px var(--f-ui); --t-meta-s: 600 13px/18px var(--f-ui); --t-micro: 600 11px/14px var(--f-ui);
+  /* sizes */
+  --h-reg: 44px; --h-compact: 32px; --h-row: 56px; --h-tab: 56px;
+  --i: 24px; --i-text: 16px; --av: 40px; --av-hero: 80px;
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 32px; --gutter: 16px;
+  --r-compact: 8px; --r-reg: 12px;
+  position: relative; width: 375px; height: 812px; border-radius: 44px; overflow: hidden;
+  background: var(--ground); color: var(--text); font: var(--t-body); box-shadow: 0 0 0 10px #0A0A0B, 0 0 0 11px #3A3A3F; -webkit-font-smoothing: antialiased;
+}
+.navy-ground .phone { --ground: #0D1726; }
+.phone :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; }
+.phone svg { width: var(--i); height: var(--i); fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; display: block; }
+.phone svg.it { width: var(--i-text); height: var(--i-text); stroke-width: 2; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 47px 0 140px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+
+.status { position: absolute; z-index: 5; inset: 0 0 auto; height: 47px; background: var(--ground); display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 40px; font: 600 15px/1 var(--f-ui); }
+.status .batt { width: 26px; height: 12px; border: 1.5px solid currentColor; border-radius: 4px; position: relative; }
+.status .batt::after { content: ""; position: absolute; inset: 1.5px 6px 1.5px 1.5px; background: currentColor; border-radius: 1.5px; }
+
+/* Icon button: 44 box, 24 glyph. Edge buttons pull out by 10 so the glyph's ink lands on the 16 keyline. */
+.ib { width: var(--h-reg); height: var(--h-reg); display: grid; place-items: center; border-radius: 999px; flex: none; }
+.ib:active { background: var(--raised); }
+.edge-l { margin-left: -10px; } .edge-chev { margin-left: -19px; } .edge-r { margin-right: -10px; }
+
+/* Title block (L1) */
+.title { padding: var(--s1) var(--gutter) var(--s2); }
+.title .row { height: var(--h-reg); display: flex; align-items: center; justify-content: space-between; }
+.title h1 { margin: 0; font: var(--t-title); letter-spacing: -0.02em; }
+.title .acts { display: flex; }
+.title .sub { font: var(--t-meta); color: var(--muted); }
+.title .sub b { font: var(--t-meta-s); color: var(--gold); }
+.topbar { height: var(--h-reg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
+.topbar .acts { display: flex; }
+
+/* Compact controls: 32 tall, 13 text, 16 icon, radius 8. Hit area grows to 44 with a pseudo-element. */
+.chips { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); height: var(--h-reg); display: flex; align-items: center; gap: var(--s2); padding: 0 var(--gutter); overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.compact { height: var(--h-compact); display: inline-flex; align-items: center; gap: var(--s1); padding: 0 12px; border-radius: var(--r-compact); font: var(--t-meta-s); white-space: nowrap; flex: none; position: relative; }
+.compact::before { content: ""; position: absolute; inset: -6px 0; }
+.filter { box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--text); }
+.filter .it { margin-right: -4px; color: var(--muted); }
+.filter[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); box-shadow: none; }
+.filter[aria-pressed="true"] .it { color: var(--on-gold); }
+.tag { background: var(--raised); color: var(--muted); font: var(--t-meta); }
+.tag.lead { color: var(--text); }
+.follow { background: var(--gold); color: var(--on-gold); padding: 0 12px 0 10px; }
+.follow.on { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.follow.wig { animation: wig .36s ease-out; }
+@keyframes wig { 25% { transform: rotate(-3deg) } 60% { transform: rotate(2deg) } 100% { transform: none } }
+
+/* Regular controls: 44 tall, 15 semibold, radius 12 */
+.btn { height: var(--h-reg); display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); padding: 0 var(--s3); border-radius: var(--r-reg); font: var(--t-body-s); }
+.btn.gold { background: var(--gold); color: var(--on-gold); }
+.btn.quiet { background: var(--raised); color: var(--text); }
+.btn.on { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* Rows with an avatar (L3): 56 tall, avatar 40 at 16, text at 72 */
+.arow { height: var(--h-row); display: flex; align-items: center; padding: 0 var(--gutter); gap: var(--s3); }
+.av { width: var(--av); height: var(--av); border-radius: 999px; position: relative; flex: none; display: block; }
+.av .k { position: absolute; inset: 0; border-radius: inherit; background:
+  radial-gradient(circle at 50% 50%, var(--c3) 0 18%, transparent 19%),
+  repeating-conic-gradient(from var(--rot), var(--c1) 0 22.5deg, var(--c2) 0 45deg, var(--c4) 0 67.5deg, var(--c2) 0 90deg); }
+.av.hero { width: var(--av-hero); height: var(--av-hero); }
+.dot { position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 2px var(--ground); }
+.who { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.who b { font: var(--t-body-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who small { font: var(--t-meta); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arow .ib.edge-r { margin-left: calc(-1 * var(--s3) + var(--s1)); }
+.arow .compact + .ib { margin-left: calc(-1 * var(--s2)); }
+
+/* Post */
+.post { margin-bottom: var(--s4); }
+.media { position: relative; width: 100%; background: var(--art); }
+.media .vid { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; }
+.media .vid span { width: 56px; height: 56px; border-radius: 999px; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.media .vid svg { fill: #fff; stroke: none; margin-left: 3px; }
+.media .mute { position: absolute; right: var(--s2); bottom: var(--s2); width: var(--h-compact); height: var(--h-compact); border-radius: 999px; background: rgba(0,0,0,.55); display: grid; place-items: center; color: #fff; }
+.acts-row { height: var(--h-reg); display: flex; align-items: center; padding: 0 var(--gutter); }
+.heart.on { color: var(--heart); } .heart.on svg { fill: currentColor; }
+.heart.pop svg { animation: pop .3s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes pop { 0% { transform: scale(.8) } 60% { transform: scale(1.18) } 100% { transform: scale(1) } }
+.cnt { font: var(--t-meta-s); font-variant-numeric: tabular-nums; margin-left: -6px; margin-right: var(--s3); }
+.score { display: inline-flex; align-items: center; gap: var(--s1); color: var(--muted); font: var(--t-meta); font-variant-numeric: tabular-nums; }
+.tags { display: flex; gap: var(--s2); padding: 0 var(--gutter); overflow: hidden; }
+
+/* Feed rows (regular height) */
+.burst { margin: calc(-1 * var(--s2)) var(--gutter) var(--s4); width: calc(100% - 2 * var(--gutter)); justify-content: space-between; }
+.divider { display: flex; align-items: center; gap: var(--s3); padding: 0 var(--gutter); height: var(--h-reg); margin-bottom: var(--s2); color: var(--muted); font: var(--t-meta-s); }
+.divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line-strong); }
+.divider span { display: inline-flex; align-items: center; gap: var(--s2); }
+.divider .it { color: var(--gold); }
+
+/* Section header (L2) */
+.shead { height: var(--h-reg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
+.shead h4 { margin: 0; font: var(--t-section); }
+.textbtn { height: var(--h-reg); display: inline-flex; align-items: center; gap: var(--s1); font: var(--t-body-s); color: var(--text); padding: 0 var(--s2); }
+.shead .textbtn:last-child { margin-right: calc(-1 * var(--s2)); }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.tiles i { aspect-ratio: 1; background: var(--art); display: block; }
+.sfoot { height: var(--h-reg); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
+.pager { display: flex; gap: 6px; align-items: center; }
+.pager i { width: 6px; height: 6px; border-radius: 999px; background: var(--line-strong); display: block; }
+.pager i.on { width: 16px; background: var(--gold); }
+.sugg { margin-bottom: var(--s4); }
+
+/* Artists screen */
+.segbar { height: var(--h-reg); display: flex; align-items: center; padding: 0 var(--gutter); }
+.segctl { height: var(--h-compact); display: grid; grid-template-columns: 1fr 1fr; width: 100%; padding: 2px; border-radius: var(--r-compact); background: var(--card); }
+.segctl span { display: grid; place-items: center; border-radius: 6px; font: var(--t-meta-s); color: var(--muted); }
+.segctl span.on { background: var(--raised); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.banner { margin: var(--s2) 0 var(--s4); padding: var(--s3) var(--gutter); background: var(--card); border-block: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s3); }
+.banner b { font: var(--t-body-s); display: block; }
+.banner small { font: var(--t-meta); color: var(--muted); }
+.banner .row { display: flex; gap: var(--s2); }
+
+/* Artist page */
+.ahead { padding: var(--s2) var(--gutter) var(--s3); display: flex; flex-direction: column; }
+.ahead h1 { margin: var(--s3) 0 0; font: var(--t-title); letter-spacing: -0.02em; }
+.ahead .handle { font: var(--t-meta); color: var(--muted); }
+.ahead .stats { font: var(--t-meta); color: var(--muted); margin-top: var(--s2); }
+.ahead .stats b { font: var(--t-meta-s); color: var(--text); }
+.ahead .btn { margin-top: var(--s3); align-self: flex-start; min-width: 140px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.grid3 i { aspect-ratio: 1; background: var(--art); display: block; position: relative; }
+.grid3 i.new::after { content: ""; position: absolute; top: var(--s2); right: var(--s2); width: 10px; height: 10px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 2px rgba(0,0,0,.35); }
+
+/* Tab bar + Play pill + toast */
+.tabbar { position: absolute; z-index: 6; inset: auto 0 0; height: calc(var(--h-tab) + 34px); padding-bottom: 34px; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--navy); border-top: 1px solid var(--line); }
+.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font: var(--t-micro); }
+.tab.on { color: var(--gold); }
+.home { position: absolute; z-index: 7; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--text); opacity: .85; }
+.play { position: absolute; z-index: 6; bottom: calc(var(--h-tab) + 34px + var(--s3)); left: 50%; transform: translateX(-50%); border-radius: 999px; padding: 0 20px 0 16px;
+  background: var(--gold); color: var(--on-gold); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+.play svg { fill: currentColor; stroke: none; }
+.toast { position: absolute; z-index: 6; left: var(--gutter); right: var(--gutter); bottom: calc(var(--h-tab) + 34px + var(--s3)); height: var(--h-reg); display: flex; align-items: center; gap: var(--s2);
+  padding: 0 var(--s1) 0 var(--s3); border-radius: var(--r-reg); background: var(--card); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,.45); font: var(--t-body); }
+.toast .msg { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toast .textbtn { color: var(--gold); padding: 0 var(--s3); }
+.toast .av { width: 24px; height: 24px; }
+
+.keys { position: absolute; inset: 0; z-index: 9; pointer-events: none; display: none; }
+.show-keys .keys { display: block; }
+.keys i { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed rgba(0,255,200,.8); }
+.keys b { position: absolute; top: 50px; font: 600 10px/12px var(--f-ui); color: #00FFC8; background: rgba(0,0,0,.65); padding: 1px 3px; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) { .heart.pop svg, .follow.wig { animation: none; } }
+</style>
+
+<div class="wrap">
+  <h1>Direction A, refined for the art</h1>
+  <p class="lede">e621's navy and gold stay, but the navy moves off the art. Pictures now sit on a neutral near-black, so nothing tints them. Navy is used only for things that never frame a picture: the tab bar, tags, cards, sheets and toasts. Gold marks what's new, what's selected and the main action.</p>
+  <p class="lede">Every size on these three screens comes from one small set: 5 text sizes, 2 control heights, 1 row height, 2 icon sizes. The full list is under the phones.</p>
+  <div class="bar">
+    <span class="lab-inline" id="glab">Ground around art</span>
+    <div class="seg" role="group" aria-labelledby="glab">
+      <button type="button" aria-pressed="true" data-ground="neutral">Neutral (new)</button>
+      <button type="button" aria-pressed="false" data-ground="navy">Navy (before)</button>
+    </div>
+    <button class="toggle" id="keys" aria-pressed="false" type="button">Show keylines (16 · 72 · 359)</button>
+  </div>
+
+  <div class="cols" id="cols"></div>
+
+  <h2>The size system</h2>
+  <p class="lede">These are the only sizes the app uses. If something needs a size that isn't here, the list changes first, then every screen changes with it.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Used for</th><th scope="col">Example</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Title</th><td class="num">28 / 34, bold</td><td>The screen's name. One per screen.</td><td class="sample" style="font:700 28px/34px var(--f-ui);letter-spacing:-.02em">Following</td></tr>
+        <tr><th scope="row">Section</th><td class="num">17 / 22, semibold</td><td>A section inside a screen</td><td class="sample" style="font:600 17px/22px var(--f-ui)">Artists you might like</td></tr>
+        <tr><th scope="row">Body</th><td class="num">15 / 20, regular or semibold</td><td>Names, button labels, toasts</td><td class="sample" style="font:600 15px/20px var(--f-ui)">inkwell_fox</td></tr>
+        <tr><th scope="row">Meta</th><td class="num">13 / 18, regular or semibold</td><td>Times, counts, chips, tags</td><td class="sample" style="font:400 13px/18px var(--f-ui);color:var(--muted)">2h ago · Explicit</td></tr>
+        <tr><th scope="row">Micro</th><td class="num">11 / 14, semibold</td><td>Tab labels only</td><td class="sample" style="font:600 11px/14px var(--f-ui)">Following</td></tr>
+        <tr><th scope="row">Regular control</th><td class="num">44 tall, radius 12</td><td>Buttons, icon buttons, full-width rows, Play, toasts</td><td class="chg">Follow on artist page, "+6 more", Play</td></tr>
+        <tr><th scope="row">Compact control</th><td class="num">32 tall, radius 8, 44 touch area</td><td>Filter chips, tags, Follow inside a row, segmented control</td><td class="chg">Media ▾, red_fox</td></tr>
+        <tr><th scope="row">Row with avatar</th><td class="num">56 tall, avatar 40</td><td>Post header, artist rows, suggestions</td><td class="chg">Avatar at 16, text at 72</td></tr>
+        <tr><th scope="row">Icons</th><td class="num">24 alone, 16 next to text</td><td>24 in every icon button, 16 inside chips and labelled buttons</td><td class="chg">Two sizes only</td></tr>
+        <tr><th scope="row">Avatars</th><td class="num">40 · 80 · 24</td><td>Rows · artist page · inside a toast</td><td class="chg"></td></tr>
+        <tr><th scope="row">Spacing</th><td class="num">4 · 8 · 16 · 24 · 32</td><td>8 inside a group, 16 between groups and at the screen edge, 24 between posts and sections</td><td class="chg"></td></tr>
+        <tr><th scope="row">Keylines</th><td class="num">16 · 72 · 359</td><td>Left edge, text after an avatar, right edge. Edge icons line up their ink, not their box.</td><td class="chg">Toggle above</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>What changed since the first comparison</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th scope="col"></th><th scope="col">First comparison</th><th scope="col">Now</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Text sizes</th><td class="num">7 (28, 17, 15, 14, 13, 12, 11)</td><td class="num">5</td></tr>
+        <tr><th scope="row">Control heights</th><td class="num">8 (20, 28, 32, 40, 44, 48, 52, 64)</td><td class="num">2, plus the 56 row</td></tr>
+        <tr><th scope="row">Icon sizes</th><td class="num">3 (16, 20, 24)</td><td class="num">2</td></tr>
+        <tr><th scope="row">Avatar in rows</th><td class="num">36 in posts, 44 in suggestions</td><td class="num">40 everywhere</td></tr>
+        <tr><th scope="row">On top of the art</th><td>Rating badge, video controls</td><td>Video controls only. The rating moved to the line under the name.</td></tr>
+        <tr><th scope="row">Suggestion section</th><td>A card inside the feed with its own inner edges</td><td>Full width like a post, on the same 16 / 72 lines</td></tr>
+        <tr><th scope="row">Bugs</th><td>Chips, Follow and Play rendered without their backgrounds</td><td>Fixed, and every mock is now screenshot-checked before you see it</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Reading order on every screen</h2>
+  <ul class="plain">
+    <li><b>1. Screen title.</b> The only 28 px text. It says where you are.</li>
+    <li><b>2. The art.</b> Full width, nothing on top except video controls.</li>
+    <li><b>3. Who made it.</b> Avatar and name, always in the same 56 px row on the same lines.</li>
+    <li><b>4. Section headers.</b> 17 px. Only where the feed changes from posts to something else.</li>
+    <li><b>5. Details and controls.</b> 13 px meta, compact chips and tags, in quiet colours, so they never compete with the art.</li>
+  </ul>
+
+  <h2>Contrast</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th scope="col">Pair</th><th scope="col">Ratio</th><th scope="col">Needs</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Text on ground</th><td class="num">16.1 : 1</td><td class="num">4.5</td></tr>
+        <tr><th scope="row">Muted text on ground</th><td class="num">7.4 : 1</td><td class="num">4.5</td></tr>
+        <tr><th scope="row">Muted text on tags (lightest navy)</th><td class="num">5.5 : 1</td><td class="num">4.5</td></tr>
+        <tr><th scope="row">Gold on ground</th><td class="num">10.5 : 1</td><td class="num">3 (icons) / 4.5 (text)</td></tr>
+        <tr><th scope="row">Gold on tab bar</th><td class="num">9.7 : 1</td><td class="num">4.5</td></tr>
+        <tr><th scope="row">Dark text on gold buttons</th><td class="num">10.2 : 1</td><td class="num">4.5</td></tr>
+        <tr><th scope="row">Heart on ground</th><td class="num">6.9 : 1</td><td class="num">3</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Colour cast of the ground (OKLCH chroma): navy 0.034, new neutral 0.004, about 8 times less. Placeholder art only. Avatars are the existing kaleidoscope style.</p>
+</div>
+
+<script>
+(() => {
+  const I = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+    more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+    down: '<path d="m6 9 6 6 6-6"/>', right: '<path d="m9 18 6-6-6-6"/>', left: '<path d="m15 18-6-6 6-6"/>', check: '<path d="M20 6 9 17l-5-5"/>',
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>', play: '<polygon points="6 3 20 12 6 21 6 3"/>', plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+    rss: '<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+    spark: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    sliders: '<path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
+    vol: '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>'
+  };
+  const svg = (n, c = '') => `<svg viewBox="0 0 24 24" class="${c}" aria-hidden="true">${I[n]}</svg>`;
+
+  // Placeholder art palettes (not real art)
+  const ART = {
+    mossy_otter: { p: ['#1F4D4A', '#8FD3C1', '#F2E3C6', '#3B2A3F', '#C96F4A'], rot: '12deg' },
+    inkwell_fox: { p: ['#3A1F2B', '#F0B37E', '#FBE6CF', '#6E3B5C', '#E8743B'], rot: '40deg' },
+    pastelbat:   { p: ['#2A2346', '#C4A8F0', '#F7D9E8', '#5B3F8C', '#8FD0F0'], rot: '70deg' },
+    dune_jackal: { p: ['#1E2C45', '#9CC3F5', '#F3DDB4', '#B5773E', '#45618F'], rot: '20deg' },
+    berry_wolf:  { p: ['#3B1530', '#F59AB8', '#FFE1E8', '#7A2E58', '#F7C873'], rot: '55deg' }
+  };
+  const art = (name, v = 0) => {
+    const p = ART[name].p, s = v % 4;
+    const pos = [['30% 35%', '72% 68%', '62% 18%'], ['65% 30%', '25% 70%', '50% 50%'], ['45% 60%', '78% 25%', '20% 22%'], ['55% 40%', '20% 30%', '80% 80%']][s];
+    return `radial-gradient(55% 45% at ${pos[0]}, ${p[2]} 0, transparent 70%), radial-gradient(50% 55% at ${pos[1]}, ${p[1]} 0, transparent 72%), radial-gradient(35% 35% at ${pos[2]}, ${p[4]} 0, transparent 70%), linear-gradient(${150 + s * 40}deg, ${p[0]}, ${p[3]})`;
+  };
+  const avatar = (name, cls = '', dot = false) => {
+    const a = ART[name], p = a.p;
+    return `<span class="av ${cls}" style="--c1:${p[0]};--c2:${p[1]};--c3:${p[2]};--c4:${p[4]};--rot:${a.rot}"><span class="k"></span>${dot ? '<span class="dot"></span>' : ''}</span>`;
+  };
+  const tabbar = (active) => `<nav class="tabbar" aria-label="Tabs">${[['rss', 'Following'], ['spark', 'For You'], ['users', 'Artists'], ['sliders', 'Settings']]
+    .map(([i, l]) => `<span class="tab ${l === active ? 'on' : ''}">${svg(i)}${l}</span>`).join('')}</nav><span class="home"></span>`;
+  const keys = `<div class="keys"><i style="left:16px"></i><b style="left:18px">16</b><i style="left:72px"></i><b style="left:74px">72</b><i style="left:359px"></i><b style="left:326px">359</b></div>`;
+  const status = `<div class="status"><span>9:41</span><span class="batt"></span></div>`;
+
+  const post = (o) => `
+    <article class="post">
+      <header class="arow">
+        ${avatar(o.artist, '', o.isNew)}
+        <span class="who"><b>${o.artist}</b><small>${o.time} · Explicit</small></span>
+        <button class="ib edge-r" aria-label="More">${svg('more')}</button>
+      </header>
+      <div class="media" style="aspect-ratio:${o.ar};--art:${art(o.artist, o.v)}">
+        ${o.video ? `<span class="vid"><span>${svg('play')}</span></span><span class="mute">${svg('vol', 'it')}</span>` : ''}
+      </div>
+      <div class="acts-row">
+        <button class="ib edge-l heart ${o.faved ? 'on' : ''}" aria-label="Favorite" aria-pressed="${!!o.faved}">${svg('heart')}</button>
+        <span class="cnt">${o.favs}</span>
+        <span class="score">${svg('up', 'it')}${o.score}</span>
+      </div>
+      <div class="tags">${o.tags.map((t, i) => `<span class="compact tag ${i < 2 ? 'lead' : ''}">${t}</span>`).join('')}</div>
+    </article>`;
+
+  const SUGG = [
+    { artist: 'pastelbat', line: 'You faved 23 · posted 4d ago' },
+    { artist: 'berry_wolf', line: 'You faved 17 · posted 1d ago' },
+    { artist: 'dune_jackal', line: 'You faved 12 · posted 6h ago' }
+  ];
+  const followBtn = () => `<button class="compact follow" type="button">${svg('plus', 'it')}Follow</button>`;
+  const suggBody = (i) => {
+    const s = SUGG[i % SUGG.length];
+    return `
+      <div class="arow">${avatar(s.artist)}<span class="who"><b>${s.artist}</b><small>${s.line}</small></span>${followBtn()}</div>
+      <div class="tiles">${[1, 2, 3].map(v => `<i style="--art:${art(s.artist, v)}"></i>`).join('')}</div>
+      <div class="sfoot">
+        <span class="pager">${Array.from({ length: 8 }, (_, k) => `<i class="${k === i % 8 ? 'on' : ''}"></i>`).join('')}</span>
+        <button class="textbtn next" type="button" style="margin-right:-8px">Next artist${svg('right', 'it')}</button>
+      </div>`;
+  };
+
+  const following = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="title">
+          <div class="row"><h1>Following</h1>
+            <div class="acts edge-r"><button class="ib" aria-label="Search">${svg('search')}</button><button class="ib" aria-label="Grid view">${svg('grid')}</button><button class="ib" aria-label="More">${svg('more')}</button></div></div>
+          <div class="sub"><b>12 new</b> since your last visit</div>
+        </div>
+        <div class="chips">
+          <button class="compact filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="compact filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+        </div>
+        ${post({ artist: 'inkwell_fox', time: '2h ago', isNew: true, ar: '4/5', v: 0, favs: '1.2k', score: '340', tags: ['red_fox', 'canine', 'smile', 'outside', 'sketch'] })}
+        ${post({ artist: 'mossy_otter', time: '3h ago', isNew: true, ar: '1/1', v: 1, favs: '486', score: '112', faved: true, tags: ['otter', 'mustelid', 'river', 'cozy'] })}
+        ${post({ artist: 'mossy_otter', time: '3h ago', isNew: true, ar: '16/9', v: 2, favs: '209', score: '58', video: true, tags: ['otter', 'animated', 'loop'] })}
+        <button class="btn quiet burst" type="button"><span>+6 more from mossy_otter</span>${svg('down', 'it')}</button>
+        <div class="divider"><span>${svg('check', 'it')}You're caught up</span></div>
+        <section class="sugg" data-i="0">
+          <div class="shead"><h4>Artists you might like</h4><button class="textbtn" type="button">See all</button></div>
+          <div class="body">${suggBody(0)}</div>
+        </section>
+        ${post({ artist: 'dune_jackal', time: 'Yesterday', isNew: false, ar: '3/4', v: 0, favs: '3.4k', score: '901', tags: ['jackal', 'desert', 'sunset'] })}
+      </div>
+      <button class="btn play" type="button">${svg('play', 'it')}Play</button>
+      ${tabbar('Following')}${keys}
+    </div>`;
+
+  const artists = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="title"><div class="row"><h1>Artists</h1><div class="acts edge-r"><button class="ib" aria-label="Search">${svg('search')}</button></div></div></div>
+        <div class="segbar"><div class="segctl" role="tablist"><span role="tab">Following 42</span><span role="tab" class="on" aria-selected="true">Suggested</span></div></div>
+        <div class="banner">
+          <div><b>8 artists you fave a lot</b><small>Follow them all at once, or pick a few.</small></div>
+          <div class="row"><button class="btn gold" type="button" style="height:32px;border-radius:8px;font:var(--t-meta-s);padding:0 12px">Review</button><button class="btn" type="button" style="height:32px;border-radius:8px;font:var(--t-meta-s);padding:0 12px;color:var(--muted)">Not now</button></div>
+        </div>
+        ${['pastelbat', 'berry_wolf', 'dune_jackal'].map((a, n) => `
+          <section class="sugg">
+            <div class="arow">${avatar(a)}<span class="who"><b>${a}</b><small>${['You faved 23 · 4d ago', 'You faved 17 · 1d ago', 'You faved 12 · 6h ago'][n]}</small></span>${followBtn()}<button class="ib edge-r" aria-label="More">${svg('more')}</button></div>
+            <div class="tiles">${[0, 1, 2].map(v => `<i style="--art:${art(a, v)}"></i>`).join('')}</div>
+          </section>`).join('')}
+      </div>
+      ${tabbar('Artists')}${keys}
+    </div>`;
+
+  const artistPage = () => `
+    <div class="phone">
+      ${status}
+      <div class="scroll">
+        <div class="topbar"><button class="ib edge-chev" aria-label="Back">${svg('left')}</button><div class="acts edge-r"><button class="ib" aria-label="Share">${svg('share')}</button><button class="ib" aria-label="More">${svg('more')}</button></div></div>
+        <div class="ahead">
+          ${avatar('inkwell_fox', 'hero')}
+          <h1>Inkwell Fox</h1>
+          <span class="handle">inkwell_fox</span>
+          <span class="stats"><b>1,204</b> posts · you faved <b>48</b> · posted <b>2h</b> ago</span>
+          <button class="btn gold follow-big" type="button">${svg('plus', 'it')}Follow</button>
+        </div>
+        <div class="chips">
+          <button class="compact filter" type="button" aria-pressed="false">Media${svg('down', 'it')}</button>
+          <button class="compact filter" type="button" aria-pressed="false" data-toggle>Hide favorited</button>
+          <button class="compact filter" type="button" aria-pressed="true">Top${svg('down', 'it')}</button>
+          <button class="compact filter" type="button" aria-pressed="false">Date${svg('down', 'it')}</button>
+          <button class="compact filter" type="button" aria-pressed="false">Score${svg('down', 'it')}</button>
+        </div>
+        <div class="grid3" style="margin-top:8px">${Array.from({ length: 15 }, (_, k) => `<i class="${k < 2 ? 'new' : ''}" style="--art:${art(['inkwell_fox', 'inkwell_fox', 'inkwell_fox', 'berry_wolf'][k % 4], k)}"></i>`).join('')}</div>
+      </div>
+      <div class="toast">${avatar('inkwell_fox')}<span class="msg">Following inkwell_fox</span><button class="textbtn" type="button">Undo</button></div>
+      ${tabbar('Artists')}${keys}
+    </div>`;
+
+  const SCREENS = [
+    { name: 'Following', note: 'First view after opening the app. Scroll inside for a burst, the caught-up line and a suggestion.', html: following() },
+    { name: 'Artists › Suggested', note: 'One artist per section: the same 56 px row, then 3 recent posts edge to edge.', html: artists() },
+    { name: 'Artist page', note: 'Just after tapping Follow: the toast sits above the tab bar. Shown in grid view.', html: artistPage() }
+  ];
+  document.getElementById('cols').innerHTML = SCREENS.map(x => `
+    <section class="col" aria-label="${x.name}">
+      <div class="col-head"><h3>${x.name}</h3><p>${x.note}</p></div>
+      <div class="phone-holder">${x.html}</div>
+    </section>`).join('');
+  // Artist page mock shows the moment after Follow
+  document.querySelectorAll('.follow-big').forEach(b => { b.classList.remove('gold'); b.classList.add('on'); b.innerHTML = `${svg('check', 'it')}Following`; });
+
+  document.addEventListener('click', e => {
+    const h = e.target.closest('.heart');
+    if (h) { const on = !h.classList.contains('on'); h.classList.toggle('on', on); h.setAttribute('aria-pressed', on); h.classList.remove('pop'); if (on) { void h.offsetWidth; h.classList.add('pop'); } return; }
+    const f = e.target.closest('.phone .follow');
+    if (f) { const on = !f.classList.contains('on'); f.classList.toggle('on', on); f.innerHTML = on ? `${svg('check', 'it')}Following` : `${svg('plus', 'it')}Follow`; f.classList.remove('wig'); void f.offsetWidth; f.classList.add('wig'); return; }
+    const c = e.target.closest('.phone [data-toggle]');
+    if (c) { c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true'); return; }
+    const n = e.target.closest('.next');
+    if (n) { const sec = n.closest('.sugg'); const i = (+sec.dataset.i + 1) % SUGG.length; sec.dataset.i = i; sec.querySelector('.body').innerHTML = suggBody(i); return; }
+    const g = e.target.closest('[data-ground]');
+    if (g) { document.querySelectorAll('[data-ground]').forEach(b => b.setAttribute('aria-pressed', b === g)); document.body.classList.toggle('navy-ground', g.dataset.ground === 'navy'); return; }
+  });
+  const kb = document.getElementById('keys');
+  kb.addEventListener('click', () => { const on = kb.getAttribute('aria-pressed') !== 'true'; kb.setAttribute('aria-pressed', on); document.body.classList.toggle('show-keys', on); });
+
+  const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
+    const w = h.parentElement.clientWidth, z = Math.min(1, w / 375);
+    h.style.height = (812 * z) + 'px'; h.firstElementChild.style.zoom = z;
+  });
+  addEventListener('resize', fit); fit();
+})();
+</script>

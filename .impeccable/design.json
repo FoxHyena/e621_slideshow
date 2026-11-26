@@ -1,0 +1,1139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T08:47:10+00:00",
+  "title": "Design System: eLicks21",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Hexagon Ground",
+        "canonical": "oklch(16.9% 0.047 255.3)",
+        "tonalRamp": [
+          "#040B16",
+          "#1C2736",
+          "#384659",
+          "#56687F",
+          "#778BA6",
+          "#9DB0C9",
+          "#C1D3EA",
+          "#E5F0FE"
+        ]
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "Well",
+        "canonical": "oklch(23.4% 0.063 259.2)",
+        "tonalRamp": [
+          "#030B1A",
+          "#19273B",
+          "#354660",
+          "#536787",
+          "#738AAF",
+          "#99AFD2",
+          "#BED2F2",
+          "#E5EFFE"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Post Panel Navy",
+        "canonical": "oklch(30.7% 0.077 258.4)",
+        "tonalRamp": [
+          "#020A1E",
+          "#162740",
+          "#304666",
+          "#4D678E",
+          "#6C8BB8",
+          "#94B0DA",
+          "#B9D3F9",
+          "#E5EFFE"
+        ]
+      },
+      "bar": {
+        "role": "neutral",
+        "displayName": "Bar Navy",
+        "canonical": "oklch(33.5% 0.082 258.4)",
+        "tonalRamp": [
+          "#010A1F",
+          "#142641",
+          "#2F4568",
+          "#4C6790",
+          "#6B8ABA",
+          "#92B0DC",
+          "#B8D3FC",
+          "#E6EFFE"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised Navy",
+        "canonical": "oklch(35.7% 0.083 258.2)",
+        "tonalRamp": [
+          "#010A1F",
+          "#142642",
+          "#2E4668",
+          "#4B6791",
+          "#6A8BBB",
+          "#92B0DD",
+          "#B7D3FC",
+          "#E5EFFE"
+        ]
+      },
+      "raised-hi": {
+        "role": "neutral",
+        "displayName": "Raised Highlight",
+        "canonical": "oklch(42.1% 0.094 258.3)",
+        "tonalRamp": [
+          "#000A21",
+          "#112645",
+          "#2B456D",
+          "#476796",
+          "#668AC2",
+          "#8EB0E3",
+          "#B6D3FF",
+          "#E6EFFE"
+        ]
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "Quiet Outline",
+        "canonical": "rgba(180,199,217,.22), 1.5px inset ring"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "link": {
+        "role": "neutral",
+        "displayName": "Link Blue",
+        "canonical": "oklch(82.1% 0.033 246.8)",
+        "tonalRamp": [
+          "#050C13",
+          "#1E2831",
+          "#3A4752",
+          "#596876",
+          "#7A8B9C",
+          "#A0B0C0",
+          "#C4D3E1",
+          "#E3F0FE"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "oklch(74.4% 0.032 258.9)",
+        "tonalRamp": [
+          "#070B13",
+          "#202731",
+          "#3D4653",
+          "#5C6777",
+          "#7E8A9D",
+          "#A3AFC0",
+          "#C7D2E2",
+          "#E6EFFE"
+        ]
+      },
+      "gold": {
+        "role": "primary",
+        "displayName": "Hexagon Gold",
+        "canonical": "oklch(83.0% 0.145 92.7)",
+        "tonalRamp": [
+          "#100B00",
+          "#2F2503",
+          "#534309",
+          "#7A6412",
+          "#A38612",
+          "#CAAB40",
+          "#EBCF76",
+          "#FFEEB8"
+        ]
+      },
+      "on-gold": {
+        "role": "primary",
+        "displayName": "Ink on Gold",
+        "canonical": "oklch(16.9% 0.047 255.3)",
+        "tonalRamp": [
+          "#040B16",
+          "#1C2736",
+          "#384659",
+          "#56687F",
+          "#778BA6",
+          "#9DB0C9",
+          "#C1D3EA",
+          "#E5F0FE"
+        ]
+      },
+      "lip-gold": {
+        "role": "primary",
+        "displayName": "Gold Lip",
+        "canonical": "oklch(63.7% 0.121 89.7)",
+        "tonalRamp": [
+          "#100A00",
+          "#312501",
+          "#554205",
+          "#7D6309",
+          "#A5851E",
+          "#C8AB5A",
+          "#E9CF88",
+          "#FEEDC2"
+        ]
+      },
+      "lip-navy": {
+        "role": "neutral",
+        "displayName": "Lip Navy",
+        "canonical": "oklch(22.6% 0.061 260.4)",
+        "tonalRamp": [
+          "#040B1A",
+          "#1A273B",
+          "#36455F",
+          "#546786",
+          "#748AAE",
+          "#9BAFD1",
+          "#BFD2F1",
+          "#E6EFFE"
+        ]
+      },
+      "fav-on": {
+        "role": "secondary",
+        "displayName": "Favourited Plum",
+        "canonical": "oklch(38.4% 0.070 322.7)",
+        "tonalRamp": [
+          "#130515",
+          "#321E34",
+          "#533B56",
+          "#785A7B",
+          "#9E7BA2",
+          "#C1A1C5",
+          "#E3C6E6",
+          "#FCE6FE"
+        ]
+      },
+      "lip-fav": {
+        "role": "secondary",
+        "displayName": "Plum Lip",
+        "canonical": "oklch(25.0% 0.053 308.6)",
+        "tonalRamp": [
+          "#0F0715",
+          "#2B2234",
+          "#4B3F56",
+          "#6E5F7B",
+          "#9281A2",
+          "#B6A6C5",
+          "#D9CAE6",
+          "#F4E9FE"
+        ]
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Chrome Glass",
+        "canonical": "rgba(21,47,86,.88) over #0B1F3E, blur(24px) saturate(1.6)"
+      },
+      "glass-base": {
+        "role": "neutral",
+        "displayName": "Glass Base",
+        "canonical": "oklch(24.2% 0.065 259.0)",
+        "tonalRamp": [
+          "#030B1B",
+          "#19273C",
+          "#344661",
+          "#526788",
+          "#728AB0",
+          "#98AFD3",
+          "#BDD2F3",
+          "#E5EFFF"
+        ]
+      },
+      "glass-over-art": {
+        "role": "neutral",
+        "displayName": "Over-art Glass",
+        "canonical": "rgba(2,15,35,.55), blur(12px), inset ring rgba(255,255,255,.16)"
+      },
+      "player-ground": {
+        "role": "neutral",
+        "displayName": "Player Black",
+        "canonical": "oklch(0.0% 0.000 0.0)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "tag-artist": {
+        "role": "tertiary",
+        "displayName": "Tag: Artist",
+        "canonical": "oklch(79.1% 0.163 79.0)",
+        "tonalRamp": [
+          "#120900",
+          "#342302",
+          "#5B3F05",
+          "#855E0B",
+          "#B37E04",
+          "#DEA22A",
+          "#FEC769",
+          "#FEECD0"
+        ]
+      },
+      "tag-character": {
+        "role": "tertiary",
+        "displayName": "Tag: Character",
+        "canonical": "oklch(72.4% 0.246 142.5)",
+        "tonalRamp": [
+          "#001000",
+          "#033002",
+          "#095507",
+          "#107C0E",
+          "#0BA609",
+          "#44CE3E",
+          "#7DF075",
+          "#CCFFC7"
+        ]
+      },
+      "tag-species": {
+        "role": "tertiary",
+        "displayName": "Tag: Species",
+        "canonical": "oklch(75.7% 0.128 43.8)",
+        "tonalRamp": [
+          "#1A0400",
+          "#431702",
+          "#702F0F",
+          "#9B4D29",
+          "#C76D45",
+          "#EA9672",
+          "#FCC2AA",
+          "#FFE9E1"
+        ]
+      },
+      "tag-general": {
+        "role": "tertiary",
+        "displayName": "Tag: General",
+        "canonical": "oklch(82.1% 0.033 246.8)",
+        "tonalRamp": [
+          "#050C13",
+          "#1E2831",
+          "#3A4752",
+          "#596876",
+          "#7A8B9C",
+          "#A0B0C0",
+          "#C4D3E1",
+          "#E3F0FE"
+        ]
+      },
+      "tag-meta": {
+        "role": "tertiary",
+        "displayName": "Tag: Meta",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "tag-copyright": {
+        "role": "tertiary",
+        "displayName": "Tag: Copyright",
+        "canonical": "oklch(75.2% 0.197 327.3)",
+        "tonalRamp": [
+          "#190019",
+          "#420543",
+          "#6D176F",
+          "#983599",
+          "#C454C5",
+          "#E782E6",
+          "#FDB4FB",
+          "#FEE6FD"
+        ]
+      },
+      "tag-lore": {
+        "role": "tertiary",
+        "displayName": "Tag: Lore",
+        "canonical": "oklch(79.4% 0.199 143.4)",
+        "tonalRamp": [
+          "#001001",
+          "#013003",
+          "#03550A",
+          "#057C12",
+          "#1DA526",
+          "#60C95F",
+          "#8FEB8C",
+          "#CBFFC8"
+        ]
+      },
+      "score": {
+        "role": "secondary",
+        "displayName": "Score Green",
+        "canonical": "oklch(72.8% 0.153 146.3)",
+        "tonalRamp": [
+          "#001002",
+          "#02300C",
+          "#08541B",
+          "#1E7A30",
+          "#3EA14D",
+          "#71C579",
+          "#9CE6A2",
+          "#C9FFCC"
+        ]
+      },
+      "heart": {
+        "role": "secondary",
+        "displayName": "Favourite Pink",
+        "canonical": "oklch(76.4% 0.142 15.1)",
+        "tonalRamp": [
+          "#1F0004",
+          "#4B0716",
+          "#752531",
+          "#A2424E",
+          "#D0616D",
+          "#F28B94",
+          "#FDBEC2",
+          "#FEE9E9"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Danger Rose",
+        "canonical": "oklch(75.6% 0.109 19.9)",
+        "tonalRamp": [
+          "#1E0003",
+          "#441417",
+          "#6C2F31",
+          "#964D4E",
+          "#C26D6E",
+          "#E59595",
+          "#FEBEBD",
+          "#FEE9E8"
+        ]
+      },
+      "rating-questionable": {
+        "role": "tertiary",
+        "displayName": "Rating Yellow",
+        "canonical": "oklch(85.5% 0.149 101.4)",
+        "tonalRamp": [
+          "#0E0B00",
+          "#2C2703",
+          "#4E4609",
+          "#726711",
+          "#9A8B10",
+          "#C0B040",
+          "#E1D475",
+          "#FDF19E"
+        ]
+      },
+      "goo": {
+        "role": "tertiary",
+        "displayName": "Goo White",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D1D1D1",
+          "#EEEEEE"
+        ]
+      },
+      "goo-aged": {
+        "role": "tertiary",
+        "displayName": "Goo Cream",
+        "canonical": "oklch(92.1% 0.081 97.7)",
+        "tonalRamp": [
+          "#0F0B00",
+          "#2E2601",
+          "#4E4518",
+          "#716633",
+          "#968A4F",
+          "#BAAF7A",
+          "#DCD2A3",
+          "#F8F0C5"
+        ]
+      },
+      "goo-shade": {
+        "role": "tertiary",
+        "displayName": "Goo Shade",
+        "canonical": "oklch(76.0% 0.042 254.1)",
+        "tonalRamp": [
+          "#050C15",
+          "#1D2734",
+          "#394657",
+          "#57687C",
+          "#788BA3",
+          "#9EB0C6",
+          "#C3D3E7",
+          "#E4F0FF"
+        ]
+      },
+      "goo-ink": {
+        "role": "tertiary",
+        "displayName": "Goo Ink",
+        "canonical": "oklch(43.8% 0.083 258.9)",
+        "tonalRamp": [
+          "#010A1F",
+          "#152642",
+          "#2F4568",
+          "#4C6791",
+          "#6B8ABB",
+          "#92B0DD",
+          "#B8D3FC",
+          "#E6EFFE"
+        ]
+      },
+      "goo-ink-active": {
+        "role": "tertiary",
+        "displayName": "Goo Ink, current tab",
+        "canonical": "oklch(23.4% 0.063 259.2)",
+        "tonalRamp": [
+          "#030B1A",
+          "#19273B",
+          "#354660",
+          "#536787",
+          "#738AAF",
+          "#99AFD2",
+          "#BED2F2",
+          "#E5EFFE"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "large-title": {
+        "displayName": "Large title",
+        "purpose": "Screen name; artist name on the artist page."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Section headers, sheet titles, the landing card headline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Artist names, caught-up line, compact bar title, 44 button labels, stat numbers, state headlines."
+      },
+      "callout": {
+        "displayName": "Callout",
+        "purpose": "Fav count, score, burst row, new-posts pill, See all, sheet rows, list row titles, menu rows, tag targets, the quiet button, bold counts."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Filter chips, the 44 segmented control."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Subtitles, inputs, steps, the sentence under a state headline."
+      },
+      "footnote": {
+        "displayName": "Footnote",
+        "purpose": "Time and post number under a name, row subtitles and values, stat labels."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Tag text, in the e621 category colour."
+      },
+      "footnote-rounded": {
+        "displayName": "Footnote rounded",
+        "purpose": "New, Follow, +N tag, video length, Play count, group and field labels, small segmented control, grid numbers, the offline banner; tabular figures."
+      },
+      "tab": {
+        "displayName": "Tab",
+        "purpose": "Tab labels and badges, the +N artists pill, the rating letter."
+      },
+      "handle": {
+        "displayName": "Handle",
+        "purpose": "Raw e621 name under the artist name on the artist page; the API key in its field."
+      },
+      "post-id": {
+        "displayName": "Post id",
+        "purpose": "Post number in the ... sheet; what e621 said, in an error; a finished step's count in a checklist."
+      },
+      "tag-list": {
+        "displayName": "Tag (list)",
+        "purpose": "A tag name as a row title, in its category colour: Tune, search suggestions."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lit",
+        "value": "inset 0 1px 0 rgba(255,255,255,.09)",
+        "purpose": "Top light on raised things and panels."
+      },
+      {
+        "name": "lit-gold",
+        "value": "inset 0 1px 0 rgba(255,255,255,.5)",
+        "purpose": "Top light on gold."
+      },
+      {
+        "name": "lit-fav",
+        "value": "inset 0 1px 0 rgba(255,190,200,.22)",
+        "purpose": "Top light on the favourited pill."
+      },
+      {
+        "name": "lit-b",
+        "value": "inset 0 -1px 0 rgba(0,0,0,.25)",
+        "purpose": "Bottom shade on post panels."
+      },
+      {
+        "name": "lip",
+        "value": "0 3px 0 var(--lip-c)",
+        "purpose": "Pressable edge; 4px on Play, 2px on Follow. --lip-c is #0A1B38 under navy, #A8871F under gold, #291A35 under the favourited pill."
+      },
+      {
+        "name": "sunk",
+        "value": "inset 0 1px 0 rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05)",
+        "purpose": "Tags and other wells."
+      },
+      {
+        "name": "sunk-art",
+        "value": "0 0 0 1px rgba(2,15,35,.6), 0 1.5px 0 rgba(255,255,255,.06)",
+        "purpose": "The picture in a panel."
+      },
+      {
+        "name": "float",
+        "value": "0 14px 28px rgba(0,0,0,.45)",
+        "purpose": "Under Play (0 8px 18px pressed). The new-posts pill and the tag targets use 0 12px 24px rgba(0,0,0,.4)."
+      },
+      {
+        "name": "tab-bar",
+        "value": "outline copy 10px lower, blur(14px), 50% black; 1px rgba(255,255,255,.16) top edge stroke",
+        "purpose": "The tab bar tube only."
+      },
+      {
+        "name": "selected-ring",
+        "value": "inset 0 0 0 1.5px #E8C446",
+        "purpose": "Selected filter chip, focused field, pinned toggle, the tag target under the finger."
+      },
+      {
+        "name": "quiet-outline",
+        "value": "inset 0 0 0 1.5px rgba(180,199,217,.22)",
+        "purpose": "Following and the +N tag."
+      },
+      {
+        "name": "glass-over-art-ring",
+        "value": "inset 0 0 0 1px rgba(255,255,255,.16)",
+        "purpose": "Video play disc and mute; player buttons."
+      }
+    ],
+    "motion": [
+      {
+        "name": "lip-press",
+        "value": "100 ms ease-out",
+        "purpose": "translateY(lip) and the lip closing to 0. Mock."
+      },
+      {
+        "name": "chip-press",
+        "value": "100 ms ease-out",
+        "purpose": "scale to .96. Mock."
+      },
+      {
+        "name": "favourite-pop",
+        "value": "320 ms cubic-bezier(.2,.9,.3,1.4)",
+        "purpose": "heart scale .7 → 1.3 → 1. Mock."
+      },
+      {
+        "name": "heart-goo-drip",
+        "value": "720 ms; sag cubic-bezier(.25,1.6,.45,1), pull back cubic-bezier(.5,0,.2,1)",
+        "purpose": "bead, three necks and blobs under the pill; the drop leaves for the tab bar at 380 ms. Mock."
+      },
+      {
+        "name": "double-tap-heart",
+        "value": "640 ms",
+        "purpose": "one 88 heart over the picture. Mock."
+      },
+      {
+        "name": "mark-spin",
+        "value": "600 ms cubic-bezier(.3,1.5,.5,1)",
+        "purpose": "one turn, on favourite and on follow. Mock."
+      },
+      {
+        "name": "follow-wiggle",
+        "value": "360 ms ease-out",
+        "purpose": "rotate −3° → 2° → 0. Mock."
+      },
+      {
+        "name": "follow-dots",
+        "value": "480 ms",
+        "purpose": "six 5 px dots, from the mark's rim, 30 px out. Mock."
+      },
+      {
+        "name": "tab-capsule",
+        "value": "500 ms cubic-bezier(.3,1.35,.5,1)",
+        "purpose": "rotation about the bend's centre. Mock."
+      },
+      {
+        "name": "tab-icon-hop",
+        "value": "420 ms cubic-bezier(.3,1.5,.5,1)",
+        "purpose": "up 5 px, scale 1.12; label colour 200 ms. Mock."
+      },
+      {
+        "name": "tab-bar-scroll",
+        "value": "spring (stiffness 210, damping 21); rubber band past the ends",
+        "purpose": "rail rotation. Mock."
+      },
+      {
+        "name": "goo-spurt-secret-tab",
+        "value": "400 ms squeeze; ten drops in spurts of 4, 3, 3, 133 ms apart, each 240 ms plus 1.4 ms per px travelled",
+        "purpose": "drops on ballistic arcs, stretched along their speed. Mock."
+      },
+      {
+        "name": "goo-wipe",
+        "value": "900 ms blade, then a 520 ms gleam",
+        "purpose": "blade rotation, flung drops, gleam. Mock."
+      },
+      {
+        "name": "play-hide-return",
+        "value": "200 ms ease-out; returns after 1 s idle",
+        "purpose": "opacity and translateY(24px). Mock."
+      },
+      {
+        "name": "top-bar-capsule",
+        "value": "150 ms ease-out, past 64 px of scroll",
+        "purpose": "opacity and an 8 px drop (opacity only with reduced motion). Mock."
+      },
+      {
+        "name": "tuck",
+        "value": "scroll-driven",
+        "purpose": "card scale 95% ↔ 100%, 16 px rise, opacity 55% ↔ 100%. Mock."
+      },
+      {
+        "name": "skeleton-shimmer",
+        "value": "1.4 s ease-in-out, looping",
+        "purpose": "a light band crossing each well shape. Mock."
+      },
+      {
+        "name": "caught-up",
+        "value": "once, on entering view",
+        "purpose": "app mark turns one notch (45°). Mock."
+      },
+      {
+        "name": "segmented-capsule",
+        "value": "360 ms cubic-bezier(.3,1.35,.5,1); label colour 200 ms",
+        "purpose": "translateX to the chosen segment. Mock."
+      },
+      {
+        "name": "menu-capsule",
+        "value": "360 ms cubic-bezier(.3,1.35,.5,1); label colour 200 ms",
+        "purpose": "translateY to the chosen row. Mock."
+      },
+      {
+        "name": "switch",
+        "value": "knob 300 ms cubic-bezier(.3,1.35,.5,1); track colour 200 ms",
+        "purpose": "knob translateX 20 px. Mock."
+      },
+      {
+        "name": "glass-back-and-toggle-press",
+        "value": "100 ms ease-out",
+        "purpose": "scale to .94. Mock."
+      },
+      {
+        "name": "hero-follow-dots",
+        "value": "520 ms",
+        "purpose": "six 7 px dots from the 80 mark's rim. Mock."
+      },
+      {
+        "name": "player-heart",
+        "value": "320 ms cubic-bezier(.2,.9,.3,1.4)",
+        "purpose": "the favourite pop, on the glass heart. Mock."
+      },
+      {
+        "name": "field-caret",
+        "value": "1.1 s, stepped",
+        "purpose": "caret opacity. Mock."
+      },
+      {
+        "name": "tag-targets-pop",
+        "value": "320 ms cubic-bezier(.3,1.35,.5,1), each 40 ms after the last",
+        "purpose": "from 60% scale and 10 px lower, fading in. Mock."
+      },
+      {
+        "name": "tag-target-under-the-finger",
+        "value": "120 ms ease-out",
+        "purpose": "scale to 1.06, ring. Mock."
+      },
+      {
+        "name": "goo-s-wave",
+        "value": "900 ms ease-in-out, three times, 400 ms after it appears",
+        "purpose": "the arm turns 16° about its shoulder; two ticks fade in and out. Mock."
+      },
+      {
+        "name": "goo-s-squash",
+        "value": "100 ms ease-out down; 420 ms back",
+        "purpose": "107% × 90% about its base under the finger; back through 94% × 109% and 103% × 97%. Mock."
+      },
+      {
+        "name": "goo-s-spurt",
+        "value": "120 ms after the tap; 1 to 3 drops 70 ms apart, each 70 + 17(√rise + √(rise + fall)) ms",
+        "purpose": "drops rise 22 to 40 px from the tip, then fall to the tab bar, stretched along their speed. Mock."
+      },
+      {
+        "name": "goo-busy",
+        "value": "3.2 s looping glance; dots 1.2 s, 0.2 s apart",
+        "purpose": "the face slides 3.5 left and right with a hold at each end; three dots light up in turn. Mock."
+      },
+      {
+        "name": "checklist",
+        "value": "spinner 0.8 s a turn; check 320 ms pop",
+        "purpose": "the running step spins; a finished step's check pops in like the heart. Mock."
+      },
+      {
+        "name": "check-well",
+        "value": "150 ms ease-out fill; check 320 ms pop",
+        "purpose": "the well turns Score Green and its check pops in. Mock."
+      },
+      {
+        "name": "goo-s-snooze",
+        "value": "3.2 s ease-in-out, looping",
+        "purpose": "the \"z\" drift 2 px right and 3 px up, to 60%. Mock."
+      },
+      {
+        "name": "slow-down-count",
+        "value": "once a second",
+        "purpose": "the number in the sentence. Mock."
+      },
+      {
+        "name": "new-posts-pill",
+        "value": "slides in under the header; posts insert with a slide-down, keeping the reading position",
+        "purpose": "translateY, opacity. Spec (not in mock)."
+      },
+      {
+        "name": "tab-content",
+        "value": "120 ms fade",
+        "purpose": "content opacity. Spec (not in mock)."
+      },
+      {
+        "name": "push-back",
+        "value": "150 ms cross-fade + 8 px rise; gesture back never animates",
+        "purpose": "opacity, translateY. Spec (not in mock)."
+      },
+      {
+        "name": "player-open-close",
+        "value": "200 ms fade-up from the card / fade out",
+        "purpose": "opacity, translateY. Spec (not in mock)."
+      },
+      {
+        "name": "player-controls",
+        "value": "auto-hide after 2.5 s playing; stay while paused or focused; 250 ms double-tap guard",
+        "purpose": "opacity. Spec (not in mock)."
+      },
+      {
+        "name": "sheets",
+        "value": "spring up; drag to dismiss with rubber-banding",
+        "purpose": "translateY. Spec (not in mock)."
+      },
+      {
+        "name": "pull-to-refresh",
+        "value": "indicator follows at half the finger; 144 px travel arms; spinner holds at 48 px for at least 400 ms",
+        "purpose": "translateY. Spec (not in mock)."
+      },
+      {
+        "name": "toast-in-out",
+        "value": "in: 320 ms cubic-bezier(.3,1.35,.5,1), rises 12 px and fades in; out: 200 ms ease-in, drops 8 px and fades. Stays 6 s with Undo, 4 s without; role=\"status\"",
+        "purpose": "opacity, translateY. Spec (not in mock)."
+      },
+      {
+        "name": "sidebar-capsule",
+        "value": "500 ms · cubic-bezier(.3,1.35,.5,1), the tab bar's",
+        "purpose": "translateY. Spec (not in mock)."
+      },
+      {
+        "name": "undo-ring",
+        "value": "empties clockwise in 6 s, linear; paused on hover or focus",
+        "purpose": "stroke-dashoffset. Spec (not in mock)."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "instant",
+        "purpose": "No pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; capsules (tab, segmented, menu) and the switch knob move instantly; tag targets appear without the pop; Goo the mascot holds still; goo still shows and updates in place."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "375px reference"
+      },
+      {
+        "name": "desktop",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Gold Button",
+      "kind": "button",
+      "refersTo": "button-gold",
+      "description": "The one main action per screen (Play, Sign in). Strong top light, gold lip closing in 100 ms.",
+      "html": "<button class=\"ds-btn ds-gold ds-lip\">Sign in</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);--lit:var(--lit-gold)}.ds-gold:hover{filter:brightness(1.05)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Tonal Button",
+      "kind": "button",
+      "refersTo": "button-tonal",
+      "description": "Secondary action: Raised Navy, top light, navy lip. 44 tall, or 36 compact.",
+      "html": "<button class=\"ds-btn ds-tonal ds-lip\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button> <button class=\"ds-btn ds-c ds-tonal ds-lip\">Rebuild</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal:hover{background:var(--raised-hi)}.ds-tonal svg{color:var(--score)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Post Panel",
+      "kind": "card",
+      "refersTo": "post-panel",
+      "description": "Signature: e621 navy post box with one 8 edge. Artist mark, name and New, time, post number on top; the picture sunk at 16 radius; tags in wells; score and the fav pill at the right end. Nothing on the art.",
+      "html": "<article class=\"ds-post\"><header class=\"ds-ph\"><span class=\"ds-av ds-new\"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M-0.658 -0.239A0.7 0.7 0 1 1 0.239 0.658\" fill=\"none\" stroke=\"#F3946B\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M0.314 0.264A0.41 0.41 0 1 1 -0.264 -0.314\" fill=\"none\" stroke=\"#E9F2FA\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#FF8A95\"/></svg></span><div class=\"ds-idn\"><b>inkwell fox</b><span><em>New</em> · 2h ago · #4512345</span></div><button class=\"ds-more\" aria-label=\"More\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1.2\"/><circle cx=\"19\" cy=\"12\" r=\"1.2\"/><circle cx=\"5\" cy=\"12\" r=\"1.2\"/></svg></button></header><div class=\"ds-art\"></div><div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember (inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red fox</button><button class=\"ds-tag\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div><footer class=\"ds-pf\"><span class=\"ds-score\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 19v-7H5.5L12 5l6.5 7H15v7Z\"/></svg>340</span><button class=\"ds-fav ds-lip\" aria-pressed=\"false\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button></footer></article>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-post{width:343px;padding:8px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);color:var(--fg)}.ds-ph{display:flex;align-items:center;gap:12px;height:36px;margin-bottom:8px}.ds-av.ds-new{position:relative}.ds-av.ds-new::after{content:'';position:absolute;top:-2px;right:-2px;width:10px;height:10px;border-radius:999px;background:var(--gold);box-shadow:0 0 0 2.5px var(--panel)}.ds-idn{flex:1;min-width:0;display:flex;flex-direction:column}.ds-idn b{font:600 17px/20px var(--f-r);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ds-idn span{font:400 13px/16px var(--f);color:var(--muted);font-variant-numeric:tabular-nums}.ds-idn em{font:500 13px/16px var(--f-r);color:var(--gold)}.ds-more{width:36px;height:36px;margin-right:-6px;display:grid;place-items:center;color:var(--muted);border-radius:999px}.ds-more:active{background:var(--well);color:var(--fg)}.ds-art{aspect-ratio:4/3;border-radius:16px;background:linear-gradient(160deg,#6E3B5C,#E8743B 60%,#F0B37E);box-shadow:0 0 0 1px rgba(2,15,35,.6),0 1.5px 0 rgba(255,255,255,.06)}.ds-pf{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-bottom:3px}.ds-score{display:inline-flex;align-items:center;gap:4px;font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-score svg{color:var(--score)}.ds-tags{display:flex;gap:8px;padding:8px 0}.ds-tag{height:28px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f);white-space:nowrap;color:#B4C7D9}.ds-tag:active{background:#071631}.ds-tag.ds-plus{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);color:var(--muted);font:500 13px/18px var(--f-r)}.ds-fav{height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 14px 0 11px;border-radius:999px;background:var(--raised);color:var(--fg);font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:var(--fav-on);--lip-c:var(--lip-fav);--lit:inset 0 1px 0 rgba(255,190,200,.22)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-pop svg{animation:ds-pop .32s cubic-bezier(.2,.9,.3,1.4)}@keyframes ds-pop{0%{transform:scale(.7)}60%{transform:scale(1.3)}100%{transform:scale(1)}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Fav Pill",
+      "kind": "button",
+      "refersTo": "fav-pill",
+      "description": "Raised 36 capsule: pink heart and count. On: plum fill with its own lip, filled heart, pop. In the app it also drips goo and sends a drop to the tab bar.",
+      "html": "<button class=\"ds-fav ds-lip\" aria-pressed=\"false\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button> <button class=\"ds-fav ds-lip ds-pop\" aria-pressed=\"true\" aria-label=\"Favorite, 1.2k\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg><span>1.2k</span></button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-fav{height:36px;display:inline-flex;align-items:center;gap:6px;padding:0 14px 0 11px;border-radius:999px;background:var(--raised);color:var(--fg);font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:var(--fav-on);--lip-c:var(--lip-fav);--lit:inset 0 1px 0 rgba(255,190,200,.22)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-pop svg{animation:ds-pop .32s cubic-bezier(.2,.9,.3,1.4)}@keyframes ds-pop{0%{transform:scale(.7)}60%{transform:scale(1.3)}100%{transform:scale(1)}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Sunk 28 well, e621 category colour as text, names shown with spaces. +N is outlined, not sunk.",
+      "html": "<div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember (inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red fox</button><button class=\"ds-tag\" style=\"color:#EE7BEE\">inkwell tales</button><button class=\"ds-tag\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-tags{width:343px;box-sizing:border-box;padding:16px 8px!important;background:var(--panel);border-radius:24px;flex-wrap:wrap}.ds-tags{display:flex;gap:8px;padding:8px 0}.ds-tag{height:28px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f);white-space:nowrap;color:#B4C7D9}.ds-tag:active{background:#071631}.ds-tag.ds-plus{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);color:var(--muted);font:500 13px/18px var(--f-r)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Panel capsule with top light, 36 tall. Selected: Raised Highlight with a 1.5 gold ring. Shrinks to 96% when pressed; no lip.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"false\">Media<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button> <button class=\"ds-chip\" aria-pressed=\"true\">Videos<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button> <button class=\"ds-chip\" aria-pressed=\"true\">Hide favorited</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-chip{height:36px;display:inline-flex;align-items:center;gap:4px;padding:0 14px;border-radius:999px;background:var(--panel);box-shadow:var(--lit);color:var(--fg);font:500 15px/20px var(--f-r);white-space:nowrap;transition:transform .1s ease-out}.ds-chip svg{color:var(--muted);margin-right:-4px}.ds-chip:active{transform:scale(.96)}.ds-chip[aria-pressed=true]{background:var(--raised-hi);box-shadow:var(--lit),inset 0 0 0 1.5px var(--gold)}.ds-chip[aria-pressed=true] svg{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Follow Pill",
+      "kind": "chip",
+      "refersTo": "follow-pill",
+      "description": "Raised 36 capsule with a gold plus and a 2 lip. Following: outlined, green check. Toggling wiggles; following also throws six dots from the artist mark.",
+      "html": "<div class=\"ds-frow\"><span class=\"ds-av \"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M-0.658 -0.239A0.7 0.7 0 1 1 0.239 0.658\" fill=\"none\" stroke=\"#5EC06A\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M0.314 0.264A0.41 0.41 0 1 1 -0.264 -0.314\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#78DCA5\"/></svg></span><button class=\"ds-follow ds-lip\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Follow</button><button class=\"ds-follow ds-on\" aria-pressed=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-frow{display:inline-flex;align-items:center;gap:12px;padding:12px;background:var(--panel);border-radius:24px}.ds-follow{height:36px;display:inline-flex;align-items:center;gap:4px;padding:0 14px 0 10px;border-radius:999px;background:var(--raised);color:var(--fg);font:500 13px/18px var(--f-r);--lip:2px}.ds-follow svg{color:var(--gold)}.ds-follow.ds-on{background:none;box-shadow:inset 0 0 0 1.5px var(--outline);padding:0 10px 0 8px}.ds-follow.ds-on:active{transform:none}.ds-follow.ds-on svg{color:var(--score)}.ds-wig{animation:ds-wig .36s ease-out}@keyframes ds-wig{25%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}100%{transform:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Play Button",
+      "kind": "button",
+      "refersTo": "play-fab",
+      "description": "Floating 56 gold circle at the bottom left: 4 lip, soft shadow, count badge ringed in gold.",
+      "html": "<button class=\"ds-fab\" aria-label=\"Play 12 new posts\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.25 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L7.75 3.64A1 1 0 0 0 6.25 4.5Z\"/></svg><span>12</span></button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-fab{position:relative;width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:var(--gold);color:var(--on-gold);box-shadow:var(--lit-gold),0 4px 0 var(--lip-gold),0 14px 28px rgba(0,0,0,.45);transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-fab:active{transform:translateY(4px);box-shadow:var(--lit-gold),0 0 0 var(--lip-gold),0 8px 18px rgba(0,0,0,.45)}.ds-fab span{position:absolute;top:-6px;right:-6px;height:24px;min-width:24px;box-sizing:border-box;padding:0 6px;border-radius:999px;background:var(--ground);color:var(--fg);font:600 13px/24px var(--f-r);text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "One solid tube, 64 thick, bent so the middle rises 10. Tabs lie along the bend; the current tab sits in a Raised Highlight capsule that slides along the curve. In the app it also scrolls to a secret fifth tab and collects goo.",
+      "html": "<nav class=\"ds-tabbar\" aria-label=\"Tabs\"><span class=\"ds-tb-bg\" style=\"clip-path:path('M27.44 10.33A1010.01 1010.01 0 0 1 315.56 10.33A32.0 32.0 0 0 1 306.44 73.67A946.01 946.01 0 0 0 36.56 73.67A32.0 32.0 0 0 1 27.44 10.33Z')\"><span class=\"ds-tb-ind\" style=\"transform:rotate(-0.12805rad)\"></span></span><svg class=\"ds-tb-hi\" width=\"343\" height=\"74\" viewBox=\"0 0 343 74\" aria-hidden=\"true\"><path d=\"M27.44 10.33A1010.01 1010.01 0 0 1 315.56 10.33\" transform=\"translate(0 .5)\"/></svg><button class=\"ds-tab ds-on\" style=\"transform:rotate(-0.12805rad)\" aria-current=\"page\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 11a9 9 0 0 1 9 9\"/><path d=\"M4 4a16 16 0 0 1 16 16\"/><circle cx=\"5\" cy=\"19\" r=\"1\"/></svg><span>Following</span></button><button class=\"ds-tab\" style=\"transform:rotate(-0.04268rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"/></svg><span>For You</span></button><button class=\"ds-tab\" style=\"transform:rotate(0.04268rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg><span>Artists</span></button><button class=\"ds-tab\" style=\"transform:rotate(0.12805rad)\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg><span>Settings</span></button></nav>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-tabbar{position:relative;width:343px;height:74px;--R:978.01px;--tw:83.49px}.ds-tb-bg{position:absolute;inset:0;background:var(--bar)}.ds-tb-hi{position:absolute;left:0;top:0;fill:none;stroke:rgba(255,255,255,.16);stroke-width:1;stroke-linecap:round;pointer-events:none}.ds-tb-ind,.ds-tab{position:absolute;top:5px;left:50%;height:54px;width:var(--tw);margin-left:calc(var(--tw) / -2);transform-origin:50% calc(27px + var(--R));border-radius:999px}.ds-tb-ind{background:var(--raised-hi);box-shadow:var(--lit);transition:transform .5s cubic-bezier(.3,1.35,.5,1)}.ds-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--link);font:500 11px/13px var(--f-r)}.ds-tab:hover{color:var(--fg)}.ds-tab.ds-on{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "A well you type in: 44 capsule sunk into its panel, label 4 above in rounded footnote, gold ring and gold caret on focus.",
+      "html": "<div class=\"ds-fpanel\"><label class=\"ds-fl\"><span>Username</span><input class=\"ds-field\" value=\"wolfie\"></label><label class=\"ds-fl\"><span>Search</span><input class=\"ds-field\" placeholder=\"Search tags\"></label></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-fpanel{display:flex;flex-direction:column;gap:12px;width:311px;padding:16px;background:var(--panel);box-shadow:var(--lit);border-radius:24px}.ds-fl{display:flex;flex-direction:column;gap:4px}.ds-fl span{margin-left:14px;font:500 13px/18px var(--f-r);color:var(--muted)}.ds-field{height:44px;box-sizing:border-box;border:0;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);padding:0 16px 0 14px;color:var(--fg);font:400 15px/20px var(--f);caret-color:var(--gold)}.ds-field::placeholder{color:var(--muted)}.ds-field:focus{outline:none;box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05),inset 0 0 0 1.5px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "List Row",
+      "kind": "custom",
+      "refersTo": "list-row",
+      "description": "Rows in one Panel group, at least 56 tall: icon in a 32 round well (sunk: the row is the button, not the icon), title over a muted line, then a value and chevron, or a control.",
+      "html": "<div class=\"ds-group\"><button class=\"ds-row\"><span class=\"ds-ico\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"3\"/><path d=\"m10 8.5 5 3.5-5 3.5Z\"/></svg></span><span class=\"ds-lbl\"><b>Slideshow</b><small>Style, timing, videos</small></span><span class=\"ds-val\">6 s</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><div class=\"ds-row\"><span class=\"ds-ico\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\"/><path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\"/></svg></span><span class=\"ds-lbl\"><b>Goo</b><small>23 favorites</small></span><button class=\"ds-btn ds-c ds-tonal ds-lip\">Wipe clean</button></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-group{width:343px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);overflow:hidden;color:var(--fg)}.ds-row{width:100%;box-sizing:border-box;min-height:56px;display:flex;align-items:center;gap:12px;padding:8px 16px;text-align:left;position:relative}.ds-row+.ds-row::before{content:'';position:absolute;top:0;right:0;left:60px;border-top:1px solid rgba(180,199,217,.1)}button.ds-row:active{background:rgba(255,255,255,.04)}.ds-ico{width:32px;height:32px;flex:none;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);display:grid;place-items:center;color:var(--link)}.ds-row:first-child .ds-ico svg{transform:translateY(.5px)}.ds-lbl{flex:1;min-width:0;display:flex;flex-direction:column}.ds-lbl b{font:600 15px/20px var(--f-r)}.ds-lbl small,.ds-val{font:400 13px/18px var(--f);color:var(--muted)}.ds-row>svg{color:var(--muted);margin:0 -5px 0 -4px}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal:hover{background:var(--raised-hi)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "custom",
+      "refersTo": "segmented",
+      "description": "A sunk capsule track; the chosen segment sits on a Raised Highlight capsule that slides to it in 360 ms, like the tab bar. No lip.",
+      "html": "<div class=\"ds-wellp\"><div class=\"ds-seg\" role=\"radiogroup\" aria-label=\"Fit\"><label><input type=\"radio\" name=\"ds-fit\" checked><span>Fit</span></label><label><input type=\"radio\" name=\"ds-fit\"><span>Fill</span></label><label><input type=\"radio\" name=\"ds-fit\"><span>1:1</span></label><i class=\"ds-thumb\"></i></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-wellp{display:inline-flex;gap:12px;padding:12px;background:var(--panel);box-shadow:var(--lit);border-radius:24px}.ds-seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:168px;height:36px;padding:3px;box-sizing:border-box;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05)}.ds-seg label{position:relative;z-index:1;display:grid;place-items:center;border-radius:999px;font:500 13px/18px var(--f-r);color:var(--muted);cursor:pointer;transition:color .2s ease-out}.ds-seg input{position:absolute;opacity:0;pointer-events:none}.ds-seg label:has(:checked){color:var(--fg)}.ds-seg label:has(:focus-visible){outline:2px solid var(--gold);outline-offset:2px}.ds-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 3);border-radius:999px;background:var(--raised-hi);box-shadow:var(--lit),0 1px 0 rgba(2,15,35,.5);transition:transform .36s cubic-bezier(.3,1.35,.5,1)}.ds-seg:has(label:nth-child(2) :checked) .ds-thumb{transform:translateX(100%)}.ds-seg:has(label:nth-child(3) :checked) .ds-thumb{transform:translateX(200%)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Switch",
+      "kind": "custom",
+      "refersTo": "switch-on",
+      "description": "51 by 31 well with a link-blue knob; on, the track is Score Green and the knob is white, 20 to the right.",
+      "html": "<div class=\"ds-wellp\"><label class=\"ds-sw\"><input type=\"checkbox\" role=\"switch\" checked aria-label=\"Mute videos\"><i></i></label><label class=\"ds-sw\"><input type=\"checkbox\" role=\"switch\" aria-label=\"Loop at the end\"><i></i></label></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-wellp{display:inline-flex;gap:12px;padding:12px;background:var(--panel);box-shadow:var(--lit);border-radius:24px}.ds-sw{display:block;position:relative;width:51px;height:31px}.ds-sw input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}.ds-sw i{position:absolute;inset:0;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);transition:background-color .2s ease-out;pointer-events:none}.ds-sw i::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:999px;background:var(--link);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 0 rgba(2,15,35,.4);transition:transform .3s cubic-bezier(.3,1.35,.5,1),background-color .2s ease-out}.ds-sw input:checked+i{background:var(--score);box-shadow:inset 0 1px 0 rgba(0,0,0,.22)}.ds-sw input:checked+i::after{transform:translateX(20px);background:#fff}.ds-sw input:focus-visible+i{outline:2px solid var(--gold);outline-offset:2px} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Stat Wells",
+      "kind": "custom",
+      "refersTo": "stat-well",
+      "description": "The artist page stats: one Panel holding three wells, each a white icon and a headline number over a muted label.",
+      "html": "<div class=\"ds-stats\"><div><b><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"3\"/><circle cx=\"9\" cy=\"9\" r=\"2\"/><path d=\"m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21\"/></svg>1.2k</b><small>posts</small></div><div><b><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>48</b><small>you faved</small></div><div><b><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/></svg>2h</b><small>last post</small></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:343px;box-sizing:border-box;padding:8px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);color:var(--fg)}.ds-stats div{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:16px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05)}.ds-stats b{display:inline-flex;align-items:center;gap:4px;font:600 17px/22px var(--f-r);font-variant-numeric:tabular-nums}.ds-stats small{font:400 13px/18px var(--f);color:var(--muted)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Menu",
+      "kind": "custom",
+      "refersTo": "menu",
+      "description": "One choice from a list, in a sheet: a sunk track (26 radius, 4 padding) of 44 rows. The chosen row is white on a Raised Highlight capsule that slides to it in 360 ms. A vertical segmented control: no gold, no check, no lip.",
+      "html": "<div class=\"ds-sheetp\"><div class=\"ds-menu\" role=\"radiogroup\" aria-label=\"Sort\"><label><input type=\"radio\" name=\"ds-sort\"><span>New</span></label><label><input type=\"radio\" name=\"ds-sort\" checked><span>Top</span></label><label><input type=\"radio\" name=\"ds-sort\"><span>Hot</span></label><label><input type=\"radio\" name=\"ds-sort\"><span>Random</span></label><i class=\"ds-mthumb\"></i></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-sheetp{width:343px;box-sizing:border-box;padding:16px;background:var(--panel);box-shadow:var(--lit);border-radius:24px}.ds-menu{position:relative;padding:4px;border-radius:26px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05)}.ds-menu label{position:relative;z-index:1;display:flex;align-items:center;height:44px;padding:0 8px 0 16px;border-radius:999px;font:600 15px/20px var(--f-r);font-variant-numeric:tabular-nums;color:var(--muted);cursor:pointer;transition:color .2s ease-out}.ds-menu input{position:absolute;opacity:0;pointer-events:none}.ds-menu label:has(:checked){color:var(--fg)}.ds-menu label:has(:focus-visible){outline:2px solid var(--gold);outline-offset:-2px}.ds-mthumb{position:absolute;top:4px;left:4px;right:4px;height:44px;border-radius:999px;background:var(--raised-hi);box-shadow:var(--lit),0 1px 0 rgba(2,15,35,.5);transition:transform .36s cubic-bezier(.3,1.35,.5,1)}.ds-menu:has(label:nth-child(2) :checked) .ds-mthumb{transform:translateY(44px)}.ds-menu:has(label:nth-child(3) :checked) .ds-mthumb{transform:translateY(88px)}.ds-menu:has(label:nth-child(4) :checked) .ds-mthumb{transform:translateY(132px)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Tag Targets",
+      "kind": "custom",
+      "refersTo": "tag-target",
+      "description": "What a held tag offers: 44 Raised Highlight capsules that float 8 above it. The one under the finger grows to 106% and takes the gold ring (the Danger ring on Blacklist). No lip.",
+      "html": "<div class=\"ds-tdemo\"><div class=\"ds-tgts\"><button class=\"ds-tgt\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7.5\"/><path d=\"m20.5 20.5-4.2-4.2\"/></svg> Search</button><button class=\"ds-tgt ds-danger\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m5.6 5.6 12.8 12.8\"/></svg> Blacklist</button></div><div class=\"ds-tags\"><span class=\"ds-tag ds-held\">otter</span><span class=\"ds-tag\">mustelid</span><span class=\"ds-tag ds-g\">river</span></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-tdemo{display:flex;flex-direction:column;gap:8px;width:343px;box-sizing:border-box;padding:12px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25)}.ds-tgts,.ds-tags{display:flex;gap:8px}.ds-tgt{height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 16px 0 12px;border:0;border-radius:999px;background:var(--raised-hi);color:var(--fg);font:600 15px/20px var(--f-r);white-space:nowrap;box-shadow:var(--lit),0 12px 24px rgba(0,0,0,.4);cursor:pointer;transition:transform .12s ease-out}.ds-tgt svg{color:var(--link)}.ds-tgt.ds-danger,.ds-tgt.ds-danger svg{color:#ED9393}.ds-tgt:hover,.ds-tgt:active{transform:scale(1.06);box-shadow:var(--lit),inset 0 0 0 1.5px var(--gold),0 12px 24px rgba(0,0,0,.4)}.ds-tgt.ds-danger:hover,.ds-tgt.ds-danger:active{box-shadow:var(--lit),inset 0 0 0 1.5px #ED9393,0 12px 24px rgba(0,0,0,.4)}.ds-tag{height:28px;padding:0 10px;display:inline-flex;align-items:center;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f);color:#F3946B}.ds-tag.ds-g{color:#B4C7D9}.ds-tag.ds-held{background:#071631;box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05),inset 0 0 0 1.5px rgba(180,199,217,.32)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Goo",
+      "kind": "custom",
+      "refersTo": "goo-mascot",
+      "description": "The mascot: a drop of the tab bar goo with a face, drawn as white shapes under a blur-and-threshold filter so body, spill and arm are one liquid. Five moods: wave (hello, sign in), snooze (nothing yet, waiting), look (nothing found), oops (something failed), busy (working on it). One per screen, never on art. Tap it: it squashes, springs back and spurts 1 to 3 drops onto the tab bar, each one more on the goo count.",
+      "html": "<div class=\"ds-goos\"><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><defs><filter id=\"ds-goo\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\" color-interpolation-filters=\"sRGB\"><feGaussianBlur in=\"SourceGraphic\" stdDeviation=\"2.4\"></feGaussianBlur><feColorMatrix mode=\"matrix\" values=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9\"></feColorMatrix></filter></defs><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"44.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"43.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"73.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"72.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"59\" cy=\"87.4\" rx=\"3.3\" ry=\"3.5\" fill=\"#FF8A95\" stroke=\"#020F23\" stroke-width=\"2.2\"></ellipse><path d=\"M52.5 83q3.25 4.6 6.5 0q3.25 4.6 6.5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g><g class=\"ds-tick\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M115 48q4 6 2 12\"></path><path d=\"M97 43q5-3 10-1\" opacity=\".7\"></path></g>\n      </svg><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g transform=\"translate(60 100) scale(1.08 .86) translate(-60 -100)\"><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g transform=\"translate(60 100) scale(1.08 .86) translate(-60 -100)\"><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g class=\"ds-bd\"><g transform=\"translate(60 100) scale(1.08 .86) translate(-60 -100)\"><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><path d=\"M39.5 72q5 4.5 10 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M68.5 72q5 4.5 10 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M54 83q2.5 3.6 5 0q2.5 3.6 5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g>\n      <g class=\"ds-zz\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M94 36h8l-8 9h8\"></path><path d=\"M106 22h5.5l-5.5 6.5h5.5\" opacity=\".7\"></path></g></svg><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"47.5\" cy=\"70\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"46.24\" cy=\"67.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"76.5\" cy=\"70\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"75.24\" cy=\"67.87\" r=\"1.5\" fill=\"#fff\"></circle><path d=\"M56 83q2.75 4 5.5 0q2.75 4 5.5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g>\n      <text class=\"ds-qq\" x=\"98\" y=\"38\" font-family=\"Fredoka, sans-serif\" font-weight=\"600\" font-size=\"24\" fill=\"#B4C7D9\" text-anchor=\"middle\">?</text></svg><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><path d=\"M40.5 68l7 4l-7 4\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M77.5 68l-7 4l7 4\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M51 85q4-5 8 0t8 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g>\n      <path class=\"ds-sw\" d=\"M98 28c3.4 4.6 5 7 5 9.4a5 5 0 0 1-10 0c0-2.4 1.6-4.8 5-9.4Z\" fill=\"#B4C7D9\"></path></svg><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g class=\"ds-bd\"><g class=\"ds-gl\"><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"44.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"43.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"73.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"72.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><path d=\"M52.5 83q3.25 4.6 6.5 0q3.25 4.6 6.5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g>\n      <g class=\"ds-dd\" fill=\"#B4C7D9\"><circle cx=\"86\" cy=\"38\" r=\"2.4\" style=\"animation-delay:0s\"></circle><circle cx=\"94.5\" cy=\"35\" r=\"2.9\" style=\"animation-delay:0.2s\"></circle><circle cx=\"103\" cy=\"32\" r=\"3.4\" style=\"animation-delay:0.4s\"></circle></g></svg></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-mas{display:block;flex:none;overflow:visible;cursor:pointer}.ds-mas .ds-bd{transform-box:view-box;transform-origin:60px 100px;transition:transform .1s ease-out}.ds-mas:active .ds-bd{transform:scale(1.07,.9)}.ds-mas .ds-arm,.ds-mas .ds-tick,.ds-mas .ds-zz{transform-box:view-box}.ds-mas .ds-arm{animation:ds-wave .9s ease-in-out .4s 3}.ds-mas .ds-tick{animation:ds-tick .9s ease-in-out .4s 3 both}.ds-mas .ds-zz{animation:ds-zz 3.2s ease-in-out infinite}@keyframes ds-wave{50%{transform:rotate(16deg)}}@keyframes ds-tick{0%,100%{opacity:0}50%{opacity:1}}@keyframes ds-zz{50%{transform:translate(2px,-3px);opacity:.6}}.ds-mas .ds-gl,.ds-mas .ds-dd circle{transform-box:view-box}.ds-mas .ds-gl{animation:ds-glance 3.2s cubic-bezier(.5,0,.3,1) infinite}.ds-mas .ds-dd circle{opacity:.35;animation:ds-dot 1.2s ease-in-out infinite}@keyframes ds-glance{0%,38%{transform:translate(-3.5px,0)}50%,88%{transform:translate(3.5px,0)}100%{transform:translate(-3.5px,0)}}@keyframes ds-dot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-2px)}}@media (prefers-reduced-motion:reduce){.ds-mas *{animation:none!important;transition:none!important}}.ds-goos{display:flex;flex-wrap:wrap;gap:16px 24px;width:343px;box-sizing:border-box;justify-content:center;padding:20px 12px 12px;border-radius:24px;background:var(--ground)}.ds-goos .ds-mas{width:72px;height:72px} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "State",
+      "kind": "custom",
+      "refersTo": "button-quiet",
+      "description": "Every state that replaces content: Goo, 12, a headline, 4, one sentence that says why, 16, the way out. On the ground, never in a card. Gold only for Sign in; a second, lesser way out is a quiet button 4 under it.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-state\"><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"112\" height=\"112\" aria-hidden=\"true\"><defs><filter id=\"ds-goo\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\" color-interpolation-filters=\"sRGB\"><feGaussianBlur in=\"SourceGraphic\" stdDeviation=\"2.4\"></feGaussianBlur><feColorMatrix mode=\"matrix\" values=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9\"></feColorMatrix></filter></defs><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"44.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"43.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"73.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"72.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"59\" cy=\"87.4\" rx=\"3.3\" ry=\"3.5\" fill=\"#FF8A95\" stroke=\"#020F23\" stroke-width=\"2.2\"></ellipse><path d=\"M52.5 83q3.25 4.6 6.5 0q3.25 4.6 6.5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g><g class=\"ds-tick\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M115 48q4 6 2 12\"></path><path d=\"M97 43q5-3 10-1\" opacity=\".7\"></path></g>\n      </svg><b>For You learns from your favorites</b><p>Sign in and it picks posts from the tags and artists you favorite most.</p><div class=\"ds-acts\"><button class=\"ds-btn ds-gold ds-lip\">Sign in</button><button class=\"ds-quiet\">Search instead</button></div></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-mas{display:block;flex:none;overflow:visible;cursor:pointer}.ds-mas .ds-bd{transform-box:view-box;transform-origin:60px 100px;transition:transform .1s ease-out}.ds-mas:active .ds-bd{transform:scale(1.07,.9)}.ds-mas .ds-arm,.ds-mas .ds-tick,.ds-mas .ds-zz{transform-box:view-box}.ds-mas .ds-arm{animation:ds-wave .9s ease-in-out .4s 3}.ds-mas .ds-tick{animation:ds-tick .9s ease-in-out .4s 3 both}.ds-mas .ds-zz{animation:ds-zz 3.2s ease-in-out infinite}@keyframes ds-wave{50%{transform:rotate(16deg)}}@keyframes ds-tick{0%,100%{opacity:0}50%{opacity:1}}@keyframes ds-zz{50%{transform:translate(2px,-3px);opacity:.6}}.ds-mas .ds-gl,.ds-mas .ds-dd circle{transform-box:view-box}.ds-mas .ds-gl{animation:ds-glance 3.2s cubic-bezier(.5,0,.3,1) infinite}.ds-mas .ds-dd circle{opacity:.35;animation:ds-dot 1.2s ease-in-out infinite}@keyframes ds-glance{0%,38%{transform:translate(-3.5px,0)}50%,88%{transform:translate(3.5px,0)}100%{transform:translate(-3.5px,0)}}@keyframes ds-dot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-2px)}}@media (prefers-reduced-motion:reduce){.ds-mas *{animation:none!important;transition:none!important}}.ds-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;color:var(--fg)}.ds-state .ds-mas{margin-bottom:12px}.ds-state>b{font:600 17px/22px var(--f-r);text-wrap:balance}.ds-state>p{margin:4px 0 0;max-width:30ch;font:400 15px/20px var(--f);color:var(--muted);text-wrap:pretty}.ds-acts{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:16px}.ds-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);--lit:var(--lit-gold)}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal svg{margin-left:-4px}.ds-quiet{height:44px;padding:0 16px;border-radius:999px;font:600 15px/20px var(--f-r);color:var(--link)}.ds-quiet:active{background:rgba(255,255,255,.04)}.ds-ground{width:343px;box-sizing:border-box;padding:24px 0 16px;border-radius:24px;background:var(--ground)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Error Panel",
+      "kind": "card",
+      "refersTo": "state-panel",
+      "description": "An error sits in a Panel where the first post would be: Goo at 96, the headline, whose fault it is, what e621 said in a 28 well capsule, then a tonal Try again. Asked to slow down is the same panel with Goo snoozing and a count.",
+      "html": "<div class=\"ds-err\"><div class=\"ds-state\"><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"96\" height=\"96\" aria-hidden=\"true\"><defs><filter id=\"ds-goo\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\" color-interpolation-filters=\"sRGB\"><feGaussianBlur in=\"SourceGraphic\" stdDeviation=\"2.4\"></feGaussianBlur><feColorMatrix mode=\"matrix\" values=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9\"></feColorMatrix></filter></defs><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><path d=\"M40.5 68l7 4l-7 4\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M77.5 68l-7 4l7 4\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path><path d=\"M51 85q4-5 8 0t8 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g>\n      <path class=\"ds-sw\" d=\"M98 28c3.4 4.6 5 7 5 9.4a5 5 0 0 1-10 0c0-2.4 1.6-4.8 5-9.4Z\" fill=\"#B4C7D9\"></path></svg><b>e621 didn't answer</b><p>Your feed is fine. The site is having a moment.</p><div class=\"ds-acts\"><code>503 Service Unavailable</code><button class=\"ds-btn ds-tonal ds-lip\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/></svg>Try again</button></div></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-mas{display:block;flex:none;overflow:visible;cursor:pointer}.ds-mas .ds-bd{transform-box:view-box;transform-origin:60px 100px;transition:transform .1s ease-out}.ds-mas:active .ds-bd{transform:scale(1.07,.9)}.ds-mas .ds-arm,.ds-mas .ds-tick,.ds-mas .ds-zz{transform-box:view-box}.ds-mas .ds-arm{animation:ds-wave .9s ease-in-out .4s 3}.ds-mas .ds-tick{animation:ds-tick .9s ease-in-out .4s 3 both}.ds-mas .ds-zz{animation:ds-zz 3.2s ease-in-out infinite}@keyframes ds-wave{50%{transform:rotate(16deg)}}@keyframes ds-tick{0%,100%{opacity:0}50%{opacity:1}}@keyframes ds-zz{50%{transform:translate(2px,-3px);opacity:.6}}.ds-mas .ds-gl,.ds-mas .ds-dd circle{transform-box:view-box}.ds-mas .ds-gl{animation:ds-glance 3.2s cubic-bezier(.5,0,.3,1) infinite}.ds-mas .ds-dd circle{opacity:.35;animation:ds-dot 1.2s ease-in-out infinite}@keyframes ds-glance{0%,38%{transform:translate(-3.5px,0)}50%,88%{transform:translate(3.5px,0)}100%{transform:translate(-3.5px,0)}}@keyframes ds-dot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-2px)}}@media (prefers-reduced-motion:reduce){.ds-mas *{animation:none!important;transition:none!important}}.ds-state{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;color:var(--fg)}.ds-state .ds-mas{margin-bottom:12px}.ds-state>b{font:600 17px/22px var(--f-r);text-wrap:balance}.ds-state>p{margin:4px 0 0;max-width:30ch;font:400 15px/20px var(--f);color:var(--muted);text-wrap:pretty}.ds-acts{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:16px}.ds-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);--lit:var(--lit-gold)}.ds-tonal{background:var(--raised);color:var(--fg)}.ds-tonal svg{margin-left:-4px}.ds-quiet{height:44px;padding:0 16px;border-radius:999px;font:600 15px/20px var(--f-r);color:var(--link)}.ds-quiet:active{background:rgba(255,255,255,.04)}.ds-err{width:343px;box-sizing:border-box;padding:24px 0;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25)}.ds-acts code{height:28px;box-sizing:border-box;margin-bottom:12px;padding:5px 12px;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:400 12px/18px var(--f-m);color:var(--muted)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Landing Card",
+      "kind": "card",
+      "refersTo": "landing-card",
+      "description": "Following, signed out: the one card. Goo waving at 104, a section headline, one muted sentence, and the screen's only gold fill. Play stays hidden until this card has scrolled away.",
+      "html": "<div class=\"ds-hello\"><svg class=\"ds-mas\" viewBox=\"0 0 120 120\" width=\"104\" height=\"104\" aria-hidden=\"true\"><defs><filter id=\"ds-goo\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"150%\" color-interpolation-filters=\"sRGB\"><feGaussianBlur in=\"SourceGraphic\" stdDeviation=\"2.4\"></feGaussianBlur><feColorMatrix mode=\"matrix\" values=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9\"></feColorMatrix></filter></defs><ellipse cx=\"60\" cy=\"109.5\" rx=\"46\" ry=\"4.5\" fill=\"#000\" opacity=\".28\"></ellipse><g fill=\"#9FB3CC\" stroke=\"#9FB3CC\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 2.4)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 4)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g fill=\"#FFFFFF\" stroke=\"#FFFFFF\" stroke-width=\"0\" filter=\"url(#ds-goo)\"><g transform=\"translate(0 0)\"><ellipse cx=\"60\" cy=\"99\" rx=\"42\" ry=\"5.5\"></ellipse><ellipse cx=\"91\" cy=\"102.5\" rx=\"11\" ry=\"4\"></ellipse><ellipse cx=\"109\" cy=\"104.4\" rx=\"3.4\" ry=\"3.4\"></ellipse></g><g transform=\"translate(0 0)\"><g class=\"ds-bd\"><g><path d=\"M60 100C38 100 24 90 24 74C24 56 42 43 52 27C55 21 58 14 64 8C67 12 66.5 18 66.5 24C69 35 96 52 96 74C96 90 82 100 60 100Z\"></path><g class=\"ds-arm\" style=\"transform-origin:89px 78px\"><path d=\"M89 78Q102 72 104 59\" fill=\"none\" stroke-width=\"9.5\" stroke-linecap=\"round\"></path><ellipse cx=\"104\" cy=\"57\" rx=\"7.4\" ry=\"7.4\"></ellipse></g></g></g></g></g><g class=\"ds-bd\"><g><ellipse cx=\"33\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"85\" cy=\"83\" rx=\"5\" ry=\"3\" fill=\"#FF8A95\" opacity=\".5\"></ellipse><ellipse cx=\"44.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"43.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"73.5\" cy=\"72\" rx=\"4.2\" ry=\"5.6\" fill=\"#020F23\"></ellipse><circle cx=\"72.24\" cy=\"69.87\" r=\"1.5\" fill=\"#fff\"></circle><ellipse cx=\"59\" cy=\"87.4\" rx=\"3.3\" ry=\"3.5\" fill=\"#FF8A95\" stroke=\"#020F23\" stroke-width=\"2.2\"></ellipse><path d=\"M52.5 83q3.25 4.6 6.5 0q3.25 4.6 6.5 0\" fill=\"none\" stroke=\"#020F23\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g></g><g class=\"ds-tick\" fill=\"none\" stroke=\"#B4C7D9\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M115 48q4 6 2 12\"></path><path d=\"M97 43q5-3 10-1\" opacity=\".7\"></path></g>\n      </svg><b>Follow the artists you love</b><p>See their new posts first, all in one feed.</p><button class=\"ds-btn ds-gold ds-lip\">Sign in with e621</button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-mas{display:block;flex:none;overflow:visible;cursor:pointer}.ds-mas .ds-bd{transform-box:view-box;transform-origin:60px 100px;transition:transform .1s ease-out}.ds-mas:active .ds-bd{transform:scale(1.07,.9)}.ds-mas .ds-arm,.ds-mas .ds-tick,.ds-mas .ds-zz{transform-box:view-box}.ds-mas .ds-arm{animation:ds-wave .9s ease-in-out .4s 3}.ds-mas .ds-tick{animation:ds-tick .9s ease-in-out .4s 3 both}.ds-mas .ds-zz{animation:ds-zz 3.2s ease-in-out infinite}@keyframes ds-wave{50%{transform:rotate(16deg)}}@keyframes ds-tick{0%,100%{opacity:0}50%{opacity:1}}@keyframes ds-zz{50%{transform:translate(2px,-3px);opacity:.6}}.ds-mas .ds-gl,.ds-mas .ds-dd circle{transform-box:view-box}.ds-mas .ds-gl{animation:ds-glance 3.2s cubic-bezier(.5,0,.3,1) infinite}.ds-mas .ds-dd circle{opacity:.35;animation:ds-dot 1.2s ease-in-out infinite}@keyframes ds-glance{0%,38%{transform:translate(-3.5px,0)}50%,88%{transform:translate(3.5px,0)}100%{transform:translate(-3.5px,0)}}@keyframes ds-dot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-2px)}}@media (prefers-reduced-motion:reduce){.ds-mas *{animation:none!important;transition:none!important}}.ds-hello{display:flex;flex-direction:column;align-items:center;text-align:center;width:343px;box-sizing:border-box;padding:20px 16px 16px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);color:var(--fg)}.ds-hello>b{margin-top:12px;font:600 20px/25px var(--f-r);letter-spacing:-.005em;text-wrap:balance}.ds-hello>p{margin:4px 0 16px;font:400 15px/20px var(--f);color:var(--muted)}.ds-hello .ds-btn{align-self:stretch}.ds-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);--lit:var(--lit-gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Offline Banner",
+      "kind": "custom",
+      "refersTo": "banner",
+      "description": "A 36 sunk capsule under the header, not a button: muted wifi-off icon and link-blue text. Back online is white with a Score Green icon for 2 s, then it leaves.",
+      "html": "<div class=\"ds-bans\"><div class=\"ds-ban\" role=\"status\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 20h.01\"/><path d=\"M8.5 16.429a5 5 0 0 1 7 0\"/><path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\"/><path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\"/><path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\"/><path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\"/><path d=\"m2 2 20 20\"/></svg><span>You're offline. Showing what's loaded.</span></div><div class=\"ds-ban ds-ok\" role=\"status\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 20h.01\"/><path d=\"M2 8.82a15 15 0 0 1 20 0\"/><path d=\"M5 12.859a10 10 0 0 1 14 0\"/><path d=\"M8.5 16.429a5 5 0 0 1 7 0\"/></svg><span>Back online</span></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-bans{display:flex;flex-direction:column;gap:12px;width:343px;box-sizing:border-box;padding:12px 0;border-radius:24px;background:var(--ground)}.ds-ban{display:flex;align-items:center;gap:8px;height:36px;padding:0 16px 0 12px;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f-r);color:var(--link)}.ds-ban svg{flex:none;color:var(--muted)}.ds-ban.ds-ok{color:var(--fg)}.ds-ban.ds-ok svg{color:var(--score)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Checklist",
+      "kind": "custom",
+      "refersTo": "check-well",
+      "description": "A long job, step by step: 28 wells 8 apart. Done is a Score Green check and muted text with its count in mono; the running step has a spinner and white text; a step to do shows its number.",
+      "html": "<div class=\"ds-ground\"><ol class=\"ds-check\"><li class=\"ds-done\"><span class=\"ds-n\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><span>Read your favorites</span><em>1,284</em></li><li class=\"ds-now\"><span class=\"ds-n\"><i class=\"ds-spin\"></i></span><span>Count your artists</span></li><li><span class=\"ds-n\">3</span><span>See who still posts</span></li></ol></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-ground{width:343px;box-sizing:border-box;padding:20px 0;border-radius:24px;background:var(--ground)}.ds-check{list-style:none;margin:0 auto;padding:0;width:248px;display:flex;flex-direction:column;gap:8px}.ds-check li{display:flex;align-items:center;gap:12px;font:400 15px/20px var(--f);color:var(--muted)}.ds-check li.ds-now{color:var(--fg)}.ds-check li>span:nth-child(2){flex:1}.ds-check em{font:400 12px/16px var(--f-m);font-style:normal}.ds-n{width:28px;height:28px;flex:none;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);display:grid;place-items:center;font:500 13px/18px var(--f-r);color:var(--muted)}.ds-done .ds-n{color:var(--score)}.ds-spin{width:14px;height:14px;box-sizing:border-box;border-radius:999px;border:2px solid rgba(255,255,255,.22);border-top-color:#fff;animation:ds-spin .8s linear infinite}@keyframes ds-spin{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){.ds-spin{animation:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Pick Row",
+      "kind": "custom",
+      "refersTo": "check-well-on",
+      "description": "Follow from favorites: the row is the checkbox. A 28 well at its right end is empty, or Score Green with a Ground navy check when picked. 60 tall, the mark, the name in headline, a muted line.",
+      "html": "<div class=\"ds-group\"><button class=\"ds-prow\" role=\"checkbox\" aria-checked=\"true\"><span class=\"ds-av \"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M-0.658 -0.239A0.7 0.7 0 1 1 0.239 0.658\" fill=\"none\" stroke=\"#F3946B\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M0.314 0.264A0.41 0.41 0 1 1 -0.264 -0.314\" fill=\"none\" stroke=\"#E9F2FA\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#FF8A95\"/></svg></span><span class=\"ds-lbl\"><b>inkwell fox</b><small>you faved 48 · 312 posts</small></span><span class=\"ds-chk\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span></button><button class=\"ds-prow\" role=\"checkbox\" aria-checked=\"false\"><span class=\"ds-av \"><svg viewBox=\"-1 -1 2 2\" aria-hidden=\"true\"><path d=\"M0.122 -0.689A0.7 0.7 0 0 1 0.536 -0.450\" fill=\"none\" stroke=\"#F3946B\" stroke-width=\".21\" stroke-linecap=\"round\"/><path d=\"M-0.355 0.205A0.41 0.41 0 1 1 -0.205 0.355\" fill=\"none\" stroke=\"#E9F2FA\" stroke-width=\".21\" stroke-linecap=\"round\"/><circle r=\"0.16\" fill=\"#FF8A95\"/></svg></span><span class=\"ds-lbl\"><b>plum raven</b><small>you faved 9 · 1.2k posts</small></span><span class=\"ds-chk\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span></button></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-group{width:343px;border-radius:24px;background:var(--panel);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);overflow:hidden;color:var(--fg)}.ds-prow{width:100%;box-sizing:border-box;min-height:60px;display:flex;align-items:center;gap:12px;padding:8px 16px;text-align:left;position:relative}.ds-prow+.ds-prow::before{content:'';position:absolute;top:0;right:0;left:64px;border-top:1px solid rgba(180,199,217,.1)}.ds-prow:active{background:rgba(255,255,255,.04)}.ds-lbl{flex:1;min-width:0;display:flex;flex-direction:column}.ds-lbl b{font:600 17px/20px var(--f-r)}.ds-lbl small{font:400 13px/18px var(--f);color:var(--muted)}.ds-chk{width:28px;height:28px;flex:none;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);display:grid;place-items:center;color:transparent;transition:background-color .15s ease-out}.ds-prow[aria-checked=true] .ds-chk{background:var(--score);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);color:var(--ground)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Disabled Button",
+      "kind": "button",
+      "refersTo": "button-disabled",
+      "description": "A button that cannot be pressed right now: Panel fill, muted label, no lip, no icon. Its label says why.",
+      "html": "<button class=\"ds-btn ds-off\" disabled>Pick artists to follow</button>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-off{background:var(--panel);color:var(--muted);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);cursor:default} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "Proposed, not owner-approved. What just happened: a floating Raised Highlight capsule with a 28 mark, the message in callout, and at most one action. Undo is a sunk 28 capsule whose ring empties in the 6 s the toast stays.",
+      "html": "<div class=\"ds-toasts\"><div class=\"ds-toast\" role=\"status\"><span class=\"ds-tm ds-ok\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><span class=\"ds-tx\"><b>Following 8 artists</b><small>2 skipped: saffron hare, harbor seal</small></span></div><div class=\"ds-toast\" role=\"status\"><span class=\"ds-tm\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg></span><span class=\"ds-tx\"><b>Marked as seen on e621</b></span><button class=\"ds-undo\">Undo<svg aria-hidden=\"true\"><rect width=\"100%\" height=\"100%\" rx=\"13.25\" pathLength=\"100\"/></svg></button></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-toasts{display:flex;flex-direction:column;align-items:center;gap:12px;width:343px;box-sizing:border-box;padding:20px 16px 24px;border-radius:24px;background:var(--ground)}.ds-toast{min-height:44px;box-sizing:border-box;max-width:100%;display:flex;align-items:center;gap:8px;padding:8px;border-radius:22px;background:var(--raised-hi);box-shadow:var(--lit),0 12px 24px rgba(0,0,0,.4);color:var(--fg)}.ds-tm{width:28px;height:28px;flex:none;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);display:grid;place-items:center;color:var(--link)}.ds-tm.ds-ok{background:var(--score);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);color:var(--ground)}.ds-tx{flex:1;min-width:0;display:flex;flex-direction:column;padding-right:8px}.ds-tx b{font:600 15px/20px var(--f-r);white-space:nowrap}.ds-tx small{font:400 13px/18px var(--f);color:var(--link);white-space:nowrap}.ds-tx:has(+ .ds-undo){padding-right:4px}.ds-undo{position:relative;height:28px;padding:0 12px;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f-r);color:var(--fg);flex:none}.ds-undo svg{position:absolute;inset:.75px;width:calc(100% - 1.5px);height:calc(100% - 1.5px);overflow:visible;pointer-events:none}.ds-undo rect{fill:none;stroke:var(--link);stroke-width:1.5;stroke-dasharray:100 100;animation:ds-drain 6s linear infinite}.ds-toast:hover .ds-undo rect{animation-play-state:paused}@keyframes ds-drain{to{stroke-dashoffset:-100}}@media (prefers-reduced-motion:reduce){.ds-undo rect{animation:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The e621 Reading Room",
+    "overview": "**Creative North Star: \"The e621 Reading Room\"**\n\nA calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: who made it on top, the picture, then tags, score and favourite underneath. Structure is iOS (large title, bottom sheets, a floating tab bar).\n\nThe room is made of three materials, all lit from above. Things you press are **raised**: a light on top and a solid darker edge underneath that closes when pressed. Posts sit in **panels**. The picture and the tags are **sunk** into the panel. There are no outlines doing the work of depth.\n\nThe personality is physical and a little cheeky, and it stays off the art: a rounded voice face (Fredoka), a tab bar that is one bent tube with a capsule that slides along the bend, artist marks that spin when you follow or favourite, and white goo that drips under the heart and slowly builds up on the tab bar as you favourite.\n\nDensity is phone-first and one-handed: a 16 edge, a closed size system (three control heights, five gaps, two nested radii), and the main action in thumb reach at the bottom left. Dark by default; there is no light theme.\n\nThe art is never tinted, framed by gradients or covered. The only things that may sit on a picture are the video play glyph, the video length and the mute button; the player adds its own controls, which auto-hide.",
+    "keyCharacteristics": [
+      "e621 navies as the neutral; one gold, used sparingly.",
+      "Three materials (raised, panel, sunk), flat fills with a 1 px top light. No gradients, no hairline outlines.",
+      "Fredoka for voice, the system face for reading.",
+      "A solid same-hue lip on pressables, closing in 100 ms.",
+      "Colour carries meaning: gold = act / new / here, green = score, pink = favourite, e621 tag category colours on tags.",
+      "\"Bends\" marks for artists (e621 has no artist pictures); the kaleidoscope is the app mark.",
+      "Goo: white, slow, earned by favouriting, wiped from Settings."
+    ],
+    "rules": [
+      {
+        "name": "The One Gold Rule",
+        "body": "Gold fills one thing per screen: its main action. Everywhere else gold is a label, a dot, a ring or a glyph that says \"new\" or \"you are here\". A second gold fill on a screen is a bug. Where a screen asks you to sign in, Sign in is that one fill: on the landing, Play stays hidden until the card that holds Sign in has scrolled away.",
+        "section": "colors"
+      },
+      {
+        "name": "The Art Is the Light Rule",
+        "body": "Nothing on the interface is more saturated than the art. Navy is the neutral; meaning colours appear only as small icons, numbers and tag text. Goo is white like text, and it never touches a picture. That goes for Goo the mascot too: white, a pale blue underside, navy eyes, and pink only on its cheeks and tongue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Fredoka for what the app says (names, numbers, actions); system for what you read. Nothing in between, and no sizes outside the table.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lip Is a Promise Rule",
+        "body": "A lip means \"press me, and something happens\". It goes on Play, the fav pill, Follow, the burst row, the new-posts pill, gold or tonal buttons, the stepper's buttons and the player's Play / Pause. Never on panels, rows, fields, tags, chips, toggles, the segmented control, menus, the tools capsule, back buttons, tabs, tag targets (you drag onto them as often as you press them; they answer by growing), or anything over art. Goo the mascot's underside is its thickness, not a lip: it does not close when pressed. Goo is a toy, not a control: a tap squashes it and spurts goo, and nothing in the app depends on that. Chips answer a press by shrinking to 96%; tags by darkening.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Light Rule",
+        "body": "Light comes from above on every surface: raised things are lit on top, sunk things are dark on top. Never a gradient fill, never a glow, never an outline around a panel.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep every value on the closed size system: gaps 4/8/12/16/24, an 8 edge inside panels and a 16 edge on the screen, heights 44/36/28, badges 16/20/24, radii 24 with 16 nested inside.",
+      "**Do** make everything pressable a raised thing with a lip, and everything that only sits there a panel or a well.",
+      "**Do** fill gold once per screen, for the main action; use gold otherwise only for \"New\", the current tab, a selected chip's ring and the Follow plus.",
+      "**Do** put the artist on top of a post and the heart at the right end of its footer, with the score beside it.",
+      "**Do** give 36 and 28 controls a 44 touch area, and every number tabular figures.",
+      "**Do** keep any new small-text colour at 4.5:1 on the surface it sits on, keeping its e621 hue."
+    ],
+    "donts": [
+      "**Don't** put anything on top of the art except the video play glyph, length and mute (and the player's own auto-hiding controls). The double-tap heart is the one thing that may flash over a picture.",
+      "**Don't** tint or frame art with colour washes; navy panels may surround it, never cover it.",
+      "**Don't** draw depth with outlines, gradients or glows. One light, from above.",
+      "**Don't** put a lip on panels, rows, fields, tags, chips, toggles, menus, tabs, tag targets or anything over art, and don't add blurred shadows beyond Play (and the Follow button that stands in its place), the new-posts pill, tag targets and the tab bar. Don't give an offline banner or a state's panel a lip either.",
+      "**Don't** use Fredoka at 700, or for tags and reading text.",
+      "**Don't** use a second accent colour, meaning colours as large fills, gold in an artist's mark, or a second gold fill on a screen (the artist page has no \"Play all\").",
+      "**Don't** put muted text on Raised Highlight (3.7:1).",
+      "**Don't** let goo touch a picture, hide a label, or be cleaned anywhere but Settings, and don't put Goo the mascot anywhere but the landing, needs sign-in, empty states, errors and the first read of your favorites.",
+      "**Don't** throw dots anywhere but Follow.",
+      "**Don't** borrow Duolingo's owl, green, streaks, gems or guilt nudges, or AllTrails' green, logo or buttons on photos."
+    ]
+  }
+}

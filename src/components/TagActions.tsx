@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Ban, Pin, Plus } from "lucide-react";
 import { TAG_CATEGORY_COLORS, type TagCategoryName } from "@/lib/e621/types";
 
-export type TagAction = "search" | "blacklist";
+/** What a held tag offers (DESIGN.md "Tag targets"): never more than three at once. */
+export type TagAction = "open" | "search" | "pin" | "blacklist";
+const ACTIONS: TagAction[] = ["open", "search", "pin", "blacklist"];
 
 /** Hold a tag this long to pick it up. */
 const HOLD_MS = 450;
@@ -12,12 +13,11 @@ const HOLD_MS = 450;
 const SLOP_PX = 10;
 /** Extra reach around each target, so a drag doesn't have to be exact. */
 const HIT_PAD_PX = 18;
-/** The targets need about this much room above the tag (pill + circles + labels). */
-const ROOM_ABOVE_PX = 170;
-/** Keep the pair of targets (about 180px wide with labels) this far from the screen edges. */
-const EDGE_PX = 104;
+/** Targets sit this far from the tag, from each other, and inside the screen's edges. */
+export const GAP_PX = 8;
+export const TARGET_H = 44;
 
-interface Held {
+export interface Held {
   tag: string;
   category: TagCategoryName;
   /** the tag's box on screen when it was picked up */
@@ -48,7 +48,7 @@ function anchor(el: HTMLElement, tag: string, category: TagCategoryName, draggin
  */
 export function useTagHold(onAction: (tag: string, action: TagAction) => void): TagHold {
   const [held, setHeld] = useState<Held | null>(null);
-  const targets = useRef<Record<TagAction, HTMLElement | null>>({ search: null, blacklist: null });
+  const targets = useRef<Record<TagAction, HTMLElement | null>>({ open: null, search: null, pin: null, blacklist: null });
   /** a hold just ended: the click the browser sends after it must not reopen the targets */
   const swallowClick = useRef(false);
   const stop = useRef<() => void>(() => {});
@@ -59,7 +59,7 @@ export function useTagHold(onAction: (tag: string, action: TagAction) => void): 
   useEffect(() => () => stop.current(), []);
 
   const targetAt = (x: number, y: number): TagAction | null => {
-    for (const a of ["search", "blacklist"] as const) {
+    for (const a of ACTIONS) {
       const r = targets.current[a]?.getBoundingClientRect();
       if (r && x >= r.left - HIT_PAD_PX && x <= r.right + HIT_PAD_PX && y >= r.top - HIT_PAD_PX && y <= r.bottom + HIT_PAD_PX)
         return a;
@@ -172,87 +172,11 @@ export function TagStrip({ tags, hold }: { tags: (readonly [TagCategoryName, str
   );
 }
 
-const TARGETS: Record<TagAction, { idle: string; hot: string }> = {
-  search: { idle: "bg-panel-2 text-accent ring-accent/40", hot: "bg-accent text-black ring-accent" },
-  blacklist: { idle: "bg-panel-2 text-red-400 ring-red-400/40", hot: "bg-red-500 text-white ring-red-400" },
-};
 
-/** The two targets over a held tag. */
-export function TagActionsOverlay({ hold, recommended, onAction }: { hold: TagHold; recommended: boolean; onAction: (tag: string, action: TagAction) => void }) {
-  const { held } = hold;
-  useEffect(() => {
-    if (!held || held.dragging) return;
-    // Capture, so Esc closes the targets before it reaches the app (which would close the feed).
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      hold.close();
-    };
-    window.addEventListener("keydown", onKey, true);
-    return () => window.removeEventListener("keydown", onKey, true);
-  }, [held, hold]);
-  if (!held) return null;
-
-  const above = held.top > ROOM_ABOVE_PX;
-  const left = Math.min(Math.max(held.cx, EDGE_PX), window.innerWidth - EDGE_PX);
-  const labels: Record<TagAction, string> = { search: recommended ? "Pin" : "Search", blacklist: "Blacklist" };
-  const icons: Record<TagAction, typeof Plus> = { search: recommended ? Pin : Plus, blacklist: Ban };
-  const pick = (a: TagAction) => {
-    hold.close();
-    onAction(held.tag, a);
+/** Which targets a tag gets: an artist's opens their page first; For You pins instead of searching. */
+export const tagTargets =
+  (pin: boolean, search = !pin) =>
+  (category: TagCategoryName): TagAction[] => {
+    const mid: TagAction[] = [...(search ? ["search" as const] : []), ...(pin ? ["pin" as const] : [])];
+    return category === "artist" ? ["open", mid[0] ?? "search", "blacklist"] : [...mid, "blacklist"];
   };
-
-  return (
-    <>
-      {/* Dims the feed so the targets read clearly; while dragging it lets the pointer through. */}
-      <div
-        className={`tag-actions-dim fixed inset-0 z-40 bg-black/45 ${held.dragging ? "pointer-events-none" : ""}`}
-        onPointerDown={hold.close}
-        data-testid="tag-actions-backdrop"
-      />
-      <div
-        className={`tag-actions pointer-events-none fixed z-50 flex flex-col items-center gap-2 ${above ? "origin-bottom" : "origin-top"}`}
-        style={{ left, top: above ? held.top - 12 : held.bottom + 12, translate: above ? "-50% -100%" : "-50% 0" }}
-        role="dialog"
-        aria-label={`Actions for ${held.tag}`}
-        data-testid="tag-actions"
-      >
-        <span
-          className={`max-w-[70vw] truncate rounded-full bg-panel-2 px-3 py-1 text-xs font-semibold shadow-lg ring-1 ring-line ${above ? "" : "order-last"}`}
-          style={{ color: TAG_CATEGORY_COLORS[held.category] }}
-        >
-          {held.tag.replaceAll("_", " ")}
-        </span>
-        <div className="flex gap-8">
-          {(["search", "blacklist"] as const).map((a) => {
-            const hot = held.hover === a;
-            const Icon = icons[a];
-            return (
-              <button
-                key={a}
-                type="button"
-                ref={(el) => {
-                  hold.targets.current[a] = el;
-                }}
-                className="pointer-events-auto flex flex-col items-center gap-1 focus-visible:outline-none"
-                onClick={() => pick(a)}
-                data-testid={`tag-action-${a}`}
-                data-hot={hot}
-              >
-                <span
-                  className={`flex size-13 items-center justify-center rounded-full shadow-xl ring-2 transition-[transform,background-color,color] duration-150 ${
-                    hot ? `scale-115 ${TARGETS[a].hot}` : TARGETS[a].idle
-                  }`}
-                >
-                  <Icon className="size-6" aria-hidden />
-                </span>
-                <span className="rounded bg-black/70 px-1.5 text-[11px] font-semibold text-neutral-200">{labels[a]}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </>
-  );
-}

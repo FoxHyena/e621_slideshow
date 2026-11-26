@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         e621 Slideshow button
 // @namespace    https://e621.cumdump.dog/
-// @version      1.1.0
-// @description  Adds a Slideshow button under the e621 search box that plays the search on e621.cumdump.dog.
+// @version      1.2.0
+// @description  Adds an eLicks21 button under the e621 search box that plays the search in eLicks21 (e621.cumdump.dog).
 // @match        https://e621.net/*
 // @match        https://e926.net/*
 // @grant        none
@@ -29,10 +29,12 @@
  *   listed and switched on. If the list is empty, recheck step 2.
  *
  * Use
- *   ▶ Slideshow plays what's in the search box (or the pool you're on), the same posts
+ *   ▶ eLicks21 plays what's in the search box (or the pool you're on), the same posts
  *   e621 shows, in your saved slideshow style and speed.
  *
- * Editing: bump @version on every change, or installed copies won't update.
+ * Editing: bump @version on every change, or installed copies won't update. @name stays
+ * "e621 Slideshow button" (the app's old name): managers know the script by it, so renaming it
+ * could leave installed copies behind.
  */
 
 (() => {
@@ -66,8 +68,8 @@
 
   const play = document.createElement("a");
   play.id = ID;
-  play.textContent = "▶ Slideshow";
-  play.title = "Play this search as a slideshow";
+  play.textContent = "▶ eLicks21";
+  play.title = "Play this search in eLicks21";
   play.target = "_blank";
   play.rel = "noopener noreferrer";
   Object.assign(play.style, {

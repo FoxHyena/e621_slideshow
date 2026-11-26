@@ -1,13 +1,16 @@
+import { isAbort, type Lane } from "../e621/client";
 import { mediaKind, type Post } from "../e621/types";
 import { blacklistedBy, type BlacklistRule, type MatchContext } from "../query/blacklist";
 import { MAX_PAGE, type BuiltQuery } from "../query/build";
 import type { SearchSettings } from "../settings";
 
-export type PageFetcher = (tags: string, page: string | number, limit: number) => Promise<Post[]>;
+export type PageFetcher = (tags: string, page: string | number, limit: number, opts?: { signal?: AbortSignal; lane?: Lane }) => Promise<Post[]>;
 
 export const PAGE_SIZE = 100;
 /** Fetch the next page when this many or fewer posts remain ahead. */
 export const REFILL_THRESHOLD = 10;
+/** The new-posts pill counts up to this many ("30+ new posts"). */
+export const NEWER_MAX = 30;
 /** Max pages to pull in one refill when the blacklist eats whole pages. */
 const MAX_PAGES_PER_REFILL = 5;
 
@@ -47,6 +50,14 @@ export interface SlideQueue {
   matchFor?(id: number): { score: number; reasons: string[] } | undefined;
   /** stop any background fetching */
   dispose?(): void;
+  /** drop the requests waiting for this queue (it was evicted); a later `ensure` fetches again */
+  cancel?(): void;
+  /** the highest id e621 sent, before any filtering (cursor-paged search queues) */
+  readonly rawMax?: number;
+  /** started from a saved first page rather than e621 (cursor-paged search queues) */
+  readonly seeded?: boolean;
+  seed?(posts: Post[], rawMax?: number): boolean;
+  countNewer?(limit?: number): Promise<{ count: number; more: boolean }>;
   /** background search progress, for sources that fetch ahead on their own */
   readonly progress?: SearchProgress;
 }
@@ -88,11 +99,19 @@ export class PostQueue implements SlideQueue {
   loading = false;
   error: string | null = null;
   stats: QueueStats = { hidden: 0, blacklisted: 0 };
+  /**
+   * The highest and lowest ids e621 sent, before the blacklist and media filters dropped any
+   * (Following: what "everything loaded" means for marking seen; 0 before the first page).
+   */
+  rawMax = 0;
+  rawMin = 0;
+  seeded = false;
 
   private seen = new Set<number>();
   private nextPage: string | number;
   private inflight: Promise<void> | null = null;
   private rules: BlacklistRule[];
+  private abort = new AbortController();
 
   constructor(
     private built: BuiltQuery,
@@ -114,9 +133,10 @@ export class PostQueue implements SlideQueue {
     if (this.exhausted || this.error) return Promise.resolve();
     if (this.posts.length - 1 - index > REFILL_THRESHOLD) return Promise.resolve();
     if (!this.inflight) {
-      this.inflight = this.refill().finally(() => {
-        this.inflight = null;
+      const p: Promise<void> = this.refill().finally(() => {
+        if (this.inflight === p) this.inflight = null;
       });
+      this.inflight = p;
     }
     return this.inflight;
   }
@@ -144,6 +164,50 @@ export class PostQueue implements SlideQueue {
     this.onChange();
   }
 
+  /** Drop what's waiting; a refill under way is forgotten, so an `ensure` right after starts afresh. */
+  cancel() {
+    this.abort.abort();
+    this.abort = new AbortController();
+    this.inflight = null;
+    if (this.loading) {
+      this.loading = false;
+      this.onChange();
+    }
+  }
+
+  /**
+   * Start from a saved first page (Following's instant paint): its posts show at once and paging
+   * goes on below the last one. Only before anything loaded; the posts pass today's filters again.
+   */
+  seed(raw: Post[], rawMax = 0): boolean {
+    if (this.built.paging !== "cursor" || this.posts.length > 0 || this.inflight || raw.length === 0) return false;
+    const ids = raw.map((p) => p.id);
+    // What e621 sent may top what was kept (a blacklisted newest post): "newer" starts above it.
+    this.rawMax = Math.max(rawMax, ...ids);
+    this.rawMin = Math.min(...ids);
+    this.nextPage = `b${this.rawMin}`;
+    this.seeded = true;
+    this.posts.push(...raw.filter((p) => this.accept(p)));
+    this.onChange();
+    return true;
+  }
+
+  /**
+   * How many posts the feed would show above the newest one loaded: up to `limit`, and whether
+   * there are more. Nothing is added (the new-posts pill does that). It's asked for the screen on
+   * show, so it waits as `user`: behind a hidden For You's ranking it would wait for aging.
+   */
+  async countNewer(limit = NEWER_MAX): Promise<{ count: number; more: boolean }> {
+    if (this.built.paging !== "cursor" || this.rawMax === 0) return { count: 0, more: false };
+    const raw = await this.fetcher(`${this.built.query} id:>${this.rawMax}`.trim(), 1, limit, { lane: "user", signal: this.abort.signal });
+    const f: PostFilter = { seen: new Set(this.seen), media: this.media, rules: this.rules, ctx: this.ctx, stats: { hidden: 0, blacklisted: 0 } };
+    return { count: raw.filter((p) => acceptPost(p, f)).length, more: raw.length >= limit };
+  }
+
+  dispose() {
+    this.cancel();
+  }
+
   setRules(rules: BlacklistRule[]) {
     this.rules = rules;
     const kept = this.posts.filter((p) => !blacklistedBy(rules, p, this.ctx));
@@ -157,18 +221,26 @@ export class PostQueue implements SlideQueue {
   }
 
   private async refill() {
+    // A cancelled refill must not touch the queue after a newer one started.
+    const signal = this.abort.signal;
     this.loading = true;
     this.onChange();
     try {
       for (let i = 0; i < MAX_PAGES_PER_REFILL && !this.exhausted; i++) {
         const page = this.nextPage;
-        const raw = await this.fetcher(this.built.query, page, PAGE_SIZE);
+        // The first page is what's on screen; later ones are read ahead.
+        const lane: Lane = this.posts.length === 0 ? "user" : "page";
+        const raw = await this.fetcher(this.built.query, page, PAGE_SIZE, { signal, lane });
+        if (signal.aborted) return;
         if (raw.length === 0) {
           this.exhausted = true;
           break;
         }
+        const ids = raw.map((p) => p.id);
+        this.rawMax = Math.max(this.rawMax, ...ids);
+        this.rawMin = Math.min(this.rawMin || Infinity, ...ids);
         if (this.built.paging === "cursor") {
-          this.nextPage = `b${Math.min(...raw.map((p) => p.id))}`;
+          this.nextPage = `b${Math.min(...ids)}`;
         } else {
           const n = (this.nextPage as number) + 1;
           this.nextPage = n;
@@ -180,10 +252,13 @@ export class PostQueue implements SlideQueue {
         if (fresh.length > 0) break;
       }
     } catch (e) {
-      this.error = e instanceof Error ? e.message : String(e);
+      // Cancelled (the feed was evicted): not an error; the next `ensure` asks again.
+      if (!isAbort(e) && !signal.aborted) this.error = e instanceof Error ? e.message : String(e);
     } finally {
-      this.loading = false;
-      this.onChange();
+      if (!signal.aborted) {
+        this.loading = false;
+        this.onChange();
+      }
     }
   }
 }

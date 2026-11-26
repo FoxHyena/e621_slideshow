@@ -757,7 +757,7 @@ function UserscriptSection() {
   return (
     <>
       <p className="text-xs text-neutral-400">
-        Adds a <span className="font-semibold text-neutral-200">▶ Slideshow</span> button under e621&rsquo;s search
+        Adds a <span className="font-semibold text-neutral-200">▶ eLicks21</span> button under e621&rsquo;s search
         box. It opens the search here: the same posts e621 shows, in your style and speed, with your blacklist.
       </p>
       <ol className="list-decimal space-y-1.5 pl-4 text-xs text-neutral-300">
@@ -830,7 +830,7 @@ export default function SettingsPanel(props: SettingsPanelProps) {
         inert={!open}
         data-testid="settings-panel"
         data-open={open}
-        className={`fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col bg-panel shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col bg-panel-old shadow-2xl transition-transform duration-300 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
