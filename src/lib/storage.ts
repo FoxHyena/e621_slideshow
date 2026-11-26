@@ -86,7 +86,17 @@ export interface FeedHead {
   rawMax?: number;
 }
 export const FEED_HEAD_TTL = 10 * 60_000;
+
 export const FEED_HEAD_POSTS = 24;
+
+/**
+ * The tags you follow, as last read from e621: `[name, subscription id]` (null: followed, id not
+ * known yet). Remember only.
+ */
+export interface SubsRecord {
+  at: number;
+  tags: [string, number | null][];
+}
 
 /**
  * Per-account records that persist only with Remember on (DECISIONS: signed-in data at rest):
@@ -211,8 +221,19 @@ export const storage = {
   /** Kept only with Remember on: a this-tab sign-in keeps nothing about its feed on disk. */
   saveFeedHead: (username: string, head: FeedHead | null, remember: boolean) =>
     writeAccount(`feedHead:${username}`, remember ? head : null, remember),
+  loadSubs: (username: string): SubsRecord | null => {
+    const r = readAccount<SubsRecord>(`subs:${username}`);
+    if (!r || typeof r.at !== "number" || !Array.isArray(r.tags)) return null;
+    const tags = r.tags.filter(
+      (t): t is [string, number | null] => Array.isArray(t) && typeof t[0] === "string" && t[0] !== "" && (t[1] === null || Number.isInteger(t[1])),
+    );
+    return { at: r.at, tags };
+  },
+  /** Kept only with Remember on, like the first posts. */
+  saveSubs: (username: string, r: SubsRecord | null, remember: boolean) => writeAccount(`subs:${username}`, remember ? r : null, remember),
   /** Everything kept for an account (sign-out, or a sign-in without Remember). */
   purgeAccount: (username: string) => {
+    writeAccount(`subs:${username}`, null, false);
     write(`account:${username}`, null);
     writeAccount(`feedHead:${username}`, null, false);
     write(`ranked:${username}`, null);

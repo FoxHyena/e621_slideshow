@@ -369,6 +369,46 @@ for the lane, pill and pull), 224.4 KB with the idle prefetch; 12 cards in the D
 feed content 0.37 s; scroll at 4× CPU: 2 long tasks, longest 51 ms. **Borderline**, like slice 2b
 (53–55 ms): recheck in Phase 6 with the performance panel.
 
+## Slice 4 review (2026-11-25): follow everywhere
+
+**code-review skill (high), 7 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Pills asked for the list only on mount, so the artist page's button stayed "waiting" when the sign-in was confirmed after it rendered | High | The effect runs again when the account or the list's status changes |
+| 2 | `/artist/foo%20bar` would follow two tags on e621 and roll back locally | High | Names with whitespace are refused |
+| 3 | A follow kept without an id ("already subscribed") was dropped on reload | Med | `subs:` rows may have a null id |
+| 4 | A write before any list read saved a one-row list as the whole list | Med | Only a list e621 sent is saved |
+| 5 | A follow made before Following opened left its saved first page in place | Med | Every follow write drops it from the follows store |
+| 6 | A sign-in still being checked looked signed out on the artist page | Low | `checking` state: pills wait, the button shows waiting |
+| 7 | The artist button carried its state twice (label and `aria-pressed`) | Low | Label only |
+
+**Fresh reviewer, 9 findings: 7 fixed, 1 already fixed, 1 no change**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A run queued for the old account ran under the new one after a switch | Med | Runs carry the account they were tapped for; unit test |
+| 2 | Null-id rows lost on reload | Med | Already fixed (code-review #3) |
+| 3 | A failed follow that a quick unfollow replaced still toasted an error | Med | Only the latest intent rolls back and speaks; unit test |
+| 4 | A sign-in without Remember loaded an earlier remembered session's list | Med | Only a remembered sign-in reads `subs:`; unit test |
+| 5 | The pill's label and `aria-pressed` both changed; the limit note wasn't linked | Low | Fixed label "Follow <artist>" + `aria-pressed`; `aria-describedby` to the note |
+| 6 | An alias came back under its new name, and the next list read dropped the follow | Low | Kept under both names; unfollow removes both; unit test |
+| 7 | An Undo from the old account worked after a switch | Low | Undo is dead after a switch; unit test |
+| 8 | A Follow tapped signed out was dropped silently when the list couldn't be read | Low | Waits for the read, toasts "tap Follow again" on failure; window 5 min (was 10) |
+| 9 | Follow then Undo shows Following's "New posts" pill for no net change | Low | **No change**: harmless, never reorders; tracking the net set isn't worth it |
+
+e2e added for the reviewer's test gaps: a share link's borrowed sign-in on Results never reads or writes
+follows (and Follow opens sign-in). Not covered: component tests of focus when a pill hides after a
+follow elsewhere (the pill stays while it's the one tapped).
+
+**Gates:** 269 unit tests, 138 e2e passed (2 skipped), typecheck and lint clean. Visual check at
+375×812 with fixture images: card pill at the row's end (✓ shrinks in place), player pill on glass,
+artist page tonal button.
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` 193.2 KB (≤ 200; +2.8
+KB for the follows store and pills), 227.2 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000;
+first feed content 0.37 s; scroll at 4× CPU: 2 long tasks, longest 51 ms (borderline as before; Phase 6).
+
 ## Live marker check (2026-11-25, owner signed in in the browser pane, Remember on)
 
 | Check | Result |

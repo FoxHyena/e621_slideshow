@@ -342,7 +342,7 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         )}
       </p>
       <ChipsRow filters={filters} chips={CHIPS} onChange={change} />
-      {(fs.newer || newer) && (
+      {(fs.newer || fs.stale || newer) && (
         <div className="top-pill-row">
           <button type="button" className="top-pill" onClick={showNewer} data-testid="new-posts-pill">
             <ArrowUp aria-hidden /> {newPostsLabel(newer)}

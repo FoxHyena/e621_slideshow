@@ -90,6 +90,8 @@ export interface FeedViewProps {
   empty: ReactNode;
   /** For You: holding a tag offers Pin in place of Search */
   recommended?: boolean;
+  /** cards offer Follow for artists you don't follow (For You, Results, Favorites) */
+  follow?: boolean;
   /**
    * Following: the rows between cards (the "You're caught up" divider, folded runs), from the
    * posts as they are now. Without it every post is its own row.
@@ -118,6 +120,7 @@ export function FeedView({
   onMenu,
   onTag,
   recommended = false,
+  follow = false,
   rowsFor,
   fresh,
   caughtNote,
@@ -369,6 +372,7 @@ export function FeedView({
                     now={now}
                     hold={hold}
                     fresh={fresh?.(p) ?? false}
+                    follow={follow}
                     onOpen={onOpen}
                     onMenu={onMenu}
                   />

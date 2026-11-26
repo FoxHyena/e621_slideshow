@@ -460,6 +460,7 @@ function Body({
       empty={<p className="feed-empty-title">Nothing new for you in this window.</p>}
       onTag={onTag}
       recommended
+      follow
     />
   );
 }

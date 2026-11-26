@@ -295,3 +295,45 @@ Format: date — decision. Why. Rejected alternatives.
 - **A refused key (anonymous answer, 401, 403) signs the saved account out** and drops the record, with
   the "e621 sign-in failed" toast. Offline or busy keeps the account; the next load checks again.
 - Sign-out and a sign-in without Remember remove the record (`purgeAccount`).
+
+## 2026-11-25 — Slice 4 build (follow everywhere)
+
+- **`follows` store** (`src/state/follows.ts`): `name → subscription id` from `GET /tag_subscriptions.json`,
+  read once per account and kept 10 min, refreshed behind what's shown (`bg`). What shows is your latest
+  tap over what e621 has. Taps on one tag run one at a time and each run sends the latest intent, so an
+  Undo waits for its follow and quick taps settle on the last one. A failure rolls back that tag (only if
+  no newer tap replaced it) and toasts e621's reason.
+- **A list read that a write overtook is dropped** (a counter bumped when a write starts and ends) and
+  asked again once the writes settle. A follow that e621 answers "already subscribed" has no id; its
+  unfollow reads the list first. A 404 on unfollow counts as done. With one tag asked for, the one added
+  row counts as it (e621 follows aliases under the new name), and is kept under both names. A run or an
+  Undo from before an account switch does nothing for the new account. A failure that a later tap
+  already replaced rolls nothing back and says nothing (the later tap speaks). Names with whitespace
+  are refused (e621 would follow each word).
+- **Kept on disk as `subs:<user>` in localStorage, Remember on only** (≤ 500 short rows, ~20 KB), not
+  IDB as ENGINEERING §2 said: one small synchronous read lets cards know at first paint which artists
+  you follow. Only a list e621 sent is saved (a write before any read isn't), and only a remembered
+  sign-in reads it back. Sign-out removes it (`purgeAccount`). Every follow write also drops
+  Following's saved first page, even if Following hasn't opened yet.
+- **The 500 limit is checked here first**: at 500 a Follow toasts "e621 allows 500 follows" without a
+  request. e621's own "over the limit" skip rolls back with the same words; "does not exist" says so.
+- **Card pill**: For You (ranked), Results and Favorites cards; not Following, the artist page's cards
+  or the signed-out Popular lists. Hidden for artists you follow, and until your list is read (no flash
+  of Follow). Tapped, it wiggles into a ✓ of the same width (nothing beside it moves) that stays on that
+  card while it's rendered, and unfollows on tap. UX's "small ✓" wins over DESIGN's "✓ Following" text
+  on cards, for the no-reflow rule; the artist page uses the full tonal "✓ Following".
+- **Player pill** sits after the artist and time, on chrome glass with no lip (DESIGN: no lip over art).
+- **Interim artist page** gets the tonal Follow / ✓ Following button under the title until slice 6. At
+  500 it's disabled with a note. Unfollowing is never blocked.
+- **Signed out, or on someone's share link**, Follow opens Settings › Account; the tapped tag is followed
+  after your own sign-in if that comes within 5 min (if the list can't be read then, a toast says to tap
+  Follow again). A borrowed sign-in never reads or writes follows. While a remembered sign-in is still
+  being checked, pills wait and the artist page's button shows its waiting state (not signed out).
+- **Accessible names**: the pill is "Follow <artist>" with `aria-pressed` carrying the state; the artist
+  page's button changes its label instead (no `aria-pressed`), and at 500 points to its note
+  (`aria-describedby`).
+- **Following after a follow or unfollow**: the saved first page goes, the anchor row is read again
+  (`bg`), and a feed on show gets the "New posts" pill (never reordered in place). A first follow ever
+  brings the feed in, with New starting at the new anchor's marker.
+- **Not yet**: "Suggestions drop that artist" waits for suggestions (slice 6). The live
+  `tag_subscriptions` POST check needs the owner's approval for a write to their account.

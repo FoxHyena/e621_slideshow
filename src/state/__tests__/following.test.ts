@@ -176,6 +176,30 @@ describe("following marker", () => {
     expect([...ls.keys()].some((k) => k.includes("feedHead:fox"))).toBe(false);
   });
 
+  it("a follow or unfollow makes the feed stale: saved first posts go, the row is read again", async () => {
+    const { f, api } = setup();
+    await f.load();
+    storage.saveFeedHead("fox", { key: "k", at: 1_000_000, posts: [] }, true);
+    f.followsChanged();
+    expect(f.store.get().stale).toBe(true);
+    expect([...ls.keys()].some((k) => k.includes("feedHead:fox"))).toBe(false);
+    await vi.waitFor(() => expect(api.getAnchor).toHaveBeenCalledTimes(2));
+    f.clearNewer();
+    expect(f.store.get().stale).toBe(false);
+  });
+
+  it("a first follow brings the anchor: New starts at its marker", async () => {
+    const { f, api } = setup({ seen: null });
+    await f.load();
+    expect(f.store.get()).toMatchObject({ anchor: null, threshold: null });
+    api.getAnchor.mockResolvedValueOnce({ ...anchor(250), tag_count: 1 });
+    f.followsChanged();
+    // Nothing on show was of an old list: no pill.
+    expect(f.store.get().stale).toBe(false);
+    await vi.waitFor(() => expect(f.store.get().anchor?.tag_count).toBe(1));
+    expect(f.store.get().threshold).toBe(250);
+  });
+
   it("keeps saved first posts only with Remember, for their own feed and 10 minutes", () => {
     const post = { id: 5, files: { original: { url: "x" } } } as never;
     storage.saveFeedHead("fox", { key: "k", at: 0, posts: [post] }, false);

@@ -13,6 +13,7 @@ import { anyPost, getAnchor, visitAnchor, type Credentials } from "@/lib/e621/cl
 import type { SavedSearchRow } from "@/lib/e621/types";
 import { storage } from "@/lib/storage";
 import { toast } from "sonner";
+import { getFollows } from "./follows";
 import { getSession } from "./session";
 import { createStore, type Store } from "./store";
 
@@ -35,9 +36,11 @@ export interface FollowingState {
   newer: boolean;
   /** when the last mark failed (offline, 429…): automatic tries wait RETRY_FAILED_MS after it */
   failedAt: number | null;
+  /** you followed or unfollowed something since this feed loaded: the pill offers a fresh start */
+  stale: boolean;
 }
 
-const EMPTY: FollowingState = { user: null, status: "idle", error: null, anchor: null, threshold: null, marked: null, marking: false, newer: false, failedAt: null };
+const EMPTY: FollowingState = { user: null, status: "idle", error: null, anchor: null, threshold: null, marked: null, marking: false, newer: false, failedAt: null, stale: false };
 
 export type MarkResult = "marked" | "local" | "newer" | "failed" | "skipped";
 
@@ -55,6 +58,8 @@ export interface Following {
   reread(): Promise<void>;
   /** The new-posts pill was used, or the feed started over: the next check runs fresh. */
   clearNewer(): void;
+  /** You followed or unfollowed a tag: the feed is of the old list (never reordered in place). */
+  followsChanged(): void;
   setAccount(creds: Credentials | null, user: string | null, remember: boolean): void;
 }
 
@@ -122,8 +127,12 @@ export function createFollowing(
       const before = store.get().anchor;
       // What you follow changed (on e621.net, say): the saved first posts are of the old list.
       if (!anchor || anchor.tag_count !== before?.tag_count) storage.saveFeedHead(user, null, remember);
-      // No row now: you follow nothing any more.
-      store.set((x) => ({ ...x, anchor }));
+      // No row now: you follow nothing any more. A first follow made one: New starts at its marker.
+      store.set((x) => ({
+        ...x,
+        anchor,
+        threshold: x.threshold ?? (anchor ? Math.max(anchor.last_seen_post_id ?? 0, storage.loadLocalSeen(user)) : null),
+      }));
       const rec = storage.loadMarker(user);
       if (rec && !rec.marked) storage.saveMarker(user, { ...rec, anchor: anchor ?? undefined }, remember);
     } catch {
@@ -190,7 +199,15 @@ export function createFollowing(
     load,
     reread,
     markSeen,
-    clearNewer: () => store.set((x) => (x.newer ? { ...x, newer: false } : x)),
+    clearNewer: () => store.set((x) => (x.newer || x.stale ? { ...x, newer: false, stale: false } : x)),
+    followsChanged() {
+      const s = store.get();
+      if (!s.user) return;
+      // The saved first posts are of the old list.
+      storage.saveFeedHead(s.user, null, remember);
+      if (s.anchor) store.set((x) => ({ ...x, stale: true }));
+      void reread();
+    },
     setAccount(c, user, keep) {
       remember = keep;
       if (store.get().user === user && creds?.apiKey === c?.apiKey) return;
@@ -215,6 +232,13 @@ export function getFollowing(): Following {
     };
     session.store.subscribe(follow);
     follow();
+    const follows = getFollows().store;
+    let changed = follows.get().changed;
+    follows.subscribe(() => {
+      if (follows.get().changed === changed) return;
+      changed = follows.get().changed;
+      f.followsChanged();
+    });
     instance = f;
   }
   return instance;

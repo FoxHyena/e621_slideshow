@@ -1022,6 +1022,115 @@ html {
 .fav-pop {
   animation: var(--animate-pop);
 }
+
+/* Follow pill (DESIGN.md "Follow pill"): raised navy, gold plus, navy lip. It sits at the end of
+   the row, so once tapped it can shrink to a small green ✓ without moving anything beside it. */
+.follow-pill {
+  --lip-c: var(--color-lip-navy);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: 0 2px 0 var(--lip-c);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 700;
+  color: var(--color-fg);
+  white-space: nowrap;
+  transition:
+    transform 100ms ease-out,
+    box-shadow 100ms ease-out;
+}
+.follow-pill::before {
+  content: "";
+  position: absolute;
+  inset: -6px 0;
+}
+.follow-pill svg {
+  width: 16px;
+  height: 16px;
+}
+.follow-plus {
+  color: var(--color-gold);
+}
+.follow-check {
+  color: var(--color-score);
+}
+.follow-pill[aria-pressed="true"] {
+  padding: 0;
+  background: transparent;
+  box-shadow: var(--inset-shadow-hairline);
+}
+/* On a card: pushed to the end, the ⋯ right after it. */
+.post-head .follow-pill {
+  margin-left: auto;
+}
+.post-head .follow-pill + .post-menu {
+  margin-left: 0;
+}
+.follow-pill:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--lip-c);
+}
+.follow-pill[aria-pressed="true"]:active {
+  box-shadow: var(--inset-shadow-hairline);
+}
+/* Over art: no lip (the Lip Is a Promise rule), glass behind it for contrast. */
+.follow-pill-art,
+.follow-pill-art[aria-pressed="true"] {
+  background: var(--color-glass-art);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+}
+.follow-pill-art:active {
+  box-shadow: none;
+}
+.follow-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+.follow-button {
+  min-width: 160px;
+}
+/* Two names, so every tap restarts it. */
+[data-wiggle="a"] {
+  animation: follow-wiggle-a 360ms ease-out;
+}
+[data-wiggle="b"] {
+  animation: follow-wiggle-b 360ms ease-out;
+}
+@keyframes follow-wiggle-a {
+  0% { transform: rotate(0); }
+  35% { transform: rotate(-3deg); }
+  70% { transform: rotate(2deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes follow-wiggle-b {
+  0% { transform: rotate(0); }
+  35% { transform: rotate(-3deg); }
+  70% { transform: rotate(2deg); }
+  100% { transform: rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .follow-pill {
+    transition: none;
+  }
+  [data-wiggle] {
+    animation: none;
+  }
+}
 .post-score {
   display: inline-flex;
   align-items: center;
@@ -1308,6 +1417,7 @@ html {
 }
 .chip:focus-visible,
 .fav-pill:focus-visible,
+.follow-pill:focus-visible,
 .post-tag:focus-visible,
 .post-menu:focus-visible,
 .post-mute:focus-visible,

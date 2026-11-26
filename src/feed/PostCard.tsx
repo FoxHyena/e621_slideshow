@@ -17,6 +17,7 @@ import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { useStore } from "@/state/store";
 import Avatar from "@/components/Avatar";
 import type { TagHold } from "@/components/TagActions";
+import { FollowPill } from "./FollowPill";
 
 /** A second tap this soon is a double tap. */
 const DOUBLE_TAP_MS = 200;
@@ -35,6 +36,8 @@ export interface PostCardProps {
   hold: TagHold;
   /** Following: above e621's seen marker */
   fresh?: boolean;
+  /** For You, Results, Favorites: a Follow pill for an artist you don't follow */
+  follow?: boolean;
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
 }
@@ -148,7 +151,7 @@ function CardMedia({ post, index, height, live, still, onOpen }: { post: Post; i
   );
 }
 
-function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, onOpen, onMenu }: PostCardProps) {
+function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
   const tags = cardTags(post);
@@ -193,6 +196,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
           {fresh && " · "}
           {ago(post.created_at, now)}
         </time>
+        {follow && by[0] && <FollowPill key={by[0]} name={by[0]} />}
         <button type="button" className="post-menu" aria-label="More" aria-haspopup="dialog" onClick={() => onMenu(post)} data-testid="card-menu">
           <MoreHorizontal aria-hidden />
         </button>

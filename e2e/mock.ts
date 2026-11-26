@@ -91,6 +91,18 @@ export interface E621Mock {
   visits: number;
   /** whether a visit moves the marker (false: e621 answers but nothing moves) */
   visitMoves: boolean;
+  /** every follow write: POST (names asked for) or DELETE (subscription id) */
+  followWrites: { method: string; names?: string[]; id?: number }[];
+  /** follow writes fail with a 500 (the "failing mock") */
+  followFails: boolean;
+  /** ms each follow write waits before answering */
+  followDelay: number;
+  /** e621's follow limit (500) */
+  followLimit: number;
+  /** tags e621 doesn't know: a follow skips them with "does not exist" */
+  unknownTags: string[];
+  /** GET /tag_subscriptions.json calls */
+  subscriptionReads: number;
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -124,7 +136,20 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     lastSeen: 0,
     visits: 0,
     visitMoves: true,
+    followWrites: [],
+    followFails: false,
+    followDelay: 0,
+    followLimit: 500,
+    unknownTags: [],
+    subscriptionReads: 0,
   };
+  /** stable subscription ids per tag, like e621's rows */
+  const subIds = new Map<string, number>();
+  const subId = (name: string) => {
+    if (!subIds.has(name)) subIds.set(name, 100 + subIds.size);
+    return subIds.get(name)!;
+  };
+  const subRow = (name: string) => ({ id: subId(name), tag_id: 1000 + subId(name), tag_name: name, category: 1, created_at: "2024-05-01T12:00:00.000-04:00" });
   const ANCHOR_ID = 7;
   const tagsOf = (p: ReturnType<typeof mockPost>) => Object.values(p.tags).flat();
 
@@ -207,12 +232,44 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       return json(route, { id: 42, name: user, blacklisted_tags: "account_rule\nsecond_rule other", tag_query_limit: 40 });
     }
 
-    if (url.pathname === "/tag_subscriptions.json") {
+    if (url.pathname === "/tag_subscriptions.json" && req.method() === "GET") {
       if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
-      return json(
-        route,
-        (state.subscriptions ?? []).map((name, i) => ({ id: 100 + i, tag_id: 1000 + i, tag_name: name, category: 1, created_at: "2024-05-01T12:00:00.000-04:00" })),
-      );
+      state.subscriptionReads++;
+      return json(route, [...(state.subscriptions ?? [])].sort().map(subRow));
+    }
+
+    // Like e621ng's TagSubscription.subscribe!: skips unknown tags, ones already followed and
+    // anything past the limit, each with a reason; the first follow makes the anchor.
+    if (url.pathname === "/tag_subscriptions.json" && req.method() === "POST") {
+      if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
+      const names = (new URLSearchParams(req.postData() ?? "").get("tag_names") ?? "").split(/\s+/).filter(Boolean);
+      state.followWrites.push({ method: "POST", names });
+      if (state.followDelay) await new Promise((r) => setTimeout(r, state.followDelay));
+      if (state.followFails) return json(route, { success: false, reason: "Mock follow failure" }, 500);
+      const subs = state.subscriptions ?? [];
+      const added: string[] = [];
+      const skipped: { name: string; reason: string }[] = [];
+      for (const name of names) {
+        if (state.unknownTags.includes(name)) skipped.push({ name, reason: "does not exist" });
+        else if (subs.includes(name) || added.includes(name)) skipped.push({ name, reason: "already subscribed" });
+        else if (subs.length + added.length >= state.followLimit) skipped.push({ name, reason: `over the limit of ${state.followLimit}` });
+        else added.push(name);
+      }
+      if (added.length) state.subscriptions = [...subs, ...added];
+      return json(route, { added: added.map(subRow), skipped });
+    }
+
+    const unsub = url.pathname.match(/^\/tag_subscriptions\/(\d+)\.json$/);
+    if (unsub && req.method() === "DELETE") {
+      if (!auth) return json(route, { success: false, reason: "Access denied" }, 403);
+      const id = Number(unsub[1]);
+      state.followWrites.push({ method: "DELETE", id });
+      if (state.followDelay) await new Promise((r) => setTimeout(r, state.followDelay));
+      if (state.followFails) return json(route, { success: false, reason: "Mock follow failure" }, 500);
+      const name = (state.subscriptions ?? []).find((n) => subId(n) === id);
+      if (!name) return json(route, { success: false, reason: "not found" }, 404);
+      state.subscriptions = state.subscriptions!.filter((n) => n !== name);
+      return route.fulfill({ status: 204, headers: CORS });
     }
 
     if (url.pathname === "/saved_searches.json") {

@@ -1,4 +1,4 @@
-import type { AutocompleteTag, CurrentUser, Post, SavedSearchRow, TagInfo, TagSubscription, UserProfile } from "./types";
+import type { AutocompleteTag, CurrentUser, Post, SavedSearchRow, SubscribeResult, TagInfo, TagSubscription, UserProfile } from "./types";
 
 export const E621_BASE = "https://e621.net";
 
@@ -295,9 +295,28 @@ export async function removeFavorite(postId: number, creds: Credentials): Promis
 // ---- Following (ENGINEERING.md §3, §4; e621ng research notes) --------------------------------
 
 /** The tags you follow on e621: the whole list (e621 allows 500), sorted by name. */
-export async function getSubscriptions(creds: Credentials, signal?: AbortSignal): Promise<TagSubscription[]> {
-  const res = await request<unknown>("/tag_subscriptions.json", { creds, signal });
-  return Array.isArray(res) ? (res as TagSubscription[]) : [];
+export async function getSubscriptions(creds: Credentials, signal?: AbortSignal, lane: Lane = "user"): Promise<TagSubscription[]> {
+  const res = await request<unknown>("/tag_subscriptions.json", { creds, signal, lane });
+  if (!Array.isArray(res)) throw new E621Error("e621 sent your follows in a format this app doesn't understand", 200);
+  return res as TagSubscription[];
+}
+
+/**
+ * Follow tags in one write. e621 follows aliases (an added row may carry the aliased name) and
+ * skips unknown tags, ones you already follow, and anything past 500, saying why for each.
+ */
+export async function subscribe(names: string[], creds: Credentials): Promise<SubscribeResult> {
+  const res = await request<Partial<SubscribeResult> | undefined>("/tag_subscriptions.json", {
+    method: "POST",
+    body: new URLSearchParams({ tag_names: names.join(" ") }),
+    creds,
+  });
+  return { added: Array.isArray(res?.added) ? res.added : [], skipped: Array.isArray(res?.skipped) ? res.skipped : [] };
+}
+
+/** Unfollow one tag by its subscription id. */
+export async function unsubscribe(subId: number, creds: Credentials): Promise<void> {
+  await request(`/tag_subscriptions/${subId}.json`, { method: "DELETE", creds });
 }
 
 /**

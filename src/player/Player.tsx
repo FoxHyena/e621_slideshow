@@ -12,6 +12,7 @@ import { postPageUrl } from "@/lib/e621/client";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { decodeResults } from "@/lib/feed/filters";
 import { ago, artists, compact } from "@/lib/feed/format";
+import { FollowPill } from "@/feed/FollowPill";
 import { DEFAULT_PLAYBACK, type PlaybackSettings } from "@/lib/settings";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import Avatar from "@/components/Avatar";
@@ -458,6 +459,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
               <Avatar seed={by ?? `post:${current.id}`} className="post-avatar" />
               <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
               <span className="post-time">{ago(current.created_at, now)}</span>
+              {by && <FollowPill key={by} name={by} art />}
             </div>
           )}
           <div className="player-rail">

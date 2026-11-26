@@ -141,6 +141,12 @@ export interface TagSubscription {
   created_at: string;
 }
 
+/** POST /tag_subscriptions.json: the rows added, and each tag skipped with e621's reason. */
+export interface SubscribeResult {
+  added: TagSubscription[];
+  skipped: { name: string; reason: string }[];
+}
+
 /**
  * A row of GET /saved_searches.json. The hidden "subscriptions" anchor (`is_subscription`) holds
  * the "new since last visit" marker for followed tags (e621ng SavedSearchBlueprint).

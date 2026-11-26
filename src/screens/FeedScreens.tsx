@@ -14,6 +14,7 @@ import { artists } from "@/lib/feed/format";
 import { DEFAULT_SEARCH, type SearchSettings } from "@/lib/settings";
 import type { TagAction } from "@/components/TagActions";
 import { FeedView, type FeedViewProps } from "@/feed/FeedView";
+import { FollowButton } from "@/feed/FollowPill";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { getNav } from "@/nav/history";
 import type { Route } from "@/nav/routes";
@@ -185,7 +186,7 @@ export function FeedBody({
   /** where the reading place is kept; tab roots name the tab, since their entry changes per visit */
   anchorKey?: string;
   recommended?: boolean;
-} & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView">) {
+} & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView" | "follow">) {
   const { entry } = useScreen();
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;
   return (
@@ -304,7 +305,7 @@ export function ResultsScreen({ params }: { params: string }) {
         </button>
       </h1>
       <ChipsRow filters={r.filters} chips={RESULTS_CHIPS} onChange={(f) => go({ ...r, filters: f })} link={r.link ? "From a link" : null} />
-      <FeedBody feed={feed} grid={grid} route={route} empty={empty} onTag={onTag} />
+      <FeedBody feed={feed} grid={grid} route={route} empty={empty} onTag={onTag} follow />
       <PlayFab feed={feed} route={route} />
       <FilterSheet sheet={sheet} filters={r.filters} apply={(f) => go({ ...r, filters: f })} />
       {sheet === "edit" && (
@@ -401,6 +402,7 @@ export function FavoritesScreen({ params }: { params: string }) {
             feed={feed}
             grid={grid}
             route={route}
+            follow
             empty={
               <>
                 <p className="feed-empty-title">{isDefaultFilters(filters) ? "No favorites yet." : "No favorites match."}</p>
@@ -440,6 +442,7 @@ export function ArtistScreen({ name }: { name: string }) {
       <h1 tabIndex={-1} className="screen-title">
         {name.replaceAll("_", " ")}
       </h1>
+      <FollowButton name={name} />
       <FeedBody
         feed={feed}
         grid={grid}
