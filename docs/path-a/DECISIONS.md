@@ -1307,3 +1307,10 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   `src/screens/GooRow.tsx`, used by both. "Tab bar goo" stays only as the DESIGN.md heading for the
   goo on the tab bar.
 
+## 2026-11-26 — Where the wordmark sits: approved
+
+- Owner, asked to approve where the wordmark sits, including under Goo on the landing card:
+  "Approve".
+- The three places: beside the 36 mark in the sidebar (20/25), under the 56 mark at the foot of
+  Settings (17/22), under Goo on the landing card (28/34). Nothing about the name or the wordmark is
+  open now.
