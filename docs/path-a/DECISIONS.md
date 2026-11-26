@@ -400,10 +400,9 @@ Format: date — decision. Why. Rejected alternatives.
 - **No rating badge yet**: DESIGN.md shows it only when a post's rating differs from the user's default,
   and there is no user default rating yet. Arrives with the rating setting.
 - **Deferred to R2 or later**: the compact header bar and the Following tab badge (neither is in R1's list).
-- **Goo is a device count**: `e6ss:v1:goo`, one number, no post ids or names. It isn't per account and
-  sign-out doesn't clear it (DESIGN.md: it stays until Wipe clean). **Open for the owner**: the hard rule
-  says per-user caches persist only with Remember on; if the owner counts this as one, it moves to the
-  account storage (sessionStorage without Remember) and sign-out clears it.
+- **Goo is kept like signed-in data** (owner: "Clear on sign-out", 2026-11-25): `e6ss:v1:goo` is in
+  localStorage only with Remember (a saved key), in this tab's sessionStorage otherwise, and signing out
+  (not leaving a share link's sign-in) wipes it with the blade. Was a device count that survived sign-out.
 - **Goo counts a post once per page session** (`addFav`): un-favouriting and favouriting again drips but
   adds nothing. A favourite e621 refuses keeps its goo (it's counted on the tap, so the drop can fall).
 - **On desktop (900 px and up) the rail has no goo and no secret tab**: desktop isn't drawn yet (R2 shows

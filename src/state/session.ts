@@ -7,6 +7,7 @@ import { E621Error, getCurrentUser, type Credentials } from "@/lib/e621/client";
 import type { CurrentUser } from "@/lib/e621/types";
 import { decodeShareCreds } from "@/lib/share";
 import { storage } from "@/lib/storage";
+import { getGoo } from "./goo";
 import { getPrefs, type PrefsApi } from "./prefs";
 import { createStore, type Store } from "./store";
 
@@ -111,6 +112,8 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
       else {
         storage.saveShareSignIn(false);
         storage.saveCredentials(null);
+        // the goo goes with the account (the bar wipes it off)
+        if (getGoo().store.get().count > 0) getGoo().wipe();
       }
       verified = true;
       store.set({ creds: null, user: null, remember: false, link: false, shareSignIn: link ? storage.loadShareSignIn() : false, ready: true });

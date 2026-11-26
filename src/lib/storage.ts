@@ -251,14 +251,15 @@ export function pushHistory(history: HistoryEntry[], tags: string, now: number):
 // ---- tab bar goo ------------------------------------------------------------------------------
 
 /**
- * How many favourites of goo are on the tab bar (DESIGN.md "Tab bar goo"). A device toy, not
- * account data: it isn't per user and survives sign-out.
+ * How many favourites of goo are on the tab bar (DESIGN.md "Tab bar goo"). Kept like the other
+ * signed-in records (owner, 2026-11-25): on the device only with Remember (a saved key), for
+ * this tab otherwise; sign-out clears it (session.ts).
  */
 export function loadGoo(): number {
-  const n = read<unknown>("goo", 0);
+  const n = readAccount<unknown>("goo");
   return typeof n === "number" && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
 export function saveGoo(n: number): void {
-  write("goo", n > 0 ? n : null);
+  writeAccount("goo", n > 0 ? n : null, storage.loadCredentials() !== null);
 }

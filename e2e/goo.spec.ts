@@ -132,3 +132,20 @@ test("with reduced motion, nothing drips or flies, and the count still grows", a
   await page.getByTestId("tab-settings").click();
   await expect(count(page)).toHaveText("1 favorite");
 });
+
+test("signing out wipes the goo off the bar and off the device", async ({ page }) => {
+  await mockE621(page);
+  await signIn(page);
+  await page.goto("/search?tags=wolf");
+  await card(page, 1150).getByTestId("card-fav").click();
+  await expect(bar(page)).toHaveAttribute("data-goo", "", { timeout: 5000 });
+  await page.getByTestId("tab-settings").click();
+  await expect(count(page)).toHaveText("1 favorite");
+  await page.getByRole("link", { name: "Account" }).click();
+  await page.getByRole("button", { name: /^e621 account/ }).click();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.getByTestId("tab-settings").click();
+  await expect(count(page)).toHaveText("0 favorites");
+  await expect(bar(page)).not.toHaveAttribute("data-goo", "", { timeout: 4000 });
+  expect(await page.evaluate(() => localStorage.getItem("e6ss:v1:goo") ?? sessionStorage.getItem("e6ss:v1:goo"))).toBeNull();
+});

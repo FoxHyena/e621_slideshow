@@ -83,6 +83,26 @@ describe("session", () => {
     expect(saved("account:fox")).toBeNull();
   });
 
+  it("keeps the goo on the device only with Remember, and wipes it on sign-out", async () => {
+    const { getGoo } = await import("../goo");
+    const { storage, saveGoo, loadGoo } = await import("@/lib/storage");
+    getCurrentUser.mockResolvedValue(user());
+    const s = createSession(null, createPrefs());
+    await s.signIn(KEY, false);
+    saveGoo(3);
+    expect(saved("goo")).toBeNull(); // this tab only (sessionStorage)
+    await s.signIn(KEY, true);
+    expect(storage.loadCredentials()).toEqual(KEY);
+    saveGoo(4);
+    expect(saved("goo")).toBe(4);
+    expect(loadGoo()).toBe(4);
+    getGoo().add(2);
+    const wipes = getGoo().store.get().wipes;
+    s.signOut();
+    expect(getGoo().store.get()).toEqual({ count: 0, wipes: wipes + 1 });
+    expect(saved("goo")).toBeNull();
+  });
+
   it("uses a link's key for this tab only: nothing saved, the saved key untouched", async () => {
     ls.set("e6ss:v1:creds", JSON.stringify({ username: "me", apiKey: "mine" }));
     getCurrentUser.mockResolvedValue(user("sharer_rule"));

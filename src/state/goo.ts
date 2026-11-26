@@ -1,7 +1,8 @@
 /**
  * The tab bar's goo count (DESIGN.md "Tab bar goo"): every favourite adds one, the secret Goo
- * tab adds ten, Wipe clean in Settings sets it back to zero. Goo only ever adds: un-favouriting
- * leaves it (an open question in DESIGN.md; this is the conservative choice).
+ * tab adds ten, Wipe clean in Settings and signing out set it back to zero. Goo only ever adds:
+ * un-favouriting leaves it (an open question in DESIGN.md; this is the conservative choice).
+ * Stored like the other signed-in records (storage.ts `saveGoo`).
  *
  * `wipes` counts wipes, so the bar can play the blade once per wipe. `landing` holds drops still
  * in the air: the bar waits for them before it grows.

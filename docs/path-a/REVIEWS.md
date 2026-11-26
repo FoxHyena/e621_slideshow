@@ -445,7 +445,7 @@ it twice).
 
 | # | Finding | Sev | Outcome |
 |---|---|---|---|
-| 1 | The goo count persists without Remember and survives sign-out | Med | **Owner's call**: kept as a device count, logged in DECISIONS |
+| 1 | The goo count persists without Remember and survives sign-out | Med | Owner: "Clear on sign-out". Stored with Remember only (tab otherwise), wiped on sign-out; unit + e2e test |
 | 2 | Two goo e2e asserts couldn't fail (no-drop checked too early; drag test never clicked a tab) | Med | No-drop waits 700 ms; new test drags back onto the start tab. Note: it passes with the click guard removed too, because Chromium retargets that click to the bar under pointer capture; it checks the outcome, not the guard |
 | 3 | The desktop rail has no goo or secret tab | Low | **No change**: desktop is undrawn (R2); logged in DECISIONS |
 | 4 | Player artist name lost its ellipsis; the player didn't turn the mark on favourite | Low | `display: block`; `turnMark` in the player |
@@ -458,7 +458,7 @@ it twice).
 
 e2e failures found by the gate: Play covered the desktop rail (4 tests); it now sits past the rail.
 
-**Gates:** 292 unit tests, 144 e2e passed (2 skipped), typecheck and lint clean. Visual check at 375×812
+**Gates:** 293 unit tests, 145 e2e passed (2 skipped), typecheck and lint clean (after the sign-out follow-up). Visual check at 375×812
 (Following, Settings, goo at 60 in the preview, the tube and capsule) and desktop (rail).
 
 **Budgets** (production build, 375×812, mock e621): JS cold load of `/following` 199.3 KB (≤ 200; was
