@@ -1139,3 +1139,19 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the new count), the pools draining during the wipe, the row's name on a computer, the secret tab on
   a computer.
 
+## 2026-11-26 — Two known gaps fixed; the sign-in check stays in the first load for now
+
+- Owner: "fix the bugs" (MORNING Decide 11 and 12).
+- **A hidden For You kept ranking after sign-out** with the old key: its screen's effects don't run
+  while hidden, so it never stopped its ranking. Now the feed registry watches the session and stops
+  and drops every kept feed (For You's rankings) when the key changes or goes. e2e: sign out with a
+  slow ranking under Settings; no request with the old key after it (fails on the old code).
+- **A tap while a Back was landing was dropped** (push, open a sheet, replace). Now it waits for the
+  Back to land and then runs, in order. A second Back during a Back is still ignored (a double Esc
+  shouldn't leave two screens).
+- Owner asked what moving the sign-in check out of the first load would mean. The check itself
+  stays; only where its code loads would change. It is small (about 1 KB), so it buys little room;
+  with Remember on nothing visible changes, without Remember the first signed-in paint waits one more
+  small file. Default: leave it; when a feature needs room, measure and move the biggest piece the
+  first paint doesn't use.
+

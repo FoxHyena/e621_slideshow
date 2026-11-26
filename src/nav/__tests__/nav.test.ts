@@ -247,15 +247,25 @@ describe("nav", () => {
     expect(nav.current().route.screen).toEqual({ kind: "settings", section: null });
   });
 
-  it("ignores a push while a Back is landing", async () => {
+  it("holds a push or a sheet tapped while a Back is landing, then does it on the entry below", async () => {
     const w = fakeWin();
     const nav = createNav(w);
     nav.push({ screen: { kind: "search" }, play: null });
     const back = nav.back();
     nav.push({ screen: { kind: "favorites", params: "" }, play: null });
+    expect(nav.store.get().index).toBe(1); // not yet: the Back hasn't landed
     await back;
-    expect(path(w)).toBe("/following");
-    expect(nav.store.get().index).toBe(0);
+    expect(path(w)).toBe("/favorites");
+    expect(nav.store.get().stack.map((e) => routeUrl(e.route))).toEqual(["/following", "/favorites"]);
+    expect(w.entries.map((e) => new URL(e.url, "https://x.test").pathname)).toEqual(["/following", "/favorites"]);
+
+    // a chip tapped again as its menu closes opens the menu again
+    nav.openSheet("sort");
+    const close = nav.back();
+    nav.openSheet("sort");
+    await close;
+    expect(nav.current().sheet).toBe("sort");
+    expect(nav.store.get().index).toBe(2);
   });
 
   it("keeps keys other code put on the entry when replacing", () => {

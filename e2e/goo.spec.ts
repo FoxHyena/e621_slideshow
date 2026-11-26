@@ -173,6 +173,8 @@ for (const [n, side, jar] of [
     const pb = (await jarPool.boundingBox())!;
     expect(Math.round(pb.y + pb.height)).toBe(Math.round(row!.y + row!.height));
     // the words show through in Goo Ink, cut to the goo
+    // the goo's slab really stands that high (its top is the level above the card's foot)
+    expect(await jarPool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg rect")!.getAttribute("y"))))).toBe(jar);
     await expect(jarPool.locator(".pool-ink")).toContainText("Tab bar goo");
     expect(await jarPool.locator(".pool-ink").evaluate((e) => getComputedStyle(e).maskImage)).toContain("data:image/svg+xml");
     await shot(page, `goo-jar-${n}`);
@@ -184,6 +186,7 @@ for (const [n, side, jar] of [
     const sb = (await page.getByTestId("sidebar").boundingBox())!;
     const sp = (await sidePool.boundingBox())!;
     expect([Math.round(sp.x), Math.round(sp.width), Math.round(sp.y + sp.height)]).toEqual([Math.round(sb.x), Math.round(sb.width), Math.round(sb.y + sb.height)]);
+    expect(await sidePool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg rect")!.getAttribute("y"))))).toBe(side);
     await expect(sidePool.locator(".pool-ink")).toContainText("tester");
     await shot(page, `goo-side-${n}`);
     await page.getByTestId("side-account").click({ position: { x: 30, y: 30 } });

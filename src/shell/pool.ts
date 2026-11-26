@@ -59,7 +59,7 @@ const markup = (s: PoolShape) =>
       : `<ellipse cx="${s.cx}" cy="${s.cy}" rx="${s.rx}" ry="${s.ry}"/>`;
 
 /**
- * The same goo as a CSS mask, filter and all, so the words drawn again in Goo Ink are cut to the
+ * The same goo as an image for a CSS mask (a data URL), filter and all, so the words drawn again in Goo Ink are cut to the
  * goo's own wavy edge, not a straight line.
  */
 export function poolMask(shapes: PoolShape[], W: number, H: number): string {
@@ -68,5 +68,8 @@ export function poolMask(shapes: PoolShape[], W: number, H: number): string {
     `<filter id="g" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB">` +
     `<feGaussianBlur stdDeviation="${POOL_FILTER.blur}"/><feColorMatrix values="${POOL_FILTER.matrix}"/></filter>` +
     `<g filter="url(#g)">${shapes.map(markup).join("")}</g></svg>`;
-  return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 0 0 / 100% 100% no-repeat`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
+
+/** The mask image as a CSS `mask` value, stretched over the whole box. */
+export const maskCss = (url: string) => `url("${url}") 0 0 / 100% 100% no-repeat`;

@@ -209,14 +209,14 @@ Approved:
 8. **"What's new"** in Settings › App isn't built (no changelog yet). Default: leave it out.
 9. **Popovers on a computer** (a chip's or ⋯'s sheet shown at the thing you clicked, no dim). Default: not
    built; every sheet is a centred dialog. Building them means each opener passes its position.
-10. **The goo on a computer** isn't designed (the design session's suggestion: along the sidebar's top edge,
-   dripping down its face; the secret tab as a row under Settings). Default: no goo on a computer.
+10. **The sidebar pool with 0 favorites.** The design's level gives a thin 10 px layer even at 0; I show
+   no goo until the first favorite (as the jar on a phone). Default: none at 0. (The goo on a computer
+   itself is settled: you picked Pool, built.)
 
-11. **Known gap: a hidden For You keeps ranking after you sign out**, with the old account's key, until
-   you open For You again. Default: fix after this PR (drop For You's feeds on sign-out from the session,
-   not from the screen).
-12. **Known gap: a second tap while a sheet is closing is dropped** (e.g. tapping a chip twice fast).
-   Default: fix after this PR (queue it, as tab taps already are).
+11. ~~Known gap: a hidden For You keeps ranking after you sign out~~ **Fixed** (you said fix it): signing
+   out, or another account, stops For You's ranking at once, even hidden.
+12. ~~Known gap: a second tap while a sheet is closing is dropped~~ **Fixed**: the tap waits for the
+   sheet to close, then happens (a chip tapped twice fast opens its menu again).
 
 ## Needs you (things I held)
 

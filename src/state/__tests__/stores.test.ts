@@ -363,4 +363,31 @@ describe("feed registry", () => {
     r.drop("ranked");
     expect(r.generation.get()).toBe(g + 1);
   });
+
+  it("stops and drops For You's kept rankings when the account leaves, and only those", () => {
+    const r = createRegistry(() => vi.fn().mockResolvedValue([]));
+    const dispose = vi.fn();
+    const queue = {
+      posts: [],
+      exhausted: false,
+      loading: true,
+      error: null,
+      stats: { hidden: 0, blacklisted: 0 },
+      query: "",
+      ensure: async () => {},
+      remove() {},
+      patch() {},
+      retry() {},
+      setRules() {},
+      dispose,
+    };
+    r.custom("ranked", () => queue, { keep: true });
+    const plain = r.get(spec("wolf"), env);
+    const g = r.generation.get();
+    r.dropKept();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(r.peek("ranked")).toBeUndefined();
+    expect(r.peek(plain.key)).toBe(plain);
+    expect(r.generation.get()).toBe(g + 1);
+  });
 });

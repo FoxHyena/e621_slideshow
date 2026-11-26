@@ -996,3 +996,19 @@ kinds, the sidebar's account row still opens through the goo, no pool at 1000 wi
 Wipe clean empties the jar); budgets JS cold load **198.8 KB** (the pool rides the sidebar and Settings
 chunks), CLS 0, 0 long tasks.
 
+## Fresh review: icon, mark, title fix, pools (2026-11-26)
+
+One fresh reviewer on `b42546a..70b37f7` (src, e2e, scripts). No high-severity findings.
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The Goo Ink words could blink when the level moves (a new mask image paints nothing until decoded) | Medium-low | The last mask stays until the new one has decoded |
+| 2 | The leaving capsule copy has no tools | Low | No change: the capsule is full width, so its shape doesn't change; the tools are back in the page at once |
+| 3 | Scrolling down again mid-fade cuts the fade | Low | No change (cosmetic, 150 ms) |
+| 4 | The 120 px pool box could cover tabs in a very short window | Low | No change: only the goo's level (at most 66 + its rise) is drawn |
+| 5 | The pool's size was rounded; the mask is stretched over the real box | Low | Measured unrounded |
+| 6 | Safari's mask of a filtered SVG untested | Low | Owner checks on the iPhone after release |
+| 7 | The pool test checked the level against its own formula | Low | Also checks the drawn slab's top |
+| 8 | "Pops once" could pass without the mark in view | Low | Waits for it in view first |
+| 9 | The scroll-up test's position check was weak | Low | Also checks the row isn't fixed |
+

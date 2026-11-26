@@ -6,9 +6,9 @@
  * drawn again in Goo Ink, cut to the goo's own shape. The level jumps to a new count (how it should
  * rise isn't designed yet).
  */
-import { useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { gooColor } from "@/shell/tube";
-import { POOL_FILTER, poolLevel, poolMask, poolShapes, type PoolKind } from "@/shell/pool";
+import { maskCss, POOL_FILTER, poolLevel, poolMask, poolShapes, type PoolKind } from "@/shell/pool";
 
 export function Pool({ kind, n, ink, className }: { kind: PoolKind; n: number; ink?: ReactNode; className?: string }) {
   const box = useRef<HTMLSpanElement>(null);
@@ -18,9 +18,11 @@ export function Pool({ kind, n, ink, className }: { kind: PoolKind; n: number; i
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
+    // (unrounded: the mask is stretched over the real box, so a box 0.5 off would shift the ink's edge)
     const measure = () => {
-      const w = Math.round(el.clientWidth);
-      const h = Math.round(el.clientHeight);
+      const r = el.getBoundingClientRect();
+      const w = Math.round(r.width * 100) / 100;
+      const h = Math.round(r.height * 100) / 100;
       setSize((s) => (s && s[0] === w && s[1] === h ? s : [w, h]));
     };
     measure();
@@ -32,7 +34,24 @@ export function Pool({ kind, n, ink, className }: { kind: PoolKind; n: number; i
   const [W, H] = size ?? [0, 0];
   const shapes = poolShapes(kind, n, W, H);
   const on = shapes.length > 0;
-  const mask = on && ink ? poolMask(shapes, W, H) : "";
+  const url = on && ink ? poolMask(shapes, W, H) : "";
+  // A new mask image paints nothing until it's decoded, so the words would blink when the level
+  // moves: keep the last one on until the new one is ready (the first waits, hidden).
+  const [shown, setShown] = useState("");
+  useEffect(() => {
+    if (!url) return;
+    let live = true;
+    const img = new Image();
+    img.src = url;
+    img.decode().then(
+      () => live && setShown(url),
+      () => live && setShown(url),
+    );
+    return () => {
+      live = false;
+    };
+  }, [url]);
+  const mask = shown ? maskCss(shown) : "";
   return (
     <span ref={box} className={`pool ${className ?? ""}`} data-kind={kind} data-level={on ? Math.round(poolLevel(kind, n)) : 0} aria-hidden data-testid={`pool-${kind}`}>
       {on && (
@@ -55,7 +74,7 @@ export function Pool({ kind, n, ink, className }: { kind: PoolKind; n: number; i
         </svg>
       )}
       {on && ink && (
-        <span className="pool-ink" style={{ mask, WebkitMask: mask }}>
+        <span className="pool-ink" style={mask ? { mask, WebkitMask: mask } : { visibility: "hidden" }}>
           {ink}
         </span>
       )}

@@ -226,3 +226,20 @@ test.describe("pull to refresh", () => {
     expect(ranked(mock)).toBe(1);
   });
 });
+
+test("signing out while For You is still ranking (hidden behind Settings) stops it asking with the old key", async ({ page }) => {
+  const mock = await withFavorites(page);
+  // every page of the ranking (its candidates, then what's popular) is slow, so it's mid-way at sign-out
+  const rankPage = (tags: string) => tags.includes("date:>=7_days_ago");
+  mock.searchDelay = (tags) => (rankPage(tags) ? 1500 : 0);
+  await page.goto("/for-you");
+  await expect(page.getByTestId("search-progress")).toBeVisible({ timeout: 15_000 });
+  await expect.poll(() => mock.searches.filter((s) => rankPage(s.tags)).length, { timeout: 15_000 }).toBeGreaterThan(0);
+  await page.getByTestId("tab-settings").click();
+  await page.getByTestId("sign-out").click();
+  await expect(page.getByTestId("sign-out")).toHaveCount(0);
+  const asked = mock.searches.filter((s) => s.auth && rankPage(s.tags)).length;
+  // a ranking left running asks for its next page as soon as the slow one answers
+  await page.waitForTimeout(4000);
+  expect(mock.searches.filter((s) => s.auth && rankPage(s.tags)).length).toBe(asked);
+});

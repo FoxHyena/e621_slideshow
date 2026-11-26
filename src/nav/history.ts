@@ -151,12 +151,21 @@ export function createNav(win: Win): Nav {
     }
     sync();
   };
+  /**
+   * Taps that came while a Back was on its way (a chip tapped again as its menu closes): they'd write
+   * onto the entry the browser is leaving, so they wait for the Back to land, then run in order.
+   */
+  let later: (() => void)[] = [];
+  let disposed = false;
   const settle = () => {
     if (!pending) return;
     win.clearTimeout(pending.timer);
     const p = pending;
     pending = null;
     p.resolve();
+    const run = later;
+    later = [];
+    if (!disposed) for (const f of run) f();
   };
 
   /** Bring the store in line with the address bar and history.state (popstate, pageshow, timeout). */
@@ -208,8 +217,7 @@ export function createNav(win: Win): Nav {
     current,
     fresh,
     push(route, opts) {
-      // A tap during a Back would write onto the entry the browser is leaving.
-      if (pending) return;
+      if (pending) return void later.push(() => nav.push(route, opts));
       const cur = current();
       // A double tap, or Search while on Search: one entry, not two.
       if (routeUrl(route) === routeUrl(cur.route) && !cur.sheet) return;
@@ -217,13 +225,13 @@ export function createNav(win: Win): Nav {
       add({ key: newKey(), depth: cur.depth + 1, from, sheet: null, route });
     },
     openSheet(name) {
-      if (pending) return;
+      if (pending) return void later.push(() => nav.openSheet(name));
       const cur = current();
       if (cur.sheet === name) return;
       add({ key: newKey(), depth: cur.depth + 1, from: cur.from, sheet: name, route: cur.route });
     },
     replace(route, opts) {
-      if (pending) return;
+      if (pending) return void later.push(() => nav.replace(route, opts));
       const cur = current();
       // The player moving on under Post info (next, a blacklisted post): the sheet stays open.
       const sheet = cur.sheet && sameScreenUrl(route, cur.route) ? cur.sheet : null;
@@ -260,6 +268,7 @@ export function createNav(win: Win): Nav {
       return run;
     },
     dispose() {
+      disposed = true;
       win.removeEventListener("popstate", onPop);
       win.removeEventListener("pageshow", onPop);
       settle();

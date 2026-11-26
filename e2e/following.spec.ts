@@ -108,9 +108,12 @@ test("new posts are marked New, a long run folds, and the divider sits at e621's
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect(page.getByTestId("caught-up")).toHaveCount(0);
   await page.evaluate((y) => window.scrollTo(0, y), at);
-  await expect(page.getByTestId("caught-up")).toBeVisible();
+  const again = page.getByTestId("caught-up").getByTestId("app-mark");
+  // (in view, so the observer has had its chance to pop it)
+  await expect(again).toBeInViewport({ ratio: 0.9 });
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   await page.waitForTimeout(400);
-  await expect(page.getByTestId("caught-up").getByTestId("app-mark")).not.toHaveAttribute("data-pop");
+  await expect(again).not.toHaveAttribute("data-pop");
 });
 
 test("a grid tile of a post folded into \"+N more\" opens the run and lands on it", async ({ page }) => {

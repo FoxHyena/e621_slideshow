@@ -519,11 +519,13 @@ for (const [w, h] of [
         // the shown screen's row (hidden screens keep their own, not drawn)
         const row = [...document.querySelectorAll<HTMLElement>("[data-testid=top-bar]")].find((e) => e.querySelector("h1")!.getClientRects().length > 0)!;
         const h1 = row.querySelector("h1")!.getBoundingClientRect();
-        return { at: row.getAttribute("data-at"), top: Math.round(h1.top), height: Math.round(h1.height) };
+        return { at: row.getAttribute("data-at"), top: Math.round(h1.top), height: Math.round(h1.height), pos: getComputedStyle(row).position };
       });
       expect(back.at, path).toBeNull();
       expect(back.height, path).toBeGreaterThan(30);
       expect(back.top, path).toBeGreaterThanOrEqual(0);
+      // in the page's flow, not still the fixed capsule
+      expect(back.pos, path).not.toBe("fixed");
       // the leaving copy fades, then goes
       await expect(page.getByTestId("top-bar-leaving")).toHaveCount(0);
     }

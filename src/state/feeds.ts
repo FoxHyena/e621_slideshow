@@ -16,6 +16,7 @@ import { buildQuery, DEFAULT_TAG_LIMIT, favoritesTags } from "@/lib/query/build"
 import type { SearchSettings } from "@/lib/settings";
 import { PostQueue, type PageFetcher, type SlideQueue } from "@/lib/slideshow/queue";
 import { blacklistOf, getPrefs } from "./prefs";
+import { getSession } from "./session";
 import { createStore, type Store } from "./store";
 
 export const MAX_FEEDS = 8;
@@ -85,6 +86,11 @@ export interface Registry {
   retain(feed: Feed): () => void;
   /** Drop a feed so the next `get` starts it over. */
   drop(key: string): void;
+  /**
+   * Stop and drop every kept feed (For You's rankings): the account they were made with has left.
+   * Done here, not by the screen, since a hidden screen's effects don't run.
+   */
+  dropKept(): void;
   peek(key: string): Feed | undefined;
   size(): number;
   /** Apply a new blacklist to every live feed. */
@@ -169,6 +175,16 @@ export function createRegistry(
       if (f) drop(f);
       generation.set((g) => g + 1);
     },
+    dropKept() {
+      let any = false;
+      for (const f of [...feeds.values()]) {
+        if (!f.keep) continue;
+        f.queue.dispose?.();
+        drop(f);
+        any = true;
+      }
+      if (any) generation.set((g) => g + 1);
+    },
     peek: (key) => feeds.get(key),
     size: () => feeds.size,
     setBlacklist(text) {
@@ -210,6 +226,21 @@ export function getFeeds(): Registry {
       if (b === last) return;
       last = b;
       reg.setBlacklist(b);
+    });
+    // Signed out, or another account: For You's rankings (made with the old key) stop at once.
+    const session = getSession().store;
+    const who = () => {
+      const x = session.get();
+      // (the key, not the user: /users/me answering later is the same account)
+      return x.link || !x.creds ? null : `${x.creds.username}\n${x.creds.apiKey}`;
+    };
+    let account = who();
+    session.subscribe(() => {
+      const next = who();
+      if (next === account) return;
+      const had = account;
+      account = next;
+      if (had !== null) reg.dropKept();
     });
     instance = reg;
   }
