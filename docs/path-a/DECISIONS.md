@@ -107,3 +107,23 @@ Format: date — decision. Why. Rejected alternatives.
 - Fix (owner: "let's do it"): one 12 px inner edge for everything in the panel; 44 header flush to the top;
   12 picture → stats, 12 stats → tags (kept at 12, not 8, so the 44 hit areas don't overlap), 12 bottom.
   Rejected: full-bleed picture inside the panel (bigger art, but reads as a generic social card).
+
+## 2026-11-25 — Engineering plan (Phase 4)
+
+- **Navigation:** native `pushState`/`replaceState` inside one persistent client shell (route files return
+  null). Why: no RSC round-trips, the shell never remounts, history entries carry our depth. Rejected:
+  `router.push` per screen (remounts, no custom state); `cacheComponents` Activity (3 routes).
+- **State:** plain `useSyncExternalStore` stores. Rejected: Zustand/Jotai (not needed for ~9 small stores).
+- **Windowing:** hand-rolled from known post aspect ratios. Rejected for now: `@tanstack/virtual` (plan B if
+  device measurement shows jank).
+- **Feed images** keep their own aspect ratio; only images taller than 1:2 are capped at 1:2 and shown
+  whole on the panel colour. Why: the art is the star; a 1:6 comic strip would otherwise fill five screens.
+- **Signed-in data at rest:** per-user caches (subscriptions, marker anchor, first feed page, For You ranked
+  ids, artist stats, favorites profile) persist to IDB/localStorage only with Remember on; this-tab-only
+  sign-ins keep them in memory; sign-out purges them. They never contain the API key.
+- **Service worker:** hand-rolled; never handles cross-origin requests, so it can't store the key or an
+  authenticated response. e621 thumbnails are not SW-cached in v1 (opaque responses inflate quota);
+  revisit with `crossorigin` previews if `static1.e621.net` sends CORS headers. Rejected: Serwist.
+- **Dependencies:** add `sonner` (toasts with Undo, `role="status"`, pause on hover/focus). Nunito through
+  `next/font/google` (self-served, build-time download). No Motion, Vaul, Serwist or state library.
+- **CSP** limiting `connect-src` to self + e621 (slice 8).

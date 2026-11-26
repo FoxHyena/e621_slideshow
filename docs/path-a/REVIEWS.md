@@ -141,3 +141,36 @@ Fresh reviewer (general-purpose agent), rendered at 1:1 with Playwright. No P0. 
 | 15 | Burst / caught-up not visible at rest | P2 | Fixed: added "Following, scrolled" phone. |
 
 Round-1 items the reviewer found not landed: #8 compact bar (now landed), #1 pill overlap (see #5), #2 gold count (see #3).
+
+## Plan review round 1 — ENGINEERING.md target (2026-11-25)
+
+Fresh `Plan` subagent given GOAL Phase 4, UX.md, DECISIONS, DESIGN.md and the code; it verified framework
+claims in `node_modules` (Next 16.3.8 `app-router.js` history patching, React 19.2.8 `Activity`). All 20
+findings accepted; ENGINEERING.md target revised in place.
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Boot built 2 entries, so closing a link's player went home, not to Results | High | 3 entries: /following, Results, `?play=` |
+| 2 | Boot would re-run on Back/Forward into an earlier document's entries | High | Rewrite history only when `state.e6` is missing; re-sync on `pageshow` |
+| 3 | Follow POST gives no ids for Undo; SWR refetch could clobber optimistic state | High | Per-tag op serialization, ids from `added` or a refetch, generation counter |
+| 4 | Head-dropping pages doesn't fit forward-only queues or player indices | High | Slim posts + one 3,000-post global budget, evict hidden feeds first, "Start from the top" |
+| 5 | Migration in slice 7 but new prefs keys in slice 1; `/following` didn't exist until slice 3 | High | Migration and an interim home (today's panel) in slice 1 |
+| 6 | Opaque redirect can't distinguish success; hidden posts could block marking forever | High | Own fetch path, re-read the anchor to confirm, `maxRawIdSeen` |
+| 7 | Scroll lock makes `scrollY` 0, breaking windowing and anchor saves | High | `scroll.ts` owns a locked offset; windowing frozen while locked |
+| 8 | Queues mutate in place, so selectors miss updates | Med | Per-feed `version` |
+| 9 | Aspect clamp not in DESIGN; no anchor-preserving relayout path | Med | Own aspect (1:2 cap, logged); one `relayout(preserveAnchor)`; CSS-pinned heights + dev check |
+| 10 | Push/back fade conflicts with one-visible-screen; focus handling missing | Med | View Transitions API with `flushSync`, instant fallback; `focus.ts` |
+| 11 | Next's `HistoryUpdater` and `__NA` edge cases | Med | Added to the slice-1 spike checklist |
+| 12 | Sign-in fragment visible to Next's initial `canonicalUrl` | Med | Inline head script strips it before hydration; test that no entry contains `k=` |
+| 13 | Signed-in data at rest undecided; no purge; unbounded tile keys | Med | Decision logged: only with Remember, purged on sign-out; `bigStorage` delete/keys/sweep; per-artist keys |
+| 14 | Batch recency reorders the list; one artist can starve a batch | Med | Two-pass rank, top 24, `limit=320`, per-artist fallback |
+| 15 | SW offline launch missing chunks; thumbnail caching undecided; SW hides requests from mocks | Med | `clients.claim` + cache loaded resources; thumbnails only if CORS; `serviceWorkers: 'block'` |
+| 16 | Back-helper lock could stick with no popstate | Med | 400 ms timeout + re-sync |
+| 17 | Lane priorities starve; per-feed 429 handling; AbortError as error | Med | Aging, lane-wide 5 s pause, AbortError is a no-op |
+| 18 | Fav count double-counts; out-of-order rollback | Low | `fav_count + (faved − is_favorited)`, per-post serialization, 422 = success |
+| 19 | Link filters lost on reload; ratings rule contradictory | Low | Filters in the Results URL; ratings in the key, blacklist via `setRules` |
+| 20 | Edge swipe slice; JS budget measurement; font dep; no CSP | Low | Slice 1; Lighthouse; `next/font/google`; CSP in slice 8 |
+
+Not verifiable without runtime or live e621 (carried into the slice-1 spike and slice-3 live check):
+RSC requests on restore, rapid-transition batching, iOS Safari scroll/toolbar/history behaviour, e621 CORS
+on `visit.json`, the `tag_subscriptions` POST body, `static1` CORS, Playwright + SW interception.
