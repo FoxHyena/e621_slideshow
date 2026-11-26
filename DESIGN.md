@@ -531,7 +531,7 @@ The art is never tinted, framed by gradients or covered. The only things that ma
 - Fredoka for voice, the system face for reading.
 - A solid same-hue lip on pressables, closing in 100 ms.
 - Colour carries meaning: gold = act / new / here, green = score, pink = favourite, e621 tag category colours on tags.
-- "Bends" marks for artists (e621 has no artist pictures); the kaleidoscope is the app mark.
+- "Bends" marks for artists (e621 has no artist pictures); the app mark is the hexagon with Play (it was the kaleidoscope until 2026-11-26).
 - Goo: white, slow, earned by favouriting, wiped from Settings.
 
 ## Colors
@@ -694,7 +694,11 @@ Raised capsule, 36 tall, gold 16 plus and "Follow" (footnote-rounded), 2 lip. **
 
 ### Artist marks ("Bends") and the app mark
 e621 has no artist pictures, so each artist gets a mark hashed from their name: two round-capped arcs (at 70% and 41% of the disc's radius, stroke 21% of it) around a centre dot. The three colours, the arcs' start angles and lengths, and the dot's size all come from the hash. Colours are picked from eight: #B4C7D9, #E9F2FA, #5B9BE0, #F3946B, #FF8A95, #EE7BEE, #5EC06A, #78DCA5. Never gold. The mark sits on a raised disc (Raised Navy, top light, 1 px dark ring) and spins one turn (600 ms, overshooting) when you favourite one of their posts or follow them.
-The **app mark** is the kaleidoscope (the generator in `src/lib/avatar.ts`, fixed at 8-fold, mirrored, in gold, two pale yellows and two link blues). It is the only kaleidoscope left in the app.
+**The app mark is the hexagon with Play** (owner, 2026-11-26: "Use the hexagon"; treatment owner-picked, "Inlay"; the measurements are mine). It is the app icon's shape drawn as a quiet thing inside the app: at "You're all caught up", at the foot of Settings and at the top of the sidebar. The kaleidoscope has left the app; no kaleidoscope is left anywhere. Source file: `docs/path-a/icons/app-mark.svg`. Sizes are a share of the mark's box (the 56 mark in brackets); it is drawn at 56 and 36.
+- **Hexagon:** point up, 97% tall and 84% wide (54 by 47), corners rounded 9.7% (5). Face: a top-to-bottom gradient from Raised Highlight (#2B4D80) to Raised (#1F3C67). Top light: white at 22%, 2% thick (1), along the upper edges.
+- **Play:** a triangle that points right, 34% wide and 39.5% tall (19 by 22), corners rounded 4% (2), moved 1.7% (1) to the right so it looks centred. Gold (#E8C446), set into the face: a darker band (#A8871F) 3% deep (1.7) along its upper edges and a light edge (white at 12%, 2%) under its lower edges.
+- **No lip and no shadow** (the Lip Is a Promise Rule: the mark is not a button). **Gold is only the Play glyph** (the One Gold Rule: Play is still the screen's one gold fill). Never the icon's gold hexagon inside the app.
+- In Settings the mark is a button for fun: pressed, it pops (92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`). *The pop is proposed, not owner-approved.*
 
 ### Buttons
 - **Gold** (main action): gold fill with the strong top light, ink label, gold lip. 44 tall (headline, 24 padding) or 36 compact (callout, 18 padding).
@@ -733,7 +737,7 @@ Every favourite adds goo to the tab bar. It is the same liquid as the drip under
 **Artist card** (For You's "Artists you might like"): Panel, 24 radius, 8 padding, 296 wide in a snapping row (12 apart, 24 below). Collage (16 radius), then 8 below a post-style header: 36 mark, name, a muted footnote line ("You faved 23 of 140"), and Follow at the right.
 
 ### Caught-up moment
-Centred, shown once per visit, never over art: the 56 app mark between two 2 px rules that fade toward the screen edges, then "You're all caught up" (headline, white) and "Marked as seen on e621" (muted footnote). The mark turns one notch as it scrolls into view.
+Centred, shown once per visit, never over art: the 56 app mark between two 2 px rules that fade toward the screen edges, then "You're all caught up" (headline, white) and "Marked as seen on e621" (muted footnote). The mark pops once as it scrolls into view: 92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`; nothing with reduced motion. *Proposed, not owner-approved: the kaleidoscope turned one notch here, and a hexagon with Play cannot turn.*
 
 **The end of a feed** is the same moment with other words: "That's everything" and, when posts were left out, a muted footnote that says why ("3 hidden by your blacklist · 2 need you signed in"). No typed flower.
 
@@ -952,7 +956,14 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **Inside another app's browser** (a link opened in a chat or social app on an iPhone): the same sheet with one paragraph, "This browser cannot install apps. Open the page in Safari, then come back to Settings.", and 16 below a tonal 44 "Copy link" at full width. Where nothing can install (Firefox on a computer) the row is left out. Safari on a Mac gets the steps sheet with two steps, "Open the File menu" and "Choose Add to Dock" (not drawn).
 - **Nothing asks you to install.** Drawn as an option, and not to be built until the owner says yes: one row at the top of Settings, "Install the app" / "Full screen, on your home screen", ending in a 28 close well. It stays until you install or close it and never shows in a feed.
 - **A new version.** When one has downloaded: the toast "New version ready", a refresh glyph in its mark, "Reload" in the action slot where Undo sits. It follows the toast's rules: 6 s with the ring. It shows once per version and only on a feed or list at rest: never over the player, a sheet, the keyboard or the first-run read; it waits for the next such moment. If it passes, Settings › App's row reads "Version" / "2.1 is ready" and ends in a tonal 36 "Reload" with a refresh glyph. A cold start runs the new version without asking. After a reload: the toast "Updated to 2.1", the green check, 4 s.
-- **The app icon.** The app mark on a navy square: a straight top-to-bottom gradient from Panel Navy (#152F56) to Ground (#020F23), the app's light from above. The mark is centred and reaches 68% of the way from the centre to the edge; with its glow it stays inside 80%, Android's safe circle, so one drawing serves iPhone (180), Android (192 and 512, "any" and "maskable") and the launch screen. These files are full squares with no rounding and no clear pixels; the phone cuts the shape. The tab icon (32 and 16) is the same square with a 22% corner radius, the mark reaching 84%, no glow. A one-colour version (the mark in white, no glow, clear ground) is for Android's themed icons. Goo is never the icon.
+- **The app icon (owner, 2026-11-26: "some kinda in-theme icon where we have a similar hexagon but with an inset play icon"; colouring owner-picked, "Gold"; the measurements are mine).** The app's gold Play button as a hexagon, with Play sunk into it, on a navy square. It replaces the kaleidoscope. Inside the app the mark is the same hexagon drawn without a lip (see "Artist marks and the app mark"). It is not e621's logo: no letter, no number, no ears. Source files: `docs/path-a/icons/app-icon.svg`, `app-icon-tab.svg`, `app-icon-mono.svg`. All sizes below are a share of the icon's width (the 180 px iPhone icon in brackets).
+  - **Ground:** a full square, a straight top-to-bottom gradient from Panel Navy (#152F56) to Ground (#020F23). No rounding and no clear pixels in the file; the phone cuts the shape.
+  - **Hexagon:** point up, 62% tall point to point and 53.7% wide (112 by 97), corners rounded 6.2% (11). Face: Gold (#E8C446). Top light: white at 55%, 0.8% thick (1.5), along the upper edges. Lip: #A8871F, 3.75% (7) under the face. Shadow on the ground: black at 50%, blurred 3.5%, 9.25% below the face. The face and its lip together are centred, so the face sits 2.4% above the middle.
+  - **Play:** a triangle that points right, 21.9% wide and 25.2% tall (39 by 45), corners rounded 2.6% (5), moved 1.1% (2) to the right so it looks centred. It is a well: Well Navy (#0A1D3B), a darker band (#030B1A) 2% deep along its upper edges, and a light edge (white at 45%, 0.8%) under its lower edges.
+  - **Fits:** everything stays inside 80% of the half-width, Android's safe circle, so one drawing serves iPhone (180), Android (192 and 512, "any" and "maskable") and the launch screen.
+  - **Tab icon (32 and 16):** the same square with a 22% corner radius; the hexagon is 80% tall, flat (no lip, no shadow, no lights); Play is flat Well Navy.
+  - **One colour** (Android's themed icons): the hexagon in white, 70% tall, with Play cut out, on a clear ground.
+  - Goo is never the icon.
 - **Names and colours.** Name "e621 Slideshow"; short name "Slideshow", which fits under an iPhone icon without being cut. The launch background and the browser's bar colour are Ground.
 
 ### On a computer (900 px and wider)
@@ -1029,7 +1040,7 @@ The goo and the secret tab on a computer. Search, Artists and the artist page on
 | Top bar capsule | 150 ms ease-out, past 64 px of scroll | opacity, and an 8 px drop (none with reduced motion) | mock |
 | Tuck | scroll-driven | card scale 95% ↔ 100%, 16 px rise, opacity 55% ↔ 100% | mock |
 | Skeleton shimmer | 1.4 s ease-in-out, looping | a light band crossing each well shape | mock |
-| Caught-up | once, on entering view | app mark turns one notch (45°) | mock |
+| Caught-up | once, on entering view | app mark pops: scale 92% to 100%, 360 ms `cubic-bezier(.3,1.35,.5,1)` | spec (proposed; not in mock) |
 | Segmented capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateX to the chosen segment | mock |
 | Menu capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateY to the chosen row | mock |
 | Switch | knob 300 ms `cubic-bezier(.3,1.35,.5,1)`; track colour 200 ms | knob translateX 20 px | mock |

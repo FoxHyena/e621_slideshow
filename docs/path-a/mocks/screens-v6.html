@@ -236,6 +236,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .caught6 .rule { display: flex; align-items: center; gap: 16px; width: 100%; margin-bottom: 12px; }
 .caught6 .rule::before, .caught6 .rule::after { content: ""; flex: 1; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(180,199,217,.22)); }
 .caught6 .rule::after { transform: scaleX(-1); }
+.hm6 { display: block; flex: none; width: 36px; height: 36px; } .hm6.l { width: 56px; height: 56px; } .hm6 svg { display: block; width: 100%; height: 100%; }
+.markpick6 { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 24px 12px; }
+.markpick6 .sbrand6 { height: 52px; padding: 0 16px 0 8px; border-radius: 16px; background: var(--panel-a); }
 .caught6 b { font: var(--t-head); }
 .caught6 small { font: var(--t-foot); color: var(--muted); }
 .shead6 { display: flex; align-items: center; justify-content: space-between; padding: 4px var(--inset) 12px; }
@@ -1250,9 +1253,11 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
         <div class="under" id="u-upd"></div>
       </section>
       <section class="col" aria-label="The app icon">
-        <div class="col-head"><h2 class="pg-h3">3. The app icon</h2><p>The app mark on navy, lit from above like every surface in the app. Under it the name is "Slideshow", which fits without being cut.</p></div>
+        <div class="col-head"><h2 class="pg-h3">3. The app icon</h2><p><b>Picked by you: Gold.</b> From your note: a hexagon with Play set into it. The hexagon is the app's gold Play button, with the light on top and a lip under it. Play is sunk into it like a well. Under it the name is "Slideshow".</p></div>
         <div class="phone-holder" id="s-icon"></div>
         <div class="under" id="u-icon"></div>
+        <div class="col-head" style="margin-top:24px"><h2 class="pg-h3">4. The mark inside the app</h2><p><b>Picked by you: the hexagon, as an Inlay.</b> A navy hexagon with the light on top, and Play set in as gold. It has no lip, because a lip means "press me", and gold stays a glyph, so Play is still the one gold fill on the screen. It shows at "You're all caught up", at the foot of Settings and at the top of the sidebar.</p></div>
+        <div class="under" id="u-mark"></div>
       </section>
     </div>
     <h2 class="pg-h2">What I decided in this pass</h2>
@@ -1561,7 +1566,18 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const avatar = (seed, cls = '', p) => `<span class="av6 ${cls} ${p ? '' : 't'}" data-seed="${seed}">${p ? svgNow(kspec(seed, p)) : svgThemed(themed(seed))}</span>`;
   // The app mark: the same generator held to e621's gold, cream and link blue, 8-fold
   const MARK = { ...AV, symmetryWeights: { 8: 1 }, mirrorChance: 1, layers: [3, 3], themeColors: ['linkActive', 'artistAlt', 'code', 'link', 'linkHover'], themePull: 1 };
-  const mark = (cls = 'l') => avatar('e621 slideshow', cls + ' appmark', MARK);
+  const f3 = n => Math.round(n * 1e3) / 1e3;
+  const rpoly = (pts, c) => pts.map((q, i) => { const n = pts.length, p0 = pts[(i + n - 1) % n], p1 = pts[(i + 1) % n], v0 = [p0[0] - q[0], p0[1] - q[1]], v1 = [p1[0] - q[0], p1[1] - q[1]], l0 = Math.hypot(...v0), l1 = Math.hypot(...v1),
+    t = c / Math.tan(Math.acos((v0[0] * v1[0] + v0[1] * v1[1]) / (l0 * l1)) / 2); return `${i ? 'L' : 'M'}${f3(q[0] + v0[0] / l0 * t)} ${f3(q[1] + v0[1] / l0 * t)}A${f3(c)} ${f3(c)} 0 0 1 ${f3(q[0] + v1[0] / l1 * t)} ${f3(q[1] + v1[1] / l1 * t)}`; }).join('') + 'Z';
+  const ring = (n, r, a0) => Array.from({ length: n }, (_, i) => [r * Math.cos((a0 + i * 360 / n) * Math.PI / 180), r * Math.sin((a0 + i * 360 / n) * Math.PI / 180)]);
+  // The app mark inside the app (owner, 2026-11-26: "Use the hexagon"). No lip and no shadow: a lip means "press me".
+  // Treatment owner-picked, "Inlay": a Raised navy hexagon with the top light, Play set in as gold (gold stays a glyph, so the One Gold Rule holds).
+  let hmN = 0;
+  const hexMarkSvg = () => { const id = 'hm' + (++hmN), R = .97, hex = rpoly(ring(6, R, -90), R * .2), tri = rpoly(ring(3, R * .47, 0), R * .085), tx = f3(R * .035);
+    return `<svg viewBox="-1 -1 2 2" aria-hidden="true"><defs><linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B4D80"/><stop offset="1" stop-color="#1F3C67"/></linearGradient><clipPath id="${id}h"><path d="${hex}"/></clipPath><clipPath id="${id}t"><path d="${tri}"/></clipPath></defs>
+      <path d="${hex}" fill="url(#${id}f)"/><g clip-path="url(#${id}h)"><path d="${hex}" fill="rgba(255,255,255,.22)"/><path d="${hex}" transform="translate(0 .04)" fill="url(#${id}f)"/></g>
+      <g transform="translate(${tx} 0)"><path d="${tri}" transform="translate(0 .04)" fill="rgba(255,255,255,.12)"/><path d="${tri}" fill="#A8871F"/><g clip-path="url(#${id}t)"><path d="${tri}" transform="translate(0 .06)" fill="#E8C446"/></g></g></svg>`; };
+  const mark = (cls = 'l') => `<span class="hm6 ${cls}">${hexMarkSvg()}</span>`;
 
   /* ---------- icons (lucide paths, drawn heavier than v5.3) ---------- */
   const P = {
@@ -2422,14 +2438,33 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const kshapes = (a, glow, one) => { const sh = one ? a.shapes.map(s => ({ ...s, color: one })) : a.shapes; return (glow ? HALOS.map(([sp, f]) => sh.map(s => dot(s, a.glow * sp, f)).join('')).join('') : '') + sh.map(s => dot(s)).join(''); };
   const appIcon = (size, cls = 'ios', o = {}) => `<span class="aicon6 ${cls}" style="width:${size}px;height:${size}px"><svg viewBox="-1 -1 2 2" aria-hidden="true">${o.mono ? '' : '<defs><linearGradient id="aig6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#152F56"/><stop offset="1" stop-color="#020F23"/></linearGradient></defs><rect x="-1" y="-1" width="2" height="2" fill="url(#aig6)"/>'}<g transform="scale(${Math.round((o.reach || .68) / EXT * 1e4) / 1e4})">${kshapes(ICONK, !o.flat && !o.mono, o.mono ? '#fff' : '')}</g></svg></span>`;
   const ph = (n = 1) => Array.from({ length: n }, () => '<div><span class="ph"></span><span class="bar"></span></div>').join('');
-  $('s-icon').innerHTML = phone(`<div class="hgrid6">${ph(9)}<div>${appIcon(60)}<span>Slideshow</span></div>${ph(2)}</div><div class="hdock6">${'<span class="ph"></span>'.repeat(4)}</div>`, 'homescr6');
+  // The app icon (owner, 2026-11-26): "a similar hexagon but with an inset play icon"; colouring owner-picked, "Gold".
+  // A hexagon that is one of the app's raised buttons (face, top light, lip), with Play sunk into it like a well.
+  const HEXV = {
+    gold: { name: 'Gold', face: ['#E8C446', '#E8C446'], lip: '#A8871F', lit: 'rgba(255,255,255,.55)', well: '#0A1D3B', shade: '#030B1A', glint: 'rgba(255,255,255,.45)' },
+  };
+  let hexN = 0;
+  const hexSvg = (v, o = {}) => { const c = HEXV[v], id = 'hx' + (++hexN), R = o.reach || .62, lip = o.flat ? 0 : .075, up = -lip / 2 - (o.flat ? 0 : .01),
+    hex = rpoly(ring(6, R, -90), R * .2), tri = rpoly(ring(3, R * .47, 0), R * .085), tx = f3(R * .035);
+    if (o.mono) return `<svg viewBox="-1 -1 2 2" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="${hex}${rpoly(ring(3, R * .47, 0).map(([x, y]) => [x + tx, y]).reverse(), R * .085).replace(/0 0 1/g, '0 0 0')}"/></svg>`;
+    return `<svg viewBox="-1 -1 2 2" aria-hidden="true"><defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#152F56"/><stop offset="1" stop-color="#020F23"/></linearGradient><linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.face[0]}"/><stop offset="1" stop-color="${c.face[1]}"/></linearGradient><clipPath id="${id}h"><path d="${hex}"/></clipPath><clipPath id="${id}t"><path d="${tri}"/></clipPath>${o.flat ? '' : `<filter id="${id}s" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".07"/></filter>`}</defs>
+      <rect x="-1" y="-1" width="2" height="2" fill="url(#${id}b)"/><g transform="translate(0 ${f3(up)})">
+      ${o.flat ? '' : `<path d="${hex}" transform="translate(0 ${f3(lip + .11)})" fill="#000" opacity=".5" filter="url(#${id}s)"/><path d="${hex}" transform="translate(0 ${lip})" fill="${c.lip}"/>`}
+      <path d="${hex}" fill="url(#${id}f)"/>${o.flat ? '' : `<g clip-path="url(#${id}h)"><path d="${hex}" fill="${c.lit}"/><path d="${hex}" transform="translate(0 .016)" fill="url(#${id}f)"/></g>`}
+      <g transform="translate(${tx} 0)">${o.flat ? `<path d="${tri}" fill="${c.well}"/>` : `<path d="${tri}" transform="translate(0 .016)" fill="${c.glint}"/><path d="${tri}" fill="${c.shade}"/><g clip-path="url(#${id}t)"><path d="${tri}" transform="translate(0 .04)" fill="${c.well}"/></g>`}</g></g></svg>`; };
+  const hexIcon = (v, size, cls = 'ios', o = {}) => `<span class="aicon6 ${cls}" style="width:${size}px;height:${size}px">${hexSvg(v, o)}</span>`;
+  const iconV = (size, cls = 'ios', o = {}) => hexIcon('gold', size, cls, o);
+  const small = { reach: .8, flat: true };
+  $('u-mark').innerHTML = strip('Two sizes', '56 at "You\'re all caught up" and at the foot of Settings. 36 beside the name in the sidebar.',
+    `<div class="strip p6 markpick6">${mark('l')}<div class="sbrand6">${mark('')}<span>Slideshow</span></div></div>`);
+  $('s-icon').innerHTML = phone(`<div class="hgrid6">${ph(9)}<div>${iconV(60)}<span>Slideshow</span></div>${ph(2)}</div><div class="hdock6">${'<span class="ph"></span>'.repeat(4)}</div>`, 'homescr6');
   $('u-icon').innerHTML = [
-    strip('One drawing, three masks', 'iPhone cuts a rounded square, Android a circle (the dashed ring is its safe area), a browser tab shows it at 32 and 16.',
-      `<div class="strip p6 row icons6"><div>${appIcon(120)}<span>iPhone, 180</span></div><div>${appIcon(96, 'round guide')}<span>Android, 192 and 512</span></div><div><span class="pair">${appIcon(32, 'fav', { reach: .84, flat: true })}${appIcon(16, 'fav', { reach: .84, flat: true })}</span><span>Tab, 32 and 16</span></div></div>`),
+    strip('One drawing, three masks', 'iPhone cuts a rounded square, Android a circle (the dashed ring is its safe area), a browser tab shows it at 32 and 16 with no lip and no shadow.',
+      `<div class="strip p6 row icons6"><div>${iconV(120)}<span>iPhone, 180</span></div><div>${iconV(96, 'round guide')}<span>Android, 192 and 512</span></div><div><span class="pair">${iconV(32, 'fav', small)}${iconV(16, 'fav', small)}</span><span>Tab, 32 and 16</span></div></div>`),
     strip('In a browser tab', 'On a dark and a light tab strip. The navy square keeps the gold readable on both.',
-      `<div class="strip p6 row" style="gap:12px;padding:20px 16px 0;align-items:flex-end"><span class="tabchip6 dk">${appIcon(16, 'fav', { reach: .84, flat: true })}Following</span><span class="tabchip6 lt">${appIcon(16, 'fav', { reach: .84, flat: true })}Following</span></div>`),
-    strip('One colour', 'For Android\'s themed icons: the same mark in one colour on a clear ground. The phone picks the colours.',
-      `<div class="strip p6 row"><div>${appIcon(72, 'mono', { mono: true })}<span>Monochrome</span></div></div>`),
+      `<div class="strip p6 row" style="gap:12px;padding:20px 16px 0;align-items:flex-end"><span class="tabchip6 dk">${iconV(16, 'fav', small)}Following</span><span class="tabchip6 lt">${iconV(16, 'fav', small)}Following</span></div>`),
+    strip('One colour', 'For Android\'s themed icons: the hexagon in one colour with Play cut out of it. The phone picks the colours.',
+      `<div class="strip p6 row"><div>${hexIcon('gold', 72, 'mono', { mono: true, reach: .7 })}<span>Monochrome</span></div></div>`),
   ].join('');
 
   /* ================= Desktop, 900 px and wider (proposed) ================= */
@@ -2873,7 +2908,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     if (pf) { const on = !pf.classList.contains('on'); pf.classList.toggle('on', on); pf.setAttribute('aria-pressed', on); pf.classList.remove('pop'); if (on) { void pf.offsetWidth; pf.classList.add('pop'); turn(pf.closest('.phone6').querySelector('.pwho6 .av6')); gooAdd(1); } return; }
     const pl = e.target.closest('.pplay6');
     if (pl) { const playing = pl.dataset.playing !== '1'; pl.dataset.playing = playing ? '1' : '0'; pl.setAttribute('aria-label', playing ? 'Pause' : 'Play'); pl.innerHTML = ic(playing ? 'pause' : 'play', 28, 0, 'solid'); return; }
-    const mk = e.target.closest('.markbtn'); if (mk) return turn(mk.querySelector('.av6'));
+    const mk = e.target.closest('.markbtn'); if (mk) { if (!calm) mk.animate([{ transform: 'scale(.92)' }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.3,1.35,.5,1)' }); return; }
   });
   const BREADTH = ['Close to my favorites', 'A little wider', 'Balanced', 'Wider', 'Surprise me'];
   document.addEventListener('input', e => {
