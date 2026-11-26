@@ -484,3 +484,24 @@ Format: date — decision. Why. Rejected alternatives.
 - Not done: no PNG sizes were made and the app's own `favicon.ico` and manifest are not touched; that
   is the builder's side.
 
+## 2026-11-26 — The mark inside the app becomes the hexagon
+
+- I asked: "inside the app, should the mark stay the kaleidoscope or become the hexagon". Owner's
+  words: "Use the hexagon".
+- **Locked: the app mark is the hexagon with Play**, at "You're all caught up", at the foot of
+  Settings and at the top of the sidebar. The kaleidoscope leaves the app.
+- Not picked yet: how it is drawn there. The icon's own drawing cannot be used as it is, because of
+  two owner-pinned rules: a lip means "press me" (the mark is not a button), and gold fills one thing
+  per screen (Play is on the same screens). Drawn behind a switch in the mock, all without a lip:
+  - **Inlay** (my pick): a Raised navy hexagon with the top light, Play set in as gold. Both rules hold.
+  - **Gold**: the tab icon's flat gold hexagon. Closest to the icon. It is a second gold fill on every
+    screen with Play, so the One Gold Rule would need an exception for the mark.
+  - **One colour**: Link Blue with Play cut out. The quietest.
+- Owner's pick: "Inlay".
+- **Locked: Inlay.** Gold and One colour are dropped; the switch is out of the mock. Written into
+  DESIGN.md ("Artist marks and the app mark") with measurements (mine). Source file:
+  `docs/path-a/icons/app-mark.svg`.
+- Proposed, not owner-approved: at "You're all caught up" the mark pops once (92% to 100%, 360 ms)
+  where the kaleidoscope turned one notch; the Settings mark pops when pressed. The caught-up pop is
+  in the spec only, not in the mock.
+
