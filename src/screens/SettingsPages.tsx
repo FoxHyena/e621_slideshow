@@ -27,6 +27,7 @@ import { getSession } from "@/state/session";
 import { promptInstall, pwa, reloadToUpdate, type InstallWay } from "@/shell/pwa";
 import { shallow, useStore } from "@/state/store";
 import { copyText, openArtist, openSignIn } from "./actions";
+import { GooRow } from "./GooRow";
 
 const SOURCE = "https://github.com/FoxHyena/e621_slideshow";
 const label = (n: string) => n.replaceAll("_", " ");
@@ -62,6 +63,10 @@ export function SettingsAll() {
           {s === "account" ? <Account onePage /> : s === "content" ? <Content /> : s === "slideshow" ? <Slideshow /> : s === "for-you" ? <ForYouPage /> : <AppPage />}
         </section>
       ))}
+      {/* the last group, under App, with no heading (owner: "Approve"); a plain row: the sidebar's pool is the jar */}
+      <section className="settings-section" aria-label="Goo">
+        <GooRow jar={false} />
+      </section>
     </div>
   );
 }

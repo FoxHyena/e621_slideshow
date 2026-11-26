@@ -81,6 +81,8 @@ Built from the hover pass, Inset rows and grid loading you approved:
 - **The wordmark is two-tone** ("e" and "21" in blue) beside the mark in the sidebar and at the foot
   of Settings. **Try on a computer:** turn the wheel down over the sidebar's tabs; "Goo" comes in
   under Settings and throws ten drops into the pool.
+- **The goo row is "Goo"** (your pick), and on a computer it is the last group of Settings, a plain
+  row; Wipe clean drains the sidebar's pool.
 - **Signed out, Settings' e621 row has a gold Sign in on it** that brings up the sign-in sheet (your
   note; no Account page in between).
 - **Icons centred** (your note): the row icons' 0.5 drop is gone, and four glyphs whose weight sits off

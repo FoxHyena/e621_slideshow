@@ -4,7 +4,7 @@
  * Settings' home (DESIGN.md "Settings"): the account, the groups, the goo row and the app foot. Its
  * own chunk, loaded when the tab opens or the page is idle, so it stays out of the first load.
  */
-import { ChevronRight, Droplets, LogIn, Play, Shield, Smartphone, Sparkles, type LucideIcon } from "lucide-react";
+import { ChevronRight, LogIn, Play, Shield, Smartphone, Sparkles, type LucideIcon } from "lucide-react";
 import { useRef } from "react";
 import Avatar, { AppMark } from "@/components/Avatar";
 import { Wordmark } from "@/components/Wordmark";
@@ -13,55 +13,11 @@ import { SETTINGS_SECTIONS, type SettingsSection } from "@/nav/routes";
 import { SECTION_LABEL } from "@/shell/screens";
 import { TitleRow } from "@/shell/TitleRow";
 import { getFollows } from "@/state/follows";
-import { getGoo, gooLabel } from "@/state/goo";
-import { Pool } from "@/components/Pool";
 import { openSignIn } from "./actions";
+import { GooRow } from "./GooRow";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
-
-/**
- * Settings' one action row (DESIGN.md "Tab bar goo"): how much goo, and Wipe clean. The row is a jar
- * (owner-picked, "jar row"): the goo rises inside its card, the words show through in Goo Ink, and
- * Wipe clean sits above the goo.
- */
-function GooRow() {
-  const goo = getGoo();
-  const n = useStore(goo.store, (s) => s.count);
-  const row = (ink: boolean) => (
-    <>
-      <span className={ink ? "row-well pool-ring" : "row-well"} aria-hidden>
-        <Droplets />
-      </span>
-      <span className="row-text">
-        <b>Tab bar goo</b>
-        <small data-testid={ink ? undefined : "goo-count"}>{gooLabel(n)}</small>
-      </span>
-    </>
-  );
-  return (
-    <div className="list-group goo-jar">
-      <div className="list-row" data-testid="goo-row">
-        {row(false)}
-        <button type="button" className="btn-tonal" data-size="compact" onClick={() => goo.wipe()} disabled={n === 0} data-testid="goo-wipe">
-          Wipe clean
-        </button>
-      </div>
-      <Pool
-        kind="jar"
-        className="jar-pool"
-        ink={
-          <span className="list-row">
-            {row(true)}
-            <span className="btn-tonal" data-size="compact" style={{ visibility: "hidden" }}>
-              Wipe clean
-            </span>
-          </span>
-        }
-      />
-    </div>
-  );
-}
 
 /** What each Settings group holds, in a muted line under its name (DESIGN.md "Settings"). */
 const SECTION_ROW: Record<Exclude<SettingsSection, "account" | "classic">, { icon: LucideIcon; line: string }> = {
@@ -157,7 +113,7 @@ export function SettingsHome({ onSection }: { onSection: (s: SettingsSection) =>
           );
         })}
       </ul>
-      <GooRow />
+      <GooRow jar />
       <AppFoot />
     </div>
   );

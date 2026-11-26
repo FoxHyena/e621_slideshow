@@ -176,7 +176,7 @@ for (const [n, side, jar] of [
     // the goo really stands that high (the surface drawn, and the slab's top above the card's foot)
     await expect(jarPool).toHaveAttribute("data-drawn", String(jar));
     expect(await jarPool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg g path")!.getAttribute("d")!.split(/[ L]/)[1])))).toBe(jar);
-    await expect(jarPool.locator(".pool-ink")).toContainText("Tab bar goo");
+    await expect(jarPool.locator(".pool-ink")).toContainText("Goo");
     expect(await jarPool.locator(".pool-ink").evaluate((e) => getComputedStyle(e).clipPath)).toMatch(/^url\(/);
     await shot(page, `goo-jar-${n}`);
 
@@ -371,4 +371,29 @@ test("on a computer with reduced motion, the secret adds its ten at once", async
   await expect.poll(() => page.evaluate(() => localStorage.getItem("e6ss:v1:goo"))).toBe("50");
   await expect(pool).toHaveAttribute("data-drawn", "42");
   await expect(page.locator(".goo-drop")).toHaveCount(0);
+});
+
+test('on a computer the goo row ("Goo") is the page\'s last group, a plain row; Wipe clean drains the sidebar\'s pool', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 12);
+  await page.goto("/settings");
+  const row = page.getByTestId("goo-row");
+  await expect(row).toContainText("Goo");
+  await expect(row).not.toContainText("Tab bar");
+  await expect(count(page)).toHaveText("12 favorites");
+  // under App, with no heading of its own, and not a jar: the sidebar's pool is the jar here
+  const all = page.getByTestId("settings-all");
+  expect(await all.evaluate((e) => e.lastElementChild?.contains(document.querySelector("[data-testid=goo-row]")))).toBe(true);
+  expect((await row.boundingBox())!.y).toBeGreaterThan((await page.getByTestId("settings-page-app").boundingBox())!.y);
+  await expect(page.getByTestId("pool-jar")).toHaveCount(0);
+  const pool = page.getByTestId("pool-side");
+  await expect(pool).not.toHaveAttribute("data-drawn", "0");
+  await row.scrollIntoViewIfNeeded();
+  await shot(page, "goo-row-desk");
+  await page.getByTestId("goo-wipe").click();
+  await expect(count(page)).toHaveText("0 favorites");
+  await expect(pool).toHaveAttribute("data-level", "0");
+  await expect(pool).toHaveAttribute("data-drawn", "0", { timeout: 3000 });
 });

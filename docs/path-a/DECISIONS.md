@@ -1298,3 +1298,12 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Still mine, not approved: where the row sits on a computer (last group, after App, a plain row).
 - Later the same day, owner, asked whether the row's place on a computer is right (the last group of
   Settings, under App, a plain row with no jar): "Approve". Nothing about the goo row is open now.
+
+## 2026-11-26 — Built: the goo row is "Goo", and a plain row on a computer (design 45d7541)
+
+- Owner: "Goo, everywhere" and "Approve". The row is "Goo" on a phone (still the jar) and on a
+  computer, where it is the last group of the one-page Settings, under App, with no heading: a plain
+  row with the count and Wipe clean, which drains the sidebar's pool. One component,
+  `src/screens/GooRow.tsx`, used by both. "Tab bar goo" stays only as the DESIGN.md heading for the
+  goo on the tab bar.
+
