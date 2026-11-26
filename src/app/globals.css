@@ -1232,10 +1232,19 @@ html {
     max-width: calc(600px + 2 * var(--spacing-inset));
     padding-top: calc(env(safe-area-inset-top) + 18px);
   }
-  /* a grid uses the full width, 24 at each side, and keeps 104 under it for Play */
+  /* a grid's tiles use the full width, 24 at each side, and keep 104 under them for Play */
   .screen-frame[data-grid] {
     max-width: none;
     padding: calc(env(safe-area-inset-top) + 18px) 24px 104px;
+  }
+  /* One head (owner's rule 2026-11-26): the title row, hero, line and chips stay in the 600 column,
+     so nothing above the tiles moves when the view is switched */
+  .screen-frame[data-grid] > :not(.feed-list, .play-fab, .compact-bar, .drop-layer, .sheet-layer) {
+    margin-inline: max(0px, (100% - 600px) / 2);
+  }
+  /* the chips row keeps its bleed to the column's sides */
+  .screen-frame[data-grid] > .chips {
+    margin-inline: calc(max(0px, (100% - 600px) / 2) - var(--spacing-inset));
   }
   /* Search is in the sidebar */
   .tool-search {
@@ -2047,6 +2056,16 @@ html {
 }
 .chip[data-on] svg {
   color: var(--color-gold);
+}
+/* open: the arrow points up, and a chip that is off steps up to Raised (DESIGN.md "Chip dropdown") */
+.chip[aria-expanded="true"]:not([data-on]) {
+  background: var(--color-raised);
+}
+.chip > svg:last-child {
+  transition: transform 150ms ease-out;
+}
+.chip[aria-expanded="true"] > svg:last-child {
+  transform: rotate(180deg);
 }
 .chip-reset {
   color: var(--color-link);
@@ -5166,35 +5185,116 @@ li[data-state="done"] .first-step-n svg,
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
 }
-/* Once the hero has scrolled away: glass, bare Back, the 24 mark, the name, a Follow pill. */
+/* The top bar (DESIGN.md "Top bar", owner-picked 2026-11-26 "Capsule"): once the title has scrolled
+   away, a floating capsule, the tab bar's sibling. The outer layer is the page fading to Ground behind
+   it; the capsule is 52 tall, Raised, 26 round, the floating shadow. On a tab it's the title row itself
+   (`TitleRow`): in the page its two layers are nothing (display: contents). */
+.topbar,
+.topbar .topcap {
+  display: contents;
+}
+.topcap-count {
+  display: none;
+}
+.topbar[data-at],
 .compact-bar {
   position: fixed;
   z-index: 40;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding-top: env(safe-area-inset-top);
-  background-color: var(--color-glass-base);
-  background-image: linear-gradient(var(--color-glass), var(--color-glass));
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
-  backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
-  box-shadow: 0 1px 0 rgba(180, 199, 217, 0.12);
-  opacity: 0;
+  inset: 0 0 auto;
+  display: block;
+  height: calc(env(safe-area-inset-top) + 84px);
+  padding: calc(env(safe-area-inset-top) + 4px) var(--spacing-inset) 0;
+  /* Ground behind the clock, 80% 13 down the capsule, clear 25 under it */
+  background: linear-gradient(
+    var(--color-ground) max(0px, calc(env(safe-area-inset-top) - 7px)),
+    rgb(2 15 35 / 0.8) calc(env(safe-area-inset-top) + 17px),
+    rgb(2 15 35 / 0) calc(env(safe-area-inset-top) + 81px)
+  );
   pointer-events: none;
-  transition: opacity 150ms ease-out;
 }
-.compact-bar[data-show] {
-  opacity: 1;
-  pointer-events: auto;
-}
-.compact-in {
+.topbar[data-at] .topcap,
+.compact-bar .topcap {
   display: flex;
   align-items: center;
   gap: 12px;
-  max-width: 600px;
   height: 52px;
-  margin: 0 auto;
-  padding: 0 12px 4px 8px;
+  border-radius: 26px;
+  background: var(--color-raised);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+/* on a tab: the title in headline 20 from the left end, the count in gold, the tools bare */
+.topbar[data-at] .topcap {
+  padding: 0 4px 0 20px;
+}
+.topbar[data-at] .screen-title {
+  flex: 0 1 auto;
+  margin: 0;
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar[data-at] .topcap-count {
+  display: block;
+  flex: none;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 600;
+  color: var(--color-gold);
+  font-variant-numeric: tabular-nums;
+}
+.topbar[data-at] .tools {
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.topbar[data-at="in"] {
+  animation: top-fade 150ms ease-out;
+}
+.topbar[data-at="in"] .topcap {
+  animation: top-drop 150ms ease-out;
+}
+.topbar[data-at="out"] {
+  animation: top-fade 150ms ease-out reverse both;
+}
+.topbar[data-at="out"] .topcap {
+  pointer-events: none;
+}
+@keyframes top-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes top-drop {
+  from {
+    transform: translateY(-8px);
+  }
+}
+/* on an artist page: bare Back 4 from the left end, the 24 mark, the name, the Follow pill 8 from the
+   right end. It's always there, faded out until the hero has gone. */
+.compact-bar {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.compact-bar .topcap {
+  gap: 8px;
+  padding: 0 8px 0 4px;
+  transform: translateY(-8px);
+  transition: transform 150ms ease-out;
+  pointer-events: none;
+}
+.compact-bar[data-show] {
+  opacity: 1;
+}
+.compact-bar[data-show] .topcap {
+  transform: none;
+  pointer-events: auto;
 }
 .compact-in > b {
   flex: 1;
@@ -5208,6 +5308,7 @@ li[data-state="done"] .first-step-n svg,
   text-overflow: ellipsis;
 }
 .compact-back {
+  margin-right: -4px;
   background: none;
   box-shadow: none;
 }
@@ -5222,14 +5323,92 @@ li[data-state="done"] .first-step-n svg,
 .compact-in .follow-pill {
   flex: none;
 }
+/* on a computer: 584 wide, centred on the 600 column, 8 from the top, level with the sidebar; it
+   doesn't move when the grid goes wide */
 @media (min-width: 900px) {
+  .topbar[data-at],
   .compact-bar {
     left: var(--spacing-rail);
+    height: calc(env(safe-area-inset-top) + 84px);
+    padding: calc(env(safe-area-inset-top) + 8px) 0 0;
+    background: linear-gradient(rgb(2 15 35 / 0.86), rgb(2 15 35 / 0));
+  }
+  .topbar[data-at] .topcap,
+  .compact-bar .topcap {
+    width: 584px;
+    margin: 0 auto;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .compact-bar {
+  .topbar[data-at] .topcap {
+    animation: none;
+  }
+  .compact-bar .topcap {
+    transform: none;
     transition: none;
+  }
+}
+
+/* A chip's dropdown (DESIGN.md "Chip dropdown", owner-picked 2026-11-26): the sheet's Panel hung 8 under
+   the chip, no dim; one of a list is the Menu's own shape on Panel. */
+.drop-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.drop-catch {
+  position: absolute;
+  inset: 0;
+}
+.drop {
+  position: fixed;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px;
+  border-radius: var(--radius-sheet);
+  background: var(--color-panel);
+  box-shadow:
+    var(--inset-shadow-lit),
+    0 12px 24px rgba(0, 0, 0, 0.4);
+  animation: drop-in 150ms ease-out;
+  transform-origin: top left;
+}
+.drop[data-menu-shape] {
+  padding: 0;
+  border-radius: var(--radius-menu);
+}
+.drop .menu {
+  background: none;
+  box-shadow: none;
+}
+.drop .sheet-rows > .list-row {
+  padding-inline: 0;
+}
+.drop .menu-custom {
+  margin: 0;
+  padding: 12px;
+  border-top: 1px solid rgba(180, 199, 217, 0.1);
+}
+.drop .link-lede,
+.drop .link-note {
+  margin-inline: 0;
+}
+.drop .link-lede {
+  margin-top: 12px;
+}
+.drop .link-mine {
+  width: 100%;
+  margin: 0 0 12px;
+}
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drop {
+    animation: none;
   }
 }
 
@@ -5760,14 +5939,42 @@ li[data-state="done"] .first-step-n svg,
   .first-pick-sheet .pick-row[aria-checked="false"]:hover .pick-check {
     background: var(--color-raised);
   }
-  .btn-tonal:not(:disabled):hover {
-    background: var(--color-raised-hi);
+  /* Lift (owner-picked 2026-11-26): a button with a lip rises 1 and its lip grows by 1. No colour
+     change. A press still sinks it (:active wins by being left out here). */
+  :is(.fav-pill, .follow-pill:not([aria-pressed="true"], .follow-pill-art), .btn-tonal:not(.follow-button[aria-pressed="true"]), .btn-gold, .stepper > button):not(:disabled, :active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c);
+  }
+  /* the ones floating over the page: their shadow on it grows by 1 too */
+  .top-pill:not(:active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c),
+      0 13px 24px rgba(0, 0, 0, 0.4);
+  }
+  :is(.first-cta .btn-gold, .play-fab:not([data-away])):not(:disabled, :active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--lit),
+      0 calc(var(--lip) + 1px) 0 var(--lip-c),
+      0 15px 28px rgba(0, 0, 0, 0.45);
+  }
+  .player-play:not(:active):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      var(--inset-shadow-lit-gold),
+      0 5px 0 var(--lip-c);
   }
   .toolbar-circle:hover {
     background: var(--color-raised);
   }
+  /* proposed 2026-11-26 (not owner-approved): the wash is 40 by 36, 4 from the capsule on every side */
   .tools .toolbar-circle:not([aria-pressed="true"]):hover {
-    background: rgba(255, 255, 255, 0.06);
+    padding-block: 4px;
+    background: rgba(255, 255, 255, 0.06) content-box;
   }
   .chip:not([data-on]):hover {
     background: var(--color-raised);

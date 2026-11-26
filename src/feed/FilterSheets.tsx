@@ -1,17 +1,19 @@
 "use client";
 
 /**
- * The chips' menus (UX §5 "Filters (chips row)", DESIGN.md "Menu", "Media menu"). Sort, Date and Score
- * are menus: tapping a row applies it and closes the sheet; only Custom… needs Apply. Media is three
- * switches with Done, since more than one can be on. Loaded when a chip opens one (its own chunk).
+ * The chips' menus (UX §5 "Filters (chips row)", DESIGN.md "Menu", "Media menu", "Chip dropdown"), each
+ * dropped under its chip. Sort, Date and Score are menus: tapping a row applies it and closes the menu;
+ * only Custom… needs Apply (tonal: Play keeps the screen's one gold). Media is three switches, since more
+ * than one can be on: what changed applies as it closes (one reload). Loaded when a chip opens one.
  */
 import { ArrowUp, CalendarDays, Clapperboard, Film, Image as ImageIcon, Shuffle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Menu, MenuRow, MenuSep } from "@/components/Menu";
 import { Seg } from "@/components/v6";
 import { SCORE_STEPS, SORT_LABEL, SORT_MAIN, SORT_MORE, type Filters } from "@/lib/feed/filters";
 import { dateMetatag, DEFAULT_DATE_FILTER, type DateFilter, type DateMode, type DatePreset, type DateUnit } from "@/lib/query/date";
-import { Sheet } from "@/shell/Sheet";
+import { getNav, openSheetName } from "@/nav/history";
+import { Dropdown } from "@/shell/Dropdown";
 import { SHEET_PREFIX, type ChipId } from "./Chips";
 
 /** Focus a field as it appears (Custom… shows it after the sheet has opened). */
@@ -62,13 +64,13 @@ function SortSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) =
     </MenuRow>
   );
   return (
-    <Sheet title="Sort" testId="sheet-sort">
+    <Dropdown anchor={SHEET_PREFIX + "sort"} label="Sort" width={220} menu testId="sheet-sort">
       <Menu label="Sort">
         {SORT_MAIN.map(row)}
         <MenuSep />
         {SORT_MORE.map(row)}
       </Menu>
-    </Sheet>
+    </Dropdown>
   );
 }
 
@@ -78,19 +80,38 @@ const KINDS = [
   { key: "video", label: "Videos", icon: Film },
 ] as const;
 
-/** Three switches: more than one can be on. Done applies them all at once (one reload). */
+/** Three switches: more than one can be on, never none (the last one on can't be turned off). What
+ * changed applies as the menu closes: one reload, however many switches moved. */
 function MediaSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) => void }) {
   const [m, setM] = useState(filters.media);
-  const none = !m.image && !m.gif && !m.video;
+  const ons = Number(m.image) + Number(m.gif) + Number(m.video);
+  const was = filters.media;
+  const changed = m.image !== was.image || m.gif !== was.gif || m.video !== was.video;
+  // Back (the browser's, a phone's) closes it too, and applies what changed, as a tap outside does
+  const closed = useRef(false);
+  const late = useRef({ changed, f: { ...filters, media: m }, apply });
+  useLayoutEffect(() => {
+    late.current = { changed, f: { ...filters, media: m }, apply };
+  });
+  useEffect(
+    () => () => {
+      const { changed, f, apply } = late.current;
+      if (!changed || closed.current || openSheetName() === SHEET_PREFIX + "media") return;
+      setTimeout(() => apply(f));
+    },
+    [],
+  );
   return (
-    <Sheet
-      title="Media"
+    <Dropdown
+      anchor={SHEET_PREFIX + "media"}
+      label="Media"
+      width={260}
       testId="sheet-media"
-      footer={
-        <button type="button" className="btn-gold sheet-wide" disabled={none} onClick={() => apply({ ...filters, media: m })} data-testid="media-done">
-          {none ? "Pick at least one" : "Done"}
-        </button>
-      }
+      onClose={() => {
+        closed.current = true;
+        if (changed) apply({ ...filters, media: m });
+        else void getNav().back();
+      }}
     >
       <div className="sheet-rows" data-wells>
         {KINDS.map(({ key, label, icon: Icon }) => (
@@ -106,13 +127,18 @@ function MediaSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) 
               role="switch"
               className="switch"
               checked={m[key]}
+              disabled={m[key] && ons === 1}
+              aria-describedby={m[key] && ons === 1 ? "media-last" : undefined}
               onChange={(e) => setM({ ...m, [key]: e.target.checked })}
               data-testid={`media-${key}`}
             />
           </label>
         ))}
       </div>
-    </Sheet>
+      <p id="media-last" className="sr-only">
+        One kind stays on.
+      </p>
+    </Dropdown>
   );
 }
 
@@ -156,7 +182,7 @@ function DateSheet({ filters, apply, anyLabel }: { filters: Filters; apply: (f: 
   const setDate = (date: DateFilter) => apply({ ...filters, date });
   const set = (patch: Partial<DateFilter>) => custom && setCustom({ ...custom, ...patch });
   return (
-    <Sheet title="Date" testId="sheet-date">
+    <Dropdown anchor={SHEET_PREFIX + "date"} label="Date" width={custom ? 343 : 220} menu testId="sheet-date">
       <Menu label="Date">
         <MenuRow on={!d.enabled && !custom} onPick={() => setDate({ ...d, enabled: false })} testId="date-any">
           {anyLabel}
@@ -214,12 +240,12 @@ function DateSheet({ filters, apply, anyLabel }: { filters: Filters; apply: (f: 
           ) : (
             <DateField label="Date" value={custom.date} onChange={(date) => set({ date })} testId="date-input" />
           )}
-          <button type="button" className="btn-gold sheet-wide" disabled={!dateMetatag(custom)} onClick={() => setDate(custom)} data-testid="date-done">
+          <button type="button" className="btn-tonal sheet-wide" disabled={!dateMetatag(custom)} onClick={() => setDate(custom)} data-testid="date-done">
             Apply
           </button>
         </div>
       )}
-    </Sheet>
+    </Dropdown>
   );
 }
 
@@ -230,7 +256,7 @@ function ScoreSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) 
   const n = custom === null || custom.trim() === "" ? NaN : Number(custom);
   const ok = Number.isInteger(n);
   return (
-    <Sheet title="Score" testId="sheet-score">
+    <Dropdown anchor={SHEET_PREFIX + "score"} label="Minimum score" width={220} menu testId="sheet-score">
       <Menu label="Minimum score">
         <MenuRow on={cur === null && custom === null} onPick={() => apply({ ...filters, minScore: null })} testId="score-any">
           Any
@@ -253,11 +279,11 @@ function ScoreSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) 
               <input type="number" inputMode="numeric" value={custom} onChange={(e) => setCustom(e.target.value)} ref={focusOnMount} data-autofocus data-testid="score-input" />
             </span>
           </label>
-          <button type="button" className="btn-gold sheet-wide" disabled={!ok} onClick={() => apply({ ...filters, minScore: n })} data-testid="score-done">
+          <button type="button" className="btn-tonal sheet-wide" disabled={!ok} onClick={() => apply({ ...filters, minScore: n })} data-testid="score-done">
             Apply
           </button>
         </div>
       )}
-    </Sheet>
+    </Dropdown>
   );
 }

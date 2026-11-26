@@ -32,6 +32,26 @@ New since then, from your notes:
   the post you went back to) over a black fade-in. Now the post you left fades out, as going forward.
   In Reflections, ← slides the other way.
 
+Built from your picks on the design session's sheet (2026-11-26):
+
+- **Chips drop their menu under themselves** (Sort, Media, Date, Score, From a link, the Artists sort), on a
+  phone and a computer. No title, no ✕, no Done, no dim. Media applies when you tap outside or press Esc.
+  The chip's arrow points up while it's open. Custom's Apply is tonal.
+- **One head on a computer:** in grid view the title row, the artist hero and the chips stay in the 600
+  column; only the tiles go wide. Nothing above the tiles moves when you switch views.
+- **Lift:** under a mouse, buttons with a lip (tonal, gold, Play, Follow, the heart, the stepper) rise 1
+  and their lip grows by 1. No colour change any more.
+- **The top bar is a floating capsule** after 64 px of scroll on Following, For You, Artists and Settings
+  (title, the new count in gold on Following, the tools), and on the artist page (Back, mark, name,
+  Follow). Same on a phone (16 from the sides) and a computer (584 wide over the column).
+- **← in Vintage Prints** (your note): it sat on the post you left. Fixed, and the same in Collage. ←
+  now dips to black and fades up the earlier post, like →.
+- **"+N" on a post's tags** (your screenshot) now opens the rest of the tags in the same row; scroll it
+  sideways. The card keeps its height, so the feed doesn't jump.
+- **Toast "Ring, hug"** was already in: the ring around Undo, and the toast is as wide as its words.
+- *Proposed, not picked:* the tools capsule's hover is now 40 by 36, 4 inside the capsule (your
+  screenshot of the box touching its edges). Say if you'd rather have the old box.
+
 Approved:
 
 1. **Goo's drops count toward the goo.** Tapping Goo spurts 1–3 drops onto the tab bar's goo, and they
@@ -140,8 +160,9 @@ Approved:
 
 ## Decide (open questions, with my default)
 
-0. **The first-load JS budget is full** (199.7 of 200 KB). Default: the next feature that adds to the
-   first load moves something out of it (the tab bar's goo, or the sign-in check, into a lazy chunk).
+0. **The first-load JS budget is full** (199.6 of 200 KB, after moving Following's ⋯ menu and the tag
+   targets out to make room for the top bar and "+N"). Default: the next feature that adds to the first load moves something out of
+   it (the sign-in check, or Following's signed-in feed, into a lazy chunk).
 
 1. **Does un-favoriting remove goo?** Default: no, goo only ever adds.
 2. **The first-run step names** ("Read your favorites", "Count your artists", "See who still posts") were

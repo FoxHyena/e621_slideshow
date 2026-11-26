@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { displayUrl } from "@/lib/slideshow/media";
 import type { PlaybackSettings } from "@/lib/settings";
@@ -30,6 +30,20 @@ interface MediaProps {
 export function Media({ post, playback, onReady, onError, still, className, fade: fadeIn, testId }: MediaProps) {
   const [loaded, setLoaded] = useState(false);
   const kind = mediaKind(post);
+  // A still that becomes the slide (← back to a Collage tile) loaded long ago: its load won't fire again.
+  const img = useRef<HTMLImageElement>(null);
+  const ready = useRef(onReady);
+  useLayoutEffect(() => {
+    ready.current = onReady;
+  });
+  const live = !still && !!onReady;
+  useEffect(() => {
+    const el = img.current;
+    if (!live || !el?.complete || el.naturalWidth === 0) return;
+    // two frames on, so the layer is painted hidden first and its fade in still runs
+    let f = requestAnimationFrame(() => (f = requestAnimationFrame(() => ready.current?.())));
+    return () => cancelAnimationFrame(f);
+  }, [live]);
   const fade = (fadeIn ?? playback.transition === "fade") && !still;
   // Videos stay visible from the start: their poster frame shows while buffering.
   const visible = loaded || !fade || kind === "video";
@@ -68,6 +82,7 @@ export function Media({ post, playback, onReady, onError, still, className, fade
   return (
     // eslint-disable-next-line @next/next/no-img-element -- remote CDN media, no Next image optimization wanted
     <img
+      ref={img}
       src={src}
       alt=""
       draggable={false}

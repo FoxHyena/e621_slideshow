@@ -138,19 +138,23 @@ test("Tune: the sync row, the Breadth slider, and Pin and Mute toggles", async (
   await shot(page, "v6-tune");
 });
 
-test("Sheets: a titled sheet's ✕ well sits on the 16 inset; Sort is a menu whose capsule sits under the choice", async ({ page }) => {
+test("Dropdowns: Sort drops 8 under its chip inside the 16 inset, a menu whose capsule sits under the choice", async ({ page }) => {
   await mockE621(page);
   await page.goto("/search?tags=wolf&order=score");
   await expect(page.getByTestId("post-card").first()).toBeVisible();
   await page.getByTestId("chip-sort").click();
   const sheet = page.getByTestId("sheet-sort");
   await expect(sheet).toBeVisible();
-  // measure once it has slid up
-  await sheet.locator(".sheet").evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
-  const panel = await box(sheet.locator(".sheet"));
-  const x = await box(sheet.getByTestId("sheet-close"));
-  expect(Math.round(panel.x + panel.width - (x.x + x.width))).toBe(16);
-  expect(x.width).toBe(36);
+  await expect(page.getByTestId("chip-sort")).toHaveAttribute("aria-expanded", "true");
+  const drop = sheet.locator(".drop");
+  await drop.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+  const panel = await box(drop);
+  const chip = await box(page.getByTestId("chip-sort"));
+  expect(Math.round(panel.y)).toBe(Math.round(chip.y + chip.height + 8));
+  expect(panel.x).toBeGreaterThanOrEqual(16);
+  expect(Math.round(panel.x + panel.width)).toBeLessThanOrEqual(Math.round((await viewW(page)) - 16));
+  // no title, no ✕: the chip is the title
+  await expect(sheet.getByTestId("sheet-close")).toHaveCount(0);
   // the capsule sits under Top, the chosen row; no check marks
   const top = await box(page.getByTestId("sort-score"));
   const thumb = await box(sheet.locator(".menu-thumb"));
@@ -200,8 +204,24 @@ test("Sheets: Media is three switches; the ⋯ menu names the post and lists its
   await shot(page, "v6-media", false);
   await page.getByTestId("media-image").uncheck();
   await page.getByTestId("media-gif").uncheck();
-  await page.getByTestId("media-done").click();
+  // the last one on can't be turned off; a tap outside applies what changed
+  await expect(page.getByTestId("media-video")).toBeDisabled();
+  await page.getByTestId("drop-outside").click({ position: { x: 5, y: 700 } });
+  await expect(page.getByTestId("sheet-media")).toBeHidden();
   await expect(page.getByTestId("chip-media")).toHaveText("Videos");
+  // Esc applies too
+  await page.getByTestId("chip-media").click();
+  await page.getByTestId("media-image").check();
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("sheet-media")).toBeHidden();
+  await expect(page.getByTestId("chip-media")).not.toHaveText("Videos");
+  // and so does Back
+  await page.getByTestId("chip-media").click();
+  await page.getByTestId("media-image").uncheck();
+  await page.goBack();
+  await expect(page.getByTestId("sheet-media")).toBeHidden();
+  await expect(page.getByTestId("chip-media")).toHaveText("Videos");
+  await expect(page).toHaveURL(/\/search\?/);
 });
 
 /** the layout viewport's width (less the desktop scrollbar's stable gutter) */
@@ -319,6 +339,8 @@ test("Tag targets on a card sit 8 above the tag, inside the screen", async ({ pa
   await tag.click();
   await expect(tag).toHaveAttribute("data-picked", "true");
   const targets = page.getByTestId("tag-actions");
+  // (their code comes with the first hold, or at idle)
+  await expect(targets).toBeVisible();
   expect(await targets.locator(".tag-target").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid")))).toEqual([
     "tag-action-search",
     "tag-action-blacklist",
@@ -361,12 +383,10 @@ test("Review fixes: Tab stays in a menu sheet; Custom… focuses its field; styl
   await page.getByTestId("chip-sort").click();
   const sort = page.getByTestId("sheet-sort");
   await settled(sort);
-  // ✕, then the chosen row: the only two tab stops, so Tab wraps back to the ✕
-  await expect(sort.getByTestId("sheet-close")).toBeFocused();
-  await page.keyboard.press("Tab");
+  // the chosen row is the only tab stop, so Tab stays on it
   await expect(sort.getByRole("radio", { checked: true })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(sort.getByTestId("sheet-close")).toBeFocused();
+  await expect(sort.getByRole("radio", { checked: true })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(sort).toBeHidden();
 
@@ -415,4 +435,50 @@ test("Review fixes: if the filter menus can't load, the sheet closes and says so
   await expect(page.getByText("Couldn't load the filters")).toBeVisible();
   await expect(page).toHaveURL(/\/search\?tags=wolf$/);
   await expect(page.getByTestId("post-card").first()).toBeVisible();
+});
+
+test("Top bar: after 64 px of scroll the title row floats as a capsule, 16 from the sides and 4 from the top", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem("seeded")) return;
+    sessionStorage.setItem("seeded", "1");
+    localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "goodkey" }));
+  });
+  const mock = await mockE621(page, Array.from({ length: 40 }, (_, i) => ({ id: 1150 - i, artist: "fox_artist" })));
+  mock.subscriptions = ["fox_artist"];
+  mock.lastSeen = 1140;
+  await page.goto("/following");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  const bar = page.getByTestId("top-bar");
+  await expect(bar).not.toHaveAttribute("data-at");
+  await page.evaluate(() => window.scrollTo(0, 400));
+  await expect(bar).toHaveAttribute("data-at", "in");
+  await settled(bar);
+  const cap = await box(bar.locator(".topcap"));
+  expect(Math.round(cap.x)).toBe(16);
+  expect(Math.round(cap.width)).toBe(375 - 32);
+  expect(Math.round(cap.height)).toBe(52);
+  expect(Math.round(cap.y)).toBe(4);
+  await expect(bar.locator(".topcap-count")).toHaveText(/\d+ new/);
+  // the same buttons, not a copy
+  await expect(page.getByTestId("grid-toggle")).toHaveCount(1);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(bar).not.toHaveAttribute("data-at");
+});
+
+test("A post's +N tag shows the rest of its tags in the same row, and the card keeps its height", async ({ page }) => {
+  const tags = Array.from({ length: 20 }, (_, i) => `tag_${i}`);
+  await mockE621(page, [{ id: 1150, tags }, { id: 1149 }]);
+  await page.goto("/search?tags=wolf");
+  const card = page.getByTestId("post-card").first();
+  await expect(card).toBeVisible();
+  const more = card.getByTestId("card-tags-more");
+  await expect(more).toHaveText(/^\+\d+$/);
+  const before = await card.getByTestId("card-tag").count();
+  const height = (await box(card)).height;
+  await more.click();
+  await expect(more).toHaveCount(0);
+  await expect.poll(() => card.getByTestId("card-tag").count()).toBeGreaterThan(before);
+  await expect(card.getByTestId("card-tag").nth(12)).toBeFocused();
+  expect((await box(card)).height).toBe(height);
 });

@@ -193,7 +193,10 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
   const name = by[0]?.replaceAll("_", " ");
   const seed = by[0] ?? `post:${post.id}`;
   const tags = cardTags(post);
-  const shown = tags.slice(0, TAGS_SHOWN);
+  // "+N" opens the rest in the same row (it scrolls sideways), so the card keeps its height
+  const [allTags, setAllTags] = useState(false);
+  const tagRow = useRef<HTMLDivElement>(null);
+  const shown = allTags ? tags : tags.slice(0, TAGS_SHOWN);
   const more = tags.length - shown.length;
   const who = useRef<HTMLDivElement>(null);
   const fav = useRef<HTMLButtonElement>(null);
@@ -256,7 +259,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         </button>
       </header>
       <CardMedia post={post} index={index} height={mediaHeight} live={live} still={still} onOpen={onOpen} onFaved={faved} />
-      <div className="post-tags" data-testid="card-tags" onScroll={fadeTags}>
+      <div ref={tagRow} className="post-tags" data-testid="card-tags" onScroll={fadeTags}>
         {shown.map(([c, t]) => (
           <button
             key={`${c}:${t}`}
@@ -274,7 +277,21 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
             {t.replaceAll("_", " ")}
           </button>
         ))}
-        {more > 0 && <span className="post-tag post-tag-more">+{more}</span>}
+        {more > 0 && (
+          <button
+            type="button"
+            className="post-tag post-tag-more"
+            aria-label={`${more} more tags`}
+            onClick={() => {
+              setAllTags(true);
+              // the first new tag takes the button's place, and the focus
+              requestAnimationFrame(() => tagRow.current?.querySelectorAll<HTMLElement>(".post-tag")[TAGS_SHOWN]?.focus({ preventScroll: true }));
+            }}
+            data-testid="card-tags-more"
+          >
+            +{more}
+          </button>
+        )}
       </div>
       <footer className="post-foot">
         <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>

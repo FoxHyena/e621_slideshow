@@ -21,7 +21,9 @@ import { ago, compact } from "@/lib/feed/format";
 import { LIST_TOP } from "@/lib/recommend/artists";
 import { getNav } from "@/nav/history";
 import { useScreen } from "@/shell/context";
+import { TitleRow } from "@/shell/TitleRow";
 import { Sheet } from "@/shell/Sheet";
+import { Dropdown } from "@/shell/Dropdown";
 import { getArtistList } from "@/state/artistList";
 import { getArtists } from "@/state/artists";
 import { FOLLOW_LIMIT, getFollows } from "@/state/follows";
@@ -60,16 +62,13 @@ export function ArtistsScreen() {
 
   return (
     <div className="screen-frame" data-testid="artists-screen">
-      <div className="title-row">
-        <h1 tabIndex={-1} className="screen-title">
-          Artists
-        </h1>
+      <TitleRow title="Artists">
         <div className="tools">
           <button type="button" className="toolbar-circle tool-search" aria-label="Search" onClick={search}>
             <Search aria-hidden />
           </button>
         </div>
-      </div>
+      </TitleRow>
       {!session.ready ? (
         <div className="feed-list" data-testid="feed-waiting" />
       ) : !session.signedIn ? (
@@ -219,7 +218,7 @@ function FollowingList({ sort }: { sort: Sort }) {
           enterKeyHint="search"
           data-testid="artists-filter"
         />
-        <button type="button" className="chip" data-on={sort !== "recent" || undefined} aria-haspopup="dialog" onClick={() => getNav().openSheet("artist-sort")} data-testid="artists-sort">
+        <button type="button" className="chip" data-on={sort !== "recent" || undefined} aria-haspopup="dialog" aria-expanded={sheet === "artist-sort"} data-menu="artist-sort" onClick={() => getNav().openSheet("artist-sort")} data-testid="artists-sort">
           <span>{SORTS.find((s) => s.value === sort)!.label}</span>
           <ChevronDown aria-hidden />
         </button>
@@ -262,7 +261,7 @@ function FollowingList({ sort }: { sort: Sort }) {
 
 function SortSheet({ sort, setSort }: { sort: Sort; setSort: (s: Sort) => void }) {
   return (
-    <Sheet title="Sort" testId="sheet-artist-sort">
+    <Dropdown anchor="artist-sort" label="Sort" width={220} menu testId="sheet-artist-sort">
       <Menu label="Sort">
         {SORTS.map((s) => (
           <MenuRow
@@ -278,7 +277,7 @@ function SortSheet({ sort, setSort }: { sort: Sort; setSort: (s: Sort) => void }
           </MenuRow>
         ))}
       </Menu>
-    </Sheet>
+    </Dropdown>
   );
 }
 

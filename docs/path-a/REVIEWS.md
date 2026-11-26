@@ -922,3 +922,26 @@ New e2e "← fades out the post you left, not an older one" fails on the old cod
 Gates: typecheck and lint clean; unit 311 pass; e2e 227 passed, 3 skipped; budgets JS 199.7 KB, CLS 0,
 0 long tasks.
 
+
+## Owner's picks from design 4e613fe, ← in Vintage Prints, "+N" tags (2026-11-26)
+
+Built: chip dropdowns, one head on a computer, Lift, the Capsule top bar (tabs and artist page), the
+tools hover inset (proposed). Toast "Ring, hug" was already built. Owner notes fixed: ← in Vintage
+Prints (and Collage) stuck on the post you left; "+N" on a post's tags did nothing (it was a plain
+label: now a button that shows the rest in the same row, the card keeps its height).
+
+**Fresh reviewer, 8 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Settings on a phone has no screen context; `TitleRow` threw there | High | Hook treats no context as shown; 13 e2e that failed on it pass |
+| 2 | The one-head margin rule also caught the dropdown and sheet layers (outside click only in the column) | Med | `.drop-layer` and `.sheet-layer` left out of the rule |
+| 3 | Media's changes were lost on the browser's Back | Med | Applied on unmount after Back; late applies check the live entry so they never go back twice (`openSheetName`); e2e |
+| 4 | Hidden mid-fade, the top bar could come back stuck "out" | Low | Cleared in the cleanup |
+| 5 | The dropdown was placed once; the scroll lock or a late chip row could move the chip | Low | Placed again a frame later |
+| 6 | The Lift selector's weight could beat state rules | Low | No change: pressed, disabled, away and Following are left out by name; colours go through `--lip-c`/`--lit` |
+| 7 | The last Media switch was disabled with no reason given | Low | Hidden hint "One kind stays on." via aria-describedby |
+| 8 | No focus restore to the chip on close | Low | No change: history-driven focus brings it back as for sheets (nav e2e) |
+
+**Gates:** typecheck and lint clean; e2e 232 passed, 3 skipped (after every fix, `E6_PORT=3000`); budgets JS cold load **199.6 KB** (the top bar and +N pushed it to 200.8: Following's ⋯ sheets
+and the tag targets moved to their own chunks), CLS 0, 0 long tasks.

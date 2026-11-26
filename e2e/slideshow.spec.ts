@@ -462,7 +462,8 @@ test("prints: one colour print over a grey heap; each slide dips to black and ar
   });
   expect(pose.scale).toBeCloseTo(1, 5);
   expect(pose.opacity).toBe("1");
-  expect(await scene(1149).evaluate((el) => getComputedStyle(el).transitionDelay)).toBe("0.7s");
+  // (once its picture is in, it waits out the old scene's fade to black)
+  await expect.poll(() => scene(1149).evaluate((el) => getComputedStyle(el).transitionDelay)).toBe("0.7s");
   await expect.poll(() => scene(1150).evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
   await expect.poll(() => scene(1149).evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
   // The old scene keeps its own heap while it fades.

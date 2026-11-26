@@ -11,7 +11,8 @@ import { ago, artists, compact, TAG_ORDER } from "@/lib/feed/format";
 import Avatar from "./Avatar";
 import { InlineLoader } from "./Loader";
 import { useShown } from "./useShown";
-import { TagActionsOverlay, TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
+import { TagStrip, useTagHold, type TagAction, type TagHold } from "./TagActions";
+import TagActionsOverlay from "./TagTargets";
 
 interface FeedProps {
   posts: Post[];

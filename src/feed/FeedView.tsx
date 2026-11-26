@@ -7,10 +7,11 @@
  * offset into it) is saved for a day, so a reload comes back to the same post.
  */
 import { ArrowUp, ChevronDown, Heart, Play } from "lucide-react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tallCap, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
-import { TagActionsOverlay, tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
+import { tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
+import { tagTargetsChunk } from "@/shell/lazy";
 import type { Feed } from "@/state/feeds";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import { ErrorPanel, SlowDownPanel, SlowDownRow } from "@/components/State";
@@ -24,6 +25,9 @@ import { AppMark } from "@/components/Avatar";
 import { PostCard } from "./PostCard";
 import { RAIL_QUERY } from "@/shell/rail";
 import { ANCHOR_PREFIX } from "@/lib/storage";
+
+/** The targets over a held tag come with the first hold (and at idle, src/shell/lazy.ts). */
+const TagActionsOverlay = lazy(tagTargetsChunk);
 import { getSession } from "@/state/session";
 
 /** Start the next page this far before the end (UX §5). */
@@ -497,7 +501,11 @@ export function FeedView({
           <span className="feed-spinner" role="status" aria-label="Loading more" />
         ) : null}
       </div>
-      <TagActionsOverlay hold={hold} recommended={recommended} onAction={onTag} targets={tagTargets(recommended)} />
+      {hold.held && (
+        <Suspense fallback={null}>
+          <TagActionsOverlay hold={hold} recommended={recommended} onAction={onTag} targets={tagTargets(recommended)} />
+        </Suspense>
+      )}
     </>
   );
 }

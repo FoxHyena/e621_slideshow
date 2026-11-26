@@ -26,8 +26,9 @@ import type { QueueStats } from "@/lib/slideshow/queue";
 import { noMatchSentence, StateBlock } from "@/components/State";
 import { DEFAULT_SEARCH } from "@/lib/settings";
 import type { TagAction } from "@/components/TagActions";
-import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
-import { getNav } from "@/nav/history";
+import { ChipsRow, FilterSheet, LINK_MENU, type ChipId } from "@/feed/Chips";
+import { Dropdown } from "@/shell/Dropdown";
+import { getNav, openSheetName } from "@/nav/history";
 import { useScreen } from "@/shell/context";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFavs } from "@/state/favs";
@@ -50,7 +51,7 @@ import { ALL_RATINGS, FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostM
  */
 async function replaceScreen(route: Route, sheetOpen: boolean) {
   const nav = getNav();
-  if (sheetOpen) {
+  if (sheetOpen && openSheetName()) {
     setLockedY(0);
     await nav.back();
   }
@@ -190,7 +191,7 @@ export function ResultsScreen({ params }: { params: string }) {
   );
 }
 
-const LINK_SHEET = "from-link";
+const LINK_SHEET = LINK_MENU;
 const FITS = { contain: "Fit", cover: "Fill", original: "1:1" } as const;
 
 /** What the link set, for this visit only, and the way back to your own settings (DESIGN.md). */
@@ -217,7 +218,7 @@ function FromALink({ r, onMine }: { r: ResultsParams; onMine: () => void }) {
     rows.push(["Slideshow", `${style}${p.intervalSec} s a slide${p.loop ? ", loops" : ""}`]);
   }
   return (
-    <Sheet title="From a link" testId="sheet-link">
+    <Dropdown anchor={LINK_MENU} label="From a link" width={343} testId="sheet-link">
       <p className="link-lede">This link came with its own settings.</p>
       <div className="sheet-rows">
         {rows.map(([name, value]) => (
@@ -233,7 +234,7 @@ function FromALink({ r, onMine }: { r: ResultsParams; onMine: () => void }) {
       <button type="button" className="btn-tonal link-mine" onClick={onMine} data-testid="use-my-settings">
         Use my settings
       </button>
-    </Sheet>
+    </Dropdown>
   );
 }
 

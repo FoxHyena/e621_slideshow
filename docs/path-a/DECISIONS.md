@@ -873,3 +873,44 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Not changed: sheets that a chip does not open (Quick settings, Post info, the ⋯ sheets, Follow from
   favorites, sign-in).
 
+
+## 2026-11-26 — Building the owner's picks (dropdowns, one head, Lift, Capsule, toast)
+
+- **Dropdown:** `src/shell/Dropdown.tsx`, still a history entry (`openSheet`), so Back, Esc and a tap
+  outside close it the same way. It hangs under the chip's `data-menu`, measured at open and once more a
+  frame later (the scroll lock can drop the scrollbar and move the chip). Media applies what changed on
+  any of the three; a late apply after Back checks the live entry (`openSheetName()`) so it never goes
+  back a second time. The last Media switch that's on is disabled, with a hidden hint for screen readers.
+- **Capsule:** `src/shell/TitleRow.tsx`. The capsule is the title row itself, not a copy (no button
+  twice, no duplicated test ids); the row keeps its 52 in the page. The artist page's bar stays its own
+  element (its contents differ) with the same look. Settings on a phone has no screen context, so the
+  hook treats a missing one as shown.
+- **One head:** CSS only: in grid view on a computer every child of the frame but the tiles and the
+  overlays keeps the 600 column (the chips keep their bleed to its sides).
+- **Lift** replaces the tonal button's lighter hover. Raised-without-lip hovers that were already built
+  (chips that are off, round Back) are left as they were; the rest of the proposed hover table isn't built.
+- **Toast "Ring, hug":** already built in slice 9a; checked at 375 and 1280, no change.
+- **The tools hover wash, 40 by 36** (proposed, not picked) is built because it fixes the owner's own
+  screenshot; MORNING asks.
+- **Budget:** these pushed the first load to 200.2 KB. Following's ⋯ menu and its "Mark all as seen"
+  check moved to their own chunk (`FollowingSheets.tsx`): 199.9 KB.
+
+## 2026-11-26 — ← in Vintage Prints (and Collage)
+
+- Owner: "Still noticing the backwards nav issue in the vintage prints slideshow."
+- **Cause:** Prints keyed its scene layers by post id. ← to the post still fading out gave the new
+  scene the old layer's key, so React kept that layer; its picture had loaded already and never said
+  ready again, so the show sat on the post you left. Collage had the same trap: ← to a post that is
+  still a tile reuses that tile.
+- **Fix:** Prints keys scenes by a counter. Media: a still that becomes the slide with its picture
+  already loaded says ready two frames on (so its layer is painted hidden first and the fade still runs).
+  Now ← looks like →: the post you left fades to black, the earlier one fades up.
+
+## 2026-11-26 — "+N" on a post's tags
+
+- Owner: "clicking this doesn't expand it out" (the "+29"). It was a label, never a control.
+- **Now a button:** it shows the rest of the tags in the same row (the row scrolls sideways) and gives
+  focus to the first new tag. Not a second line: every card's height is measured up front for the
+  windowed feed, so a taller card would move everything under it.
+- Budget: the tag targets (shown when a tag is held) moved to their own chunk, fetched on the first hold
+  and at idle with the screens.

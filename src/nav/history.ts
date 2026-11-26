@@ -298,6 +298,12 @@ export function createNav(win: Win): Nav {
   return nav;
 }
 
+/** The sheet open on the current entry, read live: an apply that lands after Back must not go back again. */
+export function openSheetName(): string | null {
+  const s = getNav().store.get();
+  return s.stack[s.index]?.sheet ?? null;
+}
+
 let instance: Nav | null = null;
 /** The app's one navigator; created on first use in the browser. */
 export function getNav(): Nav {

@@ -224,6 +224,27 @@ test.describe("player", () => {
     await expect(page.getByTestId("previous-layer").locator("img")).toHaveAttribute("src", leftSrc!);
   });
 
+  test("← in Vintage Prints and Collage brings the earlier post back up", async ({ page }) => {
+    for (const [style, sel] of [["prints", "[data-testid=prints-scene]"], ["collage", "[data-testid=collage-stage] > div"]] as const) {
+      await page.goto("/search?tags=wolf");
+      await page.evaluate((style) => localStorage.setItem("e6ss:v1:playback", JSON.stringify({ style, intervalSec: 60 })), style);
+      await page.goto("/search?tags=wolf&play=1150");
+      const player = page.getByTestId("player");
+      await expect(player).toHaveAttribute("data-post-id", "1150");
+      await page.getByTestId("next-button").click();
+      await expect(player).toHaveAttribute("data-post-id", "1149");
+      await page.getByRole("button", { name: "Previous" }).click();
+      await expect(player).toHaveAttribute("data-post-id", "1150");
+      // the layer showing 1150 comes up (before, it waited forever for a load that had already happened)
+      const shown = () =>
+        page.evaluate(
+          (sel) => [...document.querySelectorAll<HTMLElement>(sel)].some((e) => e.querySelector('[data-post-id="1150"]') && getComputedStyle(e).opacity === "1"),
+          sel,
+        );
+      await expect.poll(shown, { timeout: 3000 }).toBe(true);
+    }
+  });
+
   test("▶ plays from the top, a reload keeps the post, and Esc closes", async ({ page }) => {
     await page.goto("/search?tags=wolf");
     await page.getByTestId("play-fab").click();

@@ -111,6 +111,37 @@ test("a grid uses the full width; a titled sheet is a 420 dialog", async ({ page
   await expect(tiles.first()).toHaveAccessibleName(/favorited/);
 });
 
+test("one head: the toolbar, hero and chips stay in the 600 column when the grid goes wide", async ({ page }) => {
+  await mockE621(page, specs());
+  await page.goto("/artist/fox_artist");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  const head = async () => {
+    const at = async (sel: string) => (await page.locator(sel).first().boundingBox())!;
+    const [row, chips, hero] = [await at(".head-row"), await at(".chips .chip"), await at(".artist-hero")];
+    return [row.x, row.width, chips.x, hero.x, hero.width].map(Math.round);
+  };
+  const feed = await head();
+  await page.getByTestId("grid-toggle").click();
+  await expect(page.getByTestId("grid-tile").first()).toBeVisible();
+  expect(await head()).toEqual(feed);
+  expect(feed[1]).toBe(600);
+});
+
+test("Lift: a button with a lip rises 1 under the pointer and its lip grows by 1, same colour", async ({ page }) => {
+  await mockE621(page, specs());
+  await page.goto("/artist/fox_artist");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  for (const sel of [".follow-button", ".play-fab", ".fav-pill"]) {
+    const el = page.locator(sel).first();
+    const look = () => el.evaluate((e) => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow.match(/(\d+)px 0px 0px(?!.*inset)/)?.[1], getComputedStyle(e).backgroundColor]);
+    await page.mouse.move(600, 790);
+    await expect.poll(look).toEqual([expect.anything(), expect.any(String), expect.any(String)]);
+    const [, lip, bg] = await look();
+    await el.hover();
+    await expect.poll(look).toEqual(["matrix(1, 0, 0, 1, 0, -1)", String(Number(lip) + 1), bg]);
+  }
+});
+
 test("on a phone, holding a tile opens the same menu; a tap still opens the post", async ({ page }) => {
   await following(page);
   await page.setViewportSize({ width: 375, height: 812 });

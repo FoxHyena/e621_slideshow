@@ -7,17 +7,17 @@
  * three and "+N more". Once you've scrolled a screen past the divider and rested (or played past
  * it), with no filter on and nothing newer on e621, the marker moves (owner Q8), and a toast says so.
  */
-import { ArrowUp, CheckCheck, MoreHorizontal, RotateCw, Search } from "lucide-react";
+import { ArrowUp, MoreHorizontal, Search } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { DEFAULT_FILTERS, filtersOn, isDefaultFilters, type Filters } from "@/lib/feed/filters";
 import type { Post } from "@/lib/e621/types";
 import { dividerIndex, feedRows, isNew, newCountLabel } from "@/lib/following/feed";
 import { scrolledPast, SEEN_IDLE_MS, shouldMarkSeen } from "@/lib/following/marker";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
-import { getNav } from "@/nav/history";
+import { getNav, openSheetName } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
-import { Sheet, SheetAction } from "@/shell/Sheet";
+import { TitleRow } from "@/shell/TitleRow";
 import { getFeeds, feedQuery, type Feed, type FeedSpec } from "@/state/feeds";
 import { getFollowing, newOnFollowing, RETRY_FAILED_MS, type FollowingState } from "@/state/following";
 import { FEED_HEAD_POSTS, storage } from "@/lib/storage";
@@ -102,6 +102,8 @@ export function FollowingScreen() {
   const signedIn = !!session.creds && !!session.user && !session.link;
   const following = getFollowing();
   const fs = useStore(following.store, (s) => s, shallow);
+  // the top bar's gold count: what the feed found new
+  const fresh = useStore(newOnFollowing, (n) => n);
   const [grid, setGrid] = useState(false);
 
   useEffect(() => {
@@ -131,12 +133,9 @@ export function FollowingScreen() {
   );
   // the title row, with something else in place of the tools on the first run's pick list
   const head = (right: ReactNode = tools) => (
-    <div className="title-row">
-      <h1 tabIndex={-1} className="screen-title">
-        Following
-      </h1>
+    <TitleRow title="Following" count={fresh.user !== null && fresh.user === session.user?.name && fresh.count > 0 ? newCountLabel(fresh.count, fresh.more) : null}>
       {right}
-    </div>
+    </TitleRow>
   );
   const noOne = session.ready && signedIn && fs.status === "ready" && !follows;
   // followed someone from Popular artists: the list stays up (to follow more) until "Show my feed"
@@ -433,61 +432,19 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         filters={filters}
         apply={(f) => {
           change(f);
-          void getNav().back();
+          if (openSheetName()) void getNav().back();
         }}
       />
-      {sheet === "menu" && (
-        <Sheet title="Following" testId="sheet-following-menu">
-          <div className="sheet-rows" data-wells>
-            <SheetAction
-              icon={RotateCw}
-              label="Refresh"
-              onClick={async () => {
-                await getNav().back();
-                refresh();
-              }}
-              data-testid="following-refresh"
-            />
-            <SheetAction
-              icon={CheckCheck}
-              label="Mark all as seen"
-              disabled={newCount === 0 || fs.marked !== null || fs.marking}
-              onClick={async () => {
-                await getNav().back();
-                getNav().openSheet("mark-all");
-              }}
-              data-testid="following-mark-all"
-            />
-          </div>
-        </Sheet>
-      )}
-      {sheet === "mark-all" && (
-        <Sheet
-          title="Mark all as seen"
-          testId="sheet-mark-all"
-          footer={
-            <div className="sheet-actions">
-              <button type="button" className="btn-tonal" onClick={() => void getNav().back()}>
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn-gold"
-                onClick={async () => {
-                  await getNav().back();
-                  attempt.current(true);
-                }}
-                data-testid="mark-all-confirm"
-              >
-                Mark as seen
-              </button>
-            </div>
-          }
-        >
-          <p className="sheet-note">
-            Mark {more ? `${newCount}+` : newCount} new {newCount === 1 && !more ? "post" : "posts"} as seen on e621? This can&rsquo;t be undone.
-          </p>
-        </Sheet>
+      {(sheet === "menu" || sheet === "mark-all") && (
+        <Suspense fallback={null}>
+          <FollowingSheets
+            sheet={sheet}
+            count={{ n: newCount, more }}
+            canMark={newCount > 0 && fs.marked === null && !fs.marking}
+            onRefresh={refresh}
+            onMark={() => attempt.current(true)}
+          />
+        </Suspense>
       )}
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </>
@@ -516,6 +473,8 @@ function Landing({ grid }: { grid: boolean }) {
  * Signed in, following nothing yet: the first run (src/screens/FirstRun.tsx) in its own chunk. If
  * the chunk can't come (offline), the plain state and Popular today.
  */
+const FollowingSheets = lazy(() => import("./FollowingSheets"));
+
 const FirstRun = lazy(() =>
   import("./FirstRun").then(
     (m) => ({ default: m.FirstRun }),

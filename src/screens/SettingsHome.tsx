@@ -10,6 +10,7 @@ import Avatar, { AppMark } from "@/components/Avatar";
 import { turnMark } from "@/feed/motion";
 import { SETTINGS_SECTIONS, type SettingsSection } from "@/nav/routes";
 import { SECTION_LABEL } from "@/shell/screens";
+import { TitleRow } from "@/shell/TitleRow";
 import { getFollows } from "@/state/follows";
 import { getGoo, gooLabel } from "@/state/goo";
 import { getPrefs } from "@/state/prefs";
@@ -100,11 +101,7 @@ export function SettingsHome({ onSection }: { onSection: (s: SettingsSection) =>
   };
   return (
     <div className="screen-frame">
-      <div className="title-row">
-        <h1 tabIndex={-1} className="screen-title">
-          Settings
-        </h1>
-      </div>
+      <TitleRow title="Settings" />
       <AccountRow open={go("account")} />
       <ul className="list-group" aria-label="Settings">
         {SETTINGS_SECTIONS.filter((s) => s !== "account").map((s) => {

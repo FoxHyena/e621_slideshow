@@ -18,6 +18,7 @@ import type { SettingsSection } from "@/nav/routes";
 import { getNav } from "@/nav/history";
 import { useScreen } from "@/shell/context";
 import { SECTION_LABEL } from "@/shell/screens";
+import { TitleRow } from "@/shell/TitleRow";
 import { Sheet } from "@/shell/Sheet";
 import { getArtists } from "@/state/artists";
 import { getFollows } from "@/state/follows";
@@ -52,11 +53,7 @@ const ONE_PAGE: Exclude<SettingsSection, "classic">[] = ["account", "content", "
 export function SettingsAll() {
   return (
     <div className="screen-frame settings-page settings-all" data-testid="settings-all">
-      <div className="title-row">
-        <h1 tabIndex={-1} className="screen-title">
-          Settings
-        </h1>
-      </div>
+      <TitleRow title="Settings" />
       {ONE_PAGE.map((s) => (
         <section key={s} className="settings-section" aria-labelledby={`settings-h-${s}`} data-testid={`settings-page-${s}`}>
           <h2 id={`settings-h-${s}`} className="settings-section-title">

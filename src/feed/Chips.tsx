@@ -10,10 +10,13 @@ import { Component, lazy, Suspense, type ReactNode } from "react";
 import { toast } from "sonner";
 import { dateLabel, DEFAULT_FILTERS, isDefaultFilters, mediaLabel, scoreLabel, sortLabel, type Filters } from "@/lib/feed/filters";
 import { getNav } from "@/nav/history";
+import { useScreen } from "@/shell/context";
 import type { FilterSheetProps } from "./FilterSheets";
 
 export type ChipId = "media" | "hideFaved" | "sort" | "date" | "score";
 export const SHEET_PREFIX = "filter:";
+/** the "From a link" chip's menu (its sheet name and `data-menu`) */
+export const LINK_MENU = "from-link";
 
 function Chip({
   label,
@@ -22,6 +25,8 @@ function Chip({
   pressed,
   onClick,
   testId,
+  name,
+  open,
 }: {
   label: string;
   value: string | null;
@@ -29,6 +34,9 @@ function Chip({
   pressed?: boolean;
   onClick: () => void;
   testId: string;
+  /** the menu's name (`data-menu`), which its dropdown hangs under */
+  name?: string;
+  open?: boolean;
 }) {
   const on = value !== null || pressed === true;
   return (
@@ -38,6 +46,8 @@ function Chip({
       data-on={on || undefined}
       aria-pressed={menu ? undefined : on}
       aria-haspopup={menu ? "dialog" : undefined}
+      aria-expanded={menu ? !!open : undefined}
+      data-menu={name}
       onClick={onClick}
       data-testid={testId}
     >
@@ -64,11 +74,23 @@ export function ChipsRow({
   onLink?: (() => void) | null;
 }) {
   const open = (id: ChipId) => getNav().openSheet(SHEET_PREFIX + id);
+  // the open menu's chip points its arrow up (DESIGN.md "Chip dropdown")
+  const { sheet } = useScreen();
+  const menu = (id: ChipId) => ({ name: SHEET_PREFIX + id, open: sheet === SHEET_PREFIX + id });
   const reset = { ...DEFAULT_FILTERS, seed: filters.seed };
   return (
     <div className="chips" role="toolbar" aria-label="Filters" data-testid="chips">
       {onLink && (
-        <button type="button" className="chip chip-link" data-on aria-haspopup="dialog" onClick={onLink} data-testid="chip-link">
+        <button
+          type="button"
+          className="chip chip-link"
+          data-on
+          aria-haspopup="dialog"
+          aria-expanded={sheet === LINK_MENU}
+          data-menu={LINK_MENU}
+          onClick={onLink}
+          data-testid="chip-link"
+        >
           <Link2 aria-hidden className="chip-link-icon" />
           <span>From a link</span>
           <ChevronDown aria-hidden />
@@ -83,7 +105,7 @@ export function ChipsRow({
       {chips.map((id) => {
         switch (id) {
           case "media":
-            return <Chip key={id} label="Media" value={mediaLabel(filters.media)} menu onClick={() => open(id)} testId="chip-media" />;
+            return <Chip key={id} label="Media" value={mediaLabel(filters.media)} menu {...menu(id)} onClick={() => open(id)} testId="chip-media" />;
           case "hideFaved":
             return (
               <Chip
@@ -97,11 +119,11 @@ export function ChipsRow({
               />
             );
           case "sort":
-            return <Chip key={id} label="Sort" value={sortLabel(filters.order)} menu onClick={() => open(id)} testId="chip-sort" />;
+            return <Chip key={id} label="Sort" value={sortLabel(filters.order)} menu {...menu(id)} onClick={() => open(id)} testId="chip-sort" />;
           case "date":
-            return <Chip key={id} label={dateAny ?? "Date"} value={dateLabel(filters.date)} menu onClick={() => open(id)} testId="chip-date" />;
+            return <Chip key={id} label={dateAny ?? "Date"} value={dateLabel(filters.date)} menu {...menu(id)} onClick={() => open(id)} testId="chip-date" />;
           case "score":
-            return <Chip key={id} label="Score" value={scoreLabel(filters.minScore)} menu onClick={() => open(id)} testId="chip-score" />;
+            return <Chip key={id} label="Score" value={scoreLabel(filters.minScore)} menu {...menu(id)} onClick={() => open(id)} testId="chip-score" />;
         }
       })}
     </div>

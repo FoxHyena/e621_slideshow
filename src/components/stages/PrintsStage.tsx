@@ -16,6 +16,10 @@ interface Scene {
   bg: Post[];
   /** Drift length, frozen when the scene starts. */
   driftMs: number;
+  /** Counts scenes, for the layer's key: ← back to the post fading out is a new scene, not that layer
+      (reused, its picture had loaded already and never said ready again, so the show stuck on the
+      post you left). */
+  n: number;
 }
 
 const drift = (d: Drift) => `translate(${d.x}%, ${d.y}%) rotate(${d.rotate}deg) scale(${d.scale})`;
@@ -43,18 +47,18 @@ export default function PrintsStage(props: StageProps) {
   const { post, trail, upcoming, durationMs } = props;
   const vp = useViewportAspect();
 
-  const build = (): Scene => ({ post, bg: pickBackground(post, trail, upcoming), driftMs: durationMs });
-  const [state, setState] = useState(() => ({ cur: build(), prev: null as Scene | null }));
+  const build = (n: number): Scene => ({ post, bg: pickBackground(post, trail, upcoming), driftMs: durationMs, n });
+  const [state, setState] = useState(() => ({ cur: build(0), prev: null as Scene | null }));
   let view = state;
   if (state.cur.post.id !== post.id) {
-    view = { cur: build(), prev: state.cur };
+    view = { cur: build(state.cur.n + 1), prev: state.cur };
     setState(view);
   }
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-black" data-testid="prints-stage">
-      {view.prev && <SceneLayer key={`scene-${view.prev.post.id}`} scene={view.prev} vp={vp} props={props} outgoing />}
-      <SceneLayer key={`scene-${view.cur.post.id}`} scene={view.cur} vp={vp} props={props} afterDip={!!view.prev} />
+      {view.prev && <SceneLayer key={`scene-${view.prev.n}`} scene={view.prev} vp={vp} props={props} outgoing />}
+      <SceneLayer key={`scene-${view.cur.n}`} scene={view.cur} vp={vp} props={props} afterDip={!!view.prev} />
     </div>
   );
 }

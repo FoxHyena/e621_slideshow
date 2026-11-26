@@ -20,9 +20,10 @@ import type { SlideQueue } from "@/lib/slideshow/queue";
 import { storage, type RankedList } from "@/lib/storage";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { PullToRefresh } from "@/feed/PullToRefresh";
-import { getNav } from "@/nav/history";
+import { getNav, openSheetName } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
+import { TitleRow } from "@/shell/TitleRow";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
@@ -302,10 +303,7 @@ export function ForYouScreen() {
     <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       {signedIn && <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />}
-      <div className="title-row">
-        <h1 tabIndex={-1} className="screen-title">
-          For You
-        </h1>
+      <TitleRow title="For You">
         <div className="tools">
           {signedIn && (
             <button
@@ -333,7 +331,7 @@ export function ForYouScreen() {
             </button>
           )}
         </div>
-      </div>
+      </TitleRow>
       {subtitle && (
         <p className="screen-sub" aria-live="polite" data-testid="for-you-status">
           {subtitle}
@@ -360,7 +358,7 @@ export function ForYouScreen() {
             filters={draft}
             apply={(f) => {
               change(f);
-              void getNav().back();
+              if (openSheetName()) void getNav().back();
             }}
             dateAny={DATE_ANY}
           />

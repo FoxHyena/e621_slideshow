@@ -18,6 +18,8 @@ const artistPage = () => import("@/screens/ArtistPage");
 const settingsPages = () => import("@/screens/SettingsPages");
 const signIn = () => import("@/screens/SignIn");
 const filterSheets = () => import("@/feed/FilterSheets");
+/** The targets over a held tag (src/components/TagTargets.tsx). */
+export const tagTargetsChunk = () => import("@/components/TagTargets");
 /** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
 export const motionFx = () => import("@/feed/motionFx");
 /** The error, slow-down and offline states (src/components/StatePanels.tsx). */
@@ -42,7 +44,7 @@ export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, artistPage, settingsPages, signIn, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, artistPage, settingsPages, signIn, filterSheets, tagTargetsChunk, motionFx, statePanels, shellScreens]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

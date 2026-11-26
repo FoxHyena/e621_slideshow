@@ -20,7 +20,7 @@ import { decodeFilters, encodeFilters, filtersOn, isDefaultFilters, type Filters
 import { ago, compact } from "@/lib/feed/format";
 import type { QueueStats } from "@/lib/slideshow/queue";
 import { DEFAULT_SEARCH } from "@/lib/settings";
-import { getNav } from "@/nav/history";
+import { getNav, openSheetName } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import type { Route } from "@/nav/routes";
 import { useScreen } from "@/shell/context";
@@ -119,7 +119,7 @@ function useNewest(name: string): string | null {
 
 async function replaceScreen(route: Route, sheetOpen: boolean) {
   const nav = getNav();
-  if (sheetOpen) {
+  if (sheetOpen && openSheetName()) {
     setLockedY(0);
     await nav.back();
   }
@@ -322,11 +322,11 @@ function Stats({ name, tag, loading, visible }: { name: string; tag: TagInfo | n
   );
 }
 
-/** Once the hero has gone: bare Back, the 24 mark, the name, and a Follow pill. */
+/** Once the hero has gone, the top bar capsule: bare Back, the 24 mark, the name, and a Follow pill. */
 function CompactBar({ name, show, isArtist }: { name: string; show: boolean; isArtist: boolean }) {
   return (
     <div className="compact-bar" data-show={show || undefined} inert={!show} data-testid="artist-compact">
-      <div className="compact-in">
+      <div className="compact-in topcap">
         <button type="button" className="toolbar-circle compact-back" aria-label="Back" onClick={() => void getNav().back()}>
           <ChevronLeft aria-hidden />
         </button>
