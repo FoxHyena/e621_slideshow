@@ -151,6 +151,8 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 | Offline | Banner under the header: "You're offline. Showing what's loaded." → "Back online" (2 s), retries |
 | Needs sign-in | Mascot, why, **Sign in**, **Search instead** |
 
+- As drawn (DESIGN.md "Goo" and "States", mocks/screens-v6.html): the mascot is Goo, a drop of the tab bar's goo with four moods (wave, snooze, look, oops). Tapping Goo makes it spurt 1 to 3 drops onto the tab bar, where they add to the goo. Every state is Goo, a headline, one sentence that says why, then the way out; DESIGN.md has the words for each. Empty states sit on the ground with no card; an error sits in a panel where the first post would be, with what e621 said in a small mono capsule; the offline banner is a sunk capsule, not a button. With filters on, the empty state is headed "No posts match" and its sentence counts the filters and the blacklisted posts, in place of "Filters are on". The end of a feed is the caught-up moment with the app's mark and "That's everything", with no typed ✿. A failed "load more" is one row with a compact **Try again**.
+
 ### Feed card (all feeds)
 
 ```
@@ -271,7 +273,7 @@ Header: **Following** · search · grid · ⋯ (Refresh, Mark all as seen). Subt
 
 | State | Content |
 |---|---|
-| Signed out (landing) | Card: mascot waving, "Follow the artists you love and see their new posts first.", **Sign in with e621**. Below it a real feed, **Popular today** (`order:rank`), so the app is useful before signing in. |
+| Signed out (landing) | Card: mascot waving, "Follow the artists you love and see their new posts first.", **Sign in with e621**. Below it a real feed, **Popular today** (`order:rank`), so the app is useful before signing in. As drawn: the card's headline is "Follow the artists you love" and its sentence "See their new posts first, all in one feed."; **Sign in with e621** is the screen's one gold fill, so Play is hidden until the card has scrolled away. |
 | First read of favorites | Progress loader with checklist: "Finding artists you love". "Skip for now" → the banner state below. The read is shared with For You and Artists › Suggested (one read, cached). |
 | Follows no one | The **Follow from favorites** list inline as the screen. "Skip for now" (the only skip) folds it into a banner "Follow artists from your favorites ›" above **Popular today**. |
 | Follows no one, no favorites | "Find artists to follow": Search + "Popular artists" (e621 artists by post count) |
@@ -308,6 +310,7 @@ Header: **For You** · Tune (sliders) · search · grid · ⋯ (Refresh). Subtit
 - The player plays the ranked list; at the end it loops or stops per Settings › Slideshow › Loop.
 - States: signed out (mascot, "For You learns from your favorites", Sign in, plus Popular today); too
   few favorites ("A tag needs 3 favorites. Favorite a few more posts."); everything muted; error.
+- As drawn (DESIGN.md "States"): signed out and too few favorites are drawn as the state block alone. Popular today under the signed-out block is not drawn; build it as on the landing.
 
 ### Tune `/for-you/tune`
 

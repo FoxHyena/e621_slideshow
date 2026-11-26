@@ -7,7 +7,7 @@ related_targets: []
 
 # Surface: the app shell (all tabs, artist page, player, sheets)
 
-Mode: Operate. Build path: code-led (Operate surface). Approved composition: docs/path-a/mocks/feed-v6.html for the system, the feed and the shared chrome (owner sign-off 2026-11-25, v6); docs/path-a/mocks/screens-v6.html for the artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus and the tag targets (owner sign-off 2026-11-25). Not drawn yet: landing, empty and error states, the "From a link" chip, the grid tile's hold menu, "Follow from favorites", desktop; build those from UX.md with DESIGN.md's parts and show the owner.
+Mode: Operate. Build path: code-led (Operate surface). Approved composition: docs/path-a/mocks/feed-v6.html for the system, the feed and the shared chrome (owner sign-off 2026-11-25, v6); docs/path-a/mocks/screens-v6.html for the artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, and Goo the mascot (owner sign-off 2026-11-25). Not drawn yet: the "From a link" chip, the grid tile's hold menu, the first run after sign-in (the "Finding artists you love" loader and "Follow from favorites"), desktop; build those from UX.md with DESIGN.md's parts and show the owner.
 
 ## Direction contract
 
