@@ -87,12 +87,14 @@ export interface FeedViewProps {
   entryKey: string;
   /** what an empty result says (screen-specific) */
   empty: ReactNode;
+  /** For You: holding a tag offers Pin in place of Search */
+  recommended?: boolean;
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
   onTag: (tag: string, action: TagAction) => void;
 }
 
-export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMenu, onTag }: FeedViewProps) {
+export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMenu, onTag, recommended = false }: FeedViewProps) {
   useStore(feed.version, (v) => v);
   const q = feed.queue;
   const posts = q.posts;
@@ -321,7 +323,7 @@ export function FeedView({ feed, grid, anchorKey, entryKey, empty, onOpen, onMen
           <span className="feed-spinner" role="status" aria-label="Loading more" />
         ) : null}
       </div>
-      <TagActionsOverlay hold={hold} recommended={false} onAction={onTag} />
+      <TagActionsOverlay hold={hold} recommended={recommended} onAction={onTag} />
     </>
   );
 }

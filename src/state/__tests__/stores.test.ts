@@ -109,6 +109,19 @@ describe("prefs", () => {
     p.setSearch({ ...p.store.get().search, blacklist: "mine\nother" });
     expect(p.store.get().visitBlacklist).toBeNull();
   });
+
+  it("keeps For You's media, date and score across visits, and nothing else", () => {
+    const p = createPrefs();
+    p.setForYou({ ...DEFAULT_FILTERS, order: "score", hideFaved: true, minScore: 50, media: { image: false, gif: false, video: true } });
+    expect(saved("forYou")).toEqual({ media: { image: false, gif: false, video: true }, date: DEFAULT_FILTERS.date, minScore: 50 });
+    const again = createPrefs().store.get().forYou;
+    expect(again).toEqual({ ...DEFAULT_FILTERS, minScore: 50, media: { image: false, gif: false, video: true } });
+  });
+
+  it("reads a malformed For You setting as the default", () => {
+    ls.set("e6ss:v1:forYou", JSON.stringify({ media: { image: false, gif: 0, video: "yes" }, minScore: 1.5 }));
+    expect(createPrefs().store.get().forYou).toEqual(DEFAULT_FILTERS);
+  });
 });
 
 describe("favs", () => {
@@ -213,5 +226,31 @@ describe("feed registry", () => {
     t += IDLE_MS + 1;
     r.get(spec("fresh"), env);
     expect(r.size()).toBe(1);
+  });
+
+  it("never evicts a kept feed; its owner drops it", () => {
+    let t = 0;
+    const r = createRegistry(() => vi.fn().mockResolvedValue([]), () => t);
+    const queue = {
+      posts: [],
+      exhausted: true,
+      loading: false,
+      error: null,
+      stats: { hidden: 0, blacklisted: 0 },
+      query: "",
+      ensure: async () => {},
+      remove() {},
+      patch() {},
+      retry() {},
+      setRules() {},
+    };
+    const kept = r.custom("ranked", () => queue, { keep: true });
+    for (let i = 0; i < MAX_FEEDS + 3; i++) {
+      t += IDLE_MS + 1;
+      r.get(spec(`t${i}`), env);
+    }
+    expect(r.peek("ranked")).toBe(kept);
+    r.drop("ranked");
+    expect(r.peek("ranked")).toBeUndefined();
   });
 });

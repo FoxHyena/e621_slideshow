@@ -6,6 +6,7 @@
  * The legacy show's tag box, source and filters still live in `search` too, until slice 3 moves
  * them to per-feed filters (DECISIONS: Results defaults come from these while the legacy panel exists).
  */
+import { DEFAULT_FILTERS, type Filters } from "@/lib/feed/filters";
 import { syncAccountBlacklist } from "@/lib/query/blacklist";
 import type { PlaybackSettings, SearchSettings } from "@/lib/settings";
 import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
@@ -18,6 +19,8 @@ export interface Prefs {
   history: HistoryEntry[];
   /** A link's sign-in: the sharer's account blacklist, for this visit only (never saved). */
   visitBlacklist: string | null;
+  /** For You's chips (UX §5: kept across visits). Order and Hide favorited don't apply there. */
+  forYou: Filters;
 }
 
 export interface PrefsApi {
@@ -40,6 +43,22 @@ export interface PrefsApi {
   syncAccount(account: string, visit: boolean): number;
   /** Leaving a link's sign-in drops its blacklist. */
   endVisit(): void;
+  setForYou(f: Filters): void;
+}
+
+/** Saved For You filters over the defaults; anything malformed is the default. */
+function loadForYou(): Filters {
+  const raw = storage.loadForYou();
+  if (!raw || typeof raw !== "object") return DEFAULT_FILTERS;
+  const r = raw as Partial<Filters>;
+  const m = r.media && typeof r.media === "object" ? r.media : null;
+  const media =
+    m && (m.image === true || m.gif === true || m.video === true)
+      ? { image: m.image === true, gif: m.gif === true, video: m.video === true }
+      : DEFAULT_FILTERS.media;
+  const date = r.date && typeof r.date === "object" ? { ...DEFAULT_FILTERS.date, ...r.date } : DEFAULT_FILTERS.date;
+  const minScore = typeof r.minScore === "number" && Number.isInteger(r.minScore) ? r.minScore : null;
+  return { ...DEFAULT_FILTERS, media, date, minScore };
 }
 
 /** The blacklist in force: a link visit's, else the saved one. */
@@ -52,6 +71,7 @@ export function createPrefs(): PrefsApi {
     saved: storage.loadSaved(),
     history: storage.loadHistory(),
     visitBlacklist: null,
+    forYou: loadForYou(),
   });
   return {
     store,
@@ -93,6 +113,11 @@ export function createPrefs(): PrefsApi {
         store.set({ ...p, search: { ...p.search, blacklist } });
       }
       return account.split("\n").filter((l) => l.trim()).length;
+    },
+    setForYou(f) {
+      const { media, date, minScore } = f;
+      storage.saveForYou({ media, date, minScore });
+      store.set((p) => ({ ...p, forYou: { ...DEFAULT_FILTERS, media, date, minScore } }));
     },
     endVisit() {
       store.set((p) => (p.visitBlacklist === null ? p : { ...p, visitBlacklist: null }));

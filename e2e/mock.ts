@@ -74,6 +74,8 @@ export interface E621Mock {
   searchDelay: (tags: string, page: number) => number;
   /** ms each GET /favorites.json waits before answering */
   favoritesDelay: number;
+  /** /posts.json searches that fail with e621's 422 */
+  searchFails: (tags: string) => boolean;
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -101,6 +103,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     filterPositive: false,
     searchDelay: () => 0,
     favoritesDelay: 0,
+    searchFails: () => false,
   };
 
   const json = (route: Route, body: unknown, status = 200) =>
@@ -125,8 +128,14 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const limit = Number(url.searchParams.get("limit") ?? 75);
       state.searches.push({ tags, page: pageParam, auth });
       if (tags.includes("nothing_matches")) return postList([]);
-      if (tags.includes("server_error")) return json(route, { success: false, message: "Mock search failure" }, 422);
+      if (tags.includes("server_error") || state.searchFails(tags)) return json(route, { success: false, message: "Mock search failure" }, 422);
       let list = state.posts;
+      // `id:1,2,3`: those posts (newest first, like e621)
+      const ids = tags.match(/(?:^| )id:([\d,]+)/);
+      if (ids) {
+        const want = new Set(ids[1].split(",").map(Number));
+        list = list.filter((p) => want.has(p.id));
+      }
       // honour simple negations so blacklist-in-query behaves like e621
       const negs = tags.split(" ").filter((t) => /^-[a-z_]+$/.test(t)).map((t) => t.slice(1));
       list = list.filter((p) => !negs.some((n) => Object.values(p.tags).flat().includes(n)));

@@ -66,9 +66,12 @@ export function ChipsRow({
   chips,
   onChange,
   link,
+  dateAny,
 }: {
   filters: Filters;
   chips: ChipId[];
+  /** what an unset date means here (For You: its default ranking window) */
+  dateAny?: string;
   /** apply right away (toggles, Reset) */
   onChange: (f: Filters) => void;
   /** opened from an outside link: say so */
@@ -103,7 +106,7 @@ export function ChipsRow({
           case "sort":
             return <Chip key={id} label="Sort" value={sortLabel(filters.order)} menu onClick={() => open(id)} testId="chip-sort" />;
           case "date":
-            return <Chip key={id} label="Date" value={dateLabel(filters.date)} menu onClick={() => open(id)} testId="chip-date" />;
+            return <Chip key={id} label={dateAny ?? "Date"} value={dateLabel(filters.date)} menu onClick={() => open(id)} testId="chip-date" />;
           case "score":
             return <Chip key={id} label="Score" value={scoreLabel(filters.minScore)} menu onClick={() => open(id)} testId="chip-score" />;
         }
@@ -128,7 +131,17 @@ const DATE_PRESETS: { id: DatePreset; label: string }[] = [
 ];
 
 /** The open chip's menu, if `sheet` names one. `apply` closes the sheet and reloads the feed. */
-export function FilterSheet({ sheet, filters, apply }: { sheet: string | null; filters: Filters; apply: (f: Filters) => void }) {
+export function FilterSheet({
+  sheet,
+  filters,
+  apply,
+  dateAny,
+}: {
+  sheet: string | null;
+  filters: Filters;
+  apply: (f: Filters) => void;
+  dateAny?: string;
+}) {
   if (!sheet?.startsWith(SHEET_PREFIX)) return null;
   const id = sheet.slice(SHEET_PREFIX.length) as ChipId;
   switch (id) {
@@ -154,7 +167,7 @@ export function FilterSheet({ sheet, filters, apply }: { sheet: string | null; f
         </Sheet>
       );
     case "date":
-      return <DateSheet filters={filters} apply={apply} />;
+      return <DateSheet filters={filters} apply={apply} anyLabel={dateAny ?? "Any time"} />;
     case "score":
       return <ScoreSheet filters={filters} apply={apply} />;
     default:
@@ -190,7 +203,7 @@ function MediaSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) 
   );
 }
 
-function DateSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) => void }) {
+function DateSheet({ filters, apply, anyLabel }: { filters: Filters; apply: (f: Filters) => void; anyLabel: string }) {
   const d = filters.date;
   const preset = d.enabled && d.mode === "preset" ? d.preset : null;
   const [custom, setCustom] = useState<DateFilter | null>(d.enabled && preset === null ? d : null);
@@ -208,7 +221,7 @@ function DateSheet({ filters, apply }: { filters: Filters; apply: (f: Filters) =
       }
     >
       <div role="radiogroup" aria-label="Date">
-        <Option on={!d.enabled && !custom} label="Any time" onPick={() => setDate({ ...d, enabled: false })} testId="date-any" />
+        <Option on={!d.enabled && !custom} label={anyLabel} onPick={() => setDate({ ...d, enabled: false })} testId="date-any" />
         {DATE_PRESETS.map((p) => (
           <Option
             key={p.id}

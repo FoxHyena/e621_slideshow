@@ -56,6 +56,16 @@ export interface HistoryEntry {
 
 export const HISTORY_MAX = 20;
 
+/** For You's ranked list, so a reload or Back shows the same order (UX §3). */
+export interface RankedList {
+  /** the filters and account it was ranked for */
+  key: string;
+  /** the profile inputs it was ranked from (a later change offers Update ranking) */
+  inputs: string;
+  ids: number[];
+  at: number;
+}
+
 export const storage = {
   loadSearch: (): SearchSettings => {
     const s = read("search", DEFAULT_SEARCH);
@@ -103,6 +113,22 @@ export const storage = {
   saveTagCache: (c: TagCache): boolean => write("tagCache", c),
   loadOverrides: (username: string): Overrides => read(`overrides:${username}`, NO_OVERRIDES),
   saveOverrides: (username: string, o: Overrides) => write(`overrides:${username}`, o),
+  /** For You's filters (media, ranking window, min score): kept across visits. Validated by the caller. */
+  loadForYou: (): unknown => read<unknown>("forYou", null),
+  saveForYou: (f: unknown) => write("forYou", f),
+  /** For You's last ranked list for an account. Saved only with Remember on; sign-out removes it. */
+  loadRanked: (username: string): RankedList | null => {
+    const r = read<RankedList | null>(`ranked:${username}`, null);
+    return r &&
+      typeof r.key === "string" &&
+      typeof r.inputs === "string" &&
+      Array.isArray(r.ids) &&
+      r.ids.every((id) => Number.isInteger(id) && id > 0) &&
+      typeof r.at === "number"
+      ? r
+      : null;
+  },
+  saveRanked: (username: string, r: RankedList | null) => write(`ranked:${username}`, r),
 };
 
 export function pushHistory(history: HistoryEntry[], tags: string, now: number): HistoryEntry[] {

@@ -5,7 +5,7 @@
  * pushed screens of the current history stack, each inside <Activity> so a hidden screen
  * keeps its state, and owns the tab bar, focus, scroll offsets and push/back motion.
  */
-import { Activity, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Activity, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { boot } from "@/nav/boot";
 import { installEdgeSwipe } from "@/nav/edgeSwipe";
 import { focusScreen, restoreFocus, trackOpeners } from "@/nav/focus";
@@ -20,9 +20,7 @@ import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
-import { ArtistScreen, FavoritesScreen, ResultsScreen } from "@/screens/FeedScreens";
-import { SearchScreen } from "@/screens/SearchScreen";
-import { Player } from "@/player/Player";
+import { ArtistScreen, FavoritesScreen, ForYouScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
@@ -99,6 +97,7 @@ export default function Shell() {
   }, [nav]);
 
   useEffect(() => installEdgeSwipe(() => void nav.back({ gesture: true })), [nav]);
+  useEffect(() => prefetchScreens(), []);
 
   // Desktop: Esc goes back (UX §8). The legacy home handles its own keys.
   useEffect(() => {
@@ -127,6 +126,9 @@ export default function Shell() {
   // Tab roots mount on first visit and then stay (adjusting state while rendering).
   const [visited, setVisited] = useState<ReadonlySet<Tab>>(() => new Set(curRoot ? [curRoot] : []));
   if (curRoot && !visited.has(curRoot)) setVisited(new Set(visited).add(curRoot));
+  // Each tab root's latest entry: a hidden root keeps its own, so its feed stays bound to it.
+  const [roots, setRoots] = useState<Partial<Record<Tab, Entry>>>(() => (curRoot ? { [curRoot]: cur } : {}));
+  if (curRoot && roots[curRoot] !== cur) setRoots({ ...roots, [curRoot]: cur });
 
   // Pushed screens below and at the current entry; popped ones unmount. Overlays aren't screens.
   const pushed = shown.stack
@@ -210,10 +212,18 @@ export default function Shell() {
       {TABS.filter((t) => t !== "following" && visited.has(t)).map((t) => (
         <Activity key={t} mode={curRoot === t ? "visible" : "hidden"}>
           <section ref={ref} data-id={t} className="screen" data-screen={t}>
-            <PlaceholderScreen
-              screen={tabRoute(t).screen}
-              onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })}
-            />
+            {t === "for-you" && roots[t] ? (
+              <ScreenContext value={ctx(curRoot === t ? cur : roots[t]!, curRoot === t)}>
+                <Suspense fallback={null}>
+                  <ForYouScreen />
+                </Suspense>
+              </ScreenContext>
+            ) : (
+              <PlaceholderScreen
+                screen={tabRoute(t).screen}
+                onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })}
+              />
+            )}
           </section>
         </Activity>
       ))}
@@ -221,12 +231,18 @@ export default function Shell() {
         <Activity key={`${e.key}:${screenKey(e.route.screen)}`} mode={e === cur ? "visible" : "hidden"}>
           <section ref={ref} data-id={e.key} className="screen" data-screen={e.route.screen.kind}>
             <ScreenContext value={ctx(e, e === cur)}>
-              <PushedScreen e={e} />
+              <Suspense fallback={null}>
+                <PushedScreen e={e} />
+              </Suspense>
             </ScreenContext>
           </section>
         </Activity>
       ))}
-      {overlay?.route.play != null && <Player key={cur.key} base={cur} top={overlay} />}
+      {overlay?.route.play != null && (
+        <Suspense fallback={null}>
+          <Player key={cur.key} base={cur} top={overlay} />
+        </Suspense>
+      )}
       <Toaster position="bottom-center" theme="dark" duration={6000} offset={{ bottom: "calc(var(--bar-top) + 12px)" }} mobileOffset={{ bottom: "calc(var(--bar-top) + 12px)" }} />
     </div>
   );
@@ -246,6 +262,8 @@ function PushedScreen({ e }: { e: Entry }) {
       return <FavoritesScreen params={screen.params} />;
     case "artist":
       return <ArtistScreen name={screen.name} />;
+    case "tune":
+      return <TuneScreen />;
     default:
       return <PlaceholderScreen screen={screen} onBack={() => void nav.back()} onSection={() => {}} />;
   }

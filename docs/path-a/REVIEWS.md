@@ -248,3 +248,42 @@ Also deferred (spec gaps the reviewer listed, owned by later slices): a signed-o
 (slice 7, today a toast); the "+N" artists picker (slice 6); pull to refresh and the new-posts pill (slice 3).
 Slice 1 reviewer #10 (legacy artist feeds share an entry key) and #11 (`.legacy-home` containing block)
 stay deferred to slice 3, which deletes the legacy home.
+
+## Slice 2b review (2026-11-25): For You, Tune
+
+**code-review skill (high), 5 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The debounced chip apply scrolled whatever screen was on show (or the locked page under a sheet) | High | Scrolls only while For You is shown; `setLockedY(0)` under a lock |
+| 2 | Sign-out then sign-in as the same account reused the old ranking feed and its old key | High | Signed out forgets the choice; ranking keys take a never-repeating nonce |
+| 3 | A blocked IndexedDB open kept For You waiting forever | High | The stored-fit read races a 3 s timeout; a late fit still patches in |
+| 4 | A failed ⋯ › Refresh said "Ranking again…" forever | Med | The subtitle says it couldn't rank again; e2e |
+| 5 | A malformed saved media setting could turn every media type off | Low | Only boolean `true` values kept; none on → default; unit test |
+
+**Fresh reviewer, 12 findings: 10 fixed, 2 deferred**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A ranking stopped mid-way (feed gone while every tag was muted, or a re-check) came back from the registry stopped: endless loader | High | Stopped rankings are dropped from the registry too; e2e |
+| 2 | A chip change in its 600 ms pause was lost when the tab hid (Activity runs effect cleanups) | High | Hiding applies the waiting change; e2e |
+| 3 | Saved ids weren't checked; a list e621 won't replay looped on Retry for 30 min | Med | Ids must be positive integers; a restore whose first batch fails forgets the list and ranks afresh |
+| 4 | Every sync tick re-rendered For You and its feed | Med | For You selects the profile without `step`; only the loader follows ticks |
+| 5 | Removing a blacklist line re-ranks For You from the current profile, so the pill can show while the list is already newer | Low | **Deferred** (rare; every feed starts over on a removed line). Revisit with request lanes in slice 3 |
+| 6 | Refresh could start a second ranking during one; it read inputs from before its await | Med | Refresh is disabled while ranking; inputs read after the sheet closes |
+| 7 | A finished refresh was thrown away if the profile moved meanwhile | Low | It's swapped in; the pill stays for the newer change |
+| 8 | Sign-out with an unverified key, or a sign-in without Remember, could leave a saved list | Low | Purge by the key's username too; a sign-in without Remember removes that account's list |
+| 9 | `getRec()` starts the sync from the first render that asks | Low | **Deferred**: idempotent today; move to boot when slice 3 retires the legacy home's hook |
+| 10 | A hidden For You feed was first in line for eviction, so a re-ask could rank twice | Low | For You's feeds are never evicted (registry `keep`; a hidden Activity drops its effect retains); For You drops the ones it replaces; unit test |
+| 11 | The restore e2e couldn't tell saved order from newest-first; the "no pill" check ran before the sync ended | Low | Ranked order now differs from newest-first; the check waits for the sync; new e2e for a chip change before leaving |
+| 12 | Tune's "synced 3:41 PM" had no date for an older sync | Low | Shows the date when not today. Pull to refresh and its "Already fresh" toast stay with slice 3 |
+
+**Budgets, measured once** (production build, `e2e/budgets.spec.ts`, 375×812, mock e621):
+
+| Budget | Target | Measured |
+|---|---|---|
+| JS, cold load of `/following` | ≤ 200 KB | 199.7 KB gzip (was 219 KB before the screens were split into lazy chunks); 280 KB including the idle prefetch of every screen. The legacy home is ~21 KB of it and goes in slice 3 |
+| Cards in the DOM | ≤ 30 | 12 at most while scrolling 300 posts |
+| Layout shift | 0 | 0.0000 |
+| First feed content | < 1.5 s | 0.37 s to the first Results card (no `feedHead` cache yet; slice 3) |
+| Scroll, 4× CPU | no task > 50 ms | 0–1 long task per run, 53–55 ms. Borderline: recheck in Phase 6 with the performance panel |

@@ -1939,3 +1939,227 @@ html {
     transition: none;
   }
 }
+
+/* For You: "Ranked 3 min ago" under the title, the progress loader's room, the Update ranking pill */
+.screen-sub {
+  margin-top: 2px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.feed-loader {
+  display: grid;
+  place-items: center;
+  min-height: 50dvh;
+  padding: 24px 0;
+}
+.section-title {
+  margin: 32px 0 12px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: var(--text-section--font-weight);
+}
+.top-pill-row {
+  position: sticky;
+  z-index: 30;
+  top: 12px;
+  display: flex;
+  justify-content: center;
+  height: 0;
+  overflow: visible;
+}
+.top-pill {
+  --lip-c: var(--color-lip-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  box-shadow:
+    0 3px 0 var(--lip-c),
+    0 6px 16px rgba(2, 15, 35, 0.5);
+}
+.top-pill svg {
+  width: 16px;
+  height: 16px;
+}
+.top-pill:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--lip-c);
+}
+.top-pill:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Tune: For You's profile (UX §5) */
+.tune-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.tune-status .text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-link);
+}
+.tune-status .text-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.tune-status .text-btn:disabled {
+  opacity: 0.4;
+}
+.tune-error {
+  margin-top: 8px;
+  font-size: var(--text-footnote);
+  color: var(--color-danger);
+}
+.tune-card {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-hairline);
+}
+.tune-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 700;
+}
+.tune-value {
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.tune-range {
+  width: 100%;
+  height: 44px;
+  accent-color: var(--color-gold);
+  cursor: pointer;
+}
+.tune-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -8px;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+.tune-note {
+  margin-top: 12px;
+  max-width: 65ch;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.tune-tags {
+  margin-top: 16px;
+}
+.tune-tags .group-label {
+  padding: 0;
+  font-weight: 400;
+}
+.tune-find {
+  position: relative;
+  margin-top: 12px;
+}
+.tune-find .field {
+  width: 100%;
+}
+.tune-find-count {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  translate: 0 -50%;
+  pointer-events: none;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+.tune-list {
+  margin-top: 12px;
+  padding: 4px 0;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-hairline);
+}
+.tune-group {
+  padding: 12px var(--spacing-inset) 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 700;
+  color: var(--color-muted);
+}
+.tune-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding-left: var(--spacing-inset);
+  padding-right: 4px;
+}
+.tune-tag-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-body);
+}
+.tune-tag[data-dim] .tune-tag-name,
+.tune-tag[data-dim] .tune-tag-count {
+  opacity: 0.5;
+}
+.tune-tag[data-muted] .tune-tag-name {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+.tune-tag-count {
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.tune-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  color: var(--color-muted);
+}
+.tune-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.tune-icon[data-on] {
+  color: var(--color-gold);
+}
+.tune-mute[data-on] {
+  color: var(--color-danger);
+}
+.tune-icon:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -4px;
+}
+@media (hover: hover) {
+  .tune-icon:hover {
+    background: var(--color-raised);
+    color: var(--color-fg);
+  }
+}

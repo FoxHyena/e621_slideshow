@@ -75,9 +75,15 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
       store.set((s) => ({ ...s, creds: c, user: u, remember, link: false, ready: true }));
       adopt(u);
       storage.saveCredentials(remember ? c : null);
+      // Without Remember nothing per-account stays behind, not even an earlier session's list.
+      if (!remember) storage.saveRanked(u.name, null);
     },
     signOut() {
-      const { link } = store.get();
+      const { link, user, creds } = store.get();
+      // Per-account caches go with the sign-out (never a link's: it saved none), also when the
+      // saved key was never verified (offline, rejected).
+      const name = user?.name ?? creds?.username;
+      if (!link && name) storage.saveRanked(name, null);
       // Leaving a link's sign-in keeps whatever key (and share setting) this browser had saved.
       if (link) prefs.endVisit();
       else {

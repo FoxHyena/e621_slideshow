@@ -180,3 +180,27 @@ Format: date — decision. Why. Rejected alternatives.
   are measured at the end of slice 2b.
 - **Request lanes** (ENGINEERING.md §3 priority and aging) are deferred to slice 3, when Following's
   background reads first compete with a screen's feed. Slice 2 feeds fetch directly.
+
+## 2026-11-25 — Slice 2b build (For You, Tune)
+
+- **The favorites profile is a shared store** (`src/state/rec.ts`): one sync per sign-in, read by For You,
+  Tune and the legacy home. It follows the session and never reads a share link's borrowed sign-in.
+- **For You's Date chip unset means the last 7 days** (the engine's `recommendedWindow`), and the chip and
+  its sheet say "Last 7 days" instead of "Any time". UX §5's "default This week" is the same window in
+  practice; keeping the engine's default leaves the backtested numbers (stream.ts) valid.
+- **The ranked list is saved only with Remember on** (per-account caches persist only with Remember,
+  ENGINEERING §2), under `ranked:<user>`, for 30 minutes, at most 3,000 ids. Sign-out removes it.
+  A reload replays it with `id:a,b,…` searches, 100 ids a request, in the saved order; posts deleted or
+  newly blacklisted since drop out; nothing re-ranks.
+- **Restoring ignores profile changes; the pill reports them.** A saved list is shown when its filters
+  and account match; if the profile has changed since (a sync, Tune), **Update ranking** shows at once.
+- **Nothing re-ranks on its own.** A changed profile shows the pill; a tap ranks now (progress loader).
+  **⋯ › Refresh** ranks in the background with the old list still shown ("Ranking again…"); the pill
+  appears when the new list is ready, and a tap swaps it in. Pull to refresh is slice 3.
+- **The first ranking waits for a first-ever sync to finish learning**, so the first list isn't stale the
+  moment it shows. Later loads rank (or restore) at once with the stored fit.
+- **Holding a tag on For You offers Pin** (as the legacy Recommended feed did), with a toast that says to
+  update the ranking.
+- **Rec warnings go through sonner**, not the legacy toast (which hides behind the other screens).
+- **Screens load lazily.** Search, Results, Favorites, Artist, For You, Tune and the player are their own
+  chunks, fetched on idle after boot; a pushed screen's heading takes focus when its code lands.

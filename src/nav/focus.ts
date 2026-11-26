@@ -24,7 +24,23 @@ function heading(screen: HTMLElement | null): HTMLElement | null {
 
 /** After a push: focus the new screen's heading. */
 export function focusScreen(screen: HTMLElement | null): void {
-  heading(screen)?.focus({ preventScroll: true });
+  const h = heading(screen);
+  if (h || !screen) return h?.focus({ preventScroll: true });
+  // A screen whose code is still loading (lazy): focus its heading when it lands, unless the
+  // user has moved focus meanwhile.
+  const before = document.activeElement;
+  const mo = new MutationObserver(() => {
+    const h = heading(screen);
+    if (!h) return;
+    stop();
+    if (document.activeElement === before || document.activeElement === document.body) h.focus({ preventScroll: true });
+  });
+  const t = setTimeout(() => stop(), 5000);
+  const stop = () => {
+    mo.disconnect();
+    clearTimeout(t);
+  };
+  mo.observe(screen, { childList: true, subtree: true });
 }
 
 /** After a Back from `leftKey`: restore its opener, else the heading of the screen now shown. */

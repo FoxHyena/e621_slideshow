@@ -190,7 +190,8 @@ export default function App({
 
   // ---- recommendations ----------------------------------------------------
   // A borrowed sign-in doesn't read (and store) the sharer's favorites profile.
-  const rec = useRecommendations(linkSession ? null : creds, linkSession ? null : user, showToast);
+  // Follows the session, never a borrowed sign-in (src/state/rec.ts).
+  const rec = useRecommendations();
   /** every weighted profile tag, strongest first, for the settings panel */
   const recTags = useMemo(() => topTags(rec.weights, rec.weights.size), [rec.weights]);
   /** the tags that get their own candidate search: pins, then the highest weights */

@@ -12,10 +12,10 @@
 import { searchPosts, type Credentials } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
 import { searchFor, type Filters } from "@/lib/feed/filters";
-import { parseBlacklist } from "@/lib/query/blacklist";
-import { buildQuery, DEFAULT_TAG_LIMIT, favoritesTags, type BuiltQuery } from "@/lib/query/build";
+import { parseBlacklist, type BlacklistRule } from "@/lib/query/blacklist";
+import { buildQuery, DEFAULT_TAG_LIMIT, favoritesTags } from "@/lib/query/build";
 import type { SearchSettings } from "@/lib/settings";
-import { PostQueue } from "@/lib/slideshow/queue";
+import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
 import { blacklistOf, getPrefs } from "./prefs";
 import { createStore, type Store } from "./store";
 
@@ -41,13 +41,15 @@ export interface FeedEnv {
 
 export interface Feed {
   key: string;
-  spec: FeedSpec;
-  built: BuiltQuery;
-  queue: PostQueue;
+  /** what it searches; null for a feed with its own queue (For You's ranking) */
+  spec: FeedSpec | null;
+  queue: SlideQueue;
   /** bumps on every queue change */
   version: Store<number>;
   refs: number;
   lastUsed: number;
+  /** never evicted; its owner drops it when done with it (For You's rankings, costly to redo) */
+  keep: boolean;
 }
 
 /** The search a feed runs, with Favorites' `fav:` and Hide-favorited's `-fav:` filled in. */
@@ -70,6 +72,11 @@ type Fetcher = (creds: Credentials | null) => (tags: string, page: string | numb
 export interface Registry {
   /** The live feed for this spec, made on first ask. Doesn't fetch. */
   get(spec: FeedSpec, env: FeedEnv): Feed;
+  /**
+   * A feed with its own queue, by a key the caller builds (it must name everything that changes the
+   * posts). `make` gets the change callback and the blacklist rules in force.
+   */
+  custom(key: string, make: (onChange: () => void, rules: BlacklistRule[]) => SlideQueue, opts?: { keep?: boolean }): Feed;
   /** A screen is showing the feed; the returned function lets it go. */
   retain(feed: Feed): () => void;
   /** Drop a feed so the next `get` starts it over. */
@@ -99,12 +106,24 @@ export function createRegistry(
   const generation = createStore(0);
   let rules = parseBlacklist(blacklist);
 
+  // Dropping only forgets the feed: a hidden screen (and its player) may still hold and page it.
   const drop = (f: Feed) => {
     if (feeds.get(f.key) === f) feeds.delete(f.key);
   };
+  const add = (key: string, spec: FeedSpec | null, make: (onChange: () => void) => SlideQueue, keep = false): Feed => {
+    let f = feeds.get(key);
+    if (!f) {
+      const version = createStore(0);
+      f = { key, spec, queue: make(() => version.set((v) => v + 1)), version, refs: 0, lastUsed: now(), keep };
+      feeds.set(key, f);
+      evict(f);
+    }
+    f.lastUsed = now();
+    return f;
+  };
   const evict = (keep: Feed) => {
     const t = now();
-    const idle = [...feeds.values()].filter((f) => f !== keep && f.refs === 0).sort((a, b) => a.lastUsed - b.lastUsed);
+    const idle = [...feeds.values()].filter((f) => f !== keep && f.refs === 0 && !f.keep).sort((a, b) => a.lastUsed - b.lastUsed);
     for (const f of idle) if (t - f.lastUsed > IDLE_MS) drop(f);
     const total = () => [...feeds.values()].reduce((n, f) => n + f.queue.posts.length, 0);
     for (const f of idle) {
@@ -118,19 +137,13 @@ export function createRegistry(
     generation,
     get(spec, env) {
       const key = feedKey(spec, env);
-      let f = feeds.get(key);
-      if (!f) {
+      return add(key, spec, (onChange) => {
         const built = { ...buildQuery(feedSearch(spec, env), tagLimit(env)), rules };
-        const version = createStore(0);
-        const queue = new PostQueue(built, spec.filters.media, fetcher(env.creds), { username: env.user?.name }, () =>
-          version.set((v) => v + 1),
-        );
-        f = { key, spec, built, queue, version, refs: 0, lastUsed: now() };
-        feeds.set(key, f);
-        evict(f);
-      }
-      f.lastUsed = now();
-      return f;
+        return new PostQueue(built, spec.filters.media, fetcher(env.creds), { username: env.user?.name }, onChange);
+      });
+    },
+    custom(key, make, opts) {
+      return add(key, null, (onChange) => make(onChange, rules), opts?.keep);
     },
     retain(f) {
       f.refs++;

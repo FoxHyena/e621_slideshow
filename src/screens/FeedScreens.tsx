@@ -32,9 +32,16 @@ import { isLocked, setLockedY } from "@/nav/scroll";
 
 const ALL_RATINGS = { s: true, q: true, e: true };
 
-/** The live feed for this screen, or null while a saved sign-in is still being checked. */
-function useFeed(spec: FeedSpec, ratingsOverride: SearchSettings["ratings"] | null): Feed | null {
+/** Tie a feed to this screen: the player over it finds it, and it's kept while on screen. */
+export function useShownFeed(feed: Feed | null): void {
   const { entry, visible } = useScreen();
+  const reg = getFeeds();
+  if (feed) reg.bind(entry.key, feed);
+  useEffect(() => (feed && visible ? reg.retain(feed) : undefined), [reg, feed, visible]);
+}
+
+/** The live feed for this screen, or null while a saved sign-in is still being checked. */
+export function useFeed(spec: FeedSpec, ratingsOverride: SearchSettings["ratings"] | null): Feed | null {
   const session = useStore(getSession().store, (s) => s);
   const savedRatings = useStore(getPrefs().store, (p) => p.search.ratings);
   const reg = getFeeds();
@@ -45,8 +52,7 @@ function useFeed(spec: FeedSpec, ratingsOverride: SearchSettings["ratings"] | nu
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `generation` re-asks after the registry dropped feeds
     [reg, spec, ratings, session.ready, session.creds, session.user, generation],
   );
-  if (feed) reg.bind(entry.key, feed);
-  useEffect(() => (feed && visible ? reg.retain(feed) : undefined), [reg, feed, visible]);
+  useShownFeed(feed);
   return feed;
 }
 
@@ -62,7 +68,7 @@ function Toolbar({ children }: { children?: ReactNode }) {
   );
 }
 
-function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: boolean) => void }) {
+export function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: boolean) => void }) {
   return (
     <button
       type="button"
@@ -76,7 +82,7 @@ function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: boolean) =>
   );
 }
 
-function PlayFab({ feed, route }: { feed: Feed | null; route: Route }) {
+export function PlayFab({ feed, route }: { feed: Feed | null; route: Route }) {
   useStore(feed?.version ?? getFeeds().generation, (v) => v);
   const first = feed?.queue.posts[0];
   if (!first) return null;
@@ -111,7 +117,7 @@ async function replaceScreen(route: Route, sheetOpen: boolean) {
   else window.scrollTo(0, 0);
 }
 
-function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
+export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
   const post = feed?.queue.posts.find((p) => p.id === id);
   const { entry } = useScreen();
   if (!post) return null;
@@ -156,18 +162,23 @@ function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
   );
 }
 
-function FeedBody({
+export function FeedBody({
   feed,
   grid,
   route,
   empty,
   onTag,
+  anchorKey,
+  recommended,
 }: {
   feed: Feed | null;
   grid: boolean;
   route: Route;
   empty: ReactNode;
   onTag: (tag: string, action: TagAction) => void;
+  /** where the reading place is kept; tab roots name the tab, since their entry changes per visit */
+  anchorKey?: string;
+  recommended?: boolean;
 }) {
   const { entry } = useScreen();
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;
@@ -176,7 +187,8 @@ function FeedBody({
       key={feed.key}
       feed={feed}
       grid={grid}
-      anchorKey={`${entry.key}:${feed.key}`}
+      anchorKey={anchorKey ?? `${entry.key}:${feed.key}`}
+      recommended={recommended}
       entryKey={entry.key}
       empty={empty}
       onOpen={(p: Post) => {
@@ -190,7 +202,7 @@ function FeedBody({
   );
 }
 
-function postSheet(sheet: string | null): number | null {
+export function postSheet(sheet: string | null): number | null {
   const m = sheet?.match(/^post:(\d+)$/);
   return m ? Number(m[1]) : null;
 }
