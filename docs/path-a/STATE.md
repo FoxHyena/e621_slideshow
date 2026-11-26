@@ -8,6 +8,7 @@ seed:03339dd96a2c6b22, assigned index 5 = "plush hang tag". Directions to show t
 owner-required baseline), (2) plush hang tag (assigned), (3) reference sheet (my pick). Then: owner picks
 -> telemetry ping (concept-seed --from <key> --scope direction --mode operate --kind <...>) -> direction
 contract in surface brief -> DESIGN.md -> 1:1 key-screen mocks -> 2 review rounds -> owner OK.
+Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Waiting on owner pick; I recommended B.
 Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-libraries.md
 (deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
 PRODUCT.md written (repo root).
@@ -23,6 +24,6 @@ PRODUCT.md written (repo root).
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over
 ## Blocked on
-nothing
+owner: pick a visual direction (A e621 refined, B plush hang tag, C reference sheet)
 ## Research notes (outside repo)
 /Users/oreo/Library/Application Support/Claude/side-session-notes/local_5efac6e1-a06e-48e6-abe6-3849cfda0671/path-a-*.md
