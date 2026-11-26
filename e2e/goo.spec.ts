@@ -148,3 +148,58 @@ test("signing out wipes the goo off the bar and off the device", async ({ page }
   await expect(bar(page)).not.toHaveAttribute("data-goo", "", { timeout: 4000 });
   expect(await page.evaluate(() => localStorage.getItem("e6ss:v1:goo") ?? sessionStorage.getItem("e6ss:v1:goo"))).toBeNull();
 });
+
+const seedGoo = (page: Page, n: number) =>
+  page.addInitScript((k) => {
+    if (sessionStorage.getItem("goo-seeded")) return;
+    sessionStorage.setItem("goo-seeded", "1");
+    localStorage.setItem("e6ss:v1:goo", JSON.stringify(k));
+  }, n);
+
+for (const [n, side, jar] of [
+  [5, 14, 7],
+  [40, 37, 24],
+  [150, 61, 43],
+]) {
+  test(`the pool at ${n} favorites: ${jar} up the Settings goo row on a phone, ${side} up the sidebar's foot on a computer`, async ({ page }) => {
+    await mockE621(page);
+    await signIn(page);
+    await seedGoo(page, n);
+    await page.goto("/settings");
+    // a phone: the goo row is a jar; Wipe clean stays above the goo and still works
+    const jarPool = page.getByTestId("pool-jar");
+    await expect(jarPool).toHaveAttribute("data-level", String(jar));
+    const row = await page.getByTestId("goo-row").boundingBox();
+    const pb = (await jarPool.boundingBox())!;
+    expect(Math.round(pb.y + pb.height)).toBe(Math.round(row!.y + row!.height));
+    // the words show through in Goo Ink, cut to the goo
+    await expect(jarPool.locator(".pool-ink")).toContainText("Tab bar goo");
+    expect(await jarPool.locator(".pool-ink").evaluate((e) => getComputedStyle(e).maskImage)).toContain("data:image/svg+xml");
+    await shot(page, `goo-jar-${n}`);
+
+    // a computer: the pool in the sidebar's foot, over the account row, taking no clicks
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const sidePool = page.getByTestId("pool-side");
+    await expect(sidePool).toHaveAttribute("data-level", String(side));
+    const sb = (await page.getByTestId("sidebar").boundingBox())!;
+    const sp = (await sidePool.boundingBox())!;
+    expect([Math.round(sp.x), Math.round(sp.width), Math.round(sp.y + sp.height)]).toEqual([Math.round(sb.x), Math.round(sb.width), Math.round(sb.y + sb.height)]);
+    await expect(sidePool.locator(".pool-ink")).toContainText("tester");
+    await shot(page, `goo-side-${n}`);
+    await page.getByTestId("side-account").click({ position: { x: 30, y: 30 } });
+    await expect(page).toHaveURL(/\/settings/);
+    // icons only (900 to 1099): no goo
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await expect(sidePool).toHaveCount(0);
+  });
+}
+
+test("no goo, no pool; wiping empties the jar", async ({ page }) => {
+  await mockE621(page);
+  await seedGoo(page, 12);
+  await page.goto("/settings");
+  await expect(page.getByTestId("pool-jar")).not.toHaveAttribute("data-level", "0");
+  await page.getByTestId("goo-wipe").click();
+  await expect(page.getByTestId("pool-jar")).toHaveAttribute("data-level", "0");
+  await expect(page.getByTestId("pool-jar").locator("svg")).toHaveCount(0);
+});

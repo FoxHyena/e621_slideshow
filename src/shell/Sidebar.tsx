@@ -6,13 +6,17 @@
  * count, Search with the "/" key, and the account at the bottom. 232 wide with names from 1100 px,
  * 68 and icons only from 900. Its own chunk: a phone never loads it.
  *
- * Not designed yet, so not here: the goo and the secret tab.
+ * The goo pools in its foot (owner-picked, "Pool"), over the account row, which shows through in Goo
+ * Ink; none with icons only. Not designed yet, so not here: the drop's flight into the pool, the wipe
+ * on a computer, and the secret tab.
  */
 import { CircleUser, Rss, Search, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
 import Avatar, { AppMark } from "@/components/Avatar";
+import { Pool } from "@/components/Pool";
 import type { Tab } from "@/nav/routes";
 import { getFollows } from "@/state/follows";
+import { getGoo } from "@/state/goo";
 import { newOnFollowing } from "@/state/following";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
@@ -56,6 +60,7 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
   const user = useStore(getSession().store, (s) => (s.link ? null : (s.user?.name ?? null)));
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
   const followsUser = useStore(getFollows().store, (f) => f.user);
+  const goo = useStore(getGoo().store, (g) => g.count);
   const idx = Math.max(0, TABS.findIndex((t) => t.tab === current));
   // the account's follow count (one read of e621's list, shared with Artists and Settings)
   useEffect(() => {
@@ -81,10 +86,28 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
 
   const tip = (label: string) => (narrow ? label : undefined);
   // (signed out, Following has no count of its own; the store may still hold the last account's)
+  const who = user ? name(user) : "Not signed in";
+  const line = user ? (follows !== null ? `${follows.toLocaleString("en-US")} follow${follows === 1 ? "" : "s"}` : "Signed in") : "Sign in";
   const badge = user && fresh.user === user && fresh.count > 0 && current !== "following" ? (fresh.count > 99 ? "99+" : `${fresh.count}${fresh.more ? "+" : ""}`) : null;
 
   return (
     <nav className="side" aria-label="Tabs" data-hidden={hidden || undefined} inert={hidden} data-testid="sidebar">
+      {!narrow && (
+        <Pool
+          kind="side"
+          n={goo}
+          className="side-pool"
+          ink={
+            <span className="side-account side-pool-ink">
+              <i className="side-avatar pool-ring" />
+              <span className="side-who">
+                <b>{who}</b>
+                <small>{line}</small>
+              </span>
+            </span>
+          }
+        />
+      )}
       <div className="side-brand">
         <AppMark className="side-mark" />
         <span className="side-name">Slideshow</span>
@@ -137,7 +160,7 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
       <a
         href={hrefOf("settings")}
         className="side-account"
-        title={tip(user ? name(user) : "Sign in")}
+        title={tip(user ? who : "Sign in")}
         onClick={(e) => {
           if (!plain(e)) return;
           e.preventDefault();
@@ -147,8 +170,8 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
       >
         {user ? <Avatar seed={user} className="side-avatar" /> : <CircleUser aria-hidden className="side-avatar side-nobody" />}
         <span className="side-who">
-          <b>{user ? name(user) : "Not signed in"}</b>
-          <small>{user ? (follows !== null ? `${follows.toLocaleString("en-US")} follow${follows === 1 ? "" : "s"}` : "Signed in") : "Sign in"}</small>
+          <b>{who}</b>
+          <small>{line}</small>
         </span>
       </a>
     </nav>

@@ -13,28 +13,51 @@ import { SECTION_LABEL } from "@/shell/screens";
 import { TitleRow } from "@/shell/TitleRow";
 import { getFollows } from "@/state/follows";
 import { getGoo, gooLabel } from "@/state/goo";
+import { Pool } from "@/components/Pool";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 
-/** Settings' one action row (DESIGN.md "Tab bar goo"): how much goo, and Wipe clean. */
+/**
+ * Settings' one action row (DESIGN.md "Tab bar goo"): how much goo, and Wipe clean. The row is a jar
+ * (owner-picked, "jar row"): the goo rises inside its card, the words show through in Goo Ink, and
+ * Wipe clean sits above the goo.
+ */
 function GooRow() {
   const goo = getGoo();
   const n = useStore(goo.store, (s) => s.count);
+  const row = (ink: boolean) => (
+    <>
+      <span className={ink ? "row-well pool-ring" : "row-well"} aria-hidden>
+        <Droplets />
+      </span>
+      <span className="row-text">
+        <b>Tab bar goo</b>
+        <small data-testid={ink ? undefined : "goo-count"}>{gooLabel(n)}</small>
+      </span>
+    </>
+  );
   return (
-    <div className="list-group">
+    <div className="list-group goo-jar">
       <div className="list-row" data-testid="goo-row">
-        <span className="row-well" aria-hidden>
-          <Droplets />
-        </span>
-        <span className="row-text">
-          <b>Tab bar goo</b>
-          <small data-testid="goo-count">{gooLabel(n)}</small>
-        </span>
+        {row(false)}
         <button type="button" className="btn-tonal" data-size="compact" onClick={() => goo.wipe()} disabled={n === 0} data-testid="goo-wipe">
           Wipe clean
         </button>
       </div>
+      <Pool
+        kind="jar"
+        n={n}
+        className="jar-pool"
+        ink={
+          <span className="list-row">
+            {row(true)}
+            <span className="btn-tonal" data-size="compact" style={{ visibility: "hidden" }}>
+              Wipe clean
+            </span>
+          </span>
+        }
+      />
     </div>
   );
 }

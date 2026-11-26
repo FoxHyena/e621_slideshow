@@ -72,6 +72,10 @@ Built from the hover pass, Inset rows and grid loading you approved:
   capsule's shape fades.
 - **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
   the name in white, "artist" at the right.
+- **The goo pools (you picked Pool and jar row).** On a computer the goo collects in the sidebar's
+  foot; on a phone it rises in Settings' "Tab bar goo" card. Words under it show in Goo Ink. My
+  choice: no pool at all with 0 favorites, on a computer too. Not built yet (not designed): the drop
+  flying in, the level rising smoothly, the pool draining on Wipe clean.
 
 Approved:
 

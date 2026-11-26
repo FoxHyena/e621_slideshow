@@ -1123,3 +1123,19 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   px of 56. Words in Goo Ink under the goo; "Wipe clean" on top. The switch and the Account and
   Puddle drawings are removed from the mock.
 - Not designed, not approved: the level's motion and how the jar empties during the wipe.
+
+## 2026-11-26 — The goo pools built
+
+- Built from design 159ea87 (owner's picks "Pool" and "jar row"): `src/shell/pool.ts` (levels and
+  shapes), `src/components/Pool.tsx` (the goo through the tab bar goo's filter and colour ramp, plus
+  the copy under it drawn again in Goo Ink and cut by a mask made from the same goo, filter and all).
+- On a computer the pool lies in the sidebar's foot, clipped to its bottom corners, and takes no
+  clicks (the account row under it still opens). None with the icon-only sidebar (900–1099 wide).
+- On a phone it rises inside the "Tab bar goo" row's card in Settings; "Wipe clean" stays on top.
+- Mine: **no pool at 0 in the sidebar** too (the formula gives 10 px at 0; an empty jar shows nothing
+  on a phone, so the same on a computer). Easy to change: `poolLevel` in `src/shell/pool.ts`.
+- Known: where the goo covers the account row, its focus ring is under the goo (the row still works).
+- Not built (not designed): the drop flying into the sidebar's foot, the level's motion (it jumps to
+  the new count), the pools draining during the wipe, the row's name on a computer, the secret tab on
+  a computer.
+

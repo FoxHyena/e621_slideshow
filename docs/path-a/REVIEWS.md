@@ -982,3 +982,17 @@ it a second time; fixed with a per-entry memory and an e2e that scrolls away and
 load (the Goo drops test: its 5 s wait for idle-loaded code was short twice; now 10 s); the mark's e2e
 (caught-up pop once, Settings press pop, unique gradient ids) pass; budgets JS cold load **198.8 KB**,
 CLS 0, 0 long tasks.
+
+## The goo pools (2026-11-26)
+
+Built from design 159ea87 (owner: "Pool", "jar row"): the pool in the sidebar's foot on a computer and in
+Settings' "Tab bar goo" card on a phone, with the copy under it drawn again in Goo Ink and cut by a mask
+of the same filtered goo. Self-review against the mock at 5, 40 and 150: found the ink copy painted
+white (the copied row classes set their own colour) and the jar's well staying dark (the row well's
+background won); both fixed. Left as is: the account row's focus ring sits under the goo.
+
+**Gates:** typecheck and lint clean; e2e 244 passed, 3 skipped (new: the pool at 5/40/150 on both
+kinds, the sidebar's account row still opens through the goo, no pool at 1000 wide, no goo no pool,
+Wipe clean empties the jar); budgets JS cold load **198.8 KB** (the pool rides the sidebar and Settings
+chunks), CLS 0, 0 long tasks.
+

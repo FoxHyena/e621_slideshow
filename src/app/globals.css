@@ -810,6 +810,66 @@ html {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
 }
+/* The goo's pools (DESIGN.md "The goo on a computer", "The pool on a phone"; src/components/Pool.tsx):
+   over what's under them, taking no clicks; the copy under the goo is drawn again in Goo Ink, cut to
+   the goo's shape by a mask. */
+.pool {
+  position: absolute;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pool svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.pool-ink,
+.pool-ink :is(.side-account, .list-row, b, small) {
+  color: var(--color-goo-ink);
+}
+.pool-ink {
+  position: absolute;
+  inset: 0;
+}
+.pool-ring {
+  border-radius: 999px;
+  background: rgb(53 82 127 / 0.16);
+  box-shadow: inset 0 0 0 3px var(--color-goo-ink);
+}
+/* on a computer: the sidebar's foot, 120 tall, cut to its 24 bottom corners */
+.side-pool {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 120px;
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+}
+.side-pool-ink {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  margin: 0;
+}
+/* on a phone: the Settings goo row's card is the jar; Wipe clean stays above the goo */
+.goo-jar {
+  position: relative;
+}
+.jar-pool {
+  inset: 0;
+}
+.goo-jar .list-row > .btn-tonal {
+  position: relative;
+  z-index: 3;
+}
+.jar-pool .row-well.pool-ring {
+  background: rgb(53 82 127 / 0.16);
+  box-shadow: inset 0 0 0 2px var(--color-goo-ink);
+}
+.jar-pool .row-well svg {
+  color: var(--color-goo-ink);
+}
 .side-tab:focus-visible,
 .side-search:focus-visible,
 .side-account:focus-visible {
