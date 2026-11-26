@@ -871,7 +871,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .film6 { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; justify-content: center; }
 .film6 > figure { margin: 0; display: flex; flex-direction: column; gap: 6px; font: var(--t-foot); color: var(--muted); text-align: center; width: 343px; max-width: 100%; }
 .film6 .group6 { margin: 0; text-align: left; }
-/* The pool on a phone: it rises inside the "Tab bar goo" row's card in Settings (picked by the owner: "jar row"). */
+/* The pool on a phone: it rises inside the "Goo" row's card in Settings (picked by the owner: "jar row"). */
 .jar6 { position: relative; }
 .mp6 { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .mp6 svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -905,8 +905,6 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .stab6.ssec6 { color: #fff; }
 .side6.rail .stabs6 { height: auto; clip-path: none; }
 .scrop6.topc { height: 332px; } .scrop6.topc .side6 { bottom: auto; height: 784px; }
-/* The goo row's name (open). #root[data-gname] = goo | split */
-#root[data-gname="goo"] .nm2, #root[data-gname="split"] .nm1 { display: none; }
 .drow6 { padding: 20px; } .drow6 .dcol6 { padding-top: 0; max-width: 100%; } .drow6 .group6:last-child { margin-bottom: 0; }
 .ssearch6 { margin-top: 12px; flex: none; padding-right: 8px; }
 .ssearch6 > span:first-of-type { flex: 1; }
@@ -1073,7 +1071,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile6.skt6 .nums .sk { height: 10px; }
 </style>
 
-<div class="wrap" id="root" data-gname="goo">
+<div class="wrap" id="root">
   <h1 class="pg-h1">Screens v6</h1>
   <p class="pg-p dimtxt">The screens the feed mock never drew, built from the approved v6 parts: the same three materials, sizes, Fredoka voice, artist marks and tab bar. Every phone scrolls and its controls work. The three open choices are picked: artist stats in wells, score and favs under grid tiles, Settings icons in wells. The goo on the tab bars is live: the heart on the Player phone adds to it, and Wipe clean is on the Settings phone.</p>
 
@@ -1341,8 +1339,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <div class="under" id="u-dgoo" style="margin-top:24px"></div>
     <p class="pg-p dimtxt" style="margin-top:24px"><span class="prop6">Picked by you: Fall</span>The drop on a computer. Press a heart in the first window above ("1. Following") to see it. The drop falls straight down from the heart, as on the phone, and leaves by the bottom of the window; 140 ms later a swell comes up at the right end of the pool and the level rises. The other option, a lob into the sidebar, is gone. The pool rises and drains as the phone's jar row does (approved by you).</p>
     <h2 class="pg-h2">The goo row in Settings on a computer</h2>
-    <p class="pg-p dimtxt"><span class="prop6">Your call. Not picked</span>On a phone the row is called "Tab bar goo". A computer has no tab bar, and since your jar row the goo is not only on the tab bar on a phone either. Two names. On a computer I drew the row as the last group of the Settings page, after App, as a plain row: the pool is already in the sidebar beside it, so the row does not fill up there. "Wipe clean" below is live and drains every pool on this page.</p>
-    <div class="tchoice6" style="margin-top:16px"><b>The row's name</b><div class="pick" data-opt="gname" role="group" aria-label="The row's name"><button type="button" data-v="goo" aria-pressed="true">Goo, everywhere</button><button type="button" data-v="split" aria-pressed="false">Sidebar goo / Tab bar goo</button></div></div>
+    <p class="pg-p dimtxt"><b>Picked by you: the row is called "Goo", on a phone and on a computer.</b> The old name "Tab bar goo" is gone. <b>Approved by you: where it sits.</b> On a computer it is drawn as the last group of the Settings page, after App, as a plain row: the pool is already in the sidebar beside it, so the row does not fill up there. "Wipe clean" below is live and drains every pool on this page.</p>
     <div class="under" id="u-drow" style="margin-top:24px"></div>
     <h2 class="pg-h2">The secret tab on a computer</h2>
     <p class="pg-p dimtxt"><span class="prop6">Picked by you: Scroll</span>On a phone you drag the tab bar and find a fifth tab, "Goo", one tab past Settings; pressing it throws ten drops onto the bar. On a computer it is the same idea stood on its side. Try it in the windows above: turn the wheel down over the four tabs, then press "Goo". The other two options (hold the app mark, and no secret) are gone.</p>
@@ -1524,7 +1521,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     </section>
     <section class="col" aria-label="Settings">
       <div class="col-head"><h2 class="pg-h3">Settings</h2><p>Groups are panels with rows. The goo row now sits in a group like any other row with an action.</p></div>
-      <p class="pg-p dimtxt" style="margin:0 0 16px"><span class="prop6">Picked by you: Jar row</span>The pool comes to the phone: the "Tab bar goo" row fills up as you favorite, and "Wipe clean" drains it. Favorite a post in any phone here and watch the row.</p>
+      <p class="pg-p dimtxt" style="margin:0 0 16px"><span class="prop6">Picked by you: Jar row</span>The pool comes to the phone: the "Goo" row fills up as you favorite, and "Wipe clean" drains it. Favorite a post in any phone here and watch the row.</p>
       <div class="phone-holder" id="s-settings"></div>
       <div class="demo6" role="group" aria-label="Try the jar"><button type="button" data-goo-act="1">+1 favorite</button><button type="button" data-goo-act="12">+12 favorites</button><button type="button" data-goo-act="wipe">Wipe clean</button></div>
       <div class="under" id="u-mpool"></div>
@@ -1552,7 +1549,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <tr><th>Text fields</th><td>12 px corners</td><td>Sunk capsules, 44 tall</td><td>Everything you touch in v6 is a capsule; a field is a well you type in.</td></tr>
       <tr><th>Settings row icon tiles</th><td>32 raised squares</td><td>Icons in round wells (picked)</td><td>Raised means "press me" in v6. A tile is not a button.</td></tr>
       <tr><th>Searches shown as text</th><td>wolf solo</td><td>wolf · solo</td><td>Tags are shown with spaces now, so a dot marks where one tag ends. The field you type in keeps e621's own syntax.</td></tr>
-      <tr><th>Tab bar goo row</th><td>Its own card with a flat button</td><td>A row in a Settings group with a raised "Wipe clean"</td><td>Same pattern as every other row with an action.</td></tr>
+      <tr><th>Goo row</th><td>Its own card with a flat button</td><td>A row in a Settings group with a raised "Wipe clean"</td><td>Same pattern as every other row with an action.</td></tr>
     </tbody>
   </table></div>
 
@@ -1910,8 +1907,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   /* ---------- settings ---------- */
   const srow = (i, t, s, val = '', cls = '') => `<button class="srow6" type="button"><span class="ico ${cls}">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span>${val ? `<span class="val">${val}</span>` : ''}${chev()}</button>`;
-  // The pool on a phone lives in the "Tab bar goo" row. n = a fixed amount for a board specimen; without it the drawing follows the live count.
-  const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b><span class="nm1">Goo</span><span class="nm2">Tab bar goo</span></b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
+  // The pool on a phone lives in the "Goo" row. n = a fixed amount for a board specimen; without it the drawing follows the live count.
+  const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Goo</b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
   const setGoo = (n, fr = '') => `<div class="group6 jar6">${gooRow(n)}<span class="mp6 row" data-pool="jar" ${n == null ? '' : `data-n="${n}"`} ${fr}></span><div class="mpink6 row" aria-hidden="true">${gooRow(n, 'style="visibility:hidden"')}</div></div>`;
   $('u-mpool').innerHTML = strip('The goo row fills up', 'The row that holds "Wipe clean" is the jar. The level rises inside its card and stops just over the title: 7 tall at 5 favorites, 24 at 40, 43 at 150, of 56. The words show through in navy, cut to the goo\'s own edge. "Wipe clean" sits on top of the goo and drains it.',
     `<div class="strip p6 mpboard6">${[5, 40, 150].map(n => `<figure>${setGoo(n)}<span>${n} favorites</span></figure>`).join('')}</div>`);
@@ -2570,7 +2567,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   $('u-dgoo').innerHTML = strip('The goo collects in the foot of the sidebar', 'The sidebar is the jar. A drop falls from the heart and arcs left into it. The level rises fast at first and then slows, so it never passes the account row: 14 tall at 5 favorites, 37 at 40, 61 at 150. Your name shows through in navy where the goo covers it, as tab names do on the phone. With the icon-only sidebar there is no goo.', gooCrops());
   $('u-drow').innerHTML = strip('The last group on the Settings page', 'Under App, with no heading of its own, as on the phone. The count and "Wipe clean" are the phone\'s. Not a jar here: the sidebar\'s pool is the jar on a computer.',
     `<div class="strip p6 drow6"><div class="dcol6"><div class="shead6" style="margin-top:0"><b>App</b></div><div class="group6">${srow('app', 'Install', 'Add eLicks21 to your dock')}${srow('link', 'About', 'Version 2.0')}</div>
-      <div class="group6"><div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b><span class="nm1">Goo</span><span class="nm2">Sidebar goo</span></b><small data-goo-count></small></span><button class="btn6 lip6" type="button" data-goo-act="wipe">Wipe clean</button></div></div></div></div>`);
+      <div class="group6"><div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Goo</b><small data-goo-count></small></span><button class="btn6 lip6" type="button" data-goo-act="wipe">Wipe clean</button></div></div></div></div>`);
   const secCrop = (cls, cap) => `<figure><div class="scrop6 topc">${side('Following', cls, 12, 40)}</div><span>${cap}</span></figure>`;
   $('u-dsec').innerHTML = strip('One row past Settings', 'The four tabs ride a rail clipped to their own height. Turn the wheel down over them (or move focus past Settings) and the rail slides up one row: Following leaves at the top, "Goo" comes in under Settings. It settles on the tab bar\'s spring. The cost is the phone\'s too: while it is scrolled, the first tab is out of sight. Pressing "Goo" squeezes its icon and throws ten drops, in spurts of 4, 3 and 3, down into the pool. With the icon-only sidebar there is no secret.', `<div class="strip p6 goorow6">${secCrop('', 'At rest')}${secCrop('secopen fixsec', 'Scrolled')}</div>`);
   $('d-feed').innerHTML = desk(side('Following') + feedMain);
@@ -2852,7 +2849,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const gooLive = () => [...document.querySelectorAll('nav.tabbar6[data-goo="live"], nav.tabbar6[data-goo="own"]')];
   const gooTick = (now) => { let live = false; gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st) return; if (gooStep(nav, st, now)) live = true; gooDraw(nav, st); }); gooRaf = live ? requestAnimationFrame(gooTick) : 0; };
   const gooKick = () => { if (!gooRaf) gooRaf = requestAnimationFrame(gooTick); };
-  // The pools: the "Tab bar goo" row on a phone (jar) and the foot of the sidebar on a computer (side).
+  // The pools: the "Goo" row on a phone (jar) and the foot of the sidebar on a computer (side).
   // A pool with data-n is a still specimen; without it, it follows the live count and moves.
   const jarLv = n => 4 + 42 * (1 - Math.exp(-n / 60));
   const POOL = { jar: { W: 343, H: 56, lv: jarLv, r: 5, a: [96, 44, 3.5], b: [236, 36, 20, 3, 3.5], px: .3 }, side: { W: 232, H: 120, lv: poolH, r: 6, a: [62, 34, 4], b: [158, 26, 18, 3.5, 4], px: .75 } };

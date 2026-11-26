@@ -729,7 +729,7 @@ Every favourite adds goo to the tab bar. It is the same liquid as the drip under
 - **How it grows** (n = favourites since the last wipe): the bead along the top edge thickens, 6 + 4(1 − e^(−n/30)) px; it reaches 8 + 7·n^0.75 px along the edge; drips 10 to 17 wide creep down 0.35 to 1.1 px per favourite and run over the tabs. It is thick and slow, never runny.
 - **Colour:** white, yellowing toward Goo Cream as it grows.
 - **Over tabs:** wherever goo covers an icon or label, a Goo Ink copy shows through, so every tab stays readable.
-- **Wipe clean** lives in Settings only: a list row "Tab bar goo" (drops icon in a round well, the count "23 favorites" underneath) with a compact tonal "Wipe clean" button at its right end. A blade sweeps the bar (900 ms), flings the goo off the right end, and the bar gleams (520 ms). The count restarts at zero.
+- **Wipe clean** lives in Settings only: a list row "Goo" (owner-picked name, 2026-11-26: "Goo, everywhere"; it was "Tab bar goo") (drops icon in a round well, the count "23 favorites" underneath) with a compact tonal "Wipe clean" button at its right end. A blade sweeps the bar (900 ms), flings the goo off the right end, and the bar gleams (520 ms). The count restarts at zero.
 - The count is kept on the device. The mock only ever adds; whether un-favouriting removes goo is not decided.
 
 ### Section header and artist card
@@ -795,7 +795,7 @@ Large title "Artists" with a one-button tools capsule (Search). Then the 44 segm
 Back, large title "Tune", a muted body line ("For You learns from your favorites."). Then: a one-row group with the sync state ("1,284 favorites read" over "Synced 3 min ago") and a compact tonal "Rebuild" with a refresh icon; a Panel card with the Breadth slider; the "Filter tags" field; and "Your tags", a group label with "Pin · Mute" at its right, over a flat group of rows: the tag in Tag (list) type and its category colour, "48 favorites" underneath, then the Pin and Mute toggles.
 
 ### Settings
-- **Root:** large title; the account row in its own group; one group of rows with icon wells (Content, Slideshow, For You, App), each with a muted line saying what is inside and, where one value sums it up, that value ("6 s"); the "Tab bar goo" row in its own group; then the 56 app mark, the wordmark "eLicks21" (headline) and the version (muted footnote), centred. Tapping the mark turns it one notch.
+- **Root:** large title; the account row in its own group; one group of rows with icon wells (Content, Slideshow, For You, App), each with a muted line saying what is inside and, where one value sums it up, that value ("6 s"); the "Goo" row in its own group; then the 56 app mark, the wordmark "eLicks21" (headline) and the version (muted footnote), centred. Tapping the mark turns it one notch.
 - **A sub-page** (drawn: Slideshow): back, large title, then groups with group labels ("Videos", "Playback"). Rows are flat (no icon well) and end in a control or a value with a chevron ("Transition  Fade ›").
 - **Slideshow styles:** a sideways row of previews, 8 apart: 76 × 100, 16 radius, Player Black, each a tiny picture of what the style does (Classic, Ken Burns, Collage, Prints, Reflections), its name underneath in footnote-rounded, muted. The selected one wears the gold ring outside the preview and a white name. The row leaves 4 above itself so the ring is never clipped.
 
@@ -988,8 +988,8 @@ What Following shows the first time you sign in, before you follow anyone. Three
   - **Colour:** the tab bar goo's ramp, white to Goo Cream #F3E6A8 with tint 1 − e^(−n/70).
   - **Copy under the goo:** the account's name, its count and its avatar ring are drawn again in Goo Ink #35527F, cut to the goo's own shape (the same shapes used as a clip path, so the cut follows the wavy surface and can move with it), as tab names are on the phone.
   - **No goo** with the icon-only sidebar (900 to 1099 wide).
-- **The pool on a phone: the "Tab bar goo" row is a jar.** Owner's idea ("Maybe we bring the pool to mobile somewhere too? … Maybe the settings or something?"), owner-picked 2026-11-26 ("jar row"). Drawn in the mock's Settings phone and under it.
-  - **Where:** inside the card of the "Tab bar goo" row in Settings. The tab bar's own goo does not change.
+- **The pool on a phone: the "Goo" row is a jar.** Owner's idea ("Maybe we bring the pool to mobile somewhere too? … Maybe the settings or something?"), owner-picked 2026-11-26 ("jar row"). Drawn in the mock's Settings phone and under it.
+  - **Where:** inside the card of the "Goo" row in Settings. The tab bar's own goo does not change.
   - **Level:** 4 + 42(1 − e^(−n/60)) px above the card's bottom edge, of the row's 56: 7 at 5 favorites, 24 at 40, 43 at 150. Nothing at 0.
   - **Shape and colour:** as the computer's pool (same filter, a full-width slab with low swells, the tab bar goo's colour ramp), clipped to the card's 24 corners. It takes no clicks.
   - **Copy under the goo:** the row's title, its count and its icon well (a 2 px ring and the drops icon) are drawn again in Goo Ink #35527F, cut to the goo's own shape.
@@ -1000,9 +1000,9 @@ What Following shows the first time you sign in, before you follow anyone. Three
   - **Drain (Wipe clean):** the level sinks to nothing in 900 ms on the blade's ease (in-out cubic), in step with the blade on the tab bar. The surface leans up to 8 px lower at the right end, mid-way through. The Goo Ink copy follows the surface, so words turn white again as the goo leaves them.
   - **The drop on a computer: it falls.** Owner-picked 2026-11-26 ("Fall"). 380 ms after the press the drop falls straight down from the heart, as on a phone (8 by 10, white, 70 + 17·√distance ms, ease-in), and leaves by the bottom of the window. 140 ms after it has left, the pool swells at 75% along and rises. It does not fly to the sidebar.
   - **Reduced motion:** no drop, no swell, no lean; the level changes at once.
-- **Open, the owner is choosing (2026-11-26): the goo row in Settings on a computer.** Drawn in the mock under "The goo row in Settings on a computer"; build none of it yet.
-  - **Mine, shown to the owner, not yet approved:** it is the last group of the Settings page, after App, with no heading: the drops icon well, the name, the count, and the compact tonal "Wipe clean". It is a plain row, not a jar: on a computer the sidebar's pool is the jar, and it drains when the button is pressed.
-  - **The name, two options, none picked:** **"Goo" everywhere** (my pick; the phone's row is renamed too, since the goo is no longer only on the tab bar) or **"Sidebar goo"** on a computer with "Tab bar goo" kept on a phone.
+- **The goo row in Settings on a computer.** Drawn in the mock under "The goo row in Settings on a computer".
+  - **Where it sits (owner-approved 2026-11-26: "Approve"):** it is the last group of the Settings page, after App, with no heading: the drops icon well, the name, the count, and the compact tonal "Wipe clean". It is a plain row, not a jar: on a computer the sidebar's pool is the jar, and it drains when the button is pressed.
+  - **The name (owner-picked 2026-11-26: "Goo, everywhere"):** the row is called **"Goo"** on a phone and on a computer. The phone's old name "Tab bar goo" is gone, since the goo is no longer only on the tab bar. Ruled out: "Sidebar goo" on a computer with "Tab bar goo" kept on a phone.
 - **The secret tab on a computer: one row past Settings.** Owner-picked 2026-11-26 ("Scroll"). Live in the mock's desktop windows; drawn under "The secret tab on a computer".
   - **The rail:** the four tabs ride a rail clipped to their own height (188, clip radius 24, 3 of slack for the focus ring). A wheel turn down over the tabs, or focus moving past Settings, slides the rail up one row (48) on the tab bar's spring (500 ms, `cubic-bezier(.3,1.35,.5,1)`): Following leaves at the top and a fifth row comes in under Settings. A wheel turn up brings it back. The current tab's capsule rides the rail with its row.
   - **The fifth row:** "Goo", the drops icon, white, the same 44 row as the others.
@@ -1047,7 +1047,7 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **"From a link":** the same Panel dropdown, 343 wide, holding the line, the six rows, the note and the tonal "Use my settings".
 
 ### Not drawn yet
-The goo row's name on a computer (two options drawn, none picked). Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
+Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |

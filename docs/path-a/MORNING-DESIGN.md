@@ -135,11 +135,13 @@ treat that message as your approval of any design.
    foot of the sidebar and stops at the account row. Still open: the secret tab on a computer (my
    suggestion: one more row under Settings that shows when you scroll the tabs), and how the wipe
    looks on a computer.
-   **Your idea, picked by you ("jar row"):** the pool on a phone too, inside the "Tab bar goo" row in
+   **Your idea, picked by you ("jar row"):** the pool on a phone too, inside the "Goo" row in
    Settings. **Picked by you ("Fall"):** on a computer the drop falls off the bottom of the window.
    **Approved by you ("Approve"):** how a pool rises, catches up when Settings opens, and drains.
    **Picked by you ("Scroll"):** the secret tab on a computer is one row past Settings.
-   **Waiting for you:** the goo row's name ("Goo" everywhere, or "Sidebar goo" / "Tab bar goo").
+   **Picked by you ("Goo, everywhere"):** the row in Settings is called "Goo" on a phone and on a
+   computer. **Approved by you ("Approve"):** on a computer the row is the last group, after App, a
+   plain row.
 2. **Sidebar:** a floating panel, 232 wide, with names; the current tab wears the tab bar's sliding
    capsule. Icons only from 900 to 1099. Other option: icons only at every width.
 3. **Play** keeps its gold disc at the bottom left of the content, beside the feed column. Other
