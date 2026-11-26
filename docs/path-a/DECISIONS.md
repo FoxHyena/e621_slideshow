@@ -98,3 +98,12 @@ Format: date — decision. Why. Rejected alternatives.
 - Kept from review round 2 (owner didn't object): e621 tag category colours, "Media" / "Hide favorited"
   labels.
 - Phase 3 gate: two design review rounds done (REVIEWS.md) + owner OK. Archived: mocks/direction-a-v5-2.html.
+
+## 2026-11-25 — Post panel spacing (v5.3)
+
+- Owner on v5.2: "I still think that the spacing here is a little jank". Causes: the header collapsed to 24 px
+  (a `.line1` rule overrode its 44 px height), so the avatar sat 4 px under the border; the picture was inset 8
+  while text was inset 16; top and bottom padding differed (4 vs 12).
+- Fix (owner: "let's do it"): one 12 px inner edge for everything in the panel; 44 header flush to the top;
+  12 picture → stats, 12 stats → tags (kept at 12, not 8, so the 44 hit areas don't overlap), 12 bottom.
+  Rejected: full-bleed picture inside the panel (bigger art, but reads as a generic social card).

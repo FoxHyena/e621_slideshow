@@ -251,13 +251,13 @@ components:
 
 # Design System: e621 Slideshow
 
-Source of truth: the owner-signed-off mock `docs/path-a/mocks/direction-a-v5-2.html` (its `.phone` custom properties and classes). The app is rebuilt to match it in later phases. Values marked **spec (not in mock)** come from `docs/path-a/UX.md` because a static mock cannot show them. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
+Source of truth: the owner-signed-off mock `docs/path-a/mocks/direction-a-v5-3.html` (its `.phone` custom properties and classes). The app is rebuilt to match it in later phases. Values marked **spec (not in mock)** come from `docs/path-a/UX.md` because a static mock cannot show them. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
 
 ## Overview
 
 **Creative North Star: "The e621 Reading Room"**
 
-A calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: the artist line on top, the picture inset by 8, then favourite, score and tags underneath. Structure is iOS (large titles, round 44 toolbar buttons, a floating glass capsule tab bar, grouped settings, bottom sheets). The playful touch is small and physical: pressable things have a solid darker edge that sinks when tapped, titles and numbers speak in a rounded face, and a short celebration marks "You're caught up".
+A calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: the artist line on top, the picture, then favourite, score and tags underneath. Structure is iOS (large titles, round 44 toolbar buttons, a floating glass capsule tab bar, grouped settings, bottom sheets). The playful touch is small and physical: pressable things have a solid darker edge that sinks when tapped, titles and numbers speak in a rounded face, and a short celebration marks "You're caught up".
 
 Density is phone-first and one-handed: a 16 edge, a closed size system (6 spacing steps, 4 control heights, 4 avatar sizes, 3 icon sizes, 4 radii), and the main action in thumb reach at the bottom right. Dark by default for dark rooms; there is no light theme.
 
@@ -369,11 +369,11 @@ Depth is tonal, not shadowed: ground → panel → raised → raised-hi, each on
 ## Components
 
 ### Post panel (signature)
-The e621 post box, rebuilt. Panel Navy, 16 radius, hairline, padding 8 / 8 / 12, 24 below.
-1. **Artist line** (44 tall, sits 4 above the picture): 24 kaleidoscope avatar, name (headline, white, ellipsis), footnote muted "**New** · 2h ago" with "New" in gold 600, ⋯ (44 hit, muted) at the end.
+The e621 post box, rebuilt. Panel Navy, 16 radius, hairline, padding 0 / 12 / 12 (one 12 inner edge: avatar, picture, fav pill and first tag all start 12 in), 24 below.
+1. **Artist line** (44 tall, flush to the panel top and the picture; the 24 avatar centres with 10 above and below; ⋯ hit area runs to the panel edge): 24 kaleidoscope avatar, name (headline, white, ellipsis), footnote muted "**New** · 2h ago" with "New" in gold 600, ⋯ (44 hit, muted) at the end.
 2. **Picture** at its own aspect ratio, 8 radius, nothing on top. Video adds a 56 dark play disc (`rgba(0,0,0,.45)`) centred and a 32 mute button (44 hit) 12 from the bottom right.
 3. **Stats line** (32 tall, 12 below the picture): fav pill, score (green ↑ + number), `#id` right-aligned in muted footnote.
-4. **Tag row** (12 below): one sideways-scrolling row of tags, then a "+N" tag.
+4. **Tag row** (12 below; bleeds to the panel edges and fades in over 12): one sideways-scrolling row of tags, then a "+N" tag.
 States: new (gold "New"), faved (fav pill on), video. Rating is shown only when it differs from the user's default (spec).
 
 ### Fav pill
@@ -448,7 +448,7 @@ Grammar: 100 to 200 ms, ease-out, compositor-only properties (transform, opacity
 
 ## Build rulings (where the mock disagrees with itself)
 
-The v5.2 mock is the approved composition; these rulings win over it when building.
+The v5.3 mock is the approved composition; these rulings win over it when building.
 
 1. **Caught-up title is white**, not gold. The gold lives in the app mark beside it. Gold stays: main action, "New", current tab.
 2. **Lip by height:** 44+ controls get 3 px (Paste included); 32 compact controls get 2 px.
@@ -465,7 +465,7 @@ The v5.2 mock is the approved composition; these rulings win over it when buildi
 ### Do:
 - **Do** keep every value on the closed size system: spacing 4/8/12/16/24/32, controls 44/32/52/56/62, avatars 24/36/44/80, icons 24/20/16, radii 8/12/16/24/capsule.
 - **Do** fill gold once per screen, for the main action; use gold otherwise only for "New", the current tab, a selected chip's ring and the Follow plus.
-- **Do** put posts in navy panels with the artist line on top, the picture inset 8, and stats and tags below.
+- **Do** put posts in navy panels with the artist line on top, one 12 inner edge for picture and text, and stats and tags below.
 - **Do** give compact controls a 44 hit area and every number tabular figures.
 - **Do** lift any new small-text colour to 4.5:1 on the surface it sits on, keeping its e621 hue.
 - **Do** self-host Nunito in the build.
