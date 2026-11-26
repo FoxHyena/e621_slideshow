@@ -11,12 +11,16 @@ treat that message as your approval of any design.
 
 ## Start here: the five calls that matter most
 
-1. **Toasts** (batch 1). They are in the whole app and the builder needs them first. You had two
-   switches open; I used **Ring** and **Hug**. Say "Ring, Hug" to keep them, or name another mix.
+1. ~~**Toasts** (batch 1): Ring and Hug.~~ **Picked by you on 2026-11-26: "Ring, hug".** The rest of
+   the toast (4 s without Undo, the two-line skipped toast, the copy) is still yours to check.
 2. **The app icon** (batch 4). It is the one piece people see outside the app. Keep the navy gradient,
    or go flat?
 3. **On a computer** (batch 5): the sidebar with names, and Play as a disc beside the column. And one
-   thing only you can pick: where the goo lives on a computer.
+   thing only you can pick: where the goo lives on a computer. **Picked by you on 2026-11-26:** the
+   top bar is a floating capsule ("Capsule"), and a button with a lip rises under the pointer ("Lift").
+   Still yours to check there: the rest of the hover pass, the grid loading skeleton, the head staying
+   in the 600 column in grid view. **Also picked by you:** chips open a dropdown, on a phone too
+   ("Dropdown").
 4. **Things I added that the plan does not list.** Yes or no to each: "API key · Change", "What's new",
    "Source code" and the "Not run by e621…" line (batch 3); "Open on e621" in an artist's ⋯ and "Copy
    link" on the artist page (batches 1 and 2); the "Updated to 2.1" toast (batch 4); the one-time

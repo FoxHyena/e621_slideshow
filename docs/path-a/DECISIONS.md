@@ -832,3 +832,44 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   now passes the post it left (`leaving`) and the direction (`back`); Classic, Ken Burns and Reflections
   use it, and Reflections slides the other way going back. The old one-page app still uses `trail[0]`.
 
+## 2026-11-26 — Toast: the ring and the width picked
+
+- Owner, after seeing the four mixes side by side again: "Ring, hug".
+- Locked: a ring around Undo that empties in the 6 s the toast stays; the toast hugs its words, centred.
+- Dropped: no ring; a toast that spans the screen. The switches are out of the mock.
+- Not covered by this pick, still proposed: the rest of the Toast section (4 s without Undo, the
+  two-line skipped toast, the copy).
+- Same message, a new request: "we may want to do a pass at potential hover state as the spacing looks
+  not ideal", with a picture of the built tools capsule where the highlight touches the capsule's edge.
+
+## 2026-11-26 — Top bar and hover picked; one head; chip dropdowns asked
+
+- Owner's words: "1. Capsule 2. Lift", then "we should aim to keep the area above the grid/scroll views
+  consistently sized" and "Should we consider a dropdown menu instead of a popup? the arrow makes me
+  think that it'll pop down instead of a new popup".
+- **Locked: the top bar is a floating capsule** on a phone and on a computer. The edge-to-edge glass
+  band is dropped. The Shelf option is dropped.
+- **Locked: a button with a lip rises 1 px under the pointer.** Lighten and Both are dropped.
+- **The owner's rule, written into DESIGN.md:** on a computer the head stays in the 600 column in feed
+  view and in grid view. My first desktop drawing stretched the head with the grid; that was my
+  mistake, and the builder built it as drawn.
+- **Still proposed, not owner-approved:** the rest of the hover pass (washes, the one-step-lighter
+  rule, glass), the wash shape for rows that sit straight on a sheet, the grid loading skeleton, the
+  chip dropdown on a computer, and the chip dropdown on a phone (the sheet is what is approved).
+- The square hover block on the "Follow from favorites" list was my drawing's fault, not the
+  builder's: those rows had no side padding, so the wash had no room for a rounded shape.
+- Not done: Date and Score as dropdowns are not drawn. `.impeccable/design.json` has only the motion
+  entry renamed by hand; the script that regenerates it was lost and it was not rebuilt.
+
+## 2026-11-26 — Chips open a dropdown, on a phone too
+
+- I asked: "On a phone, should a chip open the dropdown (my pick) or keep the sheet". Owner's word:
+  "Dropdown".
+- **Locked: a chip with an arrow drops its panel under itself, on a phone and on a computer.** The
+  titled sheet for a chip is dropped (Sort, Media, Date, Score, the Artists sort, "From a link").
+- Follows from it, decided by me and shown to the owner: no title, no close button, no Done; Custom's
+  "Apply" is tonal instead of gold, because Play is still on screen under a dropdown and the screen
+  keeps one gold fill.
+- Not changed: sheets that a chip does not open (Quick settings, Post info, the ⋯ sheets, Follow from
+  favorites, sign-in).
+
