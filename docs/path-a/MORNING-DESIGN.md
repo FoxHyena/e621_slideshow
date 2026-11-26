@@ -13,8 +13,8 @@ treat that message as your approval of any design.
 
 1. ~~**Toasts** (batch 1): Ring and Hug.~~ **Picked by you on 2026-11-26: "Ring, hug".** The rest of
    the toast (4 s without Undo, the two-line skipped toast, the copy) is still yours to check.
-2. **The app icon** (batch 4). It is the one piece people see outside the app. Keep the navy gradient,
-   or go flat?
+2. ~~**The app icon** (batch 4). Keep the navy gradient, or go flat?~~ **Redrawn and picked by you on
+   2026-11-26:** a hexagon with Play sunk into it, "Gold". The kaleidoscope stays the mark inside the app.
 3. **On a computer** (batch 5): the sidebar with names, and Play as a disc beside the column. And one
    thing only you can pick: where the goo lives on a computer. **Picked by you on 2026-11-26:** the
    top bar is a floating capsule ("Capsule"), and a button with a lip rises under the pointer ("Lift").
@@ -108,7 +108,7 @@ treat that message as your approval of any design.
 
 ## Batch 4: install, update, the app icon (section "Install, update and the app icon")
 
-1. **The app icon:** the app mark (the kaleidoscope) on navy that runs from Panel Navy at the top to
+1. **The app icon (replaced on 2026-11-26 by the gold hexagon with Play; see "Start here"):** the app mark (the kaleidoscope) on navy that runs from Panel Navy at the top to
    Ground at the bottom. DESIGN.md already said the kaleidoscope is the app mark and Goo is never the
    icon, so only the background and the size are mine. Other options: a flat Ground background; a
    simpler mark for the 16 px tab icon (at 16 it reads as a gold ring, not as dots).

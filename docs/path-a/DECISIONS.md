@@ -462,3 +462,25 @@ Format: date — decision. Why. Rejected alternatives.
 - With this, everything in DESIGN.md's "The top bar, the pointer, grid loading, one head, chip
   dropdowns" is owner-picked or owner-approved. The chip dropdown's measurements are still mine.
 
+## 2026-11-26 — The app icon is redrawn as a hexagon with Play
+
+- Owner's words, with a picture of e621's hexagon logo: "For the app icon, I'd like us to make some
+  kinda in-theme icon where we have a similar hexagon but with an inset play icon".
+- This replaces the earlier question (the kaleidoscope on a navy gradient or on flat navy).
+- Drawn behind a switch in the mock ("Install, update and the app icon", column 3): a rounded,
+  point-up hexagon built like the app's raised buttons (face, top light, lip, shadow), with Play sunk
+  into it like a well, on the navy square. For a browser tab (32 and 16): no lip, no shadow, the
+  hexagon larger. One colour for Android's themed icons: the hexagon with Play cut out.
+  - **Gold** (my pick): the gold Play button as a hexagon, Play in navy. It still reads at 16.
+  - **Navy, gold Play**: a Raised navy hexagon, Play as a gold inlay.
+  - **Navy**: all navy. The quietest; Play is hard to see at 16.
+- Mine, not the owner's: the hexagon is my own drawing, not e621's logo (no "e", no "621", no ears);
+  the kaleidoscope stays the app mark inside the app (caught-up, Settings, the sidebar).
+- Owner's pick: "Gold".
+- **Locked: the Gold icon.** The other two colourings and the switch are out of the mock. The earlier
+  question (gradient or flat navy behind the kaleidoscope) is closed: the icon keeps the gradient.
+- Written into DESIGN.md with measurements (mine). Source files exported from the mock:
+  `docs/path-a/icons/app-icon.svg` (full square), `app-icon-tab.svg` (32 and 16), `app-icon-mono.svg`.
+- Not done: no PNG sizes were made and the app's own `favicon.ico` and manifest are not touched; that
+  is the builder's side.
+
