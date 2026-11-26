@@ -1,5 +1,5 @@
 # State
-Phase: 3 — Visual design           Updated: 2026-11-25
+Phase: 4 — Engineering plan           Updated: 2026-11-25
 Branch: claude/heuristic-mccarthy-c24143     PR: none
 ## Next step
 Direction round (impeccable new-work, Operate mode). concept-seed ran: key 6916281b3fb103850ea7e30b56c74e86,
@@ -8,7 +8,7 @@ seed:03339dd96a2c6b22, assigned index 5 = "plush hang tag". Directions to show t
 owner-required baseline), (2) plush hang tag (assigned), (3) reference sheet (my pick). Then: owner picks
 -> telemetry ping (concept-seed --from <key> --scope direction --mode operate --kind <...>) -> direction
 contract in surface brief -> DESIGN.md -> 1:1 key-screen mocks -> 2 review rounds -> owner OK.
-Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). v3 → owner asked for iOS floating bar + AllTrails study (not copy). v4 published (copy: mocks/direction-a-v4.html). Owner said "resume the goal" (studies, not copies) and asked for a Duolingo study (research/duolingo-study.md, duolingo-research.md). Design review round 1 on v4 logged in REVIEWS.md. v5 published (Version 5; copy: mocks/direction-a-v5.html): all round-1 fixes, Duolingo lessons (pressable lip, rounded type, stat trophies, chunky progress, caught-up mark), and 6 screens incl. player, Settings, sign-in. Review round 2 logged; v5.1 published (Version 6; copy: mocks/direction-a-v5-1.html). Owner signed off with two changes, applied in v5.2 (Version 7; copy: mocks/direction-a-v5-2.html). Next: direction contract (surface brief) -> DESIGN.md -> Phase 4.
+Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). v3 → owner asked for iOS floating bar + AllTrails study (not copy). v4 published (copy: mocks/direction-a-v4.html). Owner said "resume the goal" (studies, not copies) and asked for a Duolingo study (research/duolingo-study.md, duolingo-research.md). Design review round 1 on v4 logged in REVIEWS.md. v5 published (Version 5; copy: mocks/direction-a-v5.html): all round-1 fixes, Duolingo lessons (pressable lip, rounded type, stat trophies, chunky progress, caught-up mark), and 6 screens incl. player, Settings, sign-in. Review round 2 logged; v5.1 published (Version 6; copy: mocks/direction-a-v5-1.html). Owner signed off with two changes, applied in v5.2 (Version 7; copy: mocks/direction-a-v5-2.html). Direction contract: .impeccable/surfaces/src-app-page-tsx.md. DESIGN.md at repo root (+ .impeccable/design.json), with build rulings. NEXT: Phase 4 — write ENGINEERING.md target architecture, then Plan-agent review.
 Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-libraries.md
 (deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
 PRODUCT.md written (repo root).
@@ -18,7 +18,7 @@ PRODUCT.md written (repo root).
 - [x] Phase 1: peripheral feature brainstorm
 - [x] Phase 1: owner questions answered, scope frozen (DECISIONS 2026-11-25) — GATE MET
 - [x] Phase 2: UX.md v3.2, 3 review rounds, owner signed off — GATE MET
-- [ ] Phase 3: DESIGN.md + mocks + ≥2 review rounds + owner OK
+- [x] Phase 3: DESIGN.md (root) + mocks v5.2 + 2 review rounds + owner OK — GATE MET
 - [ ] Phase 4: ENGINEERING.md target + Plan review
 - [ ] Phase 5: slices 1–9
 - [ ] Phase 6: manual testing pass (phone + desktop)

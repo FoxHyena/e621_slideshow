@@ -1,0 +1,605 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T01:55:14+00:00",
+  "title": "Design System: e621 Slideshow",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Hexagon Ground",
+        "canonical": "oklch(16.9% 0.047 255.3)",
+        "tonalRamp": [
+          "#040B16",
+          "#1A2635",
+          "#344356",
+          "#51637A",
+          "#71849D",
+          "#95A7BD",
+          "#BCCBDF",
+          "#E3F0FF"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Post Panel Navy",
+        "canonical": "oklch(30.7% 0.077 258.4)",
+        "tonalRamp": [
+          "#020B1D",
+          "#14253F",
+          "#2D4263",
+          "#47628A",
+          "#6784AE",
+          "#8DA7CD",
+          "#B4CBEC",
+          "#DDF0FF"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised Navy",
+        "canonical": "oklch(35.7% 0.083 258.2)",
+        "tonalRamp": [
+          "#010A1E",
+          "#132540",
+          "#2B4265",
+          "#45628D",
+          "#6584B1",
+          "#8BA7D0",
+          "#B3CBEF",
+          "#DCF0FF"
+        ]
+      },
+      "raised-hi": {
+        "role": "neutral",
+        "displayName": "Raised Highlight",
+        "canonical": "oklch(41.3% 0.091 258.1)",
+        "tonalRamp": [
+          "#010A20",
+          "#102543",
+          "#284269",
+          "#426291",
+          "#6284B6",
+          "#88A7D4",
+          "#B0CBF3",
+          "#DAF0FF"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "link": {
+        "role": "neutral",
+        "displayName": "Link Blue",
+        "canonical": "oklch(82.1% 0.033 246.8)",
+        "tonalRamp": [
+          "#050C13",
+          "#1C2630",
+          "#374450",
+          "#536372",
+          "#748594",
+          "#98A7B5",
+          "#BECBD7",
+          "#E5F0FB"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "oklch(74.4% 0.032 258.9)",
+        "tonalRamp": [
+          "#070B13",
+          "#1F2530",
+          "#3A4350",
+          "#576273",
+          "#788395",
+          "#9BA6B6",
+          "#C1CAD8",
+          "#E7EFFB"
+        ]
+      },
+      "gold": {
+        "role": "primary",
+        "displayName": "Hexagon Gold",
+        "canonical": "oklch(83.0% 0.145 92.7)",
+        "tonalRamp": [
+          "#170700",
+          "#362100",
+          "#583E00",
+          "#7C5D00",
+          "#9F7F00",
+          "#BFA344",
+          "#E0C87B",
+          "#FFEEAF"
+        ]
+      },
+      "on-gold": {
+        "role": "primary",
+        "displayName": "Ink on Gold",
+        "canonical": "oklch(16.9% 0.047 255.3)",
+        "tonalRamp": [
+          "#040B16",
+          "#1A2635",
+          "#344356",
+          "#51637A",
+          "#71849D",
+          "#95A7BD",
+          "#BCCBDF",
+          "#E3F0FF"
+        ]
+      },
+      "lip-gold": {
+        "role": "primary",
+        "displayName": "Gold Lip",
+        "canonical": "oklch(63.7% 0.121 89.7)",
+        "tonalRamp": [
+          "#160800",
+          "#352100",
+          "#563E00",
+          "#7A5D00",
+          "#9D7E20",
+          "#BDA259",
+          "#DEC78A",
+          "#FFEDBB"
+        ]
+      },
+      "lip-navy": {
+        "role": "neutral",
+        "displayName": "Lip Navy",
+        "canonical": "oklch(24.2% 0.065 259.0)",
+        "tonalRamp": [
+          "#030B1A",
+          "#18253B",
+          "#31435E",
+          "#4C6284",
+          "#6C84A7",
+          "#91A6C7",
+          "#B8CAE7",
+          "#E0F0FF"
+        ]
+      },
+      "glass-base": {
+        "role": "neutral",
+        "displayName": "Glass Base",
+        "canonical": "oklch(24.2% 0.065 259.0)",
+        "tonalRamp": [
+          "#030B1A",
+          "#18253B",
+          "#31435E",
+          "#4C6284",
+          "#6C84A7",
+          "#91A6C7",
+          "#B8CAE7",
+          "#E0F0FF"
+        ]
+      },
+      "player-ground": {
+        "role": "neutral",
+        "displayName": "Player Black",
+        "canonical": "oklch(0.0% 0.000 0.0)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "tag-artist": {
+        "role": "tertiary",
+        "displayName": "Tag: Artist",
+        "canonical": "oklch(79.1% 0.163 79.0)",
+        "tonalRamp": [
+          "#1E0200",
+          "#401900",
+          "#663400",
+          "#8E5200",
+          "#B27400",
+          "#D19A32",
+          "#F1C171",
+          "#FFE8A8"
+        ]
+      },
+      "tag-character": {
+        "role": "tertiary",
+        "displayName": "Tag: Character",
+        "canonical": "oklch(72.4% 0.246 142.5)",
+        "tonalRamp": [
+          "#001500",
+          "#003500",
+          "#005800",
+          "#007D00",
+          "#00A100",
+          "#48C342",
+          "#82E57B",
+          "#B7FFB0"
+        ]
+      },
+      "tag-species": {
+        "role": "tertiary",
+        "displayName": "Tag: Species",
+        "canonical": "oklch(75.7% 0.128 43.8)",
+        "tonalRamp": [
+          "#210000",
+          "#451100",
+          "#6D2B08",
+          "#974620",
+          "#BD6843",
+          "#DC8F6F",
+          "#FBB79B",
+          "#FFE0C8"
+        ]
+      },
+      "tag-general": {
+        "role": "tertiary",
+        "displayName": "Tag: General",
+        "canonical": "oklch(82.1% 0.033 246.8)",
+        "tonalRamp": [
+          "#050C13",
+          "#1C2630",
+          "#374450",
+          "#536372",
+          "#748594",
+          "#98A7B5",
+          "#BECBD7",
+          "#E5F0FB"
+        ]
+      },
+      "tag-meta": {
+        "role": "tertiary",
+        "displayName": "Tag: Meta",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "score": {
+        "role": "secondary",
+        "displayName": "Score Green",
+        "canonical": "oklch(72.8% 0.153 146.3)",
+        "tonalRamp": [
+          "#001300",
+          "#003100",
+          "#005210",
+          "#0E7528",
+          "#3D984A",
+          "#6EBA75",
+          "#9CDCA0",
+          "#CAFFCD"
+        ]
+      },
+      "heart": {
+        "role": "secondary",
+        "displayName": "Favourite Pink",
+        "canonical": "oklch(76.4% 0.142 15.1)",
+        "tonalRamp": [
+          "#230002",
+          "#490515",
+          "#72202E",
+          "#9E3A48",
+          "#C55D68",
+          "#E4868E",
+          "#FFAFB5",
+          "#FFD9DD"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Danger Rose",
+        "canonical": "oklch(75.6% 0.109 19.9)",
+        "tonalRamp": [
+          "#1F0002",
+          "#431215",
+          "#692B2E",
+          "#924749",
+          "#B86869",
+          "#D78F8E",
+          "#F7B6B5",
+          "#FFDFDE"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(180,199,217,.14)"
+      },
+      "glass": {
+        "role": "neutral",
+        "displayName": "Chrome Glass",
+        "canonical": "rgba(21,47,86,.88) over #0B1F3E, blur(24px) saturate(1.6)"
+      },
+      "glass-over-art": {
+        "role": "neutral",
+        "displayName": "Over-art Glass",
+        "canonical": "rgba(2,15,35,.55), blur(16px), inset ring rgba(255,255,255,.16)"
+      }
+    },
+    "typographyMeta": {
+      "large-title": {
+        "displayName": "Large title",
+        "purpose": "Screen name; artist name on the artist page."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Section headers, sheet titles, landing headline."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Names, button labels, stat numbers."
+      },
+      "callout": {
+        "displayName": "Callout",
+        "purpose": "Settings row labels, See all, Sign out, bold subtitle counts."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Subtitles, steps, inputs."
+      },
+      "footnote": {
+        "displayName": "Footnote",
+        "purpose": "Times, ids, tags, row subtitles."
+      },
+      "footnote-rounded": {
+        "displayName": "Footnote rounded",
+        "purpose": "Counts, chips, pills, labels; tabular figures."
+      },
+      "tab": {
+        "displayName": "Tab",
+        "purpose": "Tab bar labels and badges only."
+      },
+      "handle": {
+        "displayName": "Handle",
+        "purpose": "Artist handle under the hero name, in link blue."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hairline",
+        "value": "inset 0 0 0 1px rgba(180,199,217,.14)",
+        "purpose": "Outline on panels, chips, toolbar circles, inputs."
+      },
+      {
+        "name": "lip",
+        "value": "0 3px 0 var(--lip-c)",
+        "purpose": "Pressable edge on 44+ controls; --lip-c is #A8871F under gold, #0B1F3E under navy."
+      },
+      {
+        "name": "lip-s",
+        "value": "0 2px 0 var(--lip-c)",
+        "purpose": "Pressable edge on 32 controls (fav pill, Follow, compact gold)."
+      },
+      {
+        "name": "floating-bar",
+        "value": "inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.10), 0 10px 30px rgba(0,0,0,.45)",
+        "purpose": "Tab bar only."
+      },
+      {
+        "name": "sheet-top",
+        "value": "inset 0 1px 0 rgba(255,255,255,.08)",
+        "purpose": "Top edge of sheets, over a rgba(0,0,0,.55) dim."
+      },
+      {
+        "name": "selected-ring",
+        "value": "inset 0 0 0 1.5px #E8C446",
+        "purpose": "Selected filter chip."
+      },
+      {
+        "name": "glass-over-art-ring",
+        "value": "inset 0 0 0 1px rgba(255,255,255,.16)",
+        "purpose": "Player buttons and count pill."
+      }
+    ],
+    "motion": [
+      {
+        "name": "lip-press",
+        "value": "100ms ease-out",
+        "purpose": "translateY(lip) and lip to 0 on :active. Mock."
+      },
+      {
+        "name": "pop",
+        "value": "300ms cubic-bezier(.2,.9,.3,1.4)",
+        "purpose": "Favourite heart scale .8 → 1.25 → 1. The only overshoot. Mock."
+      },
+      {
+        "name": "wiggle",
+        "value": "360ms ease-out",
+        "purpose": "Follow toggle: rotate -3deg → 2deg → 0. Mock."
+      },
+      {
+        "name": "fab-hide",
+        "value": "200ms ease-out; returns after 1000ms idle",
+        "purpose": "Play button opacity and translateY(24px) while scrolling down. Mock."
+      },
+      {
+        "name": "tab-switch",
+        "value": "120ms fade",
+        "purpose": "Spec (not in mock), UX.md §7."
+      },
+      {
+        "name": "push-back",
+        "value": "150ms cross-fade + 8px rise",
+        "purpose": "Spec (not in mock); gesture back never animates."
+      },
+      {
+        "name": "player-open",
+        "value": "200ms fade-up",
+        "purpose": "Spec (not in mock)."
+      },
+      {
+        "name": "player-controls-autohide",
+        "value": "2500ms",
+        "purpose": "Spec (not in mock); stays while paused or focused."
+      },
+      {
+        "name": "sheet",
+        "value": "spring; rubber-band drag to dismiss",
+        "purpose": "Spec (not in mock)."
+      },
+      {
+        "name": "toast",
+        "value": "6000ms",
+        "purpose": "Spec (not in mock); pauses on hover/focus."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "fades only",
+        "purpose": "No pop, wiggle, bounce, particles or slides; lip moves without transition; no video autoplay; player Classic."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "375px reference"
+      },
+      {
+        "name": "desktop",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Gold Button",
+      "kind": "button",
+      "refersTo": "button-gold",
+      "description": "The one main action per screen (Play all, Review, Sign in). 3 px gold lip sinks in 100 ms.",
+      "html": "<button class=\"ds-btn ds-btn-gold ds-lip\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg>Play all</button>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border:0;border-radius:999px;font:700 17px/22px var(--f-r);cursor:pointer}.ds-btn-gold{background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold)}.ds-btn-gold:hover{filter:brightness(1.05)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Tonal Button",
+      "kind": "button",
+      "refersTo": "button-tonal",
+      "description": "Secondary actions on navy, with a navy lip; green glyph when it means done.",
+      "html": "<button class=\"ds-btn ds-btn-tonal ds-lip\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-btn{height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border:0;border-radius:999px;font:700 17px/22px var(--f-r);cursor:pointer}.ds-btn-tonal{background:var(--raised);color:var(--fg)}.ds-btn-tonal svg{color:var(--score)}.ds-btn-tonal:hover{background:#244572} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Post Panel",
+      "kind": "card",
+      "refersTo": "post-panel",
+      "description": "Signature: e621 navy post box, artist line on top, picture inset 8, fav pill, score, id and tags below. Nothing on the art.",
+      "html": "<article class=\"ds-post\"><div class=\"ds-l1\"><span class=\"ds-av\"></span><b>inkwell_fox</b><span class=\"ds-t\"><span class=\"ds-new\">New</span> · 2h ago</span></div><div class=\"ds-media\"></div><div class=\"ds-l2\"><button class=\"ds-fav ds-lip-s\" aria-pressed=\"false\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>1.2k</button><span class=\"ds-score\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg>340</span><span class=\"ds-id\">#4512345</span></div><div class=\"ds-tags\"><button class=\"ds-tag\" style=\"color:#00C900\">ember_(inkwell)</button><button class=\"ds-tag\" style=\"color:#F3946B\">red_fox</button><button class=\"ds-tag\" style=\"color:#B4C7D9\">smile</button><button class=\"ds-tag ds-plus\">+14</button></div></article>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-post{width:343px;padding:8px 8px 12px;border-radius:16px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--hair);color:var(--fg);font:400 15px/20px var(--f)}.ds-l1{height:44px;display:flex;align-items:center;gap:8px;padding:0 8px;margin:-4px 0 4px}.ds-l1 b{font:700 17px/22px var(--f-r)}.ds-t{font:400 13px/18px var(--f);color:var(--muted)}.ds-new{color:var(--gold);font-weight:600}.ds-av{width:24px;height:24px;border-radius:999px;background:repeating-conic-gradient(from 40deg,#3A1F2B 0 22.5deg,#F0B37E 0 45deg,#E8743B 0 67.5deg,#F0B37E 0 90deg)}.ds-media{aspect-ratio:1;border-radius:8px;background:linear-gradient(150deg,#3A1F2B,#6E3B5C)}.ds-l2{height:32px;display:flex;align-items:center;gap:12px;margin:12px 8px 0;font:700 13px/18px var(--f-r);font-variant-numeric:tabular-nums}.ds-fav{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;padding:0 12px 0 8px;background:var(--raised);color:var(--fg);box-shadow:inset 0 0 0 1px var(--hair)}.ds-fav svg{color:var(--heart)}.ds-fav[aria-pressed=true]{background:rgba(255,138,149,.16)}.ds-fav[aria-pressed=true] svg{fill:currentColor}.ds-score{display:inline-flex;align-items:center;gap:4px;color:var(--score)}.ds-id{margin-left:auto;color:var(--muted);font:400 13px/18px var(--f)}.ds-tags{display:flex;gap:8px;margin:12px 8px 0;overflow:hidden}.ds-tag{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;font:400 13px/18px var(--f);background:var(--raised)}.ds-plus{background:transparent;color:var(--muted);box-shadow:inset 0 0 0 1px var(--hair);font:700 13px/18px var(--f-r)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "32 tall (44 hit), no lip. Selected = raised highlight with a 1.5 px gold ring and gold chevron.",
+      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-chip\" aria-pressed=\"false\">Media<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button><button class=\"ds-chip\" aria-pressed=\"true\">Sort: Top<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button></div>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-chip{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;background:var(--panel);color:var(--fg);box-shadow:inset 0 0 0 1px var(--hair)}.ds-chip svg{color:var(--muted)}.ds-chip:hover{background:#1A3762}.ds-chip[aria-pressed=true]{background:var(--raised-hi);box-shadow:inset 0 0 0 1.5px var(--gold)}.ds-chip[aria-pressed=true] svg{color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Follow Pill",
+      "kind": "chip",
+      "refersTo": "follow-pill",
+      "description": "Raised navy with gold plus and a 2 px lip; Following = outline with green check. Toggling wiggles 360 ms.",
+      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-follow ds-lip-s\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Follow</button><button class=\"ds-follow ds-on\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6 9 17l-5-5\"/></svg>Following</button></div>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-follow{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:999px;font:700 13px/18px var(--f-r);border:0;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer;background:var(--raised);color:var(--fg)}.ds-follow svg{color:var(--gold)}.ds-follow.ds-on{background:transparent;box-shadow:inset 0 0 0 1px var(--hair)}.ds-follow.ds-on svg{color:var(--score)}.ds-wig{animation:ds-wig .36s ease-out}@keyframes ds-wig{25%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}100%{transform:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Play Button",
+      "kind": "button",
+      "refersTo": "play-fab",
+      "description": "56 gold circle bottom right with a count badge; the floating main action.",
+      "html": "<button class=\"ds-fab ds-lip\" aria-label=\"Play 12 new posts\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg><span class=\"ds-n\" aria-hidden=\"true\">12</span></button>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-lip{box-shadow:0 3px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(3px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-lip-s{box-shadow:0 2px 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip-s:active{transform:translateY(2px);box-shadow:0 0 0 var(--lip-c,var(--lip-navy))}.ds-fab{position:relative;width:56px;height:56px;border-radius:999px;border:0;display:grid;place-items:center;background:var(--gold);color:var(--on-gold);--lip-c:var(--lip-gold);cursor:pointer}.ds-fab svg{margin-left:3px}.ds-n{position:absolute;top:-4px;right:-4px;height:20px;min-width:20px;padding:0 6px;border-radius:999px;background:var(--ground);color:var(--fg);font:700 11px/20px var(--f-r);font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Floating chrome-glass capsule; current tab in its own capsule in gold.",
+      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab ds-on\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"/><path d=\"M4 4a16 16 0 0 1 16 16\"/><circle cx=\"5\" cy=\"19\" r=\"1\"/></svg>Following</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3l2 7 7 2-7 2-2 7-2-7-7-2 7-2z\"/></svg>For You</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/></svg>Artists</a><a class=\"ds-tab\" href=\"#\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><circle cx=\"12\" cy=\"12\" r=\"9\"/></svg>Settings</a></nav>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-tabbar{width:343px;height:62px;border-radius:999px;display:grid;grid-template-columns:repeat(4,1fr);padding:4px;background-color:#0B1F3E;background-image:linear-gradient(rgba(21,47,86,.88),rgba(21,47,86,.88));-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 1px 0 rgba(255,255,255,.10),0 10px 30px rgba(0,0,0,.45)}.ds-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:999px;color:var(--link);font:700 11px/13px var(--f-r);text-decoration:none}.ds-tab:hover{color:var(--fg)}.ds-tab.ds-on{background:rgba(255,255,255,.10);color:var(--gold)} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-lip-s{transition:none}.ds-pop svg,.ds-wig{animation:none}}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "44 field on the ground colour inside a sheet, 12 radius, hairline; label in rounded footnote.",
+      "html": "<label class=\"ds-field\"><span>Username</span><input class=\"ds-input\" value=\"wolfie\"></label>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-field{display:flex;flex-direction:column;gap:4px;width:311px;padding:16px;background:var(--panel);border-radius:24px}.ds-field span{font:700 13px/18px var(--f-r);color:var(--muted)}.ds-input{height:44px;border:0;border-radius:12px;background:var(--ground);box-shadow:inset 0 0 0 1px var(--hair);padding:0 12px;color:var(--fg);font:400 15px/20px var(--f)}.ds-input:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--gold)}"
+    },
+    {
+      "name": "Settings Row",
+      "kind": "custom",
+      "refersTo": "settings-row",
+      "description": "iOS-style grouped row: navy tile, rounded label, muted subtitle and value, chevron.",
+      "html": "<div class=\"ds-group\"><div class=\"ds-row\"><span class=\"ds-tile\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg></span><span class=\"ds-lbl\"><b>Slideshow</b><small>Style, timing, videos</small></span><span class=\"ds-val\">6 s</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 18 6-6-6-6\"/></svg></div></div>",
+      "css": ":host{--ground:#020F23;--panel:#152F56;--raised:#1F3C67;--raised-hi:#2A4B7C;--hair:rgba(180,199,217,.14);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0B1F3E;--score:#5EC06A;--heart:#FF8A95;--f-r:ui-rounded,'SF Pro Rounded',Nunito,system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif} .ds-group{width:343px;border-radius:16px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--hair);overflow:hidden;color:var(--fg)}.ds-row{min-height:52px;display:flex;align-items:center;gap:12px;padding:0 12px 0 16px}.ds-row:hover{background:rgba(255,255,255,.03)}.ds-tile{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--link);background:var(--raised)}.ds-lbl{flex:1;display:flex;flex-direction:column}.ds-lbl b{font:700 15px/20px var(--f-r)}.ds-lbl small,.ds-val{font:400 13px/18px var(--f);color:var(--muted)}.ds-row>svg{color:var(--muted)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The e621 Reading Room",
+    "overview": "**Creative North Star: \"The e621 Reading Room\"**\n\nA calm, dark room built from e621's own Hexagon navies, where the art is the only bright thing. Each post sits in a navy e621 panel, like e621's post boxes: the artist line on top, the picture inset by 8, then favourite, score and tags underneath. Structure is iOS (large titles, round 44 toolbar buttons, a floating glass capsule tab bar, grouped settings, bottom sheets). The playful touch is small and physical: pressable things have a solid darker edge that sinks when tapped, titles and numbers speak in a rounded face, and a short celebration marks \"You're caught up\".\n\nDensity is phone-first and one-handed: a 16 edge, a closed size system (6 spacing steps, 4 control heights, 4 avatar sizes, 3 icon sizes, 4 radii), and the main action in thumb reach at the bottom right. Dark by default for dark rooms; there is no light theme.\n\nThe art is never tinted, framed by gradients or covered. The only things that may sit on top of a picture are the video play glyph and the mute button; the player adds its own controls, which auto-hide.",
+    "keyCharacteristics": [
+      "e621 navies as the neutral; one gold, used sparingly.",
+      "Navy panels around art, never overlays on it.",
+      "Rounded face for voice, system face for reading.",
+      "A 2 to 3 px same-hue lip on pressables, sinking in 100 ms.",
+      "Colour carries meaning: gold = act / new / here, green = score, pink = favourite, e621 tag category colours on tags.",
+      "Kaleidoscope avatars (e621 has no artist pictures) and a kaleidoscope app mark."
+    ],
+    "rules": [
+      {
+        "name": "The One Gold Rule",
+        "body": "Gold fills one thing per screen: its main action. Everywhere else gold is a label, a dot, a ring or a glyph that says \"new\" or \"you are here\". A second gold fill on a screen is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The Art Is the Light Rule",
+        "body": "Nothing on the interface is brighter or more saturated than the art. Navy is the neutral; meaning colours appear only as small icons, numbers and tag text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Rounded for what the app says (names, numbers, actions); system for what you read. Nothing in between, and no sizes outside the table.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lip Is a Promise Rule",
+        "body": "A lip means \"press me\". It goes on gold and tonal buttons, Follow, the fav pill and both Play buttons. Never on panels, tags, chips, toolbar circles, or anything that sits over art.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep every value on the closed size system: spacing 4/8/12/16/24/32, controls 44/32/52/56/62, avatars 24/36/44/80, icons 24/20/16, radii 8/12/16/24/capsule.",
+      "**Do** fill gold once per screen, for the main action; use gold otherwise only for \"New\", the current tab, a selected chip's ring and the Follow plus.",
+      "**Do** put posts in navy panels with the artist line on top, the picture inset 8, and stats and tags below.",
+      "**Do** give compact controls a 44 hit area and every number tabular figures.",
+      "**Do** lift any new small-text colour to 4.5:1 on the surface it sits on, keeping its e621 hue.",
+      "**Do** self-host Nunito in the build."
+    ],
+    "donts": [
+      "**Don't** put anything on top of the art except the video play glyph and mute (and the player's own auto-hiding controls). No Instagram-style hearts, names or gradients over pictures.",
+      "**Don't** tint or frame art with colour washes; navy panels may surround it, never cover it.",
+      "**Don't** put a lip on panels, tags, chips, toolbar circles or anything over art, and never use blurred drop shadows on controls.",
+      "**Don't** use a second accent colour, or meaning colours as fills.",
+      "**Don't** use muted text on Raised Highlight (3.9:1).",
+      "**Don't** borrow Duolingo's owl, green, streaks, gems or guilt nudges, or AllTrails' green, logo or buttons on photos."
+    ]
+  }
+}

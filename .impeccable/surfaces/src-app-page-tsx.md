@@ -19,6 +19,6 @@ STORY: Open Following and see "12 new since your last visit". Catch up quickly, 
 
 FIRST VIEWPORT: 34 large title "Following", then a muted line "12 new since your last visit", 44 round toolbar buttons at the top right, and chips at 32. Then the first navy post panel at a 16 edge: the artist line (24 avatar, 17 name, gold "New" · time, ⋯), the picture inset 8, then the ♥ pill, ↑ score and #id, then the tag row. A 56 gold round ▶ with a count badge sits at the bottom right, 12 above the 62 glass tab bar.
 
-FORM: e621 colours refined (direction A, position 1 on my ordered list; the assigned "plush hang tag" was shown and not chosen); seed:03339dd96a2c6b22. Signature interaction: the lip press (100 ms sink) plus the favourite pop. Motion grammar: 100–200 ms ease-out, no bounce except the heart pop, and everything off under reduced motion.
+FORM: e621 colours refined (direction A, position 1 on my ordered list; the assigned "plush hang tag" was shown and not chosen); seed:03339dd96a2c6b22. Signature interaction: the lip press (100 ms sink) plus the favourite pop. Motion grammar: 100–200 ms ease-out, no bounce. Named exceptions: the heart pop, the follow wiggle and the tab icon bounce. Everything is off under reduced motion.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
