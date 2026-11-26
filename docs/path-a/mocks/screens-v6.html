@@ -866,6 +866,11 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .goorow6 > figure { margin: 0; display: flex; flex-direction: column; gap: 8px; align-items: center; font: var(--t-foot); color: var(--muted); }
 .scrop6 { position: relative; width: 248px; height: 232px; overflow: hidden; border-radius: 16px; background: var(--ground); flex: none; }
 .scrop6.bot .side6 { top: auto; height: 784px; }
+.demo6 { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.demo6 button { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--fg); font: 600 14px var(--f-page); cursor: pointer; }
+.film6 { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; justify-content: center; }
+.film6 > figure { margin: 0; display: flex; flex-direction: column; gap: 6px; font: var(--t-foot); color: var(--muted); text-align: center; width: 343px; max-width: 100%; }
+.film6 .group6 { margin: 0; text-align: left; }
 /* The pool on a phone: it rises inside the "Tab bar goo" row's card in Settings (picked by the owner: "jar row"). */
 .jar6 { position: relative; }
 .mp6 { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
@@ -1315,6 +1320,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <h2 class="pg-h2">Where the goo lives on a computer</h2>
     <p class="pg-p dimtxt"><span class="prop6">Picked by you: Pool</span>On a phone a drop falls from the heart onto the tab bar and the goo builds up along its top edge. On a computer the tab bar is a sidebar at the left, so the goo collects in its foot. The windows above show it at 40 favorites. The other two options (along the top edge, and no goo) are gone.</p>
     <div class="under" id="u-dgoo" style="margin-top:24px"></div>
+    <p class="pg-p dimtxt" style="margin-top:24px"><span class="prop6">Picked by you: Fall</span>The drop on a computer. Press a heart in the first window above ("1. Following") to see it. The drop falls straight down from the heart, as on the phone, and leaves by the bottom of the window; 140 ms later a swell comes up at the right end of the pool and the level rises. The other option, a lob into the sidebar, is gone. The pool rises and drains as the phone's jar row does (approved by you).</p>
     <div class="cols" style="margin-top:48px" id="u-desk-cols"><section class="col" style="width:375px"><div class="under" id="u-desk"></div></section></div>
     <h2 class="pg-h2">What I decided in this pass</h2>
     <div class="tbl"><table>
@@ -1494,7 +1500,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <div class="col-head"><h2 class="pg-h3">Settings</h2><p>Groups are panels with rows. The goo row now sits in a group like any other row with an action.</p></div>
       <p class="pg-p dimtxt" style="margin:0 0 16px"><span class="prop6">Picked by you: Jar row</span>The pool comes to the phone: the "Tab bar goo" row fills up as you favorite, and "Wipe clean" drains it. Favorite a post in any phone here and watch the row.</p>
       <div class="phone-holder" id="s-settings"></div>
+      <div class="demo6" role="group" aria-label="Try the jar"><button type="button" data-goo-act="1">+1 favorite</button><button type="button" data-goo-act="12">+12 favorites</button><button type="button" data-goo-act="wipe">Wipe clean</button></div>
       <div class="under" id="u-mpool"></div>
+      <div class="under" id="u-pmove"></div>
     </section>
     <section class="col" aria-label="Slideshow settings">
       <div class="col-head"><h2 class="pg-h3">Settings › Slideshow</h2><p>The controls a sub-page needs: style previews, a stepper, a small segmented control, switches and value rows.</p></div>
@@ -1597,8 +1605,6 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // The app mark: the same generator held to e621's gold, cream and link blue, 8-fold
   const MARK = { ...AV, symmetryWeights: { 8: 1 }, mirrorChance: 1, layers: [3, 3], themeColors: ['linkActive', 'artistAlt', 'code', 'link', 'linkHover'], themePull: 1 };
   const f3 = n => Math.round(n * 1e3) / 1e3;
-  // Copy under goo is cut to the goo's own shape: the same shapes, used as a mask.
-  const gooMaskVal = (shapes, W, H) => `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${shapes}</svg>`)}') 0 0 / 100% 100% no-repeat`;
   const rpoly = (pts, c) => pts.map((q, i) => { const n = pts.length, p0 = pts[(i + n - 1) % n], p1 = pts[(i + 1) % n], v0 = [p0[0] - q[0], p0[1] - q[1]], v1 = [p1[0] - q[0], p1[1] - q[1]], l0 = Math.hypot(...v0), l1 = Math.hypot(...v1),
     t = c / Math.tan(Math.acos((v0[0] * v1[0] + v0[1] * v1[1]) / (l0 * l1)) / 2); return `${i ? 'L' : 'M'}${f3(q[0] + v0[0] / l0 * t)} ${f3(q[1] + v0[1] / l0 * t)}A${f3(c)} ${f3(c)} 0 0 1 ${f3(q[0] + v1[0] / l1 * t)} ${f3(q[1] + v1[1] / l1 * t)}`; }).join('') + 'Z';
   const ring = (n, r, a0) => Array.from({ length: n }, (_, i) => [r * Math.cos((a0 + i * 360 / n) * Math.PI / 180), r * Math.sin((a0 + i * 360 / n) * Math.PI / 180)]);
@@ -1878,9 +1884,16 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const srow = (i, t, s, val = '', cls = '') => `<button class="srow6" type="button"><span class="ico ${cls}">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span>${val ? `<span class="val">${val}</span>` : ''}${chev()}</button>`;
   // The pool on a phone lives in the "Tab bar goo" row. n = a fixed amount for a board specimen; without it the drawing follows the live count.
   const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Tab bar goo</b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
-  const setGoo = n => `<div class="group6 jar6">${gooRow(n)}<span class="mp6 row" data-mp ${n == null ? '' : `data-n="${n}"`}></span><div class="mpink6 row" aria-hidden="true">${gooRow(n, 'style="visibility:hidden"')}</div></div>`;
+  const setGoo = (n, fr = '') => `<div class="group6 jar6">${gooRow(n)}<span class="mp6 row" data-pool="jar" ${n == null ? '' : `data-n="${n}"`} ${fr}></span><div class="mpink6 row" aria-hidden="true">${gooRow(n, 'style="visibility:hidden"')}</div></div>`;
   $('u-mpool').innerHTML = strip('The goo row fills up', 'The row that holds "Wipe clean" is the jar. The level rises inside its card and stops just over the title: 7 tall at 5 favorites, 24 at 40, 43 at 150, of 56. The words show through in navy, cut to the goo\'s own edge. "Wipe clean" sits on top of the goo and drains it.',
     `<div class="strip p6 mpboard6">${[5, 40, 150].map(n => `<figure>${setGoo(n)}<span>${n} favorites</span></figure>`).join('')}</div>`);
+  const film = (frames, lab) => `<div class="strip p6 film6">${frames.map(([fr, cap]) => `<figure>${setGoo(40, `data-frame="${fr}"`)}<span>${cap}</span></figure>`).join('')}</div>`;
+  $('u-pmove').innerHTML = [
+    strip('It rises on the goo\'s spring', 'Approved by you. Here the row goes from 5 favorites to 40 in one step, so the move is easy to see; one favorite moves it about half a pixel. A swell comes up where the goo arrives and is gone in 340 ms; the level climbs on the same soft spring the drips sag on, goes about 1 px past, and settles in about 600 ms. Thick and slow, like the tab bar\'s goo. When you open Settings, the jar starts at the level it last showed you and rises from there after 250 ms, so you see what you added. With reduced motion it jumps.',
+      film([['rise:0', 'Before'], ['rise:120', '120 ms'], ['rise:260', '260 ms'], ['rise:700', '700 ms']])),
+    strip('Wipe clean drains it', 'Approved by you. The level sinks to nothing in 900 ms, the time the blade takes to cross the tab bar, on the blade\'s own ease. The surface leans up to 8 px toward the right end, the end the blade pushes the goo off. The navy words turn white again as the goo leaves them. With reduced motion it is gone at once.',
+      film([['drain:0', 'Pressed'], ['drain:0.35', '315 ms'], ['drain:0.5', '450 ms'], ['drain:0.7', '630 ms']])),
+  ].join('');
   $('s-settings').innerHTML = phone(`
     <div class="scroll6">
       <div class="head6"><div class="titlerow"><h3 class="title6">Settings</h3></div></div>
@@ -2510,11 +2523,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // The goo on a computer: static drawings of two places it could live, at a given number of favourites since the last wipe.
   const gooTint = n => mixHex('#FFFFFF', '#F3E6A8', 1 - Math.exp(-n / 70));
   const poolH = n => 10 + 56 * (1 - Math.exp(-n / 60));
-  const sidePool = n => { const h = poolH(n), y = 120 - h, c = gooTint(n), m = gooMaskVal,
-      sh = `<rect x="-12" y="${f3(y)}" width="256" height="${f3(h + 24)}"/><circle cx="1" cy="${f3(y + 1)}" r="6"/><circle cx="231" cy="${f3(y + 1)}" r="6"/><ellipse cx="62" cy="${f3(y + 1.5)}" rx="34" ry="4"/><ellipse cx="158" cy="${f3(y + 1)}" rx="${f3(26 + Math.min(18, n / 6))}" ry="${f3(3.5 + Math.min(4, n / 30))}"/>`;
-    return `<span class="dg6 pool"><svg viewBox="0 0 232 120" preserveAspectRatio="none" aria-hidden="true"><g filter="url(#gooD)" fill="${c}">${sh}</g></svg></span>` +
-      `<span class="dgink6" style="-webkit-mask:${m(sh, 232, 120)};mask:${m(sh, 232, 120)}" aria-hidden="true"><span class="in"><i></i><span><b>wolfie</b><small>42 follows</small></span></span></span>`; };
-  const side = (active, cls = '', n = 12, goo = 40) => `<nav class="side6 ${cls}" aria-label="Tabs">${cls.includes('rail') ? '' : sidePool(goo)}<div class="sbrand6">${mark('')}<span>Slideshow</span></div>
+  const sidePool = n => `<span class="dg6 pool" data-pool="side" ${n == null ? '' : `data-n="${n}"`}></span><span class="dgink6" aria-hidden="true"><span class="in"><i></i><span><b>wolfie</b><small>42 follows</small></span></span></span>`;
+  const side = (active, cls = '', n = 12, goo) => `<nav class="side6 ${cls}" aria-label="Tabs">${cls.includes('rail') ? '' : sidePool(goo)}<div class="sbrand6">${mark('')}<span>Slideshow</span></div>
     <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
     <button type="button" class="field6 ssearch6" aria-label="Search">${ic('search', 18, 2.2)}<span>Search</span><span class="kbd6">/</span></button>
     <button type="button" class="sacct6" aria-label="Account: wolfie">${avatar('wolfie')}<span><b>wolfie</b><small>42 follows</small></span></button></nav>`;
@@ -2805,15 +2815,53 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const gooLive = () => [...document.querySelectorAll('nav.tabbar6[data-goo="live"], nav.tabbar6[data-goo="own"]')];
   const gooTick = (now) => { let live = false; gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st) return; if (gooStep(nav, st, now)) live = true; gooDraw(nav, st); }); gooRaf = live ? requestAnimationFrame(gooTick) : 0; };
   const gooKick = () => { if (!gooRaf) gooRaf = requestAnimationFrame(gooTick); };
-  // The pool in the "Tab bar goo" row, drawn at the live count (or at a specimen's own data-n).
+  // The pools: the "Tab bar goo" row on a phone (jar) and the foot of the sidebar on a computer (side).
+  // A pool with data-n is a still specimen; without it, it follows the live count and moves.
   const jarLv = n => 4 + 42 * (1 - Math.exp(-n / 60));
-  const poolDraw = () => document.querySelectorAll('[data-mp]').forEach(el => {
-    const n = el.dataset.n != null ? +el.dataset.n : gooCount, c = gooTint(n), H = 56, h = n > 0 ? jarLv(n) : 0, y = H - h, ink = el.nextElementSibling,
-      sh = `<rect x="-12" y="${f3(y)}" width="367" height="${f3(h + 24)}"/><circle cx="1" cy="${f3(y + 1)}" r="5"/><circle cx="342" cy="${f3(y + 1)}" r="5"/><ellipse cx="96" cy="${f3(y + 1.5)}" rx="44" ry="3.5"/><ellipse cx="236" cy="${f3(y + 1)}" rx="${f3(36 + Math.min(20, n / 6))}" ry="${f3(3 + Math.min(3.5, n / 30))}"/>`;
-    el.innerHTML = n > 0 ? `<svg viewBox="0 0 343 ${H}" preserveAspectRatio="none" aria-hidden="true"><g filter="url(#gooD)" fill="${c}">${sh}</g></svg>` : '';
-    if (ink) { ink.style.clipPath = n > 0 ? 'none' : 'inset(100% 0 0 0)'; ink.style.webkitMask = ink.style.mask = n > 0 ? gooMaskVal(sh, 343, H) : 'none'; }
-  });
-  const gooLabels = () => { document.querySelectorAll('[data-goo-count]').forEach(el => { el.textContent = gooCount === 1 ? '1 favorite' : gooCount + ' favorites'; }); poolDraw(); };
+  const POOL = { jar: { W: 343, H: 56, lv: jarLv, r: 5, a: [96, 44, 3.5], b: [236, 36, 20, 3, 3.5], px: .3 }, side: { W: 232, H: 120, lv: poolH, r: 6, a: [62, 34, 4], b: [158, 26, 18, 3.5, 4], px: .75 } };
+  const POOL_DRAIN = 900, POOL_PLOP = 340, POOL_TILT = 8;
+  const easeIO = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(2 - 2 * p, 3) / 2;
+  let poolId = 0;
+  // h = the level, n = the count that sets colour and swell, tilt = how far the right end sits below the left, plops = [{ x, p }]
+  const poolPaint = (el, P, h, n, tilt = 0, plops = []) => {
+    const ink = el.nextElementSibling;
+    if (h < .5) { el.innerHTML = ''; if (ink) ink.style.clipPath = 'inset(100% 0 0 0)'; return; }
+    const { W, H, r, a, b } = P, y = H - h, at = x => y + tilt * (x / W - .5), id = el.dataset.pid || (el.dataset.pid = 'pc' + ++poolId),
+      sh = `<path d="M-12 ${f3(at(-12))}L${W + 12} ${f3(at(W + 12))}V${H + 24}H-12Z"/><circle cx="1" cy="${f3(at(1) + 1)}" r="${r}"/><circle cx="${W - 1}" cy="${f3(at(W - 1) + 1)}" r="${r}"/><ellipse cx="${a[0]}" cy="${f3(at(a[0]) + 1.5)}" rx="${a[1]}" ry="${a[2]}"/><ellipse cx="${b[0]}" cy="${f3(at(b[0]) + 1)}" rx="${f3(b[1] + Math.min(b[2], n / 6))}" ry="${f3(b[3] + Math.min(b[4], n / 30))}"/>` +
+        plops.map(pl => `<ellipse cx="${f3(pl.x)}" cy="${f3(at(pl.x) + 1)}" rx="${f3(12 + 16 * pl.p)}" ry="${f3(6 * Math.sin(Math.PI * pl.p))}"/>`).join('');
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="${id}" clipPathUnits="objectBoundingBox" transform="scale(${1 / W} ${1 / H})">${sh}</clipPath></defs><g filter="url(#gooD)" fill="${gooTint(n)}">${sh}</g></svg>`;
+    if (ink) ink.style.clipPath = `url(#${id})`;
+  };
+  // The level after t seconds on the goo's soft spring (the same one the drips sag on).
+  const poolSpring = (from, to, t) => { let h = from, v = 0; for (let i = 0, k = Math.round(t * 240); i < k; i++) { v += ((to - h) * 40 - v * 9) / 240; h += v / 240; } return h; };
+  const poolSt = new WeakMap(); let poolRaf = 0;
+  const poolLive = () => [...document.querySelectorAll('[data-pool]:not([data-n])')];
+  const poolStep = (el, st, now) => {
+    const P = POOL[el.dataset.pool], dt = Math.min(.05, (now - (st.last || now)) / 1000) || .016; st.last = now; let moving = false, tilt = 0;
+    st.plops = st.plops.filter(pl => now - pl.t0 < POOL_PLOP); if (st.plops.length) moving = true;
+    if (st.drain) { const p = clamp((now - st.drain.t0) / POOL_DRAIN, 0, 1); st.h = st.drain.from * (1 - easeIO(p)); tilt = POOL_TILT * Math.sin(Math.PI * p) * Math.min(1, st.drain.from / 20); st.v = 0; if (p >= 1) { st.drain = null; st.h = 0; } else moving = true; }
+    else { const e = st.tgt - st.h; st.v += (e * 40 - st.v * 9) * dt; st.h += st.v * dt; if (Math.abs(e) > .05 || Math.abs(st.v) > .5) moving = true; else { st.h = st.tgt; st.v = 0; } }
+    poolPaint(el, P, st.h, st.cn, tilt, st.plops.map(pl => ({ x: pl.x, p: (now - pl.t0) / POOL_PLOP })));
+    if (!moving) st.last = 0; return moving;
+  };
+  const poolTick = now => { let live = false; poolLive().forEach(el => { const st = poolSt.get(el); if (st && st.on && poolStep(el, st, now)) live = true; else if (st) st.on = false; }); poolRaf = live ? requestAnimationFrame(poolTick) : 0; };
+  // The count changed (or the page was drawn): aim every live pool at its level. A rise brings one plop.
+  const poolSync = () => {
+    document.querySelectorAll('[data-pool][data-n]').forEach(el => { if (el.dataset.done) return; el.dataset.done = 1; const P = POOL[el.dataset.pool], n = +el.dataset.n, f = el.dataset.frame ? el.dataset.frame.split(':') : null, to = P.lv(n);
+      if (!f) return poolPaint(el, P, to, n);
+      if (f[0] === 'drain') { const p = +f[1]; return poolPaint(el, P, to * (1 - easeIO(p)), n, POOL_TILT * Math.sin(Math.PI * p)); }
+      const t = +f[1], from = P.lv(5); poolPaint(el, P, poolSpring(from, to, t / 1000), n, 0, t > 0 && t < POOL_PLOP ? [{ x: P.W * P.px, p: t / POOL_PLOP }] : []); });
+    poolLive().forEach(el => { const P = POOL[el.dataset.pool]; let st = poolSt.get(el);
+      const tgt = gooCount > 0 ? P.lv(gooCount) : 0;
+      if (!st || calm) { st = { h: tgt, v: 0, tgt, cn: gooCount, plops: [], drain: null, on: false, last: 0 }; poolSt.set(el, st); return poolPaint(el, P, tgt, gooCount); }
+      if (st.drain) { st.tgt = tgt; return; }
+      if (tgt > st.tgt + .01) st.plops.push({ x: P.W * P.px, t0: performance.now() });
+      st.tgt = tgt; if (gooCount > 0) st.cn = gooCount; st.on = true; });
+    if (!calm && !poolRaf) poolRaf = requestAnimationFrame(poolTick);
+  };
+  // Wipe: every pool sinks to nothing in the time the blade takes to cross the bar, leaning toward the end the blade leaves by.
+  const poolDrain = () => { if (calm) return; const now = performance.now(); poolLive().forEach(el => { const st = poolSt.get(el); if (st && st.h > .5) { st.drain = { t0: now, from: st.h }; st.on = true; st.plops = []; } }); };
+  const gooLabels = () => document.querySelectorAll('[data-goo-count]').forEach(el => { el.textContent = gooCount === 1 ? '1 favorite' : gooCount + ' favorites'; });
   const gooSnap = (st) => { st.cur = { uL: st.T.uL, uR: st.T.uR, t: st.T.t, tint: st.T.tint }; st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, { l: d.len, v: 0 }])); };
   // Draw a bar's goo where it should be right now, with no animation. Called whenever a bar is drawn.
   const gooSync = (nav) => {
@@ -2829,7 +2877,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, old.get(d.id) || { l: 0, v: 0 }])); st.plops.push({ u, t0: performance.now() });
   };
   const gooSet = (landedAt) => {
-    gooLabels(); try { localStorage.setItem('feed-v6-goo', gooCount); } catch (e) {}
+    gooLabels(); poolSync(); try { localStorage.setItem('feed-v6-goo', gooCount); } catch (e) {}
     gooLive().forEach(nav => { if (nav.dataset.goo !== 'own') gooAim(nav, landedAt); });
     if (!calm) gooKick();
   };
@@ -2848,10 +2896,21 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     }, 380);
     return true;
   };
-  const gooAdd = (k, btn) => { gooCount += k; if (btn && !calm && gooFall(btn)) return gooLabels(); gooSet(); };
+  // On a computer the drop has no tab bar under it: it drops off the bottom of the window and the pool takes it in a beat later (owner-picked: "Fall").
+  const deskFall = (btn) => {
+    const win = btn.closest('.desk6'), pool = win && win.querySelector('.side6 [data-pool]'); if (!pool) return false;
+    const wr = win.getBoundingClientRect(), z = wr.width / win.offsetWidth, br = btn.getBoundingClientRect(), x = (br.left + br.width * .55 - wr.left) / z, y0 = (br.bottom - wr.top) / z + 23;
+    setTimeout(() => {
+      const el = document.createElement('span'); el.className = 'gdrop'; el.style.left = x + 'px'; el.style.top = y0 + 'px'; win.appendChild(el);
+      const dist = win.offsetHeight + 12 - y0;
+      el.animate([{ transform: 'translateY(0) scale(.8, 1)' }, { transform: `translateY(${dist}px) scale(.8, 1.5)` }], { duration: 70 + 17 * Math.sqrt(dist), easing: 'cubic-bezier(.45,0,1,.55)', fill: 'forwards' }).onfinish = () => { el.remove(); setTimeout(gooSet, 140); };
+    }, 380);
+    return true;
+  };
+  const gooAdd = (k, btn) => { gooCount += k; if (btn && !calm && (gooFall(btn) || deskFall(btn))) return gooLabels(); gooSet(); };
   // Wipe: a blade sweeps left to right along the bend. Behind it the bar is clean; in front of it the goo piles up, then flies off the end.
   const gooWipe = () => {
-    gooCount = gooOwn = 0; gooLabels(); try { localStorage.setItem('feed-v6-goo', 0); } catch (e) {}
+    poolDrain(); gooCount = gooOwn = 0; gooLabels(); poolSync(); try { localStorage.setItem('feed-v6-goo', 0); } catch (e) {}
     gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st || st.wipe) return; st.T = gooTarget(0, st.q);
       if (calm) { gooSnap(st); return gooDraw(nav, st); }
       st.wipe = { t0: performance.now(), pile: 0, ub: -1e9 }; });
@@ -3003,6 +3062,6 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // The slow-down card counts 5 to 1 and starts over (the app would retry at 0).
   if (!calm) { let n = 5; setInterval(() => { n = n > 1 ? n - 1 : 5; document.querySelectorAll('[data-count]').forEach(el => el.textContent = n); }, 1000); }
   const tagRows = () => document.querySelectorAll('.p6 .tags6').forEach(fadeTags);
-  addEventListener('resize', () => { fit(); apply(); tagRows(); }); fit(); apply(); tagRows(); gooLabels();
+  addEventListener('resize', () => { fit(); apply(); tagRows(); }); fit(); apply(); tagRows(); gooLabels(); poolSync();
 })();
 </script>
