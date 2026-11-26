@@ -648,3 +648,11 @@ Format: date — decision. Why. Rejected alternatives.
 - Still mine, not approved: where the row sits on a computer (last group, after App, a plain row).
 - Later the same day, owner, asked whether the row's place on a computer is right (the last group of
   Settings, under App, a plain row with no jar): "Approve". Nothing about the goo row is open now.
+
+## 2026-11-26 — Where the wordmark sits: approved
+
+- Owner, asked to approve where the wordmark sits, including under Goo on the landing card:
+  "Approve".
+- The three places: beside the 36 mark in the sidebar (20/25), under the 56 mark at the foot of
+  Settings (17/22), under Goo on the landing card (28/34). Nothing about the name or the wordmark is
+  open now.

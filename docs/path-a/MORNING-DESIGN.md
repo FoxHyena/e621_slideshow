@@ -127,7 +127,8 @@ treat that message as your approval of any design.
 7. ~~**Name under the icon:** "Slideshow".~~ **Named by you on 2026-11-26: "eLicks21".** It fits whole
    under an iPhone icon. **Wordmark picked by you: Two-tone** ("e" and "21" in the link blue, "Licks" in white). You ruled
    out the drop on the i: the name stays text. The app icon carries no name and does
-   not change. **Waiting for you:** the wordmark under Goo on the landing card, which is new there.
+   not change. **Approved by you ("Approve"):** where the wordmark sits: the sidebar, the foot of
+   Settings, and under Goo on the landing card.
 
 ## Batch 5: on a computer (section "On a computer (900 px and wider)")
 
