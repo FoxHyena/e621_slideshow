@@ -17,7 +17,7 @@ treat that message as your approval of any design.
    2026-11-26:** a hexagon with Play sunk into it, "Gold". Inside the app the mark is the same hexagon as an
    "Inlay" (navy, gold Play, no lip). **Approved by you:** the mark pops once at "You're all caught up".
 3. **On a computer** (batch 5): the sidebar with names, and Play as a disc beside the column. And one
-   thing only you can pick: where the goo lives on a computer. **Picked by you on 2026-11-26:** the
+   thing only you can pick: where the goo lives on a computer (**picked by you: "Pool"**, in the foot of the sidebar). **Picked by you on 2026-11-26:** the
    top bar is a floating capsule ("Capsule"), and a button with a lip rises under the pointer ("Lift").
    **Approved by you on 2026-11-26 ("Approve both"):** the rest of the hover pass and the grid loading
    skeleton. **Picked by you after that:** a row's wash is "Inset", with its corner radius matched to
@@ -128,9 +128,12 @@ treat that message as your approval of any design.
 
 ## Batch 5: on a computer (section "On a computer (900 px and wider)")
 
-1. **The goo on a computer is not designed. Your call.** The goo lies along the phone's bent bar, and
-   the sidebar is straight. My suggestion: it lies along the top edge of the sidebar panel and drips
-   down its face, and the secret tab is one more row under Settings that shows when you scroll the tabs.
+1. ~~**The goo on a computer.**~~ **Picked by you on 2026-11-26: "Pool".** The goo collects in the
+   foot of the sidebar and stops at the account row. Still open: the secret tab on a computer (my
+   suggestion: one more row under Settings that shows when you scroll the tabs), and how the wipe
+   looks on a computer.
+   **Your idea, picked by you ("jar row"):** the pool on a phone too, inside the "Tab bar goo" row in
+   Settings. Still open: how the level moves and how the jar empties when you wipe.
 2. **Sidebar:** a floating panel, 232 wide, with names; the current tab wears the tab bar's sliding
    capsule. Icons only from 900 to 1099. Other option: icons only at every width.
 3. **Play** keeps its gold disc at the bottom left of the content, beside the feed column. Other

@@ -514,3 +514,43 @@ Format: date — decision. Why. Rejected alternatives.
 - Added to the mock after the approval, so the drawing matches the spec: the caught-up mark pops the
   first time it comes into view.
 
+## 2026-11-26 — The goo on a computer: options drawn, not picked
+
+- I asked: "do you want to work on where the goo lives on a computer". Owner's word: "Yes, show
+  options".
+- Drawn in the mock behind a switch, at 5, 40 and 150 favorites: **Pool** (collects in the foot of
+  the sidebar, never passes the account row), **Top edge** (the phone's bead and drips along the
+  sidebar's top), **None** (no goo on a computer).
+- My pick is Pool: a drop falls down from the heart, so the foot of the sidebar is where it can
+  land; the top edge needs the drop to fly up. That is my view, not the owner's.
+- **Not picked.** Nothing here is approved. The secret tab on a computer is still not designed.
+
+## 2026-11-26 — The goo on a computer: Pool
+
+- I asked: "which one do you want — Pool, Top edge, or None?" Owner's word: "Pool".
+- **Picked:** the goo collects in the foot of the sidebar. Level 10 + 56(1 − e^(−n/60)) px, so it
+  stops at the account row; the name shows through in Goo Ink where covered; no goo with the
+  icon-only sidebar. The switch and the other two drawings are removed from the mock.
+- Mine, not seen moving by the owner and not approved: the drop arcing from the heart into the
+  sidebar's foot (described, not drawn). Not designed: the wipe on a computer, the row's name there,
+  the secret tab on a computer.
+
+## 2026-11-26 — The pool on a phone: options drawn, not picked
+
+- Owner, after picking Pool for the computer: "Maybe we bring the pool to mobile somewhere too? I
+  like the idea. Maybe the settings or something?"
+- Drawn in the phone's Settings behind a switch, each following the live count: **Jar row** (the
+  pool rises inside the "Tab bar goo" row's card), **Account** (inside the account card, as on a
+  computer), **Puddle** (under the app mark at the foot), and **Off**.
+- My pick is Jar row: the goo sits beside the button that wipes it. That is my view, not the owner's.
+- **Not picked.** The tab bar's own goo is unchanged in every option.
+- Fixed while drawing, on the computer's pool too: the navy copy under the goo was cut on a straight
+  line; it is now cut to the goo's wavy shape.
+
+## 2026-11-26 — The pool on a phone: Jar row
+
+- I asked: "which place do you want — Jar row, Account, Puddle, or Off?" Owner's word: "jar row".
+- **Picked:** the pool rises inside the "Tab bar goo" row's card in Settings: 4 + 42(1 − e^(−n/60))
+  px of 56. Words in Goo Ink under the goo; "Wipe clean" on top. The switch and the Account and
+  Puddle drawings are removed from the mock.
+- Not designed, not approved: the level's motion and how the jar empties during the wipe.
