@@ -1188,3 +1188,25 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   with a "+12 favorites" button. I tested the motion by script and did not watch it play.
 - Still not designed: the goo row's name and the wipe's control on a computer, and the secret tab
   on a computer.
+
+## 2026-11-26 — Sign in on the e621 row; icons centred; the pools move; the live Follow check
+
+- **Owner:** "instead of opening a menu when we're signed out we should just have a sign in button in
+  the e621 sign in row that brings in the popup". Signed out, the row is no longer a link to the
+  Account page: it carries a compact gold **Sign in** (gold: it's the one thing to do there) that opens
+  the sign-in sheet. Signed in, the row still opens Account.
+- **Owner:** "the sign in and tab bar icons look off center, we should do a pass". Measured every icon
+  against its circle, well or tab at 375 and 1280: all boxes centred except the row well's deliberate
+  0.5 drop (removed: it read as off centre). The rest was optical: four glyphs carry their weight off
+  their middle, nudged by a share of their size (`globals.css` "Optical centring"; the tab bar's Goo Ink
+  copies take the same): Sign in (log-in) −5% x, Following (rss) +4% x −4% y, Artists (users) +4% x,
+  Goo (droplets) +2% x −4% y.
+- **The pools move** (design ae6b77a, owner: "Fall", "Approve"): built as drawn in the mock's
+  `poolStep`/`poolDrain`/`deskFall`. The Goo Ink copy is now cut by a clip path of the goo's shapes
+  (user-space units), so it follows each frame. The pool reads the goo count itself; a drop in the air
+  holds it until it lands (as the tab bar does). On a computer the sidebar's pool registers as the
+  place a heart's drop goes when there is no tab bar.
+- Mine: the jar remembers its last level only within a visit (a reload starts it at rest).
+- **Live Follow check done** (owner: "Yes do follow live check"): Follow and Unfollow of nando wolf on
+  the owner's account, each confirmed by a fresh read of e621's list; the account ends as it began.
+

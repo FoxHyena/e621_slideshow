@@ -14,6 +14,7 @@ import { TitleRow } from "@/shell/TitleRow";
 import { getFollows } from "@/state/follows";
 import { getGoo, gooLabel } from "@/state/goo";
 import { Pool } from "@/components/Pool";
+import { openSignIn } from "./actions";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
@@ -47,7 +48,6 @@ function GooRow() {
       </div>
       <Pool
         kind="jar"
-        n={n}
         className="jar-pool"
         ink={
           <span className="list-row">
@@ -70,29 +70,39 @@ const SECTION_ROW: Record<Exclude<SettingsSection, "account" | "classic">, { ico
   app: { icon: Smartphone, line: "Install, data and about" },
 };
 
-/** The account in its own group: who you are, or a way to sign in. */
+/**
+ * The account in its own group: who you are (a link to the Account page), or, signed out, a row with
+ * Sign in right on it that brings up the sign-in sheet (owner, 2026-11-26: no page in between).
+ */
 function AccountRow({ open }: { open: (e: React.MouseEvent) => void }) {
   const { user, link } = useStore(getSession().store, (s) => s);
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
+  if (!user)
+    return (
+      <div className="list-group" role="group" aria-label="Account">
+        <div className="list-row" data-testid="settings-account">
+          <span className="row-well" aria-hidden>
+            <LogIn />
+          </span>
+          <span className="row-text">
+            <b>Sign in to e621</b>
+            <small>For your favorites, Following and For You</small>
+          </span>
+          <button type="button" className="btn-gold" data-size="compact" onClick={openSignIn} data-testid="settings-sign-in">
+            Sign in
+          </button>
+        </div>
+      </div>
+    );
   return (
     <ul className="list-group" aria-label="Account">
       <li>
         {/* the app's own router handles it (onClick), like every in-app link */}
-        <a href={`/settings/${"account" satisfies SettingsSection}`} className="list-row" data-account={user ? "" : undefined} onClick={open} data-testid="settings-account">
-          {user ? (
-            <Avatar seed={user.name} className="row-mark-l" />
-          ) : (
-            <span className="row-well" aria-hidden>
-              <LogIn />
-            </span>
-          )}
+        <a href={`/settings/${"account" satisfies SettingsSection}`} className="list-row" data-account="" onClick={open} data-testid="settings-account">
+          <Avatar seed={user.name} className="row-mark-l" />
           <span className="row-text">
-            <b>{user ? user.name.replaceAll("_", " ") : "Sign in to e621"}</b>
-            <small>
-              {user
-                ? `${link ? "On a shared link" : "Signed in to e621"}${follows !== null && !link ? ` · ${follows.toLocaleString("en")} follows` : ""}`
-                : "For your favorites, Following and For You"}
-            </small>
+            <b>{user.name.replaceAll("_", " ")}</b>
+            <small>{`${link ? "On a shared link" : "Signed in to e621"}${follows !== null && !link ? ` · ${follows.toLocaleString("en")} follows` : ""}`}</small>
           </span>
           <ChevronRight aria-hidden className="row-chev" />
         </a>

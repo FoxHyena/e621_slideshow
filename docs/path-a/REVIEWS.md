@@ -1012,3 +1012,19 @@ One fresh reviewer on `b42546a..70b37f7` (src, e2e, scripts). No high-severity f
 | 8 | "Pops once" could pass without the mark in view | Low | Waits for it in view first |
 | 9 | The scroll-up test's position check was weak | Low | Also checks the row isn't fixed |
 
+## The pools move; Sign in on the e621 row; icons centred; live Follow check (2026-11-26)
+
+Built from design ae6b77a (owner: "Fall", "Approve") and two owner notes. Self-review: shots of the jar
+at rest and mid-drain at 375 and the sidebar's foot at 1280 found the pool's `.pool svg` rule also
+catching icons inside the Goo Ink copy (the drops icon was pulled to the corner, since the first pool
+build); now `.pool > svg`. Measured every icon's ink against its circle at 375 and 1280 for the
+centring pass (DECISIONS).
+
+**Live Follow check:** passed against the owner's account (Follow POST 200, Unfollow DELETE 204, each
+confirmed by a fresh read of e621's list; the account ends as it began).
+
+**Gates:** typecheck, lint and unit tests (313) clean; e2e 248 passed, 3 skipped, 1 failed under full-suite
+load (the prints video test; 3 of 3 alone, player untouched); new e2e: the drop on a computer and the
+pool waiting for it, the drain over 900 ms, the jar's catch-up, reduced motion, the signed-out Sign in
+row; budgets JS cold load **199.1 KB**, CLS 0, 0 long tasks.
+

@@ -72,10 +72,18 @@ Built from the hover pass, Inset rows and grid loading you approved:
   capsule's shape fades.
 - **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
   the name in white, "artist" at the right.
+- **Signed out, Settings' e621 row has a gold Sign in on it** that brings up the sign-in sheet (your
+  note; no Account page in between).
+- **Icons centred** (your note): the row icons' 0.5 drop is gone, and four glyphs whose weight sits off
+  their middle are nudged: Sign in's arrow, Following's feed arcs, Artists' people, the Goo drops.
+- **The pools move** (you approved the design session's motion): the level rises on the goo's spring
+  with a swell where the goo lands; Wipe clean drains it in step with the blade, leaning; the jar
+  catches up when Settings opens; on a computer a heart's drop falls off the bottom of the window and
+  the sidebar's pool rises after it.
 - **The goo pools (you picked Pool and jar row).** On a computer the goo collects in the sidebar's
   foot; on a phone it rises in Settings' "Tab bar goo" card. Words under it show in Goo Ink. My
-  choice: no pool at all with 0 favorites, on a computer too. Not built yet (not designed): the drop
-  flying in, the level rising smoothly, the pool draining on Wipe clean.
+  choice: no pool at all with 0 favorites, on a computer too. Not designed yet: Wipe clean on a computer
+  (Settings there has no goo row), and its name there.
 
 Approved:
 
@@ -220,8 +228,9 @@ Approved:
 
 ## Needs you (things I held)
 
-1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested
-   against the mock only. This now covers Follow from favorites too (one POST with every picked name).
+1. ~~Live `tag_subscriptions` POST check~~ **Done 2026-11-26** (you said go ahead): followed nando wolf
+   from Artists › Suggested (POST 200; e621's list read fresh: 8 with it), then unfollowed from the
+   row's ⋯ (DELETE 204; read fresh: your 7 again). Follow from favorites uses the same POST, untried live.
 2. **The live artist-score backtest** needs your account's favorites (read-only, no writes). Put your
    username and API key in `.env.backtest` (gitignored), then run
    `node_modules/.bin/jiti scripts/rec-backtest.ts --artists`. It prints recall@10 of hidden favorites'

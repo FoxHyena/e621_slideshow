@@ -18,6 +18,9 @@ const TABS: { tab: Tab; label: string; Icon: LucideIcon }[] = [
 
 /** On a computer: the sidebar, its own chunk (a phone never loads it). */
 const Sidebar = lazy(() => import("./Sidebar"));
+
+/** The optical nudges of globals.css ("Optical centring"), in px of a 24 icon, for the Goo Ink copies. */
+const INK_NUDGE: Record<string, [number, number]> = { following: [0.96, -0.96], artists: [0.96, 0], goo: [0.48, -0.96] };
 export { RAIL_QUERY, useRail } from "./rail";
 
 /** The tube is 343 on a 375 phone: the screen less 16 each side, within reason. */
@@ -363,7 +366,7 @@ function Tube({ current, onTab, hidden }: Props) {
           <g className="goo-ink" style={{ transformOrigin: `${W / 2}px ${cy.toFixed(2)}px` }}>
             {copies.map(({ key, label, Icon }, k) => (
               <g key={key} className="goo-ink-tab" data-on={key === current || undefined} transform={rot(k)}>
-                <Icon x={W / 2 - 12} y={12.5} width={24} height={24} strokeWidth={key === current ? 2.4 : 2} />
+                <Icon x={W / 2 - 12 + (INK_NUDGE[key]?.[0] ?? 0)} y={12.5 + (INK_NUDGE[key]?.[1] ?? 0)} width={24} height={24} strokeWidth={key === current ? 2.4 : 2} />
                 <text x={W / 2} y={49} textAnchor="middle">
                   {label}
                 </text>

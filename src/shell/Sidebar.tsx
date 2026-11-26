@@ -7,8 +7,8 @@
  * 68 and icons only from 900. Its own chunk: a phone never loads it.
  *
  * The goo pools in its foot (owner-picked, "Pool"), over the account row, which shows through in Goo
- * Ink; none with icons only. Not designed yet, so not here: the drop's flight into the pool, the wipe
- * on a computer, and the secret tab.
+ * Ink; none with icons only. A heart's drop falls off the bottom of the window and the pool rises
+ * (`Pool`). Not designed yet, so not here: the wipe's control on a computer, and the secret tab.
  */
 import { CircleUser, Rss, Search, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
@@ -16,7 +16,6 @@ import Avatar, { AppMark } from "@/components/Avatar";
 import { Pool } from "@/components/Pool";
 import type { Tab } from "@/nav/routes";
 import { getFollows } from "@/state/follows";
-import { getGoo } from "@/state/goo";
 import { newOnFollowing } from "@/state/following";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
@@ -60,7 +59,6 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
   const user = useStore(getSession().store, (s) => (s.link ? null : (s.user?.name ?? null)));
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
   const followsUser = useStore(getFollows().store, (f) => f.user);
-  const goo = useStore(getGoo().store, (g) => g.count);
   const idx = Math.max(0, TABS.findIndex((t) => t.tab === current));
   // the account's follow count (one read of e621's list, shared with Artists and Settings)
   useEffect(() => {
@@ -95,7 +93,6 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
       {!narrow && (
         <Pool
           kind="side"
-          n={goo}
           className="side-pool"
           ink={
             <span className="side-account side-pool-ink">

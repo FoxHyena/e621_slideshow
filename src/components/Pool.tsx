@@ -3,78 +3,259 @@
 /**
  * A pool of goo inside its box (`src/shell/pool.ts`): the sidebar's foot on a computer, the Settings
  * goo row's card on a phone. It lies over what's under it and takes no clicks; `ink` is that content
- * drawn again in Goo Ink, cut to the goo's own shape. The level jumps to a new count (how it should
- * rise isn't designed yet).
+ * drawn again in Goo Ink, cut by a clip path made of the goo's own shapes, so the cut moves with it.
+ *
+ * How it moves (DESIGN.md "How a pool moves", owner-approved 2026-11-26): a new count rides the goo's
+ * spring with a swell where the goo arrives; Wipe clean drains it in 900 ms, leaning; on a phone the
+ * jar starts where it last showed and catches up 250 ms after Settings opens; on a computer a heart's
+ * drop falls off the bottom of the window and the pool rises 140 ms after it has left. Reduced
+ * motion: the level changes at once, no drop, swell or lean. Drawn by hand each frame (not React).
  */
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, type ReactNode } from "react";
+import { calm } from "@/feed/motion";
+import { setLivePool, type GooPool } from "@/shell/gooLive";
 import { gooColor } from "@/shell/tube";
-import { maskCss, POOL_FILTER, poolLevel, poolMask, poolShapes, type PoolKind } from "@/shell/pool";
+import {
+  easeInOut,
+  POOL_DRAIN_MS,
+  POOL_FILTER,
+  POOL_LAND,
+  POOL_PLOP_MS,
+  POOL_TILT,
+  poolLevel,
+  poolMarkup,
+  poolShapesAt,
+  poolSpring,
+  type PoolKind,
+} from "@/shell/pool";
+import { getGoo } from "@/state/goo";
 
-export function Pool({ kind, n, ink, className }: { kind: PoolKind; n: number; ink?: ReactNode; className?: string }) {
+/** The level each kind of pool last showed, so the jar can rise from there when Settings opens again. */
+const shown: Partial<Record<PoolKind, number>> = {};
+const CATCH_UP_MS = 250;
+const DROP_DELAY_MS = 380;
+const AFTER_DROP_MS = 140;
+
+export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode; className?: string }) {
   const box = useRef<HTMLSpanElement>(null);
-  const [size, setSize] = useState<[number, number] | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const gooRef = useRef<SVGGElement>(null);
+  const clipRef = useRef<SVGClipPathElement>(null);
+  const inkRef = useRef<HTMLSpanElement>(null);
   const id = `pool${useId().replace(/[^\w-]/g, "")}`;
 
   useLayoutEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    // (unrounded: the mask is stretched over the real box, so a box 0.5 off would shift the ink's edge)
+    const el = box.current!;
+    const svg = svgRef.current!;
+    const gooG = gooRef.current!;
+    const clip = clipRef.current!;
+    const inkEl = inkRef.current;
+    const goo = getGoo();
+    let W = 0;
+    let H = 0;
+    let dead = false;
+    let raf = 0;
+    let air = 0;
+    const timers = new Set<ReturnType<typeof setTimeout>>();
+    const drops = new Set<HTMLElement>();
+    const later = (fn: () => void, ms: number) => {
+      const t = setTimeout(() => {
+        timers.delete(t);
+        if (!dead) fn();
+      }, ms);
+      timers.add(t);
+    };
+
+    const count = () => goo.store.get().count;
+    const levelOf = (n: number) => (n > 0 ? poolLevel(kind, n) : 0);
+    // h: the surface now; tgt: where it's going; cn: the count that sets colour and swell size
+    const st = {
+      h: 0,
+      v: 0,
+      tgt: 0,
+      cn: count(),
+      plops: [] as { x: number; t0: number }[],
+      drain: null as { t0: number; from: number } | null,
+      last: 0,
+      tilt: 0,
+    };
+
+    const paint = (now: number) => {
+      shown[kind] = st.h;
+      el.dataset.drawn = String(Math.round(st.h));
+      if (!W || !H) return;
+      const plops = st.plops.map((p) => ({ x: p.x, p: Math.min(1, (now - p.t0) / POOL_PLOP_MS) }));
+      const shapes = poolShapesAt(kind, st.cn, W, H, st.h, st.tilt, plops);
+      if (shapes.length === 0) {
+        svg.style.display = "none";
+        if (inkEl) inkEl.style.visibility = "hidden";
+        return;
+      }
+      svg.style.display = "";
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      svg.setAttribute("width", String(W));
+      svg.setAttribute("height", String(H));
+      const markup = poolMarkup(shapes);
+      gooG.setAttribute("fill", gooColor(1 - Math.exp(-st.cn / 70)));
+      gooG.innerHTML = markup;
+      clip.innerHTML = markup;
+      if (inkEl) inkEl.style.visibility = "";
+    };
+
+    /** One frame; whether anything is still moving. */
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - (st.last || now)) / 1000) || 0.016;
+      st.last = now;
+      let moving = false;
+      st.plops = st.plops.filter((p) => now - p.t0 < POOL_PLOP_MS);
+      if (st.plops.length) moving = true;
+      st.tilt = 0;
+      if (st.drain) {
+        const p = Math.min(1, (now - st.drain.t0) / POOL_DRAIN_MS);
+        st.h = st.drain.from * (1 - easeInOut(p));
+        st.tilt = POOL_TILT * Math.sin(Math.PI * p) * Math.min(1, st.drain.from / 20);
+        st.v = 0;
+        if (p >= 1) {
+          st.drain = null;
+          st.h = 0;
+          // a favorite that came during the drain: rise to it now
+          if (st.tgt > 0.5) moving = true;
+        } else moving = true;
+      } else {
+        const e = st.tgt - st.h;
+        [st.h, st.v] = poolSpring(st.h, st.v, st.tgt, dt);
+        if (Math.abs(e) > 0.05 || Math.abs(st.v) > 0.5) moving = true;
+        else {
+          st.h = st.tgt;
+          st.v = 0;
+        }
+      }
+      if (!moving) st.last = 0;
+      return moving;
+    };
+    const tick = (now: number) => {
+      const more = step(now);
+      paint(now);
+      raf = more ? requestAnimationFrame(tick) : 0;
+    };
+    const kick = () => {
+      if (!raf && !dead) raf = requestAnimationFrame(tick);
+    };
+
+    /** Aim at the count's level; a rise brings a swell where the goo arrives. */
+    const aim = () => {
+      const n = count();
+      const t = levelOf(n);
+      el.dataset.level = String(Math.round(t));
+      if (n > 0) st.cn = n;
+      if (calm()) {
+        Object.assign(st, { h: t, v: 0, tgt: t, drain: null, plops: [], tilt: 0 });
+        return paint(performance.now());
+      }
+      if (!st.drain && t > st.tgt + 0.01) st.plops.push({ x: W * POOL_LAND[kind], t0: performance.now() });
+      st.tgt = t;
+      kick();
+    };
+    /** Wipe clean (or signing out): sink to nothing in step with the blade. */
+    const drain = () => {
+      const t = levelOf(count());
+      el.dataset.level = String(Math.round(t));
+      if (calm() || st.h <= 0.5) return aim();
+      st.tgt = t;
+      st.drain = { t0: performance.now(), from: st.h };
+      st.plops = [];
+      kick();
+    };
+
+    // Where it starts: at rest, or (the jar, opened again) where it last showed, then catching up.
+    const t0 = levelOf(count());
+    el.dataset.level = String(Math.round(t0));
+    const from = shown[kind];
+    if (kind === "jar" && from !== undefined && Math.abs(from - t0) > 0.5 && !calm()) {
+      st.h = st.tgt = from;
+      later(aim, CATCH_UP_MS);
+    } else st.h = st.tgt = t0;
+
     const measure = () => {
       const r = el.getBoundingClientRect();
-      const w = Math.round(r.width * 100) / 100;
-      const h = Math.round(r.height * 100) / 100;
-      setSize((s) => (s && s[0] === w && s[1] === h ? s : [w, h]));
+      W = Math.round(r.width * 100) / 100;
+      H = Math.round(r.height * 100) / 100;
+      paint(performance.now());
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
-  const [W, H] = size ?? [0, 0];
-  const shapes = poolShapes(kind, n, W, H);
-  const on = shapes.length > 0;
-  const url = on && ink ? poolMask(shapes, W, H) : "";
-  // A new mask image paints nothing until it's decoded, so the words would blink when the level
-  // moves: keep the last one on until the new one is ready (the first waits, hidden).
-  const [shown, setShown] = useState("");
-  useEffect(() => {
-    if (!url) return;
-    let live = true;
-    const img = new Image();
-    img.src = url;
-    img.decode().then(
-      () => live && setShown(url),
-      () => live && setShown(url),
-    );
+    let wipes = goo.store.get().wipes;
+    const off = goo.store.subscribe(() => {
+      const s = goo.store.get();
+      if (s.wipes !== wipes) {
+        wipes = s.wipes;
+        return drain();
+      }
+      // a drop still falling: the pool waits for it
+      if (air === 0) aim();
+    });
+
+    // On a computer, a heart's drop falls past the bottom of the window, and the pool takes it in.
+    let api: GooPool | undefined;
+    if (kind === "side") {
+      api = {
+        dropFrom(x, y) {
+          if (calm() || typeof document.body.animate !== "function") return false;
+          air++;
+          const land = () => {
+            air = Math.max(0, air - 1);
+            if (air === 0) aim();
+          };
+          later(() => {
+            const dist = window.innerHeight + 12 - y;
+            if (dist < 10) return later(land, AFTER_DROP_MS);
+            const d = document.createElement("span");
+            d.className = "goo-drop";
+            d.style.left = `${x}px`;
+            d.style.top = `${y}px`;
+            document.body.appendChild(d);
+            drops.add(d);
+            d.animate([{ transform: "translateY(0) scale(.8, 1)" }, { transform: `translateY(${dist}px) scale(.8, 1.5)` }], {
+              duration: 70 + 17 * Math.sqrt(dist),
+              easing: "cubic-bezier(.45,0,1,.55)",
+              fill: "forwards",
+            }).onfinish = () => {
+              d.remove();
+              drops.delete(d);
+              later(land, AFTER_DROP_MS);
+            };
+          }, DROP_DELAY_MS);
+          return true;
+        },
+      };
+      setLivePool(api);
+    }
+
     return () => {
-      live = false;
+      dead = true;
+      off();
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+      for (const t of timers) clearTimeout(t);
+      for (const d of drops) d.remove();
+      if (api) setLivePool(null, api);
     };
-  }, [url]);
-  const mask = shown ? maskCss(shown) : "";
+  }, [kind]);
+
   return (
-    <span ref={box} className={`pool ${className ?? ""}`} data-kind={kind} data-level={on ? Math.round(poolLevel(kind, n)) : 0} aria-hidden data-testid={`pool-${kind}`}>
-      {on && (
-        <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H}>
-          <filter id={id} x="-10%" y="-10%" width="120%" height="130%" colorInterpolationFilters="sRGB">
-            <feGaussianBlur stdDeviation={POOL_FILTER.blur} />
-            <feColorMatrix values={POOL_FILTER.matrix} />
-          </filter>
-          <g filter={`url(#${id})`} fill={gooColor(1 - Math.exp(-n / 70))}>
-            {shapes.map((s, i) =>
-              s.t === "rect" ? (
-                <rect key={i} x={s.x} y={s.y} width={s.w} height={s.h} />
-              ) : s.t === "circle" ? (
-                <circle key={i} cx={s.cx} cy={s.cy} r={s.r} />
-              ) : (
-                <ellipse key={i} cx={s.cx} cy={s.cy} rx={s.rx} ry={s.ry} />
-              ),
-            )}
-          </g>
-        </svg>
-      )}
-      {on && ink && (
-        <span className="pool-ink" style={mask ? { mask, WebkitMask: mask } : { visibility: "hidden" }}>
+    <span ref={box} className={`pool ${className ?? ""}`} data-kind={kind} aria-hidden data-testid={`pool-${kind}`}>
+      <svg ref={svgRef} style={{ display: "none" }}>
+        <filter id={`${id}f`} x="-10%" y="-10%" width="120%" height="130%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur stdDeviation={POOL_FILTER.blur} />
+          <feColorMatrix values={POOL_FILTER.matrix} />
+        </filter>
+        <clipPath ref={clipRef} id={`${id}c`} clipPathUnits="userSpaceOnUse" />
+        <g ref={gooRef} filter={`url(#${id}f)`} />
+      </svg>
+      {ink && (
+        <span ref={inkRef} className="pool-ink" style={{ clipPath: `url(#${id}c)`, visibility: "hidden" }}>
           {ink}
         </span>
       )}

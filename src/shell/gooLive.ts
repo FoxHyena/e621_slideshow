@@ -30,3 +30,21 @@ export function liveGoo(): GooBar | null {
 export function setLiveGoo(bar: GooBar | null, was?: GooBar) {
   if (bar || live === was) live = bar;
 }
+
+/**
+ * The sidebar's pool on a computer, when it's showing: there's no tab bar there, so a drop from a
+ * heart falls off the bottom of the window and the pool takes it in (owner-picked, "Fall").
+ */
+export interface GooPool {
+  /** a drop that lets go at `x, y` (viewport); false when nothing falls (reduced motion) */
+  dropFrom(x: number, y: number): boolean;
+}
+
+let pool: GooPool | null = null;
+export function livePool(): GooPool | null {
+  return pool;
+}
+export function setLivePool(p: GooPool | null, was?: GooPool) {
+  if (p || pool === was) pool = p;
+}
+

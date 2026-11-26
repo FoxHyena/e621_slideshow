@@ -819,7 +819,7 @@ html {
   overflow: hidden;
   pointer-events: none;
 }
-.pool svg {
+.pool > svg {
   position: absolute;
   inset: 0;
   display: block;
@@ -3694,7 +3694,8 @@ html {
   outline: 2px solid var(--color-gold);
   outline-offset: 0;
 }
-/* Icon well: 32 round, sunk (the row is the button); the glyph sits 0.5 below centre. */
+/* Icon well: 32 round, sunk (the row is the button); the glyph is centred (owner, 2026-11-26: the
+   0.5 drop read as off centre). */
 .row-well {
   display: grid;
   flex: none;
@@ -3709,7 +3710,22 @@ html {
 .row-well svg {
   width: 20px;
   height: 20px;
-  transform: translateY(0.5px);
+}
+/* Optical centring (owner, 2026-11-26: "make sure these and others are centered"): glyphs whose
+   weight sits off their box's middle, nudged by a share of their own size. Sign in's arrow and
+   bracket lean right; the feed's arcs sit low left; the second person leaves the users glyph left
+   heavy; the drops sit low. The tab bar's Goo Ink copies take the same (TabBar INK_NUDGE). */
+svg.lucide-log-in {
+  translate: -5% 0;
+}
+svg.lucide-rss {
+  translate: 4% -4%;
+}
+svg.lucide-users {
+  translate: 4% 0;
+}
+svg.lucide-droplets {
+  translate: 2% -4%;
 }
 .row-well[data-tone="pink"] {
   color: var(--color-heart);

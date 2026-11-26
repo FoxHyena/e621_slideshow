@@ -204,3 +204,17 @@ test("the app mark at the foot of Settings is the hexagon with Play, and pops wh
   await page.getByRole("button", { name: "e621 Slideshow" }).click();
   await expect(foot).toHaveAttribute("data-pop", "");
 });
+
+test("signed out on a phone, the e621 row has Sign in on it, which brings up the sheet (no page in between)", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await mockE621(page);
+  await page.goto("/settings");
+  const row = page.getByTestId("settings-account");
+  await expect(row).toContainText("Sign in to e621");
+  await page.getByTestId("settings-sign-in").click();
+  await expect(sheet(page)).toBeVisible();
+  await expect(page).toHaveURL(/\/settings$/);
+  await page.keyboard.press("Escape");
+  await expect(sheet(page)).toHaveCount(0);
+  await shot(page, "settings-signed-out");
+});

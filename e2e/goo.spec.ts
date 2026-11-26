@@ -173,10 +173,11 @@ for (const [n, side, jar] of [
     const pb = (await jarPool.boundingBox())!;
     expect(Math.round(pb.y + pb.height)).toBe(Math.round(row!.y + row!.height));
     // the words show through in Goo Ink, cut to the goo
-    // the goo's slab really stands that high (its top is the level above the card's foot)
-    expect(await jarPool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg rect")!.getAttribute("y"))))).toBe(jar);
+    // the goo really stands that high (the surface drawn, and the slab's top above the card's foot)
+    await expect(jarPool).toHaveAttribute("data-drawn", String(jar));
+    expect(await jarPool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg g path")!.getAttribute("d")!.split(/[ L]/)[1])))).toBe(jar);
     await expect(jarPool.locator(".pool-ink")).toContainText("Tab bar goo");
-    expect(await jarPool.locator(".pool-ink").evaluate((e) => getComputedStyle(e).maskImage)).toContain("data:image/svg+xml");
+    expect(await jarPool.locator(".pool-ink").evaluate((e) => getComputedStyle(e).clipPath)).toMatch(/^url\(/);
     await shot(page, `goo-jar-${n}`);
 
     // a computer: the pool in the sidebar's foot, over the account row, taking no clicks
@@ -186,7 +187,7 @@ for (const [n, side, jar] of [
     const sb = (await page.getByTestId("sidebar").boundingBox())!;
     const sp = (await sidePool.boundingBox())!;
     expect([Math.round(sp.x), Math.round(sp.width), Math.round(sp.y + sp.height)]).toEqual([Math.round(sb.x), Math.round(sb.width), Math.round(sb.y + sb.height)]);
-    expect(await sidePool.evaluate((e) => Math.round(e.getBoundingClientRect().height - Number(e.querySelector("svg rect")!.getAttribute("y"))))).toBe(side);
+    await expect(sidePool).toHaveAttribute("data-drawn", String(side));
     await expect(sidePool.locator(".pool-ink")).toContainText("tester");
     await shot(page, `goo-side-${n}`);
     await page.getByTestId("side-account").click({ position: { x: 30, y: 30 } });
@@ -204,5 +205,96 @@ test("no goo, no pool; wiping empties the jar", async ({ page }) => {
   await expect(page.getByTestId("pool-jar")).not.toHaveAttribute("data-level", "0");
   await page.getByTestId("goo-wipe").click();
   await expect(page.getByTestId("pool-jar")).toHaveAttribute("data-level", "0");
-  await expect(page.getByTestId("pool-jar").locator("svg")).toHaveCount(0);
+  await expect(page.getByTestId("pool-jar").locator(":scope > svg")).toBeHidden();
 });
+
+// How a pool moves (DESIGN.md "How a pool moves", owner-approved 2026-11-26)
+
+/** The surface's height now, sampled a few times as it moves. */
+const samples = async (page: Page, testId: string, ms: number) =>
+  page.evaluate(
+    ([id, ms]) =>
+      new Promise<number[]>((done) => {
+        const out: number[] = [];
+        const t0 = performance.now();
+        const at = () => {
+          out.push(Number(document.querySelector<HTMLElement>(`[data-testid=${id}]`)?.dataset.drawn ?? NaN));
+          if (performance.now() - t0 < ms) requestAnimationFrame(at);
+          else done(out);
+        };
+        at();
+      }),
+    [testId, ms] as const,
+  );
+
+test("on a computer a heart's drop falls off the bottom of the window, then the sidebar's pool rises", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 40);
+  await page.goto("/search?tags=wolf");
+  const pool = page.getByTestId("pool-side");
+  await expect(pool).toHaveAttribute("data-drawn", "37");
+  // (the drop lives about a third of a second: note each one as it's added)
+  await page.evaluate(() => {
+    const w = window as unknown as { drops: number[] };
+    w.drops = [];
+    new MutationObserver((ms) => {
+      for (const m of ms) for (const n of m.addedNodes) if (n instanceof HTMLElement && n.classList.contains("goo-drop")) w.drops.push(performance.now());
+    }).observe(document.body, { childList: true });
+  });
+  const t0 = await page.evaluate(() => performance.now());
+  await card(page, 1150).getByTestId("card-fav").click();
+  // the pool waits for the drop
+  await expect(pool).toHaveAttribute("data-level", "37");
+  // 380 ms on, a drop falls (and leaves by the bottom), then the pool rises to 41's level
+  await expect.poll(() => page.evaluate(() => (window as unknown as { drops: number[] }).drops.length)).toBe(1);
+  expect(await page.evaluate(() => (window as unknown as { drops: number[] }).drops[0]) - t0).toBeGreaterThan(300);
+  await expect(page.locator(".goo-drop")).toHaveCount(0);
+  await expect(pool).toHaveAttribute("data-level", "38");
+  await expect(pool).toHaveAttribute("data-drawn", "38");
+});
+
+test("Wipe clean drains the jar over the blade's 900 ms, and Settings opened again catches up", async ({ page }) => {
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 40);
+  await page.goto("/search?tags=wolf");
+  await page.getByTestId("tab-settings").click();
+  const jar = page.getByTestId("pool-jar");
+  await expect(jar).toHaveAttribute("data-drawn", "24");
+  // three favorites while Settings is away (in the app, not a reload); opened again, the jar starts
+  // at 24 and rises to 25
+  await page.goBack();
+  for (const id of [1150, 1149, 1148]) await card(page, id).getByTestId("card-fav").click();
+  await page.getByTestId("tab-settings").click();
+  await expect(count(page)).toHaveText("43 favorites");
+  const rise = await samples(page, "pool-jar", 1300);
+  expect(rise[0]).toBe(24);
+  expect(rise.at(-1)).toBe(25);
+  // the drain: down through the levels between, not at once
+  await page.getByTestId("goo-wipe").click();
+  const fall = await samples(page, "pool-jar", 1100);
+  expect(fall.filter((h) => h > 3 && h < 25).length).toBeGreaterThan(5);
+  expect(fall.at(-1)).toBe(0);
+  await expect(jar.locator(":scope > svg")).toBeHidden();
+});
+
+test("with reduced motion the level changes at once: no drop, no catch-up, no drain", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 40);
+  await page.goto("/search?tags=wolf");
+  await page.getByTestId("tab-settings").click();
+  const jar = page.getByTestId("pool-jar");
+  await expect(jar).toHaveAttribute("data-drawn", "24");
+  await page.goBack();
+  for (const id of [1150, 1149, 1148]) await card(page, id).getByTestId("card-fav").click();
+  await page.getByTestId("tab-settings").click();
+  await expect(count(page)).toHaveText("43 favorites");
+  expect((await samples(page, "pool-jar", 100))[0]).toBe(25);
+  await page.getByTestId("goo-wipe").click();
+  expect((await samples(page, "pool-jar", 50))[0]).toBe(0);
+});
+

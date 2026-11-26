@@ -17,7 +17,7 @@ import { displayUrl } from "@/lib/slideshow/media";
 import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { getGoo } from "@/state/goo";
 import { getSession } from "@/state/session";
-import { liveGoo } from "@/shell/gooLive";
+import { liveGoo, livePool } from "@/shell/gooLive";
 import { useStore } from "@/state/store";
 import Avatar from "@/components/Avatar";
 import type { TagHold } from "@/components/TagActions";
@@ -59,7 +59,8 @@ function celebrate(id: number, btn: HTMLElement | null, mark: Element | null) {
   turnMark(mark);
   const r = btn?.getBoundingClientRect();
   // the drop leaves from under the middle drip, which hangs about 23 below the pill
-  if (r && r.width > 0) liveGoo()?.dropFrom(r.left + r.width * 0.55, r.bottom + 23);
+  // (on a computer there's no bar: it falls past the bottom of the window into the sidebar's pool)
+  if (r && r.width > 0 && !liveGoo()?.dropFrom(r.left + r.width * 0.55, r.bottom + 23)) livePool()?.dropFrom(r.left + r.width * 0.55, r.bottom + 23);
   // a post favourited again this session drips, but adds no more goo
   getGoo().addFav(id);
 }
