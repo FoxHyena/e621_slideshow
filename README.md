@@ -1,8 +1,10 @@
-# e621 Slideshow
+# eLicks21
+
+A browser for e621 (unofficial). Say it like "e621": Licks rhymes with six.
 
 A scroll-first e621 client: a feed of the artists you follow, a **For You** feed that learns your taste
 from your favorites, artist pages, and a full-screen slideshow with five styles. It works on a phone
-(installable as an app) and on a computer.
+(installable as an app) and on a computer. Not made by or affiliated with e621.
 
 Live at **<https://e621.cumdump.dog>**. Everything runs in your browser and talks to `e621.net` directly
 (the API allows CORS), so your API key never touches a server.
@@ -205,7 +207,7 @@ uses these.
 
 ## Userscript
 
-Adds a **▶ Slideshow** button under the search box on e621.net and e926.net. It plays what's in
+Adds an **▶ eLicks21** button under the search box on e621.net and e926.net. It plays what's in
 the search box (or the pool you're on): the same posts e621 shows, in your saved slideshow style
 and speed.
 

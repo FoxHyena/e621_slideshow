@@ -1351,5 +1351,9 @@ test("settings link to the userscript and explain how to install it", async ({ p
   await expect(install).toHaveAttribute("href", "/e621-slideshow.user.js");
   const res = await request.get("/e621-slideshow.user.js");
   expect(res.ok()).toBe(true);
-  expect(await res.text()).toContain("// ==UserScript==");
+  const script = await res.text();
+  expect(script).toContain("// ==UserScript==");
+  // the button on e621 says the app's name; the script keeps its name in the manager, so it updates
+  expect(script).toContain('play.textContent = "▶ eLicks21"');
+  expect(script).toContain("// @name         e621 Slideshow button");
 });

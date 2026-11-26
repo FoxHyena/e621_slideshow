@@ -642,7 +642,7 @@ function InstallSheet({ way }: { way: InstallWay }) {
         </div>
       ) : (
         <div className="install">
-          <p className="install-lead">Slideshow on your home screen, full screen, without the browser&rsquo;s bars.</p>
+          <p className="install-lead">eLicks21 on your home screen, full screen, without the browser&rsquo;s bars.</p>
           <ol className="signin-steps install-steps">
             {STEPS[way === "mac" ? "mac" : "ios"].map((s, i) => (
               <li key={i}>
@@ -682,7 +682,7 @@ function AppPage() {
             </span>
             <span className="row-text">
               <b>e621 button</b>
-              <small>Adds a Slideshow button to e621</small>
+              <small>Adds an eLicks21 button to e621</small>
             </span>
             <ExternalLink aria-hidden className="row-chev" />
           </a>

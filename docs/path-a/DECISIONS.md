@@ -1210,3 +1210,16 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Live Follow check done** (owner: "Yes do follow live check"): Follow and Unfollow of nando wolf on
   the owner's account, each confirmed by a fresh read of e621's list; the account ends as it began.
 
+## 2026-11-26 — The app is called eLicks21
+
+- Owner, via the roadmap session: "Let's do eLicks21" (Licks rhymes with six, so it reads like e621).
+- Renamed every place the app names itself: page title and description, manifest name and short name
+  (the manifest id stays "/following", so an installed copy stays the same app), the sidebar's name,
+  Settings' foot, the install sheet, the e621 button's label and title, the `_client` name sent to e621
+  (`eLicks21/1.0 (by <user> on e621)`), README ("a browser for e621 (unofficial)"), PRODUCT.md and
+  DESIGN.md's name lines.
+- Kept: Settings › Slideshow and Classic slideshow (they name the Play feature's settings and the old
+  page, not the app); the userscript's file URL and its `@name` (script managers know it by them);
+  storage keys, cache names, the service worker, the repo and the domain (renaming would lose saved
+  data or links). The app mark and icon have no text in them.
+

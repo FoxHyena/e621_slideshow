@@ -201,7 +201,10 @@ test("the app mark at the foot of Settings is the hexagon with Play, and pops wh
   await expect(foot).toBeVisible();
   expect(await foot.evaluate((m) => m.querySelectorAll("clipPath").length)).toBe(2);
   await expect(foot).not.toHaveAttribute("data-pop");
-  await page.getByRole("button", { name: "e621 Slideshow" }).click();
+  // the app's name (owner, 2026-11-26: "eLicks21"), in the foot and the page's title
+  await expect(page.locator(".app-foot b")).toHaveText("eLicks21");
+  await expect(page).toHaveTitle("eLicks21");
+  await page.getByRole("button", { name: "eLicks21" }).click();
   await expect(foot).toHaveAttribute("data-pop", "");
 });
 

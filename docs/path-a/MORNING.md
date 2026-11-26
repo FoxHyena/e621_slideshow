@@ -72,6 +72,12 @@ Built from the hover pass, Inset rows and grid loading you approved:
   capsule's shape fades.
 - **Search suggestions** were already the flat 48 rows. An artist suggestion now shows its 24 mark and
   the name in white, "artist" at the right.
+- **Renamed to eLicks21. Check the app mark and the install name on your phone.** The name is in the
+  tab title, the install name (both long and short), the sidebar, Settings' foot, the install sheet and
+  the e621 button ("▶ eLicks21"). The app mark and icon carry no text, so nothing to redraw. Kept on
+  purpose: Settings › Slideshow (the Play settings) and Classic slideshow (feature names, not the app's;
+  say if they should change), the userscript's name in your script manager and its URL (so installed
+  copies keep updating), saved data keys, the repo and the domain.
 - **Signed out, Settings' e621 row has a gold Sign in on it** that brings up the sign-in sheet (your
   note; no Account page in between).
 - **Icons centred** (your note): the row icons' 0.5 drop is gone, and four glyphs whose weight sits off

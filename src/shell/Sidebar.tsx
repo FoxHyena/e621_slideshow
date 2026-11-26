@@ -107,7 +107,7 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
       )}
       <div className="side-brand">
         <AppMark className="side-mark" />
-        <span className="side-name">Slideshow</span>
+        <span className="side-name">eLicks21</span>
       </div>
       <div className="side-tabs">
         <span className="side-ind" aria-hidden style={{ transform: `translateY(${idx * 48}px)` }} />

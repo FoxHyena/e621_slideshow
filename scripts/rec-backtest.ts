@@ -116,7 +116,7 @@ let tagCache: TagCache = existsSync(tagCacheFile) ? JSON.parse(readFileSync(tagC
 const nodeFetch = globalThis.fetch;
 globalThis.fetch = (input, init) => {
   const headers = new Headers(init?.headers);
-  headers.set("User-Agent", `e621-slideshow/1.0 (rec backtest${creds ? `, by ${creds.username} on e621` : ""})`);
+  headers.set("User-Agent", `eLicks21/1.0 (rec backtest${creds ? `, by ${creds.username} on e621` : ""})`);
   return nodeFetch(input, { ...init, headers });
 };
 const log = (msg: string) => process.stderr.write(msg + "\n");

@@ -22,7 +22,7 @@ test.describe("manifest, icons, CSP", () => {
     const res = await request.get("/manifest.webmanifest");
     expect(res.ok()).toBe(true);
     const m = await res.json();
-    expect(m).toMatchObject({ name: "e621 Slideshow", short_name: "Slideshow", start_url: "/following", display: "standalone", background_color: "#020F23" });
+    expect(m).toMatchObject({ id: "/following", name: "eLicks21", short_name: "eLicks21", start_url: "/following", display: "standalone", background_color: "#020F23" });
     expect(m.icons.map((i: { purpose: string }) => i.purpose)).toEqual(["any", "any", "maskable", "monochrome"]);
     for (const i of m.icons) expect((await request.get(i.src)).headers()["content-type"]).toBe("image/png");
     await mockE621(page);

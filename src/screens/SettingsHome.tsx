@@ -116,10 +116,10 @@ function AppFoot() {
   const ref = useRef<HTMLButtonElement>(null);
   return (
     <div className="app-foot">
-      <button type="button" ref={ref} aria-label="e621 Slideshow" onClick={() => popMark(ref.current?.querySelector(".mark"))}>
+      <button type="button" ref={ref} aria-label="eLicks21" onClick={() => popMark(ref.current?.querySelector(".mark"))}>
         <AppMark />
       </button>
-      <b>e621 Slideshow</b>
+      <b>eLicks21</b>
       <small>Version {process.env.APP_VERSION}</small>
     </div>
   );

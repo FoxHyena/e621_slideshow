@@ -9,10 +9,10 @@ import "./globals.css";
 const fredoka = Fredoka({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-fredoka", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "e621 Slideshow",
-  description: "Full-screen slideshow for e621 searches",
+  title: "eLicks21",
+  description: "Follow artists on e621 and play their new posts. An unofficial browser for e621.",
   robots: { index: false, follow: false },
-  applicationName: "e621 Slideshow",
+  applicationName: "eLicks21",
   icons: {
     icon: [
       { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/icons/apple-icon-180.png", sizes: "180x180" }],
   },
   // iPhone's Add to Home Screen: full screen, the short name under the icon.
-  appleWebApp: { capable: true, title: "Slideshow", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "eLicks21", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {

@@ -151,7 +151,7 @@ export function resetLane() {
 
 function clientParam(creds: Credentials | null): string {
   const who = creds?.username ? `by ${creds.username} on e621` : "anonymous";
-  return `e621-slideshow/1.0 (${who})`;
+  return `eLicks21/1.0 (${who})`;
 }
 
 async function errorMessage(res: Response): Promise<string> {

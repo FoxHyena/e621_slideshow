@@ -757,7 +757,7 @@ function UserscriptSection() {
   return (
     <>
       <p className="text-xs text-neutral-400">
-        Adds a <span className="font-semibold text-neutral-200">▶ Slideshow</span> button under e621&rsquo;s search
+        Adds a <span className="font-semibold text-neutral-200">▶ eLicks21</span> button under e621&rsquo;s search
         box. It opens the search here: the same posts e621 shows, in your style and speed, with your blacklist.
       </p>
       <ol className="list-decimal space-y-1.5 pl-4 text-xs text-neutral-300">

@@ -1,5 +1,5 @@
 ---
-name: e621 Slideshow
+name: eLicks21
 description: A calm e621 reading room where the art is the only bright thing, built from things you want to press.
 colors:
   ground: "#020F23"
@@ -505,7 +505,7 @@ components:
     height: "28px"
 ---
 
-# Design System: e621 Slideshow
+# Design System: eLicks21
 
 Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, Goo the mascot, and the first run after sign-in. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
 
@@ -795,7 +795,7 @@ Large title "Artists" with a one-button tools capsule (Search). Then the 44 segm
 Back, large title "Tune", a muted body line ("For You learns from your favorites."). Then: a one-row group with the sync state ("1,284 favorites read" over "Synced 3 min ago") and a compact tonal "Rebuild" with a refresh icon; a Panel card with the Breadth slider; the "Filter tags" field; and "Your tags", a group label with "Pin · Mute" at its right, over a flat group of rows: the tag in Tag (list) type and its category colour, "48 favorites" underneath, then the Pin and Mute toggles.
 
 ### Settings
-- **Root:** large title; the account row in its own group; one group of rows with icon wells (Content, Slideshow, For You, App), each with a muted line saying what is inside and, where one value sums it up, that value ("6 s"); the "Tab bar goo" row in its own group; then the 56 app mark, "e621 Slideshow" (headline) and the version (muted footnote), centred. Tapping the mark turns it one notch.
+- **Root:** large title; the account row in its own group; one group of rows with icon wells (Content, Slideshow, For You, App), each with a muted line saying what is inside and, where one value sums it up, that value ("6 s"); the "Tab bar goo" row in its own group; then the 56 app mark, "eLicks21" (headline) and the version (muted footnote), centred. Tapping the mark turns it one notch.
 - **A sub-page** (drawn: Slideshow): back, large title, then groups with group labels ("Videos", "Playback"). Rows are flat (no icon well) and end in a control or a value with a chevron ("Transition  Fade ›").
 - **Slideshow styles:** a sideways row of previews, 8 apart: 76 × 100, 16 radius, Player Black, each a tiny picture of what the style does (Classic, Ken Burns, Collage, Prints, Reflections), its name underneath in footnote-rounded, muted. The selected one wears the gold ring outside the preview and a white name. The row leaves 4 above itself so the ring is never clipped.
 
@@ -964,7 +964,7 @@ What Following shows the first time you sign in, before you follow anyone. Three
   - **Tab icon (32 and 16):** the same square with a 22% corner radius; the hexagon is 80% tall, flat (no lip, no shadow, no lights); Play is flat Well Navy.
   - **One colour** (Android's themed icons): the hexagon in white, 70% tall, with Play cut out, on a clear ground.
   - Goo is never the icon.
-- **Names and colours.** Name "e621 Slideshow"; short name "Slideshow", which fits under an iPhone icon without being cut. The launch background and the browser's bar colour are Ground.
+- **Names and colours.** Name and short name "eLicks21" (owner, 2026-11-26; renamed from "e621 Slideshow"), which fits under an iPhone icon without being cut. The launch background and the browser's bar colour are Ground.
 
 ### On a computer (900 px and wider)
 *Proposed 2026-11-26, not owner-approved. Drawn in `mocks/screens-v6.html`, "On a computer (900 px and wider)", as 1280 by 800 windows.* The same screens with the tab bar stood on its side. Nothing new was made: the sidebar is the app's panel with the tab bar's sliding capsule; a popover and a dialog are the phone's sheet; Post info is that sheet standing beside the picture. Under 900 it is the phone layout.
