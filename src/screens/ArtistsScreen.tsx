@@ -8,6 +8,7 @@
 import { ChevronDown, ChevronRight, ExternalLink, EyeOff, Heart, CircleMinus, MoreHorizontal, Search, Share } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { ACTION_MS } from "@/shell/toastLook";
 import Avatar from "@/components/Avatar";
 import { Menu, MenuRow } from "@/components/Menu";
 import { StateBlock } from "@/components/State";
@@ -320,7 +321,7 @@ function ArtistSheet({ name, followed }: { name: string; followed: boolean }) {
               onClick={async () => {
                 await close();
                 getArtists().hide(name);
-                toast("Hidden from suggestions", { id: `hide:${name}`, action: { label: "Undo", onClick: () => getArtists().unhide(name) } });
+                toast("Hidden from suggestions", { id: `hide:${name}`, icon: <Avatar seed={name} />, duration: ACTION_MS, action: { label: "Undo", onClick: () => getArtists().unhide(name) } });
               }}
               data-testid="artist-hide"
             >

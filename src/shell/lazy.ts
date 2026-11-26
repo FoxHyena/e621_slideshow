@@ -22,7 +22,7 @@ const filterSheets = () => import("@/feed/FilterSheets");
 export const motionFx = () => import("@/feed/motionFx");
 /** The error, slow-down and offline states (src/components/StatePanels.tsx). */
 const statePanels = () => import("@/components/StatePanels");
-/** The tabs and pages not built yet ("Soon"), and Not found. */
+/** Not found, and the section labels. */
 const shellScreens = () => import("@/shell/screens");
 
 export const ResultsScreen = lazy(() => feedScreens().then((m) => ({ default: m.ResultsScreen })));
@@ -35,7 +35,6 @@ export const ArtistsScreen = lazy(() => artists().then((m) => ({ default: m.Arti
 export const SettingsPage = lazy(() => settingsPages().then((m) => ({ default: m.SettingsPage })));
 export const SignInSheet = lazy(() => signIn().then((m) => ({ default: m.SignInSheet })));
 export const SettingsHome = lazy(() => settingsHome().then((m) => ({ default: m.SettingsHome })));
-export const PlaceholderScreen = lazy(() => shellScreens().then((m) => ({ default: m.PlaceholderScreen })));
 export const NotFoundScreen = lazy(() => shellScreens().then((m) => ({ default: m.NotFoundScreen })));
 export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 

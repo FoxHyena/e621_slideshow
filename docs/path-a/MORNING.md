@@ -67,6 +67,13 @@ at the top once Phase 7 hands over.
    - Built without a mock: the install sheet's text when the browser starts offering Install while it is
      open ("Close this and use Install in Settings › App").
 
+12. **Toasts (slice 9a)** follow the proposed batch 1 "Toast". My calls:
+   - On screens without Play the toast sits just above the tab bar, not at Play's height.
+   - Failures ("Couldn't …", a post that didn't load) wear the red mark; a toast with no icon of its own
+     wears an info mark.
+   - The Undo ring pauses while the pointer is over the toast (sonner's timer does too), not on focus.
+   - Popular artists shows a skeleton (4 rows) while e621's tag list loads, instead of a spinner.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -77,7 +84,7 @@ at the top once Phase 7 hands over.
 2. **The first-run step names** ("Read your favorites", "Count your artists", "See who still posts") were
    proposed by the design session, not confirmed by you. Default: use them.
 3. **The Following suggestion card** (UX.md: a card in the Following feed offering artists) isn't built.
-   Default: leave it to slice 9 polish, since the first run and Artists › Suggested cover the same need.
+   Default: leave it out, since the first run and Artists › Suggested cover the same need.
 4. **Artists › Following lists every tag you follow**, not only artist tags (e621 follows are any tag, and
    telling them apart costs a lookup). Default: list them all.
 5. **Hidden suggestions ("Not interested") are kept on this device** like Tune's pins and mutes (not purged

@@ -13,7 +13,10 @@
 import { E621Error, getSubscriptions, subscribe, unsubscribe, type Credentials, type Lane } from "@/lib/e621/client";
 import { storage } from "@/lib/storage";
 import { openSignIn } from "@/screens/actions";
+import { createElement } from "react";
 import { toast } from "sonner";
+import Avatar from "@/components/Avatar";
+import { actionLook } from "@/shell/toastLook";
 import { getSession } from "./session";
 import { createStore, type Store } from "./store";
 
@@ -379,8 +382,18 @@ let instance: FollowsApi | null = null;
 export function getFollows(): FollowsApi {
   if (!instance) {
     const f = createFollows({
-      say: (message, { id, undo, error }) =>
-        error ? toast.error(message, { id }) : toast(message, { id, action: undo ? { label: "Undo", onClick: undo } : undefined }),
+      say: (message, { id, undo, error }) => {
+        // (sonner merges an update into the toast it replaces: no Undo must say so, or the old one stays)
+        const plain = { action: undefined, duration: 4000 };
+        if (error) return void toast.error(message, { id, icon: undefined, ...plain });
+        // about one artist: their mark is the toast's mark (DESIGN.md "Toast")
+        const one = id.startsWith("follow:") && id !== "follow:many" ? id.slice("follow:".length) : null;
+        toast(message, {
+          id,
+          icon: one ? createElement(Avatar, { seed: one }) : undefined,
+          ...(undo ? { action: { label: "Undo", onClick: undo }, ...actionLook() } : plain),
+        });
+      },
       signIn: openSignIn,
     });
     const session = getSession();

@@ -777,3 +777,14 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The install offer is caught by a tiny inline script in `<head>` (it can fire before the app's code
   loads); the worker registers once the page is idle, off the first load.
 - The build id is the commit (Vercel's or git's), plus a hash of the diff for an uncommitted local build.
+
+## 2026-11-26 — Slice 9a (toast restyle, overnight)
+
+- Toasts follow the proposed batch 1 "Toast": a capsule, always a 28 mark (the artist's mark for one
+  artist, an icon otherwise, an info mark when none), at most one way back, one at a time, 4 s or 6 s
+  with an action. Undo wears a ring that drains over the 6 s (paused on hover, as sonner's timer is).
+- Placement: 12 above Play when Play shows, else just above the tab bar.
+- Failures (anything that says it couldn't) use the danger mark.
+- The Following suggestion card (UX.md) is **not built**: the first run and Artists › Suggested cover the
+  same need. MORNING Decide 3.
+- Dead `PlaceholderScreen`/`Soon` removed; the Settings tab renders Settings home directly.

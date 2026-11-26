@@ -734,3 +734,39 @@ violation). Full e2e before the reviewer's fixes: 207 passed, 3 skipped.
 **Budgets** (production build, mock e621): JS cold load of `/following` **197.2 KB** (≤ 200; 198.5 KB
 while the PWA code loaded at boot, so it moved to idle); 300.8 KB with the idle prefetch; CLS 0.0000;
 0 long tasks at 4× CPU.
+
+## Slice 9a — toast restyle, Popular artists skeleton, dead placeholders (2026-11-26)
+
+**Code-review (high), 3 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A follow toast updated in place without an Undo kept the old Undo (sonner merges updates) | High | No Undo now says `action: undefined` and 4 s; errors too |
+| 2 | "Marked as seen. Couldn't confirm it with e621." looked like an info toast | Low | Any "Couldn't" is a failure toast |
+| 3 | The toast stayed at Play's height when Play had stepped aside on scroll | Low | Only a showing Play lifts it |
+
+**Fresh reviewer, 10 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Sonner's swiping and removed `::before` rules moved the plain toast's mark | Med | Higher-specificity override keeps it in place |
+| 2 | Sonner's inline 356 px `--width` beat the stylesheet | Med | `--width` set through the Toaster's `style` |
+| 3 | A replaced (hidden) toast's Undo stayed tabbable; the ring paused on focus though sonner's timer didn't | Med | Hidden toasts get `visibility:hidden`; the ring pauses on hover only, like the timer |
+| 4 | The Undo ring didn't restart when a toast was updated in place | Low | `actionLook()` alternates the ring's keyframes |
+| 5 | Failures used the plain look (filters load, restore place, a stalled post, fullscreen, mark-seen) | Low | `toast.error` |
+| 6 | On screens without Play the toast floated ~190 px up over nothing | Low | `--toast-bottom` falls to just above the bar |
+| 7 | No visible focus on the toast or Undo | Low | Gold ring on both, the toast keeps its shadow |
+| 8 | The skeleton was a labelled landmark | Low | A plain block with `aria-busy` and a hidden ": loading" in its heading |
+| 9 | Motion: 320 ms in vs DESIGN.md's toast timing | Low | No change: sonner's own transition; noted for Phase 6 |
+| 10 | `PlaceholderScreen` removal left the default case reachable | Low | No change: tabs and the pre-boot root are never pushed; returns null |
+
+**Also:** the Goo flake from slice 8 (states-v6 under load) is fixed by waiting for the tab bar's
+`data-goo` before navigating.
+
+**Gates:** typecheck clean; unit 308 pass. New e2e: e2e/toast.spec.ts (a follow's toast with the artist
+mark and Undo that unfollows; a plain toast's 28 px mark; one visible at a time; the replaced one hidden;
+placement above the bar with no Play), first-run's skeleton test. Full e2e before the fixes: 210 passed,
+3 skipped.
+
+**Budgets** (production build, mock e621): JS cold load **198.4 KB** (≤ 200; +1.2 KB for the toast icons);
+301.1 KB with idle prefetch; CLS 0.0000. Headroom is 1.6 KB: slice 9b makes room before adding.

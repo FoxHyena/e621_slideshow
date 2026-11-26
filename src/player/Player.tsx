@@ -136,7 +136,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
       return;
     }
     if (posts.length) {
-      toast("Couldn't restore your place");
+      toast.error("Couldn't restore your place");
       nav.replace({ screen: top.route.screen, play: String(posts[0].id) });
     }
   });
@@ -214,7 +214,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
 
   // A post that never loads must not freeze the show.
   const onStall = useEffectEvent((id: number) => {
-    toast(`Post #${id} didn't load, skipped`);
+    toast.error(`Post #${id} didn't load, skipped`);
     void next();
   });
   const stallWatch = !!current && !isReady && !paused && sheet === null;
@@ -316,7 +316,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   // ---- fullscreen -----------------------------------------------------------
   const toggleFullscreen = () => {
     if (document.fullscreenElement) void document.exitFullscreen();
-    else void document.documentElement.requestFullscreen?.().catch(() => toast("Fullscreen isn't allowed here"));
+    else void document.documentElement.requestFullscreen?.().catch(() => toast.error("Fullscreen isn't allowed here"));
   };
   useEffect(() => {
     const onChange = () => setFullscreen(!!document.fullscreenElement);

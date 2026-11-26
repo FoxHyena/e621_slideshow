@@ -221,7 +221,26 @@ function PopularArtists({ onFollowed, done, fallback }: { onFollowed: () => void
       live = false;
     };
   }, []);
-  if (rows === null) return <div className="popular-wait" data-testid="popular-artists-wait" />;
+  if (rows === null)
+    return (
+      <div className="popular-artists" aria-busy="true" data-testid="popular-artists-wait">
+        <h2 className="section-title">
+          Popular artists<span className="sr-only">: loading</span>
+        </h2>
+        <ul className="list-group" aria-hidden>
+          {[0, 1, 2, 3].map((i) => (
+            <li key={i} className="list-row popular-row">
+              <span className="sk-dot" />
+              <span className="row-text popular-sk">
+                <span className="sk-line" />
+                <span className="sk-line" />
+              </span>
+              <span className="sk-pill" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   if (rows.length === 0) return fallback;
   return (
     <section className="popular-artists" aria-labelledby="popular-artists-h" data-testid="popular-artists">

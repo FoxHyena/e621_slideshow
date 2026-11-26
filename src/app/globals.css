@@ -597,6 +597,11 @@ html {
   --bar-top: calc(var(--bar-bottom) + var(--spacing-bar) + 10px);
   /* the top of the bottom stack: Play's disc, 100 from the bottom and 56 tall */
   --stack-top: calc(var(--bar-bottom) + 134px);
+  /* toasts sit 12 above the stack: Play when it shows, else the bar (Play steps aside on scroll) */
+  --toast-bottom: calc(var(--stack-top) + 12px);
+}
+:root:not(:has(.play-fab:not([data-away]))) {
+  --toast-bottom: calc(var(--bar-top) + 16px);
 }
 
 ::selection {
@@ -4616,8 +4621,15 @@ li[data-state="done"] .first-step-n svg,
 .popular-row .follow-pill {
   flex: none;
 }
-.popular-wait {
-  min-height: 120px;
+.popular-sk {
+  gap: 6px;
+}
+.popular-sk .sk-line:first-child {
+  width: 55%;
+}
+.popular-sk .sk-line + .sk-line {
+  width: 30%;
+  height: 10px;
 }
 .popular-done {
   justify-content: center;
@@ -5085,4 +5097,204 @@ li[data-state="done"] .first-step-n svg,
 .install-copy {
   width: 100%;
   height: 44px;
+}
+
+/* ---- Toast (slice 9; DESIGN.md "Toast", proposed) ---- */
+@property --undo-left {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+.toast6 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--color-raised-hi);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 12px 24px rgba(0, 0, 0, 0.4);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
+/* sonner centres the list (its --width comes from the Toaster's style); the toast hugs its words,
+   centred inside it, never past the 16 insets */
+@media (max-width: 600px) {
+  [data-sonner-toaster][data-x-position="center"] {
+    width: auto;
+  }
+}
+[data-sonner-toaster] [data-sonner-toast].toast6 {
+  left: 0;
+  right: 0;
+  width: max-content;
+  max-width: 100%;
+}
+/* 1: sonner moves its own ::before while swiping or leaving; the plain toast's mark stays put */
+[data-sonner-toaster] [data-sonner-toast].toast6:not(:has(> .toast6-mark))::before {
+  position: static;
+  inset: auto;
+  width: 28px;
+  height: 28px;
+  z-index: auto;
+  transform: none;
+}
+/* 3: a toast another replaced is gone for the keyboard and screen readers too */
+[data-sonner-toaster] [data-sonner-toast][data-visible="false"] {
+  visibility: hidden;
+}
+/* 7: focus keeps the toast's own light and shadow, with the gold ring */
+[data-sonner-toaster] [data-sonner-toast].toast6:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px var(--color-gold);
+}
+.toast6-undo:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+.toast6:has(.toast6-sub) {
+  min-height: 54px;
+  border-radius: 27px;
+}
+.toast6-mark,
+.toast6:not(:has(> .toast6-mark))::before {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+  overflow: hidden;
+}
+/* a plain toast's mark: the info glyph (lucide "info") in Link Blue on the well */
+.toast6:not(:has(> .toast6-mark))::before {
+  content: "";
+  background: var(--color-well) center / 16px no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4c7d9' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E");
+}
+.toast6-mark svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+}
+.toast6-mark svg[data-tone="danger"],
+.toast6-mark .tone-danger {
+  color: var(--color-danger);
+}
+.toast6-mark:has(svg[data-tone="ok"]) {
+  background: var(--color-score);
+  box-shadow: none;
+  color: var(--color-on-gold);
+}
+/* an artist's own mark fills the well */
+.toast6-mark .mark {
+  width: 28px;
+  height: 28px;
+}
+/* (over sonner's own 16 px icon box, injected after this sheet) */
+[data-sonner-toast].toast6 .toast6-mark {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  justify-content: center;
+}
+[data-sonner-toast].toast6 .toast6-mark svg {
+  margin: 0;
+}
+[data-sonner-toast].toast6 .toast6-mark .mark svg {
+  width: 100%;
+  height: 100%;
+}
+.toast6-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-right: 8px;
+}
+.toast6:has(.toast6-undo) .toast6-text {
+  padding-right: 4px;
+}
+.toast6-title {
+  overflow: hidden;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.toast6-sub {
+  overflow: hidden;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-link);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.toast6-undo {
+  position: relative;
+  flex: none;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+/* the hit area reaches 44 */
+.toast6-undo::before {
+  content: "";
+  position: absolute;
+  inset: -8px -4px;
+}
+/* the ring empties clockwise over the toast's 6 s; held while you hover or focus it */
+.toast6-undo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from -45deg, var(--color-link) var(--undo-left), transparent 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: undo-ring 6s linear forwards;
+  pointer-events: none;
+}
+[data-sonner-toaster]:hover .toast6-undo::after {
+  animation-play-state: paused;
+}
+/* 4: a toast updated in place (Following → Undo → Unfollowed) restarts its ring: two names, alternated */
+.toast6-undo.ring-b::after {
+  animation-name: undo-ring-b;
+}
+@keyframes undo-ring {
+  to {
+    --undo-left: 0%;
+  }
+}
+@keyframes undo-ring-b {
+  to {
+    --undo-left: 0%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast6-undo::after {
+    animation: none;
+  }
 }

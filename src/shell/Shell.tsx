@@ -12,15 +12,16 @@ import { focusScreen, restoreFocus, trackOpeners } from "@/nav/focus";
 import { baseIndex, getNav, isOverlay, type Entry, type NavState } from "@/nav/history";
 import { lockScroll, restoreOffset, saveOffset, unlockScroll } from "@/nav/scroll";
 import { runTransition, type NavDirection } from "@/nav/transition";
-import { activeTab, screenKey, tab as tabRoute, tabRoot, TABS, type Tab } from "@/nav/routes";
+import { activeTab, screenKey, tabRoot, TABS, type Tab } from "@/nav/routes";
 import { LegacyHome } from "./LegacyHome";
 import { FollowingScreen } from "@/screens/Following";
 import { migrate } from "@/state/migrate";
 import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
+import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsHome, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -255,10 +256,7 @@ export default function Shell() {
               </ScreenContext>
             ) : (
               <Suspense fallback={null}>
-                <PlaceholderScreen
-                  screen={tabRoute(t).screen}
-                  onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })}
-                />
+                <SettingsHome onSection={(s) => nav.push({ screen: { kind: "settings", section: s }, play: null }, { from: "settings" })} />
               </Suspense>
             )}
           </section>
@@ -285,7 +283,18 @@ export default function Shell() {
           <Player key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
-      <Toaster position="bottom-center" theme="dark" duration={6000} offset={{ bottom: "calc(var(--stack-top) + 12px)" }} mobileOffset={{ bottom: "calc(var(--stack-top) + 12px)" }} />
+      {/* DESIGN.md "Toast": one at a time, a mark, the words, at most one way back; 4 s, 6 s with an action */}
+      <Toaster
+        position="bottom-center"
+        theme="dark"
+        duration={4000}
+        visibleToasts={1}
+        offset={{ bottom: "var(--toast-bottom)" }}
+        mobileOffset={{ bottom: "var(--toast-bottom)" }}
+        style={{ "--width": "min(600px, calc(100vw - 32px))" } as React.CSSProperties}
+        icons={TOAST_ICONS}
+        toastOptions={{ unstyled: true, classNames: TOAST_CLASSES }}
+      />
     </div>
   );
 }
@@ -307,9 +316,11 @@ function PushedScreen({ e }: { e: Entry }) {
     case "tune":
       return <TuneScreen />;
     case "settings":
+      // (the classic app is kept mounted by the shell itself; the Settings root is a tab)
       if (screen.section && screen.section !== "classic") return <SettingsPage section={screen.section} />;
       return null;
     default:
-      return <PlaceholderScreen screen={screen} onBack={() => void nav.back()} onSection={() => {}} />;
+      // tabs and the pre-boot root are never pushed
+      return null;
   }
 }

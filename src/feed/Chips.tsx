@@ -116,7 +116,7 @@ class LoadFailed extends Component<{ children: ReactNode }, { failed: boolean }>
   }
   componentDidCatch() {
     LazyFilterSheet = lazy(load);
-    toast("Couldn't load the filters. Check your connection and try again.");
+    toast.error("Couldn't load the filters. Check your connection and try again.");
     void getNav().back();
   }
   render() {

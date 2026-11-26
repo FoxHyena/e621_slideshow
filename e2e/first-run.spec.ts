@@ -105,6 +105,26 @@ test("Skip for now folds the list into a row over Popular today, kept across a r
   await expect(page.getByTestId("first-run-pick")).toBeVisible();
 });
 
+test("while e621 lists popular artists, their place holds four skeleton rows", async ({ page }) => {
+  const mock = await setup(page, []);
+  mock.popularArtists = [{ name: "big_artist", post_count: 18_200 }];
+  let release!: () => void;
+  const held = new Promise<void>((r) => (release = r));
+  // (registered after the mock, so it answers first: hold the answer, then let the mock give it)
+  await page.route(/\/tags\.json\?.*search%5Border%5D=count|\/tags\.json\?.*search\[order\]=count/, async (route) => {
+    await held;
+    await route.fallback();
+  });
+  await page.goto("/following");
+  const wait = page.getByTestId("popular-artists-wait");
+  await expect(wait).toBeVisible({ timeout: 15_000 });
+  await expect(wait).toHaveAttribute("aria-busy", "true");
+  await expect(wait.locator(".sk-dot")).toHaveCount(4);
+  release();
+  await expect(page.getByTestId("popular-row")).toHaveCount(1);
+  await expect(wait).toHaveCount(0);
+});
+
 test("no favorites: Search, and Popular artists to follow in place", async ({ page }) => {
   const mock = await setup(page, []);
   mock.popularArtists = [

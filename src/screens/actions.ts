@@ -10,6 +10,9 @@ import type { SearchSettings } from "@/lib/settings";
 import { getNav } from "@/nav/history";
 import { SIGN_IN_SHEET, type Route } from "@/nav/routes";
 import { getPrefs } from "@/state/prefs";
+import { Ban } from "lucide-react";
+import { createElement } from "react";
+import { ACTION_MS } from "@/shell/toastLook";
 
 /**
  * A new search's filters. Until slice 3 retires the legacy panel, they follow its saved search
@@ -72,6 +75,8 @@ export function blacklistLine(line: string, label = line.replaceAll("_", " ")): 
   // Into this browser's own list (and a link visit's, which stays unsaved).
   prefs.editBlacklist((b) => (b.trim() ? `${b.trimEnd()}\n${line}` : line));
   toast(`Blacklisted ${label}`, {
+    icon: createElement(Ban, { className: "tone-danger" }),
+    duration: ACTION_MS,
     action: {
       label: "Undo",
       onClick: () =>

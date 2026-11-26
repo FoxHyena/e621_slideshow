@@ -12,6 +12,8 @@
 import { anyPost, getAnchor, visitAnchor, type Credentials } from "@/lib/e621/client";
 import type { SavedSearchRow } from "@/lib/e621/types";
 import { storage } from "@/lib/storage";
+import { Eye } from "lucide-react";
+import { createElement } from "react";
 import { toast } from "sonner";
 import { getFollows } from "./follows";
 import { getSession } from "./session";
@@ -223,7 +225,11 @@ let instance: Following | null = null;
 /** The app's one Following marker, following the session's own sign-in (never a borrowed one). */
 export function getFollowing(): Following {
   if (!instance) {
-    const f = createFollowing((m) => toast(m));
+    const f = createFollowing((m) => {
+      // (the store speaks in sentences: a failure says it couldn't, or that e621 didn't take it)
+      if (/Couldn't|didn't take it/.test(m)) return void toast.error(m);
+      toast(m, m === "Marked as seen on e621" ? { icon: createElement(Eye) } : undefined);
+    });
     const session = getSession();
     const follow = () => {
       const s = session.store.get();

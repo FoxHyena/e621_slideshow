@@ -3,7 +3,10 @@
  * service worker, the "New version ready" toast, and what Settings › App's install row can offer.
  * Loaded after boot, off the first load.
  */
+import { RefreshCw } from "lucide-react";
+import { createElement } from "react";
 import { toast } from "sonner";
+import { ACTION_MS } from "./toastLook";
 import { getNav, isOverlay } from "@/nav/history";
 import { createStore } from "@/state/store";
 
@@ -94,7 +97,7 @@ function offerUpdate(): void {
   const nav = getNav();
   const show = () => {
     if (isOverlay(nav.current()) || document.querySelector("[data-testid=first-run-read]")) return false;
-    toast("New version ready", { id: "update", duration: 6000, action: { label: "Reload", onClick: reloadToUpdate } });
+    toast("New version ready", { id: "update", icon: createElement(RefreshCw), duration: ACTION_MS, action: { label: "Reload", onClick: reloadToUpdate } });
     return true;
   };
   if (show()) return;
