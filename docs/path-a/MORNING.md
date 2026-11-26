@@ -28,6 +28,9 @@ New since then, from your notes:
   cut at the avatar). The empty check well lifts instead, as rows in other sheets have no wash either.
 - Fixed in passing: a tile tapped in the first 0.6 s after the page loaded did nothing.
 - On Following, a tile for a post folded into "+N more" opens that run first, then lands on the post.
+- **← in the slideshow no longer looks like a reload.** It faded out the wrong picture (the one before
+  the post you went back to) over a black fade-in. Now the post you left fades out, as going forward.
+  In Reflections, ← slides the other way.
 
 Approved:
 
@@ -168,10 +171,6 @@ Approved:
    Default: fix after this PR (queue it, as tab taps already are).
 
 ## Needs you (things I held)
-
-0. **Which Back reloads the picture?** I couldn't reproduce it: Back from an artist page to the feed keeps
-   the same pictures, and the player's ← shows the one it already had. Tell me where you were and which
-   button (the ‹ at the top, the browser's Back, a swipe, or ← in the slideshow).
 
 1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested
    against the mock only. This now covers Follow from favorites too (one POST with every picked name).

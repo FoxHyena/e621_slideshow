@@ -827,6 +827,8 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   its own column width. "Play from here" stays in the tile's menu.
 - **No wash on Follow from favorites' rows** (owner's screenshot): rows with no side padding don't wash,
   as in every sheet; the empty check well lifts under the pointer.
-- **"Back reloads the picture"**: not reproduced. Back keeps the same picture elements (checked in a real
-  browser on Results → artist page → Back, and the player's ←). Asked the owner which Back.
+- **"Back reloads the picture"** was ← in the slideshow. The stages faded or slid out `trail[0]`, which is
+  the post you left only going forward; going back it's the one before the post you return to. The player
+  now passes the post it left (`leaving`) and the direction (`back`); Classic, Ken Burns and Reflections
+  use it, and Reflections slides the other way going back. The old one-page app still uses `trail[0]`.
 

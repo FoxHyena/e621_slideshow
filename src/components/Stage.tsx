@@ -23,6 +23,18 @@ export interface StageProps {
   durationMs: number;
   /** The slide timer is counting; motion pauses with it. */
   running: boolean;
+  /**
+   * The post on screen before this one, which the styles fade or slide out. Defaults to `trail[0]`,
+   * which is only right going forward: going back (←) it's the post you left, not the one before.
+   */
+  leaving?: Post | null;
+  /** This slide came from going back (←): styles that slide, slide the other way. */
+  back?: boolean;
+}
+
+/** The post leaving the screen as this one comes on (see `leaving`). */
+export function leavingOf(p: Pick<StageProps, "leaving" | "trail">): Post | null {
+  return p.leaving === undefined ? (p.trail[0] ?? null) : p.leaving;
 }
 
 export default function Stage(props: StageProps) {

@@ -3,11 +3,14 @@
 import { aspectOf } from "@/lib/slideshow/layout";
 import type { Post } from "@/lib/e621/types";
 import { Media } from "../Media";
-import type { StageProps } from "../Stage";
+import { leavingOf, type StageProps } from "../Stage";
 
 /** The post standing on a black floor, slides entering from the right. */
-export default function ReflectionsStage({ post, trail, playback, onReady, onError, currentReady }: StageProps) {
-  const previous = trail[0];
+export default function ReflectionsStage(props: StageProps) {
+  const { post, playback, onReady, onError, currentReady, back } = props;
+  const previous = leavingOf(props);
+  // forward: in from the right, out to the left; back (←) the other way
+  const side = back ? -110 : 110;
   return (
     <div className="absolute inset-0 overflow-hidden bg-black" data-testid="reflections-stage">
       <div className="reflections-floor pointer-events-none absolute inset-x-0 bottom-0 h-[38%]" />
@@ -15,7 +18,7 @@ export default function ReflectionsStage({ post, trail, playback, onReady, onErr
         <Plate
           key={`prev-${previous.id}`}
           post={previous}
-          offset={currentReady ? -110 : 0}
+          offset={currentReady ? -side : 0}
           playback={playback}
           still
           testId="previous-layer"
@@ -24,7 +27,7 @@ export default function ReflectionsStage({ post, trail, playback, onReady, onErr
       <Plate
         key={post.id}
         post={post}
-        offset={currentReady ? 0 : 110}
+        offset={currentReady ? 0 : side}
         playback={playback}
         onReady={(d) => onReady(post.id, d)}
         onError={() => onError(post.id)}

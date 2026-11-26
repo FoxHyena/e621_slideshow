@@ -210,6 +210,20 @@ test.describe("player", () => {
     expect(centre!).toBeLessThan(40);
   });
 
+  test("← fades out the post you left, not an older one", async ({ page }) => {
+    await page.goto("/search?tags=wolf&play=1150");
+    const player = page.getByTestId("player");
+    await expect(player).toHaveAttribute("data-post-id", "1150");
+    await page.getByTestId("next-button").click();
+    await page.getByTestId("next-button").click();
+    await expect(player).toHaveAttribute("data-post-id", "1148");
+    const leftSrc = await slide(page).getAttribute("src");
+    await page.getByRole("button", { name: "Previous" }).click();
+    await expect(player).toHaveAttribute("data-post-id", "1149");
+    // the layer fading out is 1148 (the one on screen a moment ago), never 1150
+    await expect(page.getByTestId("previous-layer").locator("img")).toHaveAttribute("src", leftSrc!);
+  });
+
   test("▶ plays from the top, a reload keeps the post, and Esc closes", async ({ page }) => {
     await page.goto("/search?tags=wolf");
     await page.getByTestId("play-fab").click();

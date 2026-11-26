@@ -916,3 +916,9 @@ first 0.6 s. "Back reloads the picture" not reproduced (DECISIONS).
 the dev server already running in this folder, `E6_PORT=3000`); feeds, desktop and following specs after
 them (43 passed, including the new folded-run test). **Budgets:** JS cold load **199.7 KB** (≤ 200, 0.3 KB
 headroom), CLS 0, 0 long tasks.
+
+**Follow-up: ← in the slideshow** (the owner's "Back reloads the picture"). Cause and fix in DECISIONS.
+New e2e "← fades out the post you left, not an older one" fails on the old code and passes on the fix.
+Gates: typecheck and lint clean; unit 311 pass; e2e 227 passed, 3 skipped; budgets JS 199.7 KB, CLS 0,
+0 long tasks.
+

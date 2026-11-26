@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { mediaKind } from "@/lib/e621/types";
 import { kenBurns, type KenBurns } from "@/lib/slideshow/layout";
 import { Media } from "../Media";
-import type { StageProps } from "../Stage";
+import { leavingOf, type StageProps } from "../Stage";
 
 const pose = (p: KenBurns["from"]) => `translate(${p.x}%, ${p.y}%) scale(${p.scale})`;
 
@@ -12,8 +12,9 @@ const pose = (p: KenBurns["from"]) => `translate(${p.x}%, ${p.y}%) scale(${p.sca
  * Full-bleed slow pan and zoom across the slide's whole duration. Videos sit
  * still: moving a moving picture just reads as camera shake.
  */
-export default function KenBurnsStage({ post, trail, playback, onReady, onError, currentReady, durationMs, running }: StageProps) {
-  const previous = trail[0];
+export default function KenBurnsStage(props: StageProps) {
+  const { post, playback, onReady, onError, currentReady, durationMs, running } = props;
+  const previous = leavingOf(props);
   const motion = mediaKind(post) !== "video";
   const kb = kenBurns(post.id);
   const vars = { "--kb-from": pose(kb.from), "--kb-to": pose(kb.to) } as CSSProperties;

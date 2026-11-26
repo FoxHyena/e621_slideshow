@@ -103,6 +103,8 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
     return () => clearTimeout(t);
   }, [nobodyShown]);
   const [trail, setTrail] = useState<Post[]>([]);
+  /** the post the last move left, and where it went: the stage fades or slides that one out */
+  const [left, setLeft] = useState<{ post: Post; to: number; back: boolean } | null>(null);
   const [ready, setReady] = useState<{ id: number; durationSec?: number } | null>(null);
   const [controls, setControls] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
@@ -113,6 +115,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   const show = (i: number) => {
     const p = posts[i];
     if (!p) return;
+    if (current) setLeft({ post: current, to: p.id, back: i < index });
     if (current && trail[0]?.id === p.id) setTrail(trail.slice(1));
     else if (current) setTrail([current, ...trail.filter((t) => t.id !== current.id)].slice(0, TRAIL_MAX));
     setReady(null);
@@ -431,6 +434,8 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
           <Stage
             post={current}
             trail={trail}
+            leaving={left?.to === current.id ? left.post : null}
+            back={left?.to === current.id && left.back}
             upcoming={posts.slice(index + 1, index + 1 + UPCOMING_SHOWN)}
             playback={playback}
             currentReady={isReady}
