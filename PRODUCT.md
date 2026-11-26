@@ -48,7 +48,7 @@ Success: Following is the first thing the owner opens each day, and catching up 
 
 ## Brand Commitments
 
-- Name: "e621 Slideshow" (kept for now).
+- Name: "eLicks21", spelled exactly so (owner, 2026-11-26). An unofficial browser for e621; no e621 logo or brand. The slideshow is a feature called "Play".
 - Kaleidoscope artist avatars stay.
 - Colors and type are free to restyle, **but** the owner wants a side-by-side comparison of a couple of
   options against e621's own colors (navy panels, yellow-orange accent, as the app uses today) to show

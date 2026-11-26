@@ -124,7 +124,10 @@ treat that message as your approval of any design.
    top of Settings. The builder is told not to build it until you say yes.
 6. **Added:** an "Updated to 2.1" toast after the reload; a sheet for links opened inside another app
    ("This browser cannot install apps…" with "Copy link").
-7. **Name under the icon:** "Slideshow" ("e621 Slideshow" is cut off on an iPhone).
+7. ~~**Name under the icon:** "Slideshow".~~ **Named by you on 2026-11-26: "eLicks21".** It fits whole
+   under an iPhone icon. **Wordmark picked by you: Two-tone** ("e" and "21" in the link blue, "Licks" in white). You ruled
+   out the drop on the i: the name stays text. The app icon carries no name and does
+   not change. **Waiting for you:** the wordmark under Goo on the landing card, which is new there.
 
 ## Batch 5: on a computer (section "On a computer (900 px and wider)")
 
@@ -135,7 +138,8 @@ treat that message as your approval of any design.
    **Your idea, picked by you ("jar row"):** the pool on a phone too, inside the "Tab bar goo" row in
    Settings. **Picked by you ("Fall"):** on a computer the drop falls off the bottom of the window.
    **Approved by you ("Approve"):** how a pool rises, catches up when Settings opens, and drains.
-   Still open: the goo row's name on a computer, and the secret tab there.
+   **Picked by you ("Scroll"):** the secret tab on a computer is one row past Settings.
+   **Waiting for you:** the goo row's name ("Goo" everywhere, or "Sidebar goo" / "Tab bar goo").
 2. **Sidebar:** a floating panel, 232 wide, with names; the current tab wears the tab bar's sliding
    capsule. Icons only from 900 to 1099. Other option: icons only at every width.
 3. **Play** keeps its gold disc at the bottom left of the content, beside the feed column. Other

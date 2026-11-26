@@ -883,14 +883,31 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mpboard6 { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
 .mpboard6 > figure { margin: 0; display: flex; flex-direction: column; gap: 6px; font: var(--t-foot); color: var(--muted); text-align: center; }
 .mpboard6 .group6 { margin: 0; text-align: left; }
+/* The wordmark "eLicks21". Owner-picked: Two-tone ("e" and "21" in the link blue). Type only: the owner ruled out a drop on the i. */
+.wm6 { font-family: var(--f-r); font-weight: var(--w-d); letter-spacing: var(--ls-d); white-space: nowrap; }
+.wm6 i { font-style: normal; color: var(--link); }
+.hello6 .wm6 { font-size: 28px; line-height: 34px; margin: 4px 0 10px; color: var(--text); }
+.wmrow6 { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px 36px; padding: 24px 16px; color: var(--text); }
+.wmrow6 .lock { display: flex; align-items: center; gap: 12px; }
+.wmrow6 .lock.goo { flex-direction: column; gap: 2px; }
 .sbrand6 { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 4px; font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); }
-.stabs6 { position: relative; display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.stabs6 { position: relative; margin-top: 8px; }
 .sind6 { position: absolute; left: 0; right: 0; top: 0; height: var(--h); border-radius: 999px; background: var(--raised-hi-a); box-shadow: var(--lit); transform: translateY(calc(var(--k, 0) * 48px)); transition: transform .5s cubic-bezier(.3,1.35,.5,1); }
 .stab6 { position: relative; height: var(--h); display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 999px; color: var(--link); font: var(--w-s) 15px/20px var(--f-r); text-align: left; transition: color .2s ease-out; }
 .stab6.on { color: var(--gold); } .stab6.on .ic { stroke-width: 2.4; }
 .stab6 .badge { margin-left: auto; height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font: var(--w-v) 13px/20px var(--f-r); text-align: center; font-variant-numeric: tabular-nums; transition: transform .2s ease-out, opacity .2s ease-out; }
 .stab6.on .badge { transform: scale(0); opacity: 0; }
 .stab6:not(.on):hover, .stab6.hov, .sacct6:hover, .sacct6.hov { background: rgba(255,255,255,.05); }
+/* The secret tab on a computer (picked by the owner: "Scroll"): the tabs ride a rail, clipped to the four rows; one row past Settings is the fifth. */
+.stabs6 { height: 188px; flex: none; clip-path: inset(-3px -4px round 24px); }
+.srail6 { position: relative; display: flex; flex-direction: column; gap: 4px; transition: transform .5s cubic-bezier(.3,1.35,.5,1); }
+.side6.secopen .srail6 { transform: translateY(-48px); }
+.stab6.ssec6 { color: #fff; }
+.side6.rail .stabs6 { height: auto; clip-path: none; }
+.scrop6.topc { height: 332px; } .scrop6.topc .side6 { bottom: auto; height: 784px; }
+/* The goo row's name (open). #root[data-gname] = goo | split */
+#root[data-gname="goo"] .nm2, #root[data-gname="split"] .nm1 { display: none; }
+.drow6 { padding: 20px; } .drow6 .dcol6 { padding-top: 0; max-width: 100%; } .drow6 .group6:last-child { margin-bottom: 0; }
 .ssearch6 { margin-top: 12px; flex: none; padding-right: 8px; }
 .ssearch6 > span:first-of-type { flex: 1; }
 .sacct6 { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 12px; text-align: left; } /* 24 - 12: the sidebar's radius less its padding */
@@ -1056,7 +1073,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile6.skt6 .nums .sk { height: 10px; }
 </style>
 
-<div class="wrap" id="root">
+<div class="wrap" id="root" data-gname="goo">
   <h1 class="pg-h1">Screens v6</h1>
   <p class="pg-p dimtxt">The screens the feed mock never drew, built from the approved v6 parts: the same three materials, sizes, Fredoka voice, artist marks and tab bar. Every phone scrolls and its controls work. The three open choices are picked: artist stats in wells, score and favs under grid tiles, Settings icons in wells. The goo on the tab bars is live: the heart on the Player phone adds to it, and Wipe clean is on the Settings phone.</p>
 
@@ -1282,11 +1299,13 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
         <div class="under" id="u-upd"></div>
       </section>
       <section class="col" aria-label="The app icon">
-        <div class="col-head"><h2 class="pg-h3">3. The app icon</h2><p><b>Picked by you: Gold.</b> From your note: a hexagon with Play set into it. The hexagon is the app's gold Play button, with the light on top and a lip under it. Play is sunk into it like a well. Under it the name is "Slideshow".</p></div>
+        <div class="col-head"><h2 class="pg-h3">3. The app icon</h2><p><b>Picked by you: Gold.</b> From your note: a hexagon with Play set into it. The hexagon is the app's gold Play button, with the light on top and a lip under it. Play is sunk into it like a well. Under it the name is "eLicks21".</p></div>
         <div class="phone-holder" id="s-icon"></div>
         <div class="under" id="u-icon"></div>
         <div class="col-head" style="margin-top:24px"><h2 class="pg-h3">4. The mark inside the app</h2><p><b>Picked by you: the hexagon, as an Inlay.</b> A navy hexagon with the light on top, and Play set in as gold. It has no lip, because a lip means "press me", and gold stays a glyph, so Play is still the one gold fill on the screen. It shows at "You're all caught up", at the foot of Settings and at the top of the sidebar.</p></div>
         <div class="under" id="u-mark"></div>
+        <div class="col-head" style="margin-top:24px"><h2 class="pg-h3">5. The name and its wordmark</h2><p><b>Picked by you: Two-tone.</b> The app is <b>eLicks21</b>, your name. It is written in Fredoka like every title; "e" and "21" are the light blue of links and "Licks" is white. It is text only: you ruled out a drop on the i. The app icon carries no name, so it does not change. <span class="prop6">Proposed, not owner-approved</span> Where it sits is mine: the sidebar, the foot of Settings and, new, under Goo on the landing card.</p></div>
+        <div class="under" id="u-wm"></div>
       </section>
     </div>
     <h2 class="pg-h2">What I decided in this pass</h2>
@@ -1300,7 +1319,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
         <tr><th>Update toast</th><td>Update toast</td><td>"New version ready" with "Reload", 6 s with the ring, once per version, only on a feed (never over the player, a sheet or the keyboard). After that: Settings › App, "Version · 2.1 is ready · Reload".</td><td>It acts like every other action toast, so it cannot sit on the screen for a whole session. Other option: it stays until you tap it.</td></tr>
         <tr><th>After the reload</th><td>(not said)</td><td>A 4 s toast: "Updated to 2.1".</td><td>Added. It shows the reload did something. Say the word and it goes.</td></tr>
         <tr><th>The icon</th><td>(not said)</td><td>The app mark reaching 68% of the way from the centre to the edge, on navy that runs from Panel Navy at the top to Ground at the bottom. Tab icon: the mark reaching 84%, with no glow. One-colour version for Android.</td><td>DESIGN.md already says the kaleidoscope is the app mark and that Goo is never the icon. 68% keeps it, glow and all, inside Android's circle. Other option: a flat Ground background.</td></tr>
-        <tr><th>The name</th><td>(not said)</td><td>"Slideshow" under the icon; "e621 Slideshow" as the full name. Launch colour and the status bar's colour are Ground.</td><td>"e621 Slideshow" is cut off under an iPhone icon.</td></tr>
+        <tr><th>The name</th><td>(not said)</td><td>"eLicks21", your name for the app. It is short enough to sit whole under an iPhone icon, so there is no second, shorter name. Launch colour and the status bar's colour are Ground.</td><td>The old name, "e621 Slideshow", was cut off under an iPhone icon and needed "Slideshow" as a short name.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -1321,6 +1340,13 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <p class="pg-p dimtxt"><span class="prop6">Picked by you: Pool</span>On a phone a drop falls from the heart onto the tab bar and the goo builds up along its top edge. On a computer the tab bar is a sidebar at the left, so the goo collects in its foot. The windows above show it at 40 favorites. The other two options (along the top edge, and no goo) are gone.</p>
     <div class="under" id="u-dgoo" style="margin-top:24px"></div>
     <p class="pg-p dimtxt" style="margin-top:24px"><span class="prop6">Picked by you: Fall</span>The drop on a computer. Press a heart in the first window above ("1. Following") to see it. The drop falls straight down from the heart, as on the phone, and leaves by the bottom of the window; 140 ms later a swell comes up at the right end of the pool and the level rises. The other option, a lob into the sidebar, is gone. The pool rises and drains as the phone's jar row does (approved by you).</p>
+    <h2 class="pg-h2">The goo row in Settings on a computer</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Your call. Not picked</span>On a phone the row is called "Tab bar goo". A computer has no tab bar, and since your jar row the goo is not only on the tab bar on a phone either. Two names. On a computer I drew the row as the last group of the Settings page, after App, as a plain row: the pool is already in the sidebar beside it, so the row does not fill up there. "Wipe clean" below is live and drains every pool on this page.</p>
+    <div class="tchoice6" style="margin-top:16px"><b>The row's name</b><div class="pick" data-opt="gname" role="group" aria-label="The row's name"><button type="button" data-v="goo" aria-pressed="true">Goo, everywhere</button><button type="button" data-v="split" aria-pressed="false">Sidebar goo / Tab bar goo</button></div></div>
+    <div class="under" id="u-drow" style="margin-top:24px"></div>
+    <h2 class="pg-h2">The secret tab on a computer</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Scroll</span>On a phone you drag the tab bar and find a fifth tab, "Goo", one tab past Settings; pressing it throws ten drops onto the bar. On a computer it is the same idea stood on its side. Try it in the windows above: turn the wheel down over the four tabs, then press "Goo". The other two options (hold the app mark, and no secret) are gone.</p>
+    <div class="under" id="u-dsec" style="margin-top:24px"></div>
     <div class="cols" style="margin-top:48px" id="u-desk-cols"><section class="col" style="width:375px"><div class="under" id="u-desk"></div></section></div>
     <h2 class="pg-h2">What I decided in this pass</h2>
     <div class="tbl"><table>
@@ -1615,6 +1641,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     return `<svg viewBox="-1 -1 2 2" aria-hidden="true"><defs><linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B4D80"/><stop offset="1" stop-color="#1F3C67"/></linearGradient><clipPath id="${id}h"><path d="${hex}"/></clipPath><clipPath id="${id}t"><path d="${tri}"/></clipPath></defs>
       <path d="${hex}" fill="url(#${id}f)"/><g clip-path="url(#${id}h)"><path d="${hex}" fill="rgba(255,255,255,.22)"/><path d="${hex}" transform="translate(0 .04)" fill="url(#${id}f)"/></g>
       <g transform="translate(${tx} 0)"><path d="${tri}" transform="translate(0 .04)" fill="rgba(255,255,255,.12)"/><path d="${tri}" fill="#A8871F"/><g clip-path="url(#${id}t)"><path d="${tri}" transform="translate(0 .06)" fill="#E8C446"/></g></g></svg>`; };
+  // The wordmark, two-tone (owner-picked). Read aloud as one name.
+  const wm = (style = '') => `<span class="wm6" role="img" aria-label="eLicks21" ${style ? `style="${style}"` : ''}><span aria-hidden="true"><i>e</i>Licks<i>21</i></span></span>`;
   const mark = (cls = 'l') => `<span class="hm6 ${cls}">${hexMarkSvg()}</span>`;
 
   /* ---------- icons (lucide paths, drawn heavier than v5.3) ---------- */
@@ -1883,7 +1911,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* ---------- settings ---------- */
   const srow = (i, t, s, val = '', cls = '') => `<button class="srow6" type="button"><span class="ico ${cls}">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span>${val ? `<span class="val">${val}</span>` : ''}${chev()}</button>`;
   // The pool on a phone lives in the "Tab bar goo" row. n = a fixed amount for a board specimen; without it the drawing follows the live count.
-  const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Tab bar goo</b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
+  const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b><span class="nm1">Goo</span><span class="nm2">Tab bar goo</span></b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
   const setGoo = (n, fr = '') => `<div class="group6 jar6">${gooRow(n)}<span class="mp6 row" data-pool="jar" ${n == null ? '' : `data-n="${n}"`} ${fr}></span><div class="mpink6 row" aria-hidden="true">${gooRow(n, 'style="visibility:hidden"')}</div></div>`;
   $('u-mpool').innerHTML = strip('The goo row fills up', 'The row that holds "Wipe clean" is the jar. The level rises inside its card and stops just over the title: 7 tall at 5 favorites, 24 at 40, 43 at 150, of 56. The words show through in navy, cut to the goo\'s own edge. "Wipe clean" sits on top of the goo and drains it.',
     `<div class="strip p6 mpboard6">${[5, 40, 150].map(n => `<figure>${setGoo(n)}<span>${n} favorites</span></figure>`).join('')}</div>`);
@@ -1902,7 +1930,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
         ${srow('eye', 'Content', 'Ratings, blacklist')}${srow('film', 'Slideshow', 'Style, timing, videos', '6 s')}${srow('spark', 'For You', 'Tune, hidden artists')}${srow('app', 'App', 'Install, shortcuts, about')}
       </div>
       ${setGoo()}
-      <div class="caught6" style="padding-top:16px"><button type="button" class="markbtn" aria-label="e621 Slideshow" style="border-radius:999px;margin-bottom:8px">${mark('l')}</button><b>e621 Slideshow</b><small>Version 2.0</small></div>
+      <div class="caught6" style="padding-top:16px"><button type="button" class="markbtn" aria-label="eLicks21" style="border-radius:999px;margin-bottom:8px">${mark('l')}</button><b>${wm()}</b><small>Version 2.0</small></div>
     </div>` + bottom('Settings'));
 
   /* ---------- settings › slideshow ---------- */
@@ -2149,7 +2177,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <div class="cbar6"><div class="in"><b>Following</b><span></span>${tools()}</div></div>
     <div class="scroll6">
       <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
-      <div class="hello6">${mascot('wave', 104)}<b>Follow the artists you love</b><p>See their new posts first, all in one feed.</p><button class="btn6 gold lip6 wide" type="button">Sign in with e621</button></div>
+      <div class="hello6">${mascot('wave', 104)}${wm()}<b>Follow the artists you love</b><p>See their new posts first, all in one feed.</p><button class="btn6 gold lip6 wide" type="button">Sign in with e621</button></div>
       <div class="shead6"><b>Popular today</b></div>
       ${post(POP)}${post(POP2)}
     </div>
@@ -2446,7 +2474,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <div class="scroll6">${subHead('App')}
       <div class="group6" style="margin-top:16px">${srow('app', 'Install the app', 'Add it to your home screen')}</div>
       <p class="gnote6">Links you open will still go to Safari, not the installed app, and the two keep separate sign-ins.</p>
-      <div class="group6">${srow('ext', 'e621 button', 'Adds a Slideshow button to e621')}${srow('keys', 'Keyboard shortcuts', 'On a computer')}</div>
+      <div class="group6">${srow('ext', 'e621 button', 'Adds an eLicks21 button to e621')}${srow('keys', 'Keyboard shortcuts', 'On a computer')}</div>
       ${glab('About')}
       <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>What's new</b></span>${chev()}</button><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
       <p class="gnote6">Not run by e621. It reads e621 with your own account and key.</p>
@@ -2460,7 +2488,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* ================= Install, update and the app icon (proposed) ================= */
   Object.assign(P, { addsq: '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/>', dots: '<path d="M5 12h.01"/><path d="M12 12h.01"/><path d="M19 12h.01"/>' });
   const isteps = (...l) => `<ol class="check6 isteps6">${l.map(([t, sub, g], i) => `<li><span class="n">${i + 1}</span><span>${t}${sub ? `<small>${sub}</small>` : ''}</span>${g ? ic(g, 20, 2) : ''}</li>`).join('')}</ol>`;
-  const instSheet = `${shtop('Install the app')}<p class="shp6">Slideshow on your home screen, full screen, without the browser's bars.</p>${isteps(['Tap <b>Share</b>', 'In Safari it can be under •••', 'share'], ['Choose <b>Add to Home Screen</b>', '', 'addsq'], ['Tap <b>Add</b>', '', ''])}<p class="shn6">The installed app keeps its own sign-in, so you sign in once more there.</p>`;
+  const instSheet = `${shtop('Install the app')}<p class="shp6">eLicks21 on your home screen, full screen, without the browser's bars.</p>${isteps(['Tap <b>Share</b>', 'In Safari it can be under •••', 'share'], ['Choose <b>Add to Home Screen</b>', '', 'addsq'], ['Tap <b>Add</b>', '', ''])}<p class="shn6">The installed app keeps its own sign-in, so you sign in once more there.</p>`;
   // the steps open over Settings › App
   $('s-inst').innerHTML = $('s-app').innerHTML;
   $('s-inst').querySelector('.home6').insertAdjacentHTML('beforebegin', `<div class="dim6"></div><div class="sheet6 in" role="dialog" aria-label="Install the app">${instSheet}</div>`);
@@ -2506,8 +2534,12 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const iconV = (size, cls = 'ios', o = {}) => hexIcon('gold', size, cls, o);
   const small = { reach: .8, flat: true };
   $('u-mark').innerHTML = strip('Two sizes', '56 at "You\'re all caught up" and at the foot of Settings. 36 beside the name in the sidebar.',
-    `<div class="strip p6 markpick6">${mark('l')}<div class="sbrand6">${mark('')}<span>Slideshow</span></div></div>`);
-  $('s-icon').innerHTML = phone(`<div class="hgrid6">${ph(9)}<div>${iconV(60)}<span>Slideshow</span></div>${ph(2)}</div><div class="hdock6">${'<span class="ph"></span>'.repeat(4)}</div>`, 'homescr6');
+    `<div class="strip p6 markpick6">${mark('l')}<div class="sbrand6">${mark('')}${wm()}</div></div>`);
+  const wmStrip = () => `<div class="strip p6 wmrow6"><div class="lock">${mark('')}${wm('font-size:20px;line-height:25px')}</div><div class="lock goo">${mascot('wave', 84)}${wm('font-size:28px;line-height:34px')}</div><div class="lock">${wm('font-size:44px;line-height:52px')}</div></div>`;
+  $('u-wm').innerHTML = [
+    strip('Two-tone, picked by you', '"e" and "21" step back to the light blue of links; "Licks" stays white. Shown beside the mark at 20, under Goo at 28, and alone at 44.', wmStrip()),
+  ].join('');
+  $('s-icon').innerHTML = phone(`<div class="hgrid6">${ph(9)}<div>${iconV(60)}<span>eLicks21</span></div>${ph(2)}</div><div class="hdock6">${'<span class="ph"></span>'.repeat(4)}</div>`, 'homescr6');
   $('u-icon').innerHTML = [
     strip('One drawing, three masks', 'iPhone cuts a rounded square, Android a circle (the dashed ring is its safe area), a browser tab shows it at 32 and 16 with no lip and no shadow.',
       `<div class="strip p6 row icons6"><div>${iconV(120)}<span>iPhone, 180</span></div><div>${iconV(96, 'round guide')}<span>Android, 192 and 512</span></div><div><span class="pair">${iconV(32, 'fav', small)}${iconV(16, 'fav', small)}</span><span>Tab, 32 and 16</span></div></div>`),
@@ -2524,8 +2556,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const gooTint = n => mixHex('#FFFFFF', '#F3E6A8', 1 - Math.exp(-n / 70));
   const poolH = n => 10 + 56 * (1 - Math.exp(-n / 60));
   const sidePool = n => `<span class="dg6 pool" data-pool="side" ${n == null ? '' : `data-n="${n}"`}></span><span class="dgink6" aria-hidden="true"><span class="in"><i></i><span><b>wolfie</b><small>42 follows</small></span></span></span>`;
-  const side = (active, cls = '', n = 12, goo) => `<nav class="side6 ${cls}" aria-label="Tabs">${cls.includes('rail') ? '' : sidePool(goo)}<div class="sbrand6">${mark('')}<span>Slideshow</span></div>
-    <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
+  const side = (active, cls = '', n = 12, goo) => `<nav class="side6 ${cls}" aria-label="Tabs">${cls.includes('rail') ? '' : sidePool(goo)}<div class="sbrand6">${mark('')}${wm()}</div>
+    <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><div class="srail6"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}${cls.includes('rail') ? '' : `<button type="button" class="stab6 ssec6" data-ssecret aria-label="Secret: ten more favorites of goo">${ic('drops', 22, 2)}<span>Goo</span></button>`}</div></div>
     <button type="button" class="field6 ssearch6" aria-label="Search">${ic('search', 18, 2.2)}<span>Search</span><span class="kbd6">/</span></button>
     <button type="button" class="sacct6" aria-label="Account: wolfie">${avatar('wolfie')}<span><b>wolfie</b><small>42 follows</small></span></button></nav>`;
   const dtools = `<div class="tools6"><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
@@ -2536,6 +2568,11 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // 1. Following: the sidebar, the 600 column, Play beside it
   const gooCrops = () => `<div class="strip p6 goorow6">${[5, 40, 150].map(n => `<figure><div class="scrop6 bot">${side('Following', '', 12, n)}</div><span>${n} favorites</span></figure>`).join('')}</div>`;
   $('u-dgoo').innerHTML = strip('The goo collects in the foot of the sidebar', 'The sidebar is the jar. A drop falls from the heart and arcs left into it. The level rises fast at first and then slows, so it never passes the account row: 14 tall at 5 favorites, 37 at 40, 61 at 150. Your name shows through in navy where the goo covers it, as tab names do on the phone. With the icon-only sidebar there is no goo.', gooCrops());
+  $('u-drow').innerHTML = strip('The last group on the Settings page', 'Under App, with no heading of its own, as on the phone. The count and "Wipe clean" are the phone\'s. Not a jar here: the sidebar\'s pool is the jar on a computer.',
+    `<div class="strip p6 drow6"><div class="dcol6"><div class="shead6" style="margin-top:0"><b>App</b></div><div class="group6">${srow('app', 'Install', 'Add eLicks21 to your dock')}${srow('link', 'About', 'Version 2.0')}</div>
+      <div class="group6"><div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b><span class="nm1">Goo</span><span class="nm2">Sidebar goo</span></b><small data-goo-count></small></span><button class="btn6 lip6" type="button" data-goo-act="wipe">Wipe clean</button></div></div></div></div>`);
+  const secCrop = (cls, cap) => `<figure><div class="scrop6 topc">${side('Following', cls, 12, 40)}</div><span>${cap}</span></figure>`;
+  $('u-dsec').innerHTML = strip('One row past Settings', 'The four tabs ride a rail clipped to their own height. Turn the wheel down over them (or move focus past Settings) and the rail slides up one row: Following leaves at the top, "Goo" comes in under Settings. It settles on the tab bar\'s spring. The cost is the phone\'s too: while it is scrolled, the first tab is out of sight. Pressing "Goo" squeezes its icon and throws ten drops, in spurts of 4, 3 and 3, down into the pool. With the icon-only sidebar there is no secret.', `<div class="strip p6 goorow6">${secCrop('', 'At rest')}${secCrop('secopen fixsec', 'Scrolled')}</div>`);
   $('d-feed').innerHTML = desk(side('Following') + feedMain);
 
   // 2. Grid: the full width; a chip's sheet becomes a popover under the chip
@@ -2841,7 +2878,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     st.plops = st.plops.filter(pl => now - pl.t0 < POOL_PLOP); if (st.plops.length) moving = true;
     if (st.drain) { const p = clamp((now - st.drain.t0) / POOL_DRAIN, 0, 1); st.h = st.drain.from * (1 - easeIO(p)); tilt = POOL_TILT * Math.sin(Math.PI * p) * Math.min(1, st.drain.from / 20); st.v = 0; if (p >= 1) { st.drain = null; st.h = 0; } else moving = true; }
     else { const e = st.tgt - st.h; st.v += (e * 40 - st.v * 9) * dt; st.h += st.v * dt; if (Math.abs(e) > .05 || Math.abs(st.v) > .5) moving = true; else { st.h = st.tgt; st.v = 0; } }
-    poolPaint(el, P, st.h, st.cn, tilt, st.plops.map(pl => ({ x: pl.x, p: (now - pl.t0) / POOL_PLOP })));
+    poolPaint(el, P, st.h, st.cn, tilt, st.plops.map(pl => ({ x: pl.x, p: clamp((now - pl.t0) / POOL_PLOP, 0, 1) })));
     if (!moving) st.last = 0; return moving;
   };
   const poolTick = now => { let live = false; poolLive().forEach(el => { const st = poolSt.get(el); if (st && st.on && poolStep(el, st, now)) live = true; else if (st) st.on = false; }); poolRaf = live ? requestAnimationFrame(poolTick) : 0; };
@@ -2907,6 +2944,22 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     }, 380);
     return true;
   };
+  // The secret on a computer: ten drops thrown from the "Goo" row, falling into the pool at the sidebar's foot. Each one that lands is one more favorite.
+  const sideSpurt = (nav, from) => {
+    const pool = nav.querySelector('[data-pool]'), icon = from.querySelector('.ic') || from.querySelector('svg') || from;
+    if (calm || !pool) return gooAdd(10);
+    const nr = nav.getBoundingClientRect(), z = nr.width / nav.offsetWidth, ir = icon.getBoundingClientRect(), x0 = (ir.left + ir.width / 2 - nr.left) / z, y0 = (ir.top + ir.height / 2 - nr.top) / z, r = (lo, hi) => lo + Math.random() * (hi - lo);
+    icon.animate([0, 1, 2].flatMap(k => [{ transform: 'scale(1)', offset: k / 3, easing: 'cubic-bezier(.3,0,.4,1)' }, { transform: `translateY(${3 - k * .5}px) scale(${1.24 - k * .04}, ${.74 + k * .05})`, offset: k / 3 + .1, easing: 'cubic-bezier(.3,1.6,.5,1)' }]).concat({ transform: 'scale(1)' }), { duration: 400 });
+    [4, 3, 3].forEach((n, pulse) => { for (let j = 0; j < n; j++) setTimeout(() => {
+      const st = poolSt.get(pool), x1 = r(28, nav.offsetWidth - 28), y1 = nav.offsetHeight - (st ? st.h : 0) - 2, dx = x1 - x0, dy = y1 - y0, U = r(180, 320), T = 300 + 17 * Math.sqrt(Math.max(0, dy)) + r(0, 80), k = r(.8, 1.2);
+      const frames = Array.from({ length: 13 }, (_, i) => { const t = i / 12; return { offset: t, transform: `translate(${(dx * t).toFixed(1)}px, ${(-U * t + (dy + U) * t * t).toFixed(1)}px) scale(${(k * .85).toFixed(2)}, ${(k * (1 + .5 * t)).toFixed(2)})` }; });
+      const el = document.createElement('span'); el.className = 'gdrop'; el.style.left = x0.toFixed(1) + 'px'; el.style.top = y0.toFixed(1) + 'px'; nav.appendChild(el);
+      el.animate(frames, { duration: T, fill: 'forwards' }).onfinish = () => { el.remove(); gooCount++; gooSet(); };
+    }, pulse * 133 + j * 26); });
+  };
+  document.addEventListener('click', e => { const b = e.target.closest('[data-ssecret]'); if (b) sideSpurt(b.closest('.side6'), b); });
+  document.addEventListener('wheel', e => { const t = e.target.closest && e.target.closest('.stabs6'), nav = t && t.closest('.side6'); if (!nav || nav.classList.contains('rail') || nav.classList.contains('fixsec') || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return; e.preventDefault(); nav.classList.toggle('secopen', e.deltaY > 0); }, { passive: false });
+  document.addEventListener('focusin', e => { const b = e.target.closest && e.target.closest('[data-ssecret]'); if (b) b.closest('.side6').classList.add('secopen'); });
   const gooAdd = (k, btn) => { gooCount += k; if (btn && !calm && (gooFall(btn) || deskFall(btn))) return gooLabels(); gooSet(); };
   // Wipe: a blade sweeps left to right along the bend. Behind it the bar is clean; in front of it the goo piles up, then flies off the end.
   const gooWipe = () => {
