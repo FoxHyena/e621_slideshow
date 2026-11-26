@@ -43,3 +43,16 @@ Format: date — decision. Why. Rejected alternatives.
 - Suggestions (Following card and Artists › Suggested) show one artist per section with 3 tiled recent
   posts, filtered by ratings + blacklist, fetched in one batched `~a ~b …` request. Rejected: a
   horizontal row of small avatar tiles (owner found it janky).
+
+## 2026-11-25 — Visual direction (Phase 3)
+- Owner picked **A, e621 colours refined** (navy + #fcb328 gold), with a condition: "it should not tint
+  every picture. The idea behind this is seeing the art." So the ground around art is a neutral
+  near-black; navy is kept for chrome surfaces (cards, chips, sheets, tab bar) that don't frame art,
+  and gold for accents. Nothing is overlaid on art except what the medium needs (video play, mute).
+  Rejected: B plush hang tag (my recommendation), C reference sheet. impeccable telemetry: kind canon.
+- Owner: spacing fixes "a little better", but "overall our visual information architecture and sizes of
+  things all feels kind of off and inconsistent". Response: a closed size system (5 type sizes, 2
+  control heights, 1 row height, 2 icon sizes, 3 avatar sizes, 5 spacing steps, 3 radii) that every
+  screen must use, shown on the next comparison page.
+- Process fix: the first comparison shipped with chips, Play and Follow unstyled (a `.phone button`
+  reset beat the component classes). Every mock now gets a Playwright screenshot before it's shown.
