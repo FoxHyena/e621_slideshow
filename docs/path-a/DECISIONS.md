@@ -914,3 +914,58 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   windowed feed, so a taller card would move everything under it.
 - Budget: the tag targets (shown when a tag is held) moved to their own chunk, fetched on the first hold
   and at idle with the screens.
+
+## 2026-11-26 — The rest of the hover pass and the grid loading skeleton approved
+
+- I asked: "Approve the rest of the hover pass and the grid loading skeleton?" Owner's words:
+  "Approve both".
+- **Approved: the whole "Under the pointer" table in DESIGN.md.** Lift was already picked. Now also:
+  one step lighter for raised things with no lip; the 6% wash for icons, words and wells; the 40 by 36
+  wash in the tools capsule (4 to the capsule on every side); the 4% wash for rows, 8 wider with a 16
+  radius on a row that sits straight on a sheet; white words with no wash for one-of-several; the
+  glass rim from 16% to 32%; nothing on pictures.
+- **Approved: the grid loading skeleton.** Twelve skeleton tiles on a phone's first load (three full
+  rows on a computer), one row of them when loading more.
+- Not covered by this approval, still proposed: my drawing of the one-head rule (the rule itself is
+  the owner's), and the other sections headed *Proposed* in DESIGN.md.
+- Not verified: the lift is 1 px and hard to see in a still picture; live hover was tested by script
+  on the tools capsule only.
+
+## 2026-11-26 — Row hover opened again
+
+- Owner, right after "Approve both", with a picture of the approved sheet rows: "Actually, should we
+  give the rows hover a pass?"
+- What the picture shows: the rounded wash is as tall as the row, so its corners sit on the line
+  between rows, and two washes next to each other touch.
+- Drawn behind a switch in the mock ("Under the pointer", top of the section), for rows on a sheet,
+  in a panel and in a well:
+  - **Inset** (my pick): the wash floats 4 inside the row, rounded to follow its container (20 in a
+    panel, 12 in a well, 16 and 8 wider than the words on a sheet); the lines above and below it fade.
+  - **Band**: straight edges, to the container's edges; on a sheet it reaches the sheet's edges. Lines
+    stay.
+  - **Quiet**: no wash; the chevron turns white and moves 2, the check well gets a rim, a menu row's
+    icon turns white.
+- Owner's pick: "Inset, just gotta make sure the corner radius matches the outer container as well".
+- **Locked: Inset**, for the pointer and for a press. Band and Quiet are dropped; the switch is out of
+  the mock.
+- **Locked, the owner's rule: the wash's corner radius is the container's radius less the gap between
+  them.** Measured by script on every row in the mock: 20 in a panel (24 − 4), 12 in a well (16 − 4),
+  16 on a sheet or a dropdown (24 − 8).
+- Fixed to follow that rule: the sidebar's account row was 16 and is now 12 (24 − 12); the specimen
+  sheet in the mock was drawn with a 16 radius and is now the real sheet's 24.
+- Found while measuring, my mistake: the search suggestions group shared a class name with the
+  Artists tab's suggestion cards, so since that batch it was drawn with 16 of extra side padding and
+  16 gaps between rows. It is a flat group of 48 rows again, as DESIGN.md says.
+- The wash is 5% white (it was 4%); this is what the owner saw when picking.
+- Not verified: live hover was tested by script on one Settings row only.
+
+## 2026-11-26 — The one-head drawing approved
+
+- I asked: "do you approve that drawing", after saying that on Following's grid the left-aligned
+  title in the centred column does not line up with the full-width tiles. Owner's word: "Approve".
+- **Approved: the drawing of the owner's one-head rule.** On a computer the head stays in the 600
+  column in feed view and in grid view; only the tiles use the full width, 24 at each side.
+- Accepted with it: in grid view the head's left edge and the tiles' left edge do not line up.
+- With this, everything in DESIGN.md's "The top bar, the pointer, grid loading, one head, chip
+  dropdowns" is owner-picked or owner-approved. The chip dropdown's measurements are still mine.
+

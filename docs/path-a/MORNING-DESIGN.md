@@ -18,8 +18,9 @@ treat that message as your approval of any design.
 3. **On a computer** (batch 5): the sidebar with names, and Play as a disc beside the column. And one
    thing only you can pick: where the goo lives on a computer. **Picked by you on 2026-11-26:** the
    top bar is a floating capsule ("Capsule"), and a button with a lip rises under the pointer ("Lift").
-   Still yours to check there: the rest of the hover pass, the grid loading skeleton, the head staying
-   in the 600 column in grid view. **Also picked by you:** chips open a dropdown, on a phone too
+   **Approved by you on 2026-11-26 ("Approve both"):** the rest of the hover pass and the grid loading
+   skeleton. **Picked by you after that:** a row's wash is "Inset", with its corner radius matched to
+   its container. **Approved by you ("Approve"):** my drawing of the head staying in the 600 column in grid view. **Also picked by you:** chips open a dropdown, on a phone too
    ("Dropdown").
 4. **Things I added that the plan does not list.** Yes or no to each: "API key · Change", "What's new",
    "Source code" and the "Not run by e621…" line (batch 3); "Open on e621" in an artist's ⋯ and "Copy
