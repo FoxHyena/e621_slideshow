@@ -31,6 +31,23 @@ treat that message as your approval of any design. To throw a batch away: `git r
    Favorite a few more posts, or look for artists yourself."; "Hidden from suggestions"; "Unfollowed X";
    "Couldn't follow X" / "e621 didn't answer. Nothing was changed."; No artist you follow matches "zz".
 
+## Batch 2: links, the grid menu, the artist page's edges (section of the same name)
+
+1. **The "From a link" chip opens a sheet, not a menu.** Six rows of what the link set, one line ("For
+   this visit only. Nothing of yours is changed."), and a tonal "Use my settings". Other option: a row of
+   switches so you can keep some of the link's settings and drop others.
+2. **"Not signed in on this browser"** is a two-line sunk banner on Results with a small "Sign in", and
+   the same words in glass over the player for 4 s. Other option: a toast.
+3. **Holding a grid tile opens the app's ⋯ sheet** (Favorite, Open artist, Play from here, Open on e621).
+   The tile sinks to 96% first. Other option: a small menu at the finger, like the tag targets.
+4. **A tag that is not an artist keeps the artist hero,** with a tag glyph in the well, the name in its
+   e621 colour, and "Follow tag". Other option: no hero, only a Results header.
+5. **No such artist:** Goo looking, No artist called "inkwel fox", Search.
+6. **At 500 follows** the wide button goes flat and one line says "Unfollow an artist in Artists to follow
+   another."
+7. **The artist page's ⋯ gains "Copy link"** next to "Open on e621"; copying shows the toast "Link copied".
+8. **Your favorites** takes the pushed-screen header (Back, grid tool, large title), not the Results one.
+
 ## Still open from before tonight
 
 - The checklist step names: "Read your favorites", "Count your artists", "See who still posts".

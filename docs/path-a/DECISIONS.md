@@ -313,3 +313,17 @@ Format: date — decision. Why. Rejected alternatives.
   - Popular artists under "Find artists to follow".
 - The full list for the owner, with the alternatives: docs/path-a/MORNING-DESIGN.md.
 
+## 2026-11-26 (night) — Overnight proposals, batch 2: links, the grid menu, the artist page's edges
+
+- No owner decision in this entry. **Proposed, not owner-approved.**
+- DESIGN.md "Links, the grid tile's menu, the artist page's edges"; mocks/screens-v6.html "Links, the grid
+  menu and the artist page's edges".
+- Choices: the "From a link" chip is an on chip (gold ring) that opens a sheet of name / value rows and a
+  tonal "Use my settings"; the not-signed-in notice is the sunk banner at two lines on Results and the
+  player's glass over the player; holding a tile opens the app's ⋯ sheet (no new menu); a non-artist tag
+  keeps the hero with a tag glyph in the well; ⋯ on the artist page gains "Copy link".
+- Copy written here: "This link came with its own settings.", "For this visit only. Nothing of yours is
+  changed.", "Use my settings", "Not signed in on this browser" / "Your blacklist isn't applied",
+  No artist called "X" / "e621 has no tag with this name. Check the spelling, or search for it.",
+  "Follow tag", "Unfollow an artist in Artists to follow another.", "Link copied", "Unfavorite".
+

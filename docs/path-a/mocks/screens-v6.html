@@ -762,6 +762,30 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 /* Artists: a suggestion's own menu button, the filter with a match, the proposal note */
 .sugg6 .ph .more6 { margin-left: -4px; }
 .prop6 { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font: 600 13px var(--f-page); color: var(--fg); margin-right: 8px; }
+
+/* ---------- links from outside, the grid tile's menu, the artist page's edges (proposed) ---------- */
+.chip6 > .ic.lead { margin-left: -2px; color: var(--link); }
+.lnote6 { margin: 8px 0 16px; font: var(--t-foot); color: var(--muted); }
+.lnote6.c { margin: 8px 0 0; text-align: center; }
+/* not signed in on this browser: a sunk two-line banner with one raised way out */
+.banner6.two { height: auto; min-height: 52px; border-radius: 22px; padding: 8px 8px 8px 12px; align-items: center; }
+.banner6.two > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.banner6.two b { font: var(--t-foot-r); color: var(--text); font-weight: 500; }
+.banner6.two small { font: var(--t-foot); color: var(--link); }
+.banner6.two .btn6 { --lip: 2px; flex: none; }
+/* the same words over the player, in the player's glass */
+.pnote6 { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 8px 8px 8px 12px; border-radius: 22px; background: rgba(2,15,35,.55); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); color: #fff; }
+.pnote6 > .ic { flex: none; }
+.pnote6 > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pnote6 b { font: var(--t-foot-r); font-weight: 500; }
+.pnote6 small { font: var(--t-foot); color: rgba(255,255,255,.78); }
+.pnote6 button { height: var(--h-c); padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,.16); font: var(--t-foot-r); color: #fff; flex: none; }
+/* a held tile sinks before its menu rises */
+.tile6.held > i { transform: scale(.96); transition: transform .12s ease-out; }
+/* a tag that is not an artist: a tag in a well where the mark would be */
+.tagmark6 { width: 80px; height: 80px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); }
+.hero6 .title6.s { color: var(--t-species); }
+.row6.on .ic { color: var(--heart); fill: currentColor; }
 </style>
 
 <div class="wrap" id="root">
@@ -899,6 +923,42 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     </table></div>
   </section>
 
+  <section id="edges" aria-label="Links, the grid menu and the artist page's edges">
+    <h2 class="pg-h2" style="margin-top:40px">Links, the grid menu and the artist page's edges</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>The pieces of Results, the grid and the artist page that had no drawing: a link that brings its own settings, holding a tile, and what the artist page shows when the name is wrong, is not an artist, or you cannot follow.</p>
+    <div class="cols">
+      <section class="col" aria-label="Opened from a link">
+        <div class="col-head"><h2 class="pg-h3">1. Opened from a link</h2><p>The "From a link" chip leads the row. It opens a sheet that lists what the link set, with one button to go back to your own settings.</p></div>
+        <div class="phone-holder" id="s-link"></div>
+        <div class="under" id="u-link"></div>
+      </section>
+      <section class="col" aria-label="Grid: hold a tile">
+        <div class="col-head"><h2 class="pg-h3">2. Grid: hold a tile</h2><p>The app's ⋯ sheet, headed by the post's artist and number. Four rows; Favorite is first because it is the one you came for.</p></div>
+        <div class="phone-holder" id="s-hold"></div>
+        <div class="under" id="u-hold"></div>
+      </section>
+      <section class="col" aria-label="Artist page: no such artist">
+        <div class="col-head"><h2 class="pg-h3">3. Artist page: no such artist</h2><p>A pasted or mistyped link. The empty shape with Goo looking, the name as it was typed, and Search as the way on.</p></div>
+        <div class="phone-holder" id="s-noart"></div>
+        <div class="under" id="u-noart"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The "From a link" chip</th><td>First in the chips row; lists what the link set, with "Use my settings"</td><td>A chip with a link glyph and the gold ring (it is on). It opens a titled sheet: six rows of name and value, one line saying it is for this visit only, and a tonal "Use my settings".</td><td>A chip that is on already wears the ring. The button is tonal because gold is Play's. Other option: a menu of switches, one per setting.</td></tr>
+        <tr><th>Not signed in on this browser</th><td>A notice over the player for 4 s, then the same strip on Results</td><td>On Results: the sunk banner at two lines with a small raised "Sign in". Over the player: the same words in the player's glass.</td><td>The offline banner is the app's strip for "something about this session"; this one needs a second line and an action. Other option: a toast.</td></tr>
+        <tr><th>Holding a tile</th><td>Menu: Favorite, Open artist, Play from here, Open on e621</td><td>The tile sinks to 96% after 400 ms and the ⋯ sheet rises, headed by the artist and the post number. Favorited already: "Unfavorite" with a filled heart.</td><td>One menu for the whole app. Other option: a small menu at the finger, like the tag targets.</td></tr>
+        <tr><th>No such artist</th><td>"No artist called X on e621" + Search</td><td>The empty shape: Goo looking, "No artist called "inkwel fox"", one sentence, a tonal Search. Back stays in the header.</td><td>It is "nothing found", which is Goo looking everywhere else.</td></tr>
+        <tr><th>A tag that is not an artist</th><td>Works as a tag feed, "Follow tag"</td><td>The hero keeps its shape: a tag glyph in an 80 well, the name in its e621 colour, the raw name and its category, the stats, "Follow tag".</td><td>A drawn mark would say "artist". Other option: no hero at all, only a Results-style header.</td></tr>
+        <tr><th>At 500 follows</th><td>Follow disabled + note</td><td>The disabled button reading "e621 allows 500 follows" and one line: "Unfollow an artist in Artists to follow another."</td><td>The same disabled button the follow list uses.</td></tr>
+        <tr><th>Share and ⋯</th><td>Share → system sheet, fallback copies the link; ⋯ → Open on e621</td><td>⋯ is the app's sheet: Copy link, Open on e621. Copying shows the toast "Link copied".</td><td>Copy link is there for browsers with no share sheet. Results' ⋯ uses the same sheet with "Copy share link".</td></tr>
+        <tr><th>Your favorites</th><td>‹ Your favorites · grid; chips Media, Sort, Score</td><td>A pushed screen like Tune: Back and the grid tool in the top row, the large title under it, then the chips.</td><td>No search field to edit, so it takes the pushed-screen header, not the Results header.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
 
   <section id="new" aria-label="Menus and sheets">
     <h2 class="pg-h2" style="margin-top:40px">Filter menus, player sheets and tag targets</h2>
@@ -988,8 +1048,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>The "From a link" chip on Results.</li>
-    <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
+    <li>Settings sub-pages (Account, Content, For You, App), the install steps and the update toast.</li>
     <li>Desktop layouts.</li>
   </ul>
 </div>
@@ -1767,6 +1826,63 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       const row = t.parentElement.querySelector(`.poprow6[data-artist="${t.dataset.artist}"]`);
       if (row) { undoing = true; row.querySelector('.follow6').click(); undoing = false; } dropToast(t); }
   });
+
+  /* ================= links from outside, the grid tile's menu, the artist page's edges (proposed) ================= */
+  Object.assign(P, {
+    link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    tag: '<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/>',
+  });
+  const resTools = `<div class="tools6"><button type="button" aria-label="Save search">${ic('star', 20, 2.2)}</button><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const linkChip = `<button class="chip6" type="button" aria-pressed="true">${ic('link', 16, 2.4, 'lead')}From a link${ic('down', 16, 2.4)}</button>`;
+  const resHead = `<div class="head6"><div class="srchtop6">${back()}<button class="field6" type="button"><span class="val" style="font:var(--t-count)">${q('wolf', 'solo')}</span></button>${resTools}</div>
+        <div class="chips6">${linkChip}${chip('Videos', true)}${chip('Top', true)}${chip('Date')}${chip('Score')}</div></div>`;
+  const outBanner = `<div class="banner6 two" role="status">${ic('info', 18, 2.2)}<span><b>Not signed in on this browser</b><small>Your blacklist isn't applied</small></span><button class="btn6 lip6" type="button">Sign in</button></div>`;
+  const lrow = (t, v) => `<div class="srow6"><span class="lbl"><b>${t}</b></span><span class="val">${v}</span></div>`;
+  $('s-link').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">${resHead}${outBanner}${post(P2)}</div>
+    <div class="scrim6"></div>${fab(0)}${tabbar('Following', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="From a link">${shtop('From a link')}
+      <p class="sub6" style="margin:-4px 0 8px">This link came with its own settings.</p>
+      <div class="qrows6">${lrow('Ratings', 'Safe, Questionable')}${lrow('Media', 'Videos')}${lrow('Sort', 'Top')}${lrow('Date', 'This week')}${lrow('Score', '≥ 50')}${lrow('Slideshow', 'Ken Burns · 4 s')}</div>
+      <p class="lnote6">For this visit only. Nothing of yours is changed.</p>
+      <button class="btn6 lip6 wide" type="button">Use my settings</button>
+    </div><span class="home6"></span>`);
+  $('u-link').innerHTML = [
+    strip('Results from a link', 'The chip comes first and is on, so it wears the gold ring like any filter that is on. If this browser has no account, the banner says what that means.', `<div class="strip p6" style="padding:12px 0 16px">${resHead}${outBanner}</div>`),
+    strip('Over the player, for its first 4 seconds', 'The same words in the player\'s glass. Signing in pauses the show and it carries on after.', `<div class="strip p6 art" style="--art:${art('mossy otter', 1)};height:auto;padding:16px 16px 72px"><div class="pnote6" role="status">${ic('info', 18, 2.2)}<span><b>Not signed in on this browser</b><small>Your blacklist isn't applied</small></span><button type="button">Sign in</button></div></div>`),
+  ].join('');
+
+  // Grid: hold a tile
+  const rows6c = (...r) => `<div class="rows6">${r.map(([i, t, note = '', cls = '']) => `<button class="row6 ${cls}" type="button">${ic(i, 20, 2)}${t}${note ? `<small>${note}</small>` : ''}</button>`).join('')}</div>`;
+  const tileRows = faved => rows6c(['heart', faved ? 'Unfavorite' : 'Favorite', '', faved ? 'on' : ''], ['users', 'Open artist'], ['play', 'Play from here'], ['ext', 'Open on e621', 'e621.net']);
+  $('s-hold').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div><div class="chips6">${chip('Media')}${chip('Hide favorited', false, false, true)}</div></div>
+      <div class="grid6">${tiles('mossy otter', 3, 0, 3)}<div class="gridrule6">${caught()}</div>${tiles('dune jackal', 9, 4, 0)}</div>
+    </div>
+    <div class="scrim6"></div>${fab(3)}${tabbar('Following', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Post by mossy otter">${ctx('mossy otter', '#4512290')}${tileRows(false)}</div><span class="home6"></span>`);
+  $('u-hold').innerHTML = [
+    strip('While you hold', 'After 400 ms the tile sinks to 96% and the sheet rises. No callout and no selection, the same as a picture in the feed.', `<div class="strip p6" style="padding:20px 0 0"><div class="grid6">${tiles('mossy otter', 3, 0, 0)}</div></div>`),
+    strip('A post you already favorited', 'The first row becomes "Unfavorite" and its heart is filled.', sheetStrip(ctx('mossy otter', '#4512291') + tileRows(true))),
+    strip('Your favorites', 'A pushed screen like Tune: Back and the grid tool, then the title, then its chips (Media, Sort, Score).', `<div class="strip p6" style="padding:8px 0 0"><div class="head6"><div class="titlerow">${back()}<div class="tools6"><button type="button" aria-label="Grid view">${ic('grid', 20, 2.2)}</button></div></div><h3 class="title6">Your favorites</h3><div class="chips6">${chip('Media')}${chip('New')}${chip('Score')}</div></div></div>`),
+  ].join('');
+  { const t = document.querySelectorAll('#u-hold .grid6 .tile6')[1]; if (t) t.classList.add('held'); }
+
+  // Artist page: the edges
+  $('s-noart').innerHTML = phone(`
+    <div class="scroll6"><div class="head6"><div class="titlerow">${back()}</div></div>
+      ${state('look', 'No artist called "inkwel fox"', 'e621 has no tag with this name. Check the spelling, or search for it.', act('Search', 'lip6', 'search'), 'screen')}
+    </div>` + bottom('Following'));
+  $('u-noart').innerHTML = [
+    strip('A tag that is not an artist', 'The page still works as a feed of that tag. A tag stands in the well, the name takes its e621 colour, and the button says "Follow tag".', `<div class="strip p6" style="padding:20px 16px 24px"><div class="hero6" style="padding:0"><span class="tagmark6">${ic('tag', 36, 2)}</span><h3 class="title6 s">red fox</h3><span class="handle">red_fox · species</span>
+      <div class="stats6"><div class="stat6"><b>${ic('image', 16, 2.4)}182k</b><small>posts</small></div><div class="stat6 pink"><b>${ic('heart', 16, 2.6)}48</b><small>you faved</small></div><div class="stat6 green"><b>${ic('clock', 16, 2.4)}4m</b><small>last post</small></div></div>
+      ${hfollow(false).replace('Follow</button>', 'Follow tag</button>')}</div></div>`),
+    strip('At 500 follows', 'The button goes flat and says why, and one line says what to do.', `<div class="strip p6" style="padding:20px 16px 24px"><button class="btn6 wide" type="button" disabled>e621 allows 500 follows</button><p class="lnote6 c">Unfollow an artist in Artists to follow another.</p></div>`),
+    strip('Share and ⋯', 'Share opens the system share sheet. Where there is none, the link is copied and a toast says so. ⋯ is the app\'s sheet.', sheetStrip(ctx('inkwell fox', 'inkwell_fox') + rows6c(['link', 'Copy link'], ['ext', 'Open on e621', 'e621.net'])) + `<div class="strip p6 toasts6" style="margin-top:-8px">${toast({ icon: 'link', title: 'Link copied' }, 'static')}</div>`),
+  ].join('');
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
