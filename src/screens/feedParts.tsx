@@ -8,7 +8,7 @@
  */
 import { ChevronLeft, ExternalLink, Heart, LayoutGrid, Play, Rows3, Share, User, UserX } from "lucide-react";
 import Avatar from "@/components/Avatar";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { postPageUrl } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
 import { OfflineBanner, QuietButton, StateBlock } from "@/components/State";
@@ -68,6 +68,9 @@ export function Toolbar({ children, middle }: { children?: ReactNode; middle?: R
     </div>
   );
 }
+
+/** The screen's grid switch, so a tile tap can turn the grid back into the feed at that post. */
+export const GridSet = createContext<((grid: boolean) => void) | null>(null);
 
 export function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: boolean) => void }) {
   return (
@@ -325,6 +328,7 @@ export function FeedBody({
   recommended?: boolean;
 } & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView" | "follow">) {
   const { entry } = useScreen();
+  const setGrid = useContext(GridSet);
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;
   return (
     <>
@@ -344,6 +348,7 @@ export function FeedBody({
         getNav().push({ screen: route.screen, play: String(p.id) });
       }}
       onMenu={(p: Post, tile?: boolean) => getNav().openSheet(`${tile ? "tile" : "post"}:${p.id}`)}
+      onList={setGrid ? () => setGrid(false) : undefined}
       onTag={onTag}
     />
     </>

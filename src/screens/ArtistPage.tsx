@@ -32,7 +32,7 @@ import { getRec } from "@/state/rec";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { copyText, onFeedTag, shareArtist } from "./actions";
-import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
+import { FeedBody, GridSet, GridToggle, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
 
 const CHIPS: ChipId[] = ["media", "hideFaved", "sort", "date", "score"];
 const label = (n: string) => n.replaceAll("_", " ");
@@ -189,6 +189,7 @@ export function ArtistScreen({ name: typed, params }: { name: string; params: st
     );
 
   return (
+    <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       <Toolbar>
         <button type="button" className="toolbar-circle" aria-label="Share" onClick={() => void shareArtist(name)} data-testid="artist-share">
@@ -207,6 +208,7 @@ export function ArtistScreen({ name: typed, params }: { name: string; params: st
       {sheet === MENU && <ArtistMenu name={name} />}
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </div>
+    </GridSet>
   );
 }
 

@@ -33,7 +33,7 @@ import type { TagAction } from "@/components/TagActions";
 import type { Route } from "@/nav/routes";
 import { toast } from "sonner";
 import { onFeedTag } from "./actions";
-import { FeedBody, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./feedParts";
+import { FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./feedParts";
 import { ErrorPanel, quietEmpty, StateBlock } from "@/components/State";
 import { MIN_SUPPORT } from "@/lib/recommend/weights";
 
@@ -299,6 +299,7 @@ export function ForYouScreen() {
   };
 
   return (
+    <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       {signedIn && <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />}
       <div className="title-row">
@@ -374,6 +375,7 @@ export function ForYouScreen() {
         </>
       )}
     </div>
+    </GridSet>
   );
 }
 

@@ -28,7 +28,7 @@ import { shallow, useStore } from "@/state/store";
 import { Goo } from "@/components/Goo";
 import { ErrorPanel, noMatchSentence, quietEmpty, StateBlock } from "@/components/State";
 import { onFeedTag, openSignIn } from "./actions";
-import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./feedParts";
+import { FeedBody, GridSet, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./feedParts";
 
 /** only the signed-in feed pulls to refresh: a signed-out cold load never fetches it */
 const PullToRefresh = lazy(() => import("@/feed/PullToRefresh").then((m) => ({ default: m.PullToRefresh })));
@@ -146,6 +146,7 @@ export function FollowingScreen() {
   const first = noOne || browsing;
 
   return (
+    <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       {first ? (
         <Suspense
@@ -173,6 +174,7 @@ export function FollowingScreen() {
         </>
       )}
     </div>
+    </GridSet>
   );
 }
 

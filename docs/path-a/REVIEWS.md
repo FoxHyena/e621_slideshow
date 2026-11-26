@@ -896,3 +896,23 @@ placeholder fixtures.
 
 **Budgets** (production build, mock e621): JS cold load **199.5 KB** (≤ 200; 0.5 KB headroom); 301.9 KB
 with idle prefetch; CLS 0.0000; 0 long tasks.
+
+## The owner's morning notes (2026-11-26)
+
+Grid tile → the feed at that post; no wash on Follow from favorites' rows; the tile tap ignored in the
+first 0.6 s. "Back reloads the picture" not reproduced (DECISIONS).
+
+**Fresh reviewer, 5 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A post folded into "+N more" (Following) landed on the "+N more" row, not the post; a NaN top scrolled to 0 | Low | Opens the run, then lands on the post; NaN guarded |
+| 2 | `view` stays stale for one frame after the switch | Low | No change: setting state in the effect breaks the lint rule; the scroll event follows in a frame |
+| 3 | A reveal that never fired stayed armed for the next switch | Low | Cleared when the grid stays or the post is gone |
+| 4 | A saved place still loading could take the view back after the reveal | Low | The reveal ends the search for the saved place |
+| 5 | Revealing an old post on Following marks the new ones seen after 1.5 s | Low | No change: scrolling the grid there already does; consistent |
+
+**Gates:** typecheck and lint clean; e2e 225 passed, 3 skipped before the reviewer's fixes (Playwright on
+the dev server already running in this folder, `E6_PORT=3000`); feeds, desktop and following specs after
+them (43 passed, including the new folded-run test). **Budgets:** JS cold load **199.7 KB** (≤ 200, 0.3 KB
+headroom), CLS 0, 0 long tasks.

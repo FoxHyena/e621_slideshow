@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3621;
+// E6_PORT: reuse a dev server already running in this folder (Next allows one per folder)
+const PORT = Number(process.env.E6_PORT ?? 3621);
 
 export default defineConfig({
   testDir: "e2e",

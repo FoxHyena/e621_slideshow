@@ -95,6 +95,9 @@ function useReducedMotion(): boolean {
   );
 }
 
+/** room above a post the grid opened the feed at */
+const REVEAL_GAP = 12;
+
 export interface FeedViewProps {
   feed: Feed;
   grid: boolean;
@@ -122,6 +125,9 @@ export interface FeedViewProps {
   /** Following: where the view is, and the divider's top (list coordinates), as the page scrolls */
   onView?: (v: { top: number; height: number; dividerTop: number | null; total: number }) => void;
   onOpen: (post: Post, index: number) => void;
+  /** A tile tapped: the screen turns the grid back into the feed, which opens at that post. Without
+   * it a tile opens the player. */
+  onList?: () => void;
   /** a card's ⋯, or a held or right-clicked tile (`tile`) */
   onMenu: (post: Post, tile?: boolean) => void;
   onTag: (tag: string, action: TagAction) => void;
@@ -133,6 +139,7 @@ export function FeedView({
   anchorKey,
   entryKey,
   empty,
+  onList,
   onOpen,
   onMenu,
   onTag,
@@ -308,6 +315,36 @@ export function FeedView({
     keep.current = i >= 0 && !grid ? { id: posts[i].id, top: topOf(i) } : null;
   });
 
+  // A tile tapped: the feed opens with that post at the top (under the screen's own top inset).
+  const revealing = useRef<{ id: number; unfolded: boolean } | null>(null);
+  useLayoutEffect(() => {
+    const r = revealing.current;
+    const el = list.current;
+    if (r === null) return;
+    // still the grid: the tap didn't turn it into the feed after all
+    if (grid) return void (revealing.current = null);
+    // On a computer the grid is wider than the feed's column: wait for the column's width, or the
+    // cards' heights (and so the post's place) are the grid's.
+    if (!el || width === 0 || el.clientWidth !== width) return;
+    const i = posts.findIndex((p) => p.id === r.id);
+    if (i < 0) return void (revealing.current = null);
+    // Following: a post folded into "+N more" has no card yet; open the run, then go to it
+    const row = rows[layout.rowOf[i]];
+    if (row?.kind === "more" && onExpand && !r.unfolded) {
+      r.unfolded = true;
+      onExpand(row.run);
+      return;
+    }
+    revealing.current = null;
+    const top = topOf(i);
+    if (!Number.isFinite(top)) return;
+    const listTop = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, Math.max(0, listTop + top - REVEAL_GAP));
+    keep.current = null;
+    // a saved place still being looked for doesn't take the view back later
+    restored.current = true;
+  });
+
   // The player closing over this list centres the last post it showed (or the nearest older one).
   const geometry = useRef({ grid, layout, tiles, posts });
   useLayoutEffect(() => {
@@ -373,7 +410,11 @@ export function FeedView({
                   post={p}
                   fresh={fresh?.(p) ?? false}
                   style={tileAt(tiles, i)}
-                  onOpen={() => onOpen(p, i)}
+                  onOpen={() => {
+                    if (!onList) return onOpen(p, i);
+                    revealing.current = { id: p.id, unfolded: false };
+                    onList();
+                  }}
                   onMenu={() => onMenu(p, true)}
                 />
               );
@@ -510,7 +551,7 @@ function Tile({ post, fresh, style, onOpen, onMenu }: { post: Post; fresh: boole
   // computer, right-click or the menu key). Nothing shows on the tile under the pointer.
   const held = useRef<{ t: ReturnType<typeof setTimeout>; x: number; y: number; done: boolean } | null>(null);
   /** when a hold last opened the menu: the click or menu event that follows it isn't a tap */
-  const heldAt = useRef(0);
+  const heldAt = useRef(-Infinity);
   const [sunk, setSunk] = useState(false);
   useEffect(() => () => clearTimeout(held.current?.t), []);
   const justHeld = () => performance.now() - heldAt.current < 600;
@@ -528,7 +569,7 @@ function Tile({ post, fresh, style, onOpen, onMenu }: { post: Post; fresh: boole
       onClick={(e) => {
         // the click that ends a hold isn't a tap
         if (justHeld()) {
-          heldAt.current = 0;
+          heldAt.current = -Infinity;
           e.preventDefault();
           return;
         }

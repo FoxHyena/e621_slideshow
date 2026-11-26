@@ -68,6 +68,41 @@ test("the grid shows the same posts as tiles", async ({ page }) => {
   expect(await page.getByTestId("grid-tile").count()).toBeGreaterThan(9);
 });
 
+test("a tile opens the feed at that post, not the player", async ({ page }) => {
+  await page.goto("/search?tags=wolf");
+  await page.getByTestId("grid-toggle").click();
+  const tile = page.getByTestId("grid-tile").nth(7);
+  await expect(tile).toBeVisible();
+  const id = await tile.getAttribute("data-post-id");
+  await tile.click();
+  await expect(page.getByTestId("feed")).toBeVisible();
+  await expect(page.getByTestId("player")).toHaveCount(0);
+  await expect(page.getByTestId("grid-toggle")).toHaveAttribute("aria-label", "Show as grid");
+  // the tapped post's card starts at the top of the view
+  const card = page.locator(`[data-testid="post-card"][data-post-id="${id}"]`);
+  await expect(card).toBeInViewport();
+  const top = (await card.boundingBox())!.y;
+  expect(top).toBeGreaterThanOrEqual(0);
+  expect(top).toBeLessThan(40);
+});
+
+test("Back keeps the cards you were looking at: the same pictures, not new ones decoding again", async ({ page }) => {
+  await page.goto("/search?tags=wolf");
+  const card = page.locator('[data-testid=post-card][data-post-id="1140"]');
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  // scroll until the card is on screen
+  await expect(async () => {
+    await page.mouse.wheel(0, 1200);
+    await expect(card).toBeInViewport({ timeout: 300 });
+  }).toPass();
+  await card.getByTestId("card-image").evaluate((img) => ((img as HTMLImageElement & { kept?: boolean }).kept = true));
+  await card.getByTestId("card-artist").click();
+  await expect(page).toHaveURL(/\/artist\//);
+  await page.goBack();
+  await expect(card).toBeInViewport();
+  expect(await card.getByTestId("card-image").evaluate((img) => (img as HTMLImageElement & { kept?: boolean }).kept === true)).toBe(true);
+});
+
 test("favoriting shows at once on the card and reaches e621", async ({ page }) => {
   await signIn(page);
   await page.goto("/search?tags=wolf");

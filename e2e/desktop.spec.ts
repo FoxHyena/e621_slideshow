@@ -119,10 +119,11 @@ test("on a phone, holding a tile opens the same menu; a tap still opens the post
   const tile = page.getByTestId("grid-tile").first();
   await expect(tile).toBeVisible();
   const b = (await tile.boundingBox())!;
+  // a tap turns the grid back into the feed, at that post
   await tile.click();
-  await expect(page.getByTestId("player")).toBeVisible();
-  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("feed")).toBeVisible();
   await expect(page.getByTestId("player")).toHaveCount(0);
+  await page.getByTestId("grid-toggle").click();
   // a hold: pointer down, 400 ms, up
   await tile.dispatchEvent("pointerdown", { pointerType: "touch", clientX: b.x + 20, clientY: b.y + 20, isPrimary: true });
   await page.waitForTimeout(500);

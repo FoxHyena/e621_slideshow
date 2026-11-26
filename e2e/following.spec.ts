@@ -101,6 +101,18 @@ test("new posts are marked New, a long run folds, and the divider sits at e621's
   await shot(page, "following-caught-up");
 });
 
+test("a grid tile of a post folded into \"+N more\" opens the run and lands on it", async ({ page }) => {
+  await followingSignedIn(page);
+  await page.goto("/following");
+  await page.getByTestId("grid-toggle").click();
+  const tile = page.locator('[data-testid=grid-tile][data-post-id="1145"]');
+  await expect(tile).toBeVisible();
+  await tile.click();
+  const card = page.locator('[data-testid=post-card][data-post-id="1145"]');
+  await expect(card).toBeInViewport();
+  expect((await card.boundingBox())!.y).toBeLessThan(40);
+});
+
 test("a screen past the divider, at rest, marks seen on e621; the dots stay for the session", async ({ page }) => {
   const mock = await followingSignedIn(page);
   await page.goto("/following");

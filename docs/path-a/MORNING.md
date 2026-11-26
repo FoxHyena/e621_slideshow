@@ -18,6 +18,19 @@ Built overnight (2026-11-26). Most important first in each group.
 
 ## Approve (design or copy I chose)
 
+**You approved 1–15 on 2026-11-26** (1 yes, 2 looks good, 3–5 yes, 6–8 nice, 9 ok, the rest look good).
+New since then, from your notes:
+
+- **A grid tile opens the feed at that post** (12 from the top), not the slideshow. Hold or right-click
+  a tile for "Play from here". Back doesn't return to the grid (the grid isn't a place in history); the
+  grid button does.
+- **Follow from favorites: no hover box on a row** (rows there have no side padding, so the wash was a box
+  cut at the avatar). The empty check well lifts instead, as rows in other sheets have no wash either.
+- Fixed in passing: a tile tapped in the first 0.6 s after the page loaded did nothing.
+- On Following, a tile for a post folded into "+N more" opens that run first, then lands on the post.
+
+Approved:
+
 1. **Goo's drops count toward the goo.** Tapping Goo spurts 1–3 drops onto the tab bar's goo, and they
    count toward the "N favorites" line in Settings. Goo is pointer-only (no keyboard focus, no label).
    Easy to change: `src/components/Goo.tsx` `poke`.
@@ -124,6 +137,9 @@ Built overnight (2026-11-26). Most important first in each group.
 
 ## Decide (open questions, with my default)
 
+0. **The first-load JS budget is full** (199.7 of 200 KB). Default: the next feature that adds to the
+   first load moves something out of it (the tab bar's goo, or the sign-in check, into a lazy chunk).
+
 1. **Does un-favoriting remove goo?** Default: no, goo only ever adds.
 2. **The first-run step names** ("Read your favorites", "Count your artists", "See who still posts") were
    proposed by the design session, not confirmed by you. Default: use them.
@@ -152,6 +168,10 @@ Built overnight (2026-11-26). Most important first in each group.
    Default: fix after this PR (queue it, as tab taps already are).
 
 ## Needs you (things I held)
+
+0. **Which Back reloads the picture?** I couldn't reproduce it: Back from an artist page to the feed keeps
+   the same pictures, and the player's ← shows the one it already had. Tell me where you were and which
+   button (the ‹ at the top, the browser's Back, a swipe, or ← in the slideshow).
 
 1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested
    against the mock only. This now covers Follow from favorites too (one POST with every picked name).

@@ -817,3 +817,16 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **A key that couldn't be checked is checked again** on `online` and when the tab is shown again.
 - **A sheet over the player stays open when the player moves to another post**; closing it lands on that
   post (history.ts carries the route down).
+
+## 2026-11-26 (morning) — the owner's notes on the morning list
+
+- **Approved:** MORNING "Approve" 1–15, so the work built from the proposed design batches 1–5 as listed
+  there stands. The "Decide" items weren't answered: their defaults stay.
+- **A grid tile opens the feed at that post** (owner's idea), not the player. The screen's grid switch
+  reaches the feed through a `GridSet` context; the feed scrolls the post 12 below the top once it has
+  its own column width. "Play from here" stays in the tile's menu.
+- **No wash on Follow from favorites' rows** (owner's screenshot): rows with no side padding don't wash,
+  as in every sheet; the empty check well lifts under the pointer.
+- **"Back reloads the picture"**: not reproduced. Back keeps the same picture elements (checked in a real
+  browser on Results → artist page → Back, and the player's ←). Asked the owner which Back.
+

@@ -42,7 +42,7 @@ import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import type { Route } from "@/nav/routes";
 import { isLocked, setLockedY } from "@/nav/scroll";
-import { ALL_RATINGS, FeedBody, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
+import { ALL_RATINGS, FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
 
 /**
  * Close the open sheet (if any), then put this screen's new URL in place of the current one. The
@@ -132,6 +132,7 @@ export function ResultsScreen({ params }: { params: string }) {
   );
 
   return (
+    <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       <Toolbar
         middle={
@@ -185,6 +186,7 @@ export function ResultsScreen({ params }: { params: string }) {
       {sheet === LINK_SHEET && r.link && <FromALink r={r} onMine={() => go({ ...r, link: null, filters: defaultFilters() })} />}
       {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </div>
+    </GridSet>
   );
 }
 
@@ -289,6 +291,7 @@ export function FavoritesScreen({ params }: { params: string }) {
   };
 
   return (
+    <GridSet value={setGrid}>
     <div className="screen-frame" data-grid={grid || undefined}>
       <Toolbar>{signedIn && <GridToggle grid={grid} setGrid={setGrid} />}</Toolbar>
       <h1 tabIndex={-1} className="screen-title">
@@ -334,5 +337,6 @@ export function FavoritesScreen({ params }: { params: string }) {
         </>
       )}
     </div>
+    </GridSet>
   );
 }

@@ -5052,6 +5052,11 @@ li[data-state="done"] .first-step-n svg,
   min-height: 60px;
   padding-inline: 0;
 }
+/* rows with no side padding get no wash (it would be a box cut at the avatar's edge), as in every
+   sheet: the check well answers the tap */
+.first-pick-sheet .pick-row:active {
+  background: none;
+}
 .sheet-body:has(> .first-pick-sheet) {
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
 }
@@ -5747,8 +5752,13 @@ li[data-state="done"] .first-step-n svg,
   .well-row:hover {
     background: rgba(255, 255, 255, 0.04);
   }
-  .sheet-rows > .list-row:hover {
+  .sheet-rows > .list-row:hover,
+  .first-pick-sheet .pick-row:hover {
     background: none;
+  }
+  /* the empty check well lifts under the pointer instead */
+  .first-pick-sheet .pick-row[aria-checked="false"]:hover .pick-check {
+    background: var(--color-raised);
   }
   .btn-tonal:not(:disabled):hover {
     background: var(--color-raised-hi);
