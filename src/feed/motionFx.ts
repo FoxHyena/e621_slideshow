@@ -9,16 +9,17 @@ import { calm } from "./motion";
  * Following: six 5 px dots in the artist's colours leave the mark's rim and fly 30 px out
  * (480 ms). The only burst in the app.
  */
-export function followBurst(mark: HTMLElement | null | undefined, seed: string) {
+export function followBurst(mark: HTMLElement | null | undefined, seed: string, big = false) {
   if (!mark || calm() || typeof mark.animate !== "function") return;
   const colors = bendsFor(seed).colors;
   const box = document.createElement("span");
   box.className = "dots";
   mark.appendChild(box);
   const N = 6;
-  const reach = 30;
-  const from = 18;
-  const size = 5;
+  // the artist page's 80 mark: scaled up, six 7 px dots over 520 ms (DESIGN.md "Artist page")
+  const reach = big ? 64 : 30;
+  const from = big ? 40 : 18;
+  const size = big ? 7 : 5;
   for (let k = 0; k < N; k++) {
     const i = document.createElement("i");
     const ang = k * ((2 * Math.PI) / N) - Math.PI / 2;
@@ -33,7 +34,7 @@ export function followBurst(mark: HTMLElement | null | undefined, seed: string) 
         { transform: `${at(reach)} scale(1)`, opacity: 1, offset: 0.6, easing: "ease-in" },
         { transform: `${at(reach * 1.12)} scale(0)`, opacity: 0 },
       ],
-      { duration: 480, fill: "forwards" },
+      { duration: big ? 520 : 480, fill: "forwards" },
     );
   }
   setTimeout(() => box.remove(), 740);

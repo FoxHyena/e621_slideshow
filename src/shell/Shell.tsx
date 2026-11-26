@@ -285,7 +285,7 @@ function PushedScreen({ e }: { e: Entry }) {
     case "favorites":
       return <FavoritesScreen params={screen.params} />;
     case "artist":
-      return <ArtistScreen name={screen.name} />;
+      return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
     case "tune":
       return <TuneScreen />;
     default:

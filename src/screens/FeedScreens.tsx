@@ -8,15 +8,13 @@
 import { Link2, MoreHorizontal, Search, Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { DEFAULT_FILTERS, decodeFilters, decodeResults, encodeFilters, encodeResults, filtersOn, isDefaultFilters, type Filters, type ResultsParams } from "@/lib/feed/filters";
+import { decodeFilters, decodeResults, encodeFilters, encodeResults, filtersOn, isDefaultFilters, type Filters, type ResultsParams } from "@/lib/feed/filters";
 import type { QueueStats } from "@/lib/slideshow/queue";
-import { noMatchSentence, quietEmpty, StateBlock } from "@/components/State";
+import { noMatchSentence, StateBlock } from "@/components/State";
 import { DEFAULT_SEARCH } from "@/lib/settings";
 import type { TagAction } from "@/components/TagActions";
-import { FollowButton } from "@/feed/FollowPill";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { getNav } from "@/nav/history";
-import { getArtistList } from "@/state/artistList";
 import { useScreen } from "@/shell/context";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFavs } from "@/state/favs";
@@ -265,40 +263,6 @@ export function FavoritesScreen({ params }: { params: string }) {
           {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
         </>
       )}
-    </div>
-  );
-}
-
-/**
- * `/artist/<name>`, interim until the artist page (slice 6): the artist's posts, newest first, with
- * your ratings and blacklist. No chips yet: the artist route has no filter params until then.
- */
-export function ArtistScreen({ name }: { name: string }) {
-  const { entry, sheet } = useScreen();
-  const spec = useMemo<FeedSpec>(() => ({ kind: "search", tags: name, filters: DEFAULT_FILTERS }), [name]);
-  const feed = useFeed(spec, null);
-  const [grid, setGrid] = useState(false);
-  const route = entry.route;
-  // opening an artist's page clears their New dot on Artists for the session
-  useEffect(() => getArtistList().opened(name), [name]);
-  return (
-    <div className="screen-frame" data-grid={grid || undefined}>
-      <Toolbar>
-        <GridToggle grid={grid} setGrid={setGrid} />
-      </Toolbar>
-      <h1 tabIndex={-1} className="screen-title">
-        {name.replaceAll("_", " ")}
-      </h1>
-      <FollowButton name={name} />
-      <FeedBody
-        feed={feed}
-        grid={grid}
-        route={route}
-        empty={quietEmpty(`No posts by ${name.replaceAll("_", " ")}`, "e621 has no posts under this name yet.", { screen: true, testId: "artist-empty" })}
-        onTag={onFeedTag}
-      />
-      <PlayFab feed={feed} route={route} />
-      {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
     </div>
   );
 }

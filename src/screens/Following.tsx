@@ -140,8 +140,10 @@ export function FollowingScreen() {
   );
   const noOne = session.ready && signedIn && fs.status === "ready" && !follows;
   // followed someone from Popular artists: the list stays up (to follow more) until "Show my feed"
-  const [browsing, setBrowsing] = useState(false);
-  const first = noOne || (browsing && signedIn);
+  // (kept per account: another account signing in starts from its own Following)
+  const [browsingAs, setBrowsingAs] = useState<string | null>(null);
+  const browsing = signedIn && browsingAs !== null && browsingAs === session.user?.name;
+  const first = noOne || browsing;
 
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
@@ -154,7 +156,7 @@ export function FollowingScreen() {
             </>
           }
         >
-          <FirstRun key={session.user?.name} head={head} popular={<Popular grid={grid} />} browsing={setBrowsing} hasFollows={browsing && !noOne} />
+          <FirstRun key={session.user?.name} head={head} popular={<Popular grid={grid} />} browsing={(on) => setBrowsingAs(on ? (session.user?.name ?? null) : null)} hasFollows={browsing && !noOne} />
         </Suspense>
       ) : (
         <>

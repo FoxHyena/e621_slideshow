@@ -14,6 +14,7 @@ const tune = () => import("@/screens/Tune");
 const player = () => import("@/player/Player");
 const settingsHome = () => import("@/screens/SettingsHome");
 const artists = () => import("@/screens/ArtistsScreen");
+const artistPage = () => import("@/screens/ArtistPage");
 const filterSheets = () => import("@/feed/FilterSheets");
 /** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
 export const motionFx = () => import("@/feed/motionFx");
@@ -24,7 +25,7 @@ const shellScreens = () => import("@/shell/screens");
 
 export const ResultsScreen = lazy(() => feedScreens().then((m) => ({ default: m.ResultsScreen })));
 export const FavoritesScreen = lazy(() => feedScreens().then((m) => ({ default: m.FavoritesScreen })));
-export const ArtistScreen = lazy(() => feedScreens().then((m) => ({ default: m.ArtistScreen })));
+export const ArtistScreen = lazy(() => artistPage().then((m) => ({ default: m.ArtistScreen })));
 export const SearchScreen = lazy(() => searchScreen().then((m) => ({ default: m.SearchScreen })));
 export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYouScreen })));
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));
@@ -37,7 +38,7 @@ export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, settingsHome, artists, artistPage, filterSheets, motionFx, statePanels, shellScreens]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

@@ -622,3 +622,38 @@ Visual check at 375×812: the read, the pick list, the skipped row, Artists › 
 **Budgets** (production build, mock e621): JS cold load of `/following` **197.1 KB** (≤ 200; R3 194.5);
 274.3 KB with the idle prefetch; CLS 0.0000; first feed content 0.37 s; 12 cards in the DOM; 0 long tasks
 at 4× CPU. `E6_BUDGET_FILES=1` now lists the first-load files by size.
+
+## Slice 6 review (2026-11-26): the artist page
+
+**code-review skill (high), 3 findings: 1 fixed, 2 skipped**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Following's "keep Popular artists up after a follow" flag outlived the account: the next account could land on the first run | Med | Kept per account |
+| 2 | A name e621 doesn't know still starts its posts search | Low | **Skipped**: one wasted request, never shown |
+| 3 | Popular artists pops in below a 120 px blank | Low | **Skipped**: below the fold; slice 9 polish |
+
+**Fresh reviewer, 9 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A hand-typed `/artist/Some%20One` searched two tags, never matched e621's `some_one`, and Follow did nothing | High | The page folds the name to e621's form (lower case, `_` for spaces) and uses it for everything |
+| 2 | `/tags.json` leaves out tags with no posts, so an artist with none read "No artist called…" | Med | The page's lookup asks with `search[hide_empty]=false` |
+| 3 | "last post" followed the chips (Sort: Oldest gave "9y") and could come from a post you never see | Med | Its own one-post search, newest first, kept for the visit |
+| 4 | A chip change remounts the page and the hero blanked while the lookup re-answered | Low | Answers already in seed the remount |
+| 5 | While loading, a non-artist tag first shows an artist's mark and "Follow" | Low | **No change**: most pages are artists; #4 removes it after the first visit |
+| 6 | The observer read the oldest entry of a batch: the compact bar could stick | Low | Reads the newest |
+| 7 | "2h" froze at mount on a screen kept alive while hidden | Low | Counts from when the screen was last shown |
+| 8 | The compact bar's pill follows without the mark's spin | Low | **No change**: the bar has no big mark; as drawn |
+| 9 | The loading placeholder was a real `<dd>` with a blank | Low | The placeholder well is `aria-hidden` and outside the list's terms |
+
+**Gates:** typecheck, lint clean; unit tests pass (routes: the artist page's params). New e2e:
+e2e/artist-page.spec.ts (7: pasted signed out with Follow → sign-in; signed in with the compact bar and
+Unfollow from it; a hand-typed name; chips in the URL across a reload and a remount without blank wells;
+Share and ⋯; no such artist; a tag that isn't an artist). follow.spec's 500 test reads the new copy.
+Full e2e before the fixes: 192 passed, 2 skipped; the affected specs after: 65 passed.
+Visual check at 375×812: hero, compact bar, ⋯, a species tag, no such artist.
+
+**Budgets** (production build, mock e621): JS cold load of `/following` **196.1 KB** (≤ 200; slice 5
+197.1); 281.3 KB with the idle prefetch; CLS 0.0000; 0 long tasks at 4× CPU. The artist page is its own chunk.
+

@@ -30,13 +30,14 @@ function useFollow(name: string) {
   return { ...s, set: (on: boolean) => follows.setFollowed(name, on), retry: () => void follows.ensure("user", true) };
 }
 
-export function FollowPill({ name, art = false, onFollowed }: { name: string; art?: boolean; onFollowed?: () => void }) {
+export function FollowPill({ name, art = false, always = false, onFollowed }: { name: string; art?: boolean; always?: boolean; onFollowed?: () => void }) {
   const f = useFollow(name);
   /** tapped here: stays (as ✓) after following, so it can be undone in place */
   const [touched, setTouched] = useState(false);
   const [wiggle, setWiggle] = useState(0);
   if (f.checking || (f.signedIn && f.status !== "ready")) return null;
-  if (f.on && !touched) return null;
+  // `always`: the artist page's compact bar shows "✓ Following" too
+  if (f.on && !touched && !always) return null;
   return (
     <button
       type="button"
@@ -46,7 +47,7 @@ export function FollowPill({ name, art = false, onFollowed }: { name: string; ar
       data-wiggle={wiggle % 2 === 1 ? "a" : wiggle > 0 ? "b" : undefined}
       onClick={(e) => {
         e.stopPropagation();
-        if (f.signedIn) setTouched(true);
+        if (f.signedIn && !always) setTouched(true);
         if (!f.on) {
           setWiggle((w) => w + 1);
           if (f.signedIn && !f.full) onFollowed?.();
@@ -71,7 +72,8 @@ export function FollowPill({ name, art = false, onFollowed }: { name: string; ar
   );
 }
 
-export function FollowButton({ name }: { name: string }) {
+/** `tag`: a tag that isn't an artist ("Follow tag"). `onFollowed`: the page's mark spins and bursts. */
+export function FollowButton({ name, tag = false, onFollowed }: { name: string; tag?: boolean; onFollowed?: () => void }) {
   const f = useFollow(name);
   const [wiggle, setWiggle] = useState(0);
   const waiting = f.checking || (f.signedIn && (f.status === "idle" || f.status === "loading"));
@@ -83,7 +85,7 @@ export function FollowButton({ name }: { name: string }) {
         type="button"
         className="btn-tonal follow-button"
         // one name, the state in aria-pressed: "Follow fox, toggle button, pressed"
-        aria-label={`Follow ${name.replaceAll("_", " ")}`}
+        aria-label={blocked ? LIMIT_MESSAGE : `Follow ${name.replaceAll("_", " ")}`}
         aria-pressed={f.on}
         aria-busy={waiting || undefined}
         aria-describedby={blocked ? note : undefined}
@@ -92,16 +94,17 @@ export function FollowButton({ name }: { name: string }) {
         onClick={() => {
           // toggling either way wiggles it (DESIGN.md "Artist page")
           setWiggle((w) => w + 1);
+          if (!f.on && f.signedIn && !f.full) onFollowed?.();
           f.set(!f.on);
         }}
         data-testid="follow-button"
       >
-        {f.on ? <Check aria-hidden className="follow-check" /> : <Plus aria-hidden className="follow-plus" />}
-        {f.on ? "Following" : "Follow"}
+        {blocked ? null : f.on ? <Check aria-hidden className="follow-check" /> : <Plus aria-hidden className="follow-plus" />}
+        {blocked ? LIMIT_MESSAGE : f.on ? "Following" : tag ? "Follow tag" : "Follow"}
       </button>
       {blocked && (
-        <p id={note} className="feed-note" data-testid="follow-limit">
-          {LIMIT_MESSAGE}. Unfollow one to follow another.
+        <p id={note} className="follow-note" data-testid="follow-limit">
+          Unfollow an artist in Artists to follow another.
         </p>
       )}
       {f.status === "error" && f.signedIn && (

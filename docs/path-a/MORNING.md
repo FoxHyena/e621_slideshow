@@ -38,6 +38,15 @@ at the top once Phase 7 hands over.
    "640 of 1,284 · about 2 s" (estimated from 320 favorites a page, about a second each); post counts read
    "18.2K" (the app's existing number format) where the mock says "18.2k".
 
+9. **The artist page (slice 6)** follows DESIGN.md "Artist page" (approved) and the proposed "artist page's
+   edges" (No artist called "x", a tag that isn't an artist with "Follow tag", the 500 note, Share's "Link
+   copied", ⋯ with Copy link and Open on e621). Built without a mock:
+   - The chips are Results' five (Media, Hide favorited, Sort, Date, Score); the mock's row shows "New"
+     where UX.md has Sort. They live in the URL (`/artist/x?…`), so a reload or a pasted link keeps them.
+   - With filters on and nothing left: "No posts match" with Reset filters, as on Results.
+   - The compact bar on a tag that isn't an artist shows a small tag well where the mark would be.
+   - The posts well holds its place (blank) while e621's count loads, so the wells don't jump.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -54,6 +63,9 @@ at the top once Phase 7 hands over.
 5. **Hidden suggestions ("Not interested") are kept on this device** like Tune's pins and mutes (not purged
    on sign-out, not tied to Remember). Default: keep it that way; they hold no account data.
 
+6. **"you faved" on the artist page shows only once your favorites have been read** (by For You or Artists ›
+   Suggested). A cold visit to `/artist/x` doesn't read your favorites just for that number. Default: keep
+   it that way (reading can take a minute on a big account).
 ## Needs you (things I held)
 
 1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested

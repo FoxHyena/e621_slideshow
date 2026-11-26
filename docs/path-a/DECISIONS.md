@@ -708,3 +708,16 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   place; the two hover rules.
 - Not designed, left for the owner: the goo and the secret tab on a computer.
 
+## 2026-11-26 (night) — Slice 6 build: the artist page
+
+- No owner decision in this entry. Built from DESIGN.md "Artist page" (approved) and the proposed "artist
+  page's edges" (batch 2).
+- The artist route takes the chips as params (`/artist/x?…`, Favorites' filter params), so a reload and a
+  pasted link keep them.
+- The name in the URL is folded to e621's form (lower case, `_` for spaces) before anything uses it.
+- The tag lookup asks for empty tags too, so "No artist called x" means e621 has no such tag.
+- "last post" is its own one-post search (newest first, bg lane), not the feed's first page, so the chips
+  don't change it.
+- "you faved" reads the For You profile when it's there; the page doesn't read favorites for it.
+- Chips: Results' five. The mock's row shows "New" where UX.md has Sort; UX.md wins.
+

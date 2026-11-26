@@ -70,6 +70,10 @@ export interface E621Mock {
   tagCounts: Record<string, number>;
   /** names asked for in each /tags.json request */
   tagLookups: string[][];
+  /** a tag's e621 category in /tags.json (default: 1, artist, for a name some post has as its artist; else 0) */
+  tagCategories: Record<string, number>;
+  /** tags e621 doesn't have: /tags.json leaves them out */
+  missingTags: string[];
   /** e621's biggest artist tags (/tags.json by category and count), most posts first */
   popularArtists: { name: string; post_count: number }[];
   /** page numbers of each GET /favorites.json request */
@@ -131,6 +135,8 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     tagCounts: {},
     tagLookups: [],
     popularArtists: [],
+    tagCategories: {},
+    missingTags: [],
     favoritePages: [],
     filterPositive: false,
     searchDelay: () => 0,
@@ -331,7 +337,9 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       state.tagLookups.push(names);
       return json(
         route,
-        names.map((name, i) => ({ id: i + 1, name, post_count: state.tagCounts[name] ?? 100_000, category: 0 })),
+        names
+          .filter((name) => !state.missingTags.includes(name))
+          .map((name, i) => ({ id: i + 1, name, post_count: state.tagCounts[name] ?? 100_000, category: state.tagCategories[name] ?? (state.posts.some((p) => p.tags.artist?.includes(name)) ? 1 : 0) })),
       );
     }
 

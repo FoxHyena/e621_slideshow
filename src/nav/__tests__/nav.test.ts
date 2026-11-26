@@ -20,6 +20,8 @@ describe("routes", () => {
     expect(p("/favorites").screen).toEqual({ kind: "favorites", params: "" });
     expect(p("/favorites?m=v&order=score").screen).toEqual({ kind: "favorites", params: "m=v&order=score" });
     expect(p("/artist/some%20one").screen).toEqual({ kind: "artist", name: "some one" });
+    expect(p("/artist/fox?hideFaved=1").screen).toEqual({ kind: "artist", name: "fox", params: "hideFaved=1" });
+    expect(routeUrl({ screen: { kind: "artist", name: "fox", params: "hideFaved=1" }, play: "3" })).toBe("/artist/fox?hideFaved=1&play=3");
     expect(p("/").screen).toEqual({ kind: "root", params: "" });
     expect(p("/?v=1&tags=fox").screen).toEqual({ kind: "root", params: "v=1&tags=fox" });
   });

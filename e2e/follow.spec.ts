@@ -109,7 +109,8 @@ test("at e621's 500 follows, Follow is off with a note, and a card says so witho
   mock.subscriptions = ["fox_artist", ...Array.from({ length: 499 }, (_, i) => `tag_${i}`)];
   await page.goto("/artist/otter_artist");
   await expect(page.getByTestId("follow-button")).toBeDisabled();
-  await expect(page.getByTestId("follow-limit")).toContainText("e621 allows 500 follows");
+  await expect(page.getByTestId("follow-button")).toHaveText("e621 allows 500 follows");
+  await expect(page.getByTestId("follow-limit")).toHaveText("Unfollow an artist in Artists to follow another.");
   // Unfollowing still works there.
   await page.goto("/search?tags=wolf");
   await pill(page, 1149).click();

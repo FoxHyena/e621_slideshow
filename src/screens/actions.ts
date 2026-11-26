@@ -48,7 +48,7 @@ export async function shareArtist(name: string): Promise<void> {
       if (e instanceof DOMException && e.name === "AbortError") return;
     }
   }
-  await copyText(url, "Link to the artist copied");
+  await copyText(url, "Link copied");
 }
 
 /** Open an artist's page. */

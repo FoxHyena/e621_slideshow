@@ -278,11 +278,15 @@ export async function getFavorites(
   return postList(res);
 }
 
-/** Post counts for exact tag names. Names e621 doesn't know are simply absent. */
-export async function getTags(names: string[], creds: Credentials | null, lane: Lane = "user"): Promise<TagInfo[]> {
+/**
+ * Post counts for exact tag names. Names e621 doesn't know are simply absent. `withEmpty`: e621 leaves
+ * out tags with no posts unless asked (`search[hide_empty]`), which the artist page needs to tell "no
+ * posts yet" from "no such tag".
+ */
+export async function getTags(names: string[], creds: Credentials | null, lane: Lane = "user", withEmpty = false): Promise<TagInfo[]> {
   if (names.length === 0) return [];
   const res = await request<TagInfo[] | Record<string, unknown>>("/tags.json", {
-    params: { "search[name]": names.join(","), limit: 320 },
+    params: { "search[name]": names.join(","), limit: 320, ...(withEmpty ? { "search[hide_empty]": "false" } : {}) },
     creds,
     lane,
   });

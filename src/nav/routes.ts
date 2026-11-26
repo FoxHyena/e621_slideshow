@@ -15,7 +15,8 @@ export type Screen =
   | { kind: "search" }
   | { kind: "results"; params: string }
   | { kind: "favorites"; params: string }
-  | { kind: "artist"; name: string }
+  /** `params`: the chips (the same filter params as Favorites), left out when none is set */
+  | { kind: "artist"; name: string; params?: string }
   | { kind: "root"; params: string }
   | { kind: "notFound"; path: string };
 
@@ -65,7 +66,8 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
       } catch {
         return notFound(path);
       }
-      return name ? { kind: "artist", name } : notFound(path);
+      if (!name) return notFound(path);
+      return params ? { kind: "artist", name, params } : { kind: "artist", name };
     }
     default:
       return notFound(path);
@@ -89,7 +91,7 @@ export function screenPath(s: Screen): string {
     case "favorites":
       return s.params ? `/favorites?${s.params}` : "/favorites";
     case "artist":
-      return `/artist/${encodeURIComponent(s.name)}`;
+      return `/artist/${encodeURIComponent(s.name)}${s.params ? `?${s.params}` : ""}`;
     case "root":
       return s.params ? `/?${s.params}` : "/";
     case "notFound":
