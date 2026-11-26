@@ -2891,6 +2891,12 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // Compact bar after the title scrolls away; Play hides while scrolling down.
 
   /* ---------- behaviour for the new screens ---------- */
+  // "You're all caught up": the mark pops once, the first time it comes into view (owner-approved 2026-11-26).
+  if (!calm && 'IntersectionObserver' in window) {
+    const popIO = new IntersectionObserver(es => es.forEach(en => { if (!en.isIntersecting) return; popIO.unobserve(en.target);
+      en.target.animate([{ transform: 'scale(.92)' }, { transform: 'scale(1)' }], { duration: 360, easing: 'cubic-bezier(.3,1.35,.5,1)' }); }), { threshold: .9 });
+    document.querySelectorAll('.caught6 .rule .hm6').forEach(el => popIO.observe(el));
+  }
   const rootEl = $('root');
   document.addEventListener('click', e => {
     const pk = e.target.closest('.pick[data-opt] button');

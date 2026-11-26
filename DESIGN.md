@@ -698,7 +698,7 @@ e621 has no artist pictures, so each artist gets a mark hashed from their name: 
 - **Hexagon:** point up, 97% tall and 84% wide (54 by 47), corners rounded 9.7% (5). Face: a top-to-bottom gradient from Raised Highlight (#2B4D80) to Raised (#1F3C67). Top light: white at 22%, 2% thick (1), along the upper edges.
 - **Play:** a triangle that points right, 34% wide and 39.5% tall (19 by 22), corners rounded 4% (2), moved 1.7% (1) to the right so it looks centred. Gold (#E8C446), set into the face: a darker band (#A8871F) 3% deep (1.7) along its upper edges and a light edge (white at 12%, 2%) under its lower edges.
 - **No lip and no shadow** (the Lip Is a Promise Rule: the mark is not a button). **Gold is only the Play glyph** (the One Gold Rule: Play is still the screen's one gold fill). Never the icon's gold hexagon inside the app.
-- In Settings the mark is a button for fun: pressed, it pops (92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`). *The pop is proposed, not owner-approved.*
+- In Settings the mark is a button for fun: pressed, it pops (92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`). Owner-approved 2026-11-26 ("Approve").
 
 ### Buttons
 - **Gold** (main action): gold fill with the strong top light, ink label, gold lip. 44 tall (headline, 24 padding) or 36 compact (callout, 18 padding).
@@ -737,7 +737,7 @@ Every favourite adds goo to the tab bar. It is the same liquid as the drip under
 **Artist card** (For You's "Artists you might like"): Panel, 24 radius, 8 padding, 296 wide in a snapping row (12 apart, 24 below). Collage (16 radius), then 8 below a post-style header: 36 mark, name, a muted footnote line ("You faved 23 of 140"), and Follow at the right.
 
 ### Caught-up moment
-Centred, shown once per visit, never over art: the 56 app mark between two 2 px rules that fade toward the screen edges, then "You're all caught up" (headline, white) and "Marked as seen on e621" (muted footnote). The mark pops once as it scrolls into view: 92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`; nothing with reduced motion. *Proposed, not owner-approved: the kaleidoscope turned one notch here, and a hexagon with Play cannot turn.*
+Centred, shown once per visit, never over art: the 56 app mark between two 2 px rules that fade toward the screen edges, then "You're all caught up" (headline, white) and "Marked as seen on e621" (muted footnote). The mark pops once as it scrolls into view: 92% to 100%, 360 ms, `cubic-bezier(.3,1.35,.5,1)`; nothing with reduced motion. Owner-approved 2026-11-26 ("Approve"); it replaces the kaleidoscope's one-notch turn.
 
 **The end of a feed** is the same moment with other words: "That's everything" and, when posts were left out, a muted footnote that says why ("3 hidden by your blacklist · 2 need you signed in"). No typed flower.
 
@@ -1040,7 +1040,7 @@ The goo and the secret tab on a computer. Search, Artists and the artist page on
 | Top bar capsule | 150 ms ease-out, past 64 px of scroll | opacity, and an 8 px drop (none with reduced motion) | mock |
 | Tuck | scroll-driven | card scale 95% ↔ 100%, 16 px rise, opacity 55% ↔ 100% | mock |
 | Skeleton shimmer | 1.4 s ease-in-out, looping | a light band crossing each well shape | mock |
-| Caught-up | once, on entering view | app mark pops: scale 92% to 100%, 360 ms `cubic-bezier(.3,1.35,.5,1)` | spec (proposed; not in mock) |
+| Caught-up | once, on entering view | app mark pops: scale 92% to 100%, 360 ms `cubic-bezier(.3,1.35,.5,1)` | mock |
 | Segmented capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateX to the chosen segment | mock |
 | Menu capsule | 360 ms `cubic-bezier(.3,1.35,.5,1)`; label colour 200 ms | translateY to the chosen row | mock |
 | Switch | knob 300 ms `cubic-bezier(.3,1.35,.5,1)`; track colour 200 ms | knob translateX 20 px | mock |
