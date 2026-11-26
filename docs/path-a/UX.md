@@ -1,6 +1,6 @@
 # UX plan
 
-Status: **v3** (2026-11-25), revised after UX review rounds 1 and 2 (see REVIEWS.md).
+Status: **v3.1** (2026-11-25), revised after UX review rounds 1–3 (see REVIEWS.md).
 Phone first (375×812 reference). Desktop is the same screens with a sidebar.
 
 ## 1. Principles
@@ -62,10 +62,14 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 - A Results screen opened from a link shows a **"From a link"** chip first in its chips row: it lists what
   the link set, with "Use my settings" to switch to your own.
 - **Not signed in here:** on iOS, links always open in Safari, never in the installed app, and the two
-  keep separate storage. A link visit with no saved account shows a dismissible strip: "You're not
-  signed in on this browser, so your blacklist isn't applied. Sign in". Settings › App explains why.
+  keep separate storage. A link visit with no saved account and no blacklist shows a notice **over the
+  player** for its first 4 s ("Not signed in on this browser: your blacklist isn't applied · Sign in"),
+  then the same strip on Results. Signing in from it pauses the show, and it resumes after. Settings ›
+  App explains why.
 - History after a link: `/following` is inserted under Results, so closing the player shows Results and
-  Back from Results goes home. If Safari skips the inserted entry, the Back helper (§3) covers it.
+  Back from Results goes home. The same happens when you land directly on **any** pushed screen (a pasted
+  `/artist/x`), so the browser's Back and ‹ Back agree. If Safari skips the inserted entry, the Back
+  helper (§3) covers it.
 
 ## 3. Navigation model
 
@@ -77,6 +81,9 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
   (a pasted URL, a shared artist link, a reload), it **replaces** the current entry with the parent:
   Artist / Results / Favorites / Search → the tab you came from or `/following`; Tune → `/for-you`;
   `?play` → the same screen without it; settings sub-page → `/settings`. So ‹ Back and ✕ always work.
+  An entry without `depth` (a reload after leaving for the API-key page, an old entry) counts as a root:
+  the helper never calls `history.back()` from it. The helper ignores a second call while one is in
+  flight, so one gesture can't pop two layers.
 - **Tab tap (different tab):** pops pushed screens (through the helper, awaited, never a raw
   `history.go(-n)` racing the next push), then shows that tab's root. Leaving Following adds one entry;
   switching between other tabs replaces it. Back at a tab root → Following; Back at Following leaves.
@@ -89,9 +96,14 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 - **Sheets** push a same-URL entry; Back (gesture, button, Esc) closes just the sheet. Closing by ✕, scrim
   or drag calls the helper so the entry is consumed. Two layers never close at once.
 - **Edge swipe in the installed app:** iOS gives standalone apps no back gesture, so pushed screens,
-  the player and sheets handle a swipe from the left 20 px themselves (Back). Ships with the routing slice.
+  the player and sheets handle a swipe from the left 20 px themselves (Back). In the player it only
+  closes the player. At Following's root it does nothing (there's nothing to leave to). Ships with the
+  routing slice.
+- **Scroll lock:** while the player or a sheet is open, the document underneath is locked
+  (`position: fixed` at its offset, restored on close), so pulls and swipes can't reach it.
 - **Memory and restore:** every screen keeps its post list and scroll anchor (post id + offset). The 4
-  tabs and the last 6 pushed screens stay in memory, with cards outside ±2 screens unmounted. Anchors
+  tabs and the screens in the current history stack stay in memory (cards outside ±2 screens unmounted);
+  a screen you've backed out of is dropped and rebuilt from its URL and saved anchor if you return. Anchors
   (1 day) and For You's ranked id list (30 min) are saved to localStorage, because iOS wipes
   sessionStorage when it kills a backgrounded app. On restore, a missing anchor post falls back to the
   nearest older post in the list.
@@ -107,13 +119,16 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
   releasing before springs back and does nothing. While refreshing, the spinner holds at 48 px for at least
   400 ms. The `touchmove` listener is attached only while such a touch is live, so normal scrolling stays passive.
 - **New posts:** checked when the screen becomes visible again (tab return, app foreground). If any, a
-  pill **↑ 6 new posts** floats under the header. Posts go in only on pill tap (smooth-scroll to top,
+  pill **↑ 6 new posts** floats under the header. Only one top pill shows at a time (new posts beats
+  "Update ranking"). Posts go in only on pill tap (smooth-scroll to top,
   then insert with a slide-down) or pull to refresh. Inserting keeps the card under the header in place
   (measure, insert, `scrollBy` the difference), since Safari has no `overflow-anchor`.
 - **Chrome on scroll:** the large title collapses to a 44 px bar; the chips row and the Play pill hide on
   scroll down and return on scroll up.
 - **Bottom stack** (bottom to top, each above `env(safe-area-inset-bottom)`): tab bar → Play pill
-  (centered, 12 px above the bar) → toasts (above the pill). The offline banner and new-posts pill sit
+  (centered, 12 px above the bar) → toasts (above the pill). The pill is 36 px tall and hides while
+  scrolling down; "Play from this post" is always in each card's ⋯ menu, so a hidden pill never blocks
+  anything. Feeds get bottom padding so the last card's ♥ row clears the pill. The offline banner and new-posts pill sit
   under the header at the top. The PTR spinner sits under the header. On Search, with the keyboard up,
   the tab bar is hidden and anything bottom-pinned follows `visualViewport`.
 
@@ -155,8 +170,8 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
   becomes a small **✓** in place (no reflow), toast "Following artist_x · Undo". Tapping ✓ unfollows
   with the same toast. At 500: toast "e621 allows 500 follows". On failure: rolls back, toast with the reason.
 - **Media taps** (media has `touch-action: manipulation`, no selection, no callout):
-  - **Single tap** (after a 250 ms double-tap guard): images open the player **paused** on that post
-    (a full-screen viewer that can start the slideshow); videos play/pause in place.
+  - **Single tap** (after a 200 ms double-tap guard, media only): images open the player **paused** on
+    that post (a full-screen viewer that can start the slideshow); videos play/pause in place.
   - **Double tap** favorites (never unfavorites) with a heart burst.
   - Videos: one live `<video>` at a time (the card nearest the middle, muted, `playsinline`); others are
     posters with a ▶ glyph. A mute button sits bottom-right. If autoplay is blocked (Low Power Mode) the
@@ -177,7 +192,7 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 - Square tiles, preview then sample. New posts get the • dot; Following's caught-up divider is a
   full-width row; no bursts, no suggestions card.
 - Tap a tile → player paused on it. Long-press a tile → menu: Favorite, Open artist, Play from here,
-  Open on e621.
+  Open on e621. Tiles have no callout or selection (same rules as card media).
 
 ### Filters (chips row)
 
@@ -228,13 +243,15 @@ Header: **Following** · search · grid · ⋯ (Refresh, Mark all as seen). Subt
   new posts loaded so far, "40+" while more pages of new posts remain.
 - **Marking seen (moves e621's marker, shared with e621.net):** e621 can only move the marker to its
   newest post, and can't move it back. So the app moves it only when all of these hold:
-  1. the divider has been above the header for 1.5 s while the page is idle (or the player has played
-     past the last new post);
+  1. you've scrolled at least one screen past the divider and stayed 1.5 s while idle (or the player has
+     played past the last new post);
   2. no filter is on (with Media or Hide favorited on, some new posts were never shown);
   3. a quick check (`search:subscriptions id:>newest_loaded`, 1 post) finds nothing newer than what's
      loaded; if it finds some, the new-posts pill shows instead.
-  Collapsed bursts count as seen (the "+9 more" row was shown). ⋯ › **Mark all as seen** asks first
-  ("Mark 12 new posts as seen on e621? This can't be undone.") and skips rule 2.
+  The rules apply the same way when it happens from the player. Collapsed bursts count as seen (the
+  "+9 more" row was shown). It's never silent: a small toast says "Marked as seen on e621". ⋯ › **Mark
+  all as seen** asks first ("Mark 12 new posts as seen on e621? This can't be undone.") and skips rule 2.
+  **Open question for the owner (Q8):** auto-mark as above, or only by ⋯ › Mark all as seen.
 - **Bursts (exact):** among new posts, a run is consecutive posts that share their first artist. Runs of
   **5+** show their first 3, then "+N more from <artist> ▾". Runs never cross the divider. Expanding is in
   place and lasts the session. Collapsed posts still play in the player.
@@ -246,8 +263,8 @@ Header: **Following** · search · grid · ⋯ (Refresh, Mark all as seen). Subt
 | State | Content |
 |---|---|
 | Signed out (landing) | Card: mascot waving, "Follow the artists you love and see their new posts first.", **Sign in with e621**. Below it a real feed, **Popular today** (`order:rank`), so the app is useful before signing in. |
-| First read of favorites | Progress loader with checklist: "Finding artists you love". "Skip, I'll pick myself" → Artists › Suggested |
-| Follows no one | The **Follow from favorites** list inline as the screen |
+| First read of favorites | Progress loader with checklist: "Finding artists you love". "Skip for now" → the banner state below. The read is shared with For You and Artists › Suggested (one read, cached). |
+| Follows no one | The **Follow from favorites** list inline as the screen. "Skip for now" (the only skip) folds it into a banner "Follow artists from your favorites ›" above **Popular today**. |
 | Follows no one, no favorites | "Find artists to follow": Search + "Popular artists" (e621 artists by post count) |
 | Follows people, no posts yet | "No posts yet from the N artists you follow." + suggestions card |
 
@@ -277,8 +294,8 @@ Header: **For You** · Tune (sliders) · search · grid · ⋯ (Refresh). Subtit
 - The ranked id list is saved (localStorage, 30 min), so reload and Back restore the same order.
 - Filters: Media, Date (the ranking window, default This week), Score.
 - **Pull to refresh** re-ranks only if the ranking is older than 10 min; otherwise toast "Already fresh,
-  ranked 3 min ago" (⋯ › Refresh forces it). While re-ranking the old list stays; a pill "New ranking
-  ready" swaps it in on tap.
+  ranked 3 min ago" (⋯ › Refresh forces it). While re-ranking the old list stays; an **Update ranking**
+  pill swaps it in on tap.
 - The player plays the ranked list; at the end it loops or stops per Settings › Slideshow › Loop.
 - States: signed out (mascot, "For You learns from your favorites", Sign in, plus Popular today); too
   few favorites ("A tag needs 3 favorites. Favorite a few more posts."); everything muted; error.
@@ -286,8 +303,8 @@ Header: **For You** · Tune (sliders) · search · grid · ⋯ (Refresh). Subtit
 ### Tune `/for-you/tune`
 
 Today's Recommended panel as a screen: sync status + Rebuild, Breadth slider, filter box, tag list with
-Pin / Mute, Muted list. Leaving with changes shows an **Apply changes** pill on For You; nothing re-ranks
-on its own.
+Pin / Mute, Muted list. Leaving with changes shows an **Update ranking** pill on For You (the same pill
+as a finished background re-rank); nothing re-ranks on its own.
 
 ### Artists `/artists`
 
@@ -385,7 +402,8 @@ appends to it as it goes (the feed grows too).
 - Controls auto-hide after 2.5 s while playing (stay while paused or while focus is inside them);
   single tap toggles them (250 ms double-tap guard).
 - **Gestures:** swipe left/right = next/previous; swipe down = close; double tap = favorite + burst
-  (never seeks). Swipes starting within 20 px of the left edge are Back (§3); other edges are left to the OS.
+  (never seeks). Swipes starting within 24 px of the left edge are left to Back (closes the player only);
+  other edges are left to the OS.
   The first 10 px of a drag lock its axis.
 - **Zoom:** pinch (or Classic fit "1:1") zooms; while zoomed, drags pan the image and swipe navigation
   and swipe-down are off; double tap or pinch back to fit resets.
@@ -393,7 +411,8 @@ appends to it as it goes (the feed grows too).
   Loop setting.
 - **Offline:** pauses with a "Paused: offline" chip instead of stall-skipping; resumes when back.
 - **⚙ Quick settings sheet:** Style (5 thumbnails), Seconds per slide, Fit (Classic), Mute, Quality,
-  "More in Settings". Opening pauses; closing resumes. Saved as defaults, except on a link visit, where a
+  "More in Settings" (closes the player, feed anchored, and opens `/settings/slideshow`; Back returns to
+  the feed). Opening the sheet pauses; closing resumes. Saved as defaults, except on a link visit, where a
   "This visit only / Save as default" switch shows (default: this visit only).
 - **ⓘ Info sheet:** tags by category; tap a tag → menu: Search this tag · Blacklist · Pin/Mute (For You)
   · Open artist (artist tags). Recommended reasons here.

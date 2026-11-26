@@ -70,3 +70,27 @@ Reviewer: fresh general-purpose subagent, same brief and inputs (UX.md v2). 25 f
 | 23 | minor | Safari may skip history inserted on load | **Changed.** Verify in slice 1; Back helper covers it. |
 | 24 | minor | iOS memory | **Changed.** Unmount cards outside ±2 screens. |
 | 25 | nit | Three surfaces for suggestions; slice load | **Accepted for Phase 4/5 ordering:** follow-from-favorites + Suggested first; inline card and bursts in a later slice. |
+
+## UX round 3 — 2026-11-25
+
+Reviewer: fresh general-purpose subagent, walked 6 flows over UX.md v3. 15 findings (13 major/minor, 1 nit
+on over-building). "Material issues remaining: yes", driven mainly by #3–4 (auto-moving a shared,
+irreversible marker), which is now an owner question (Q8). UX.md → v3.1.
+
+| # | Sev | Finding (short) | Outcome |
+|---|---|---|---|
+| 1 | major | iPhone launch link plays without blacklist; strip hidden behind player | **Changed.** Notice over the player for 4 s, then strip; sign-in pauses and resumes. |
+| 2 | major | Missing `depth` after reload with a sheet | **Changed.** No depth = root; helper never goes back from it. |
+| 3 | major | Player path skips marker rules | **Changed.** Same rules from the player. |
+| 4 | major | Auto-moving the shared marker is irreversible and silent | **Changed:** one screen past the divider + dwell, toast "Marked as seen on e621". **Asked owner (Q8):** auto vs manual only. |
+| 5 | major | Standalone Back at Following root | **Changed.** Edge swipe does nothing there. |
+| 6 | major | Player edge swipe vs previous; double pops | **Changed.** Edge (24 px) only closes the player; helper ignores re-entry. |
+| 7 | major | 250 ms tap delay on images | **Changed** to 200 ms, media only. Kept double-tap favorite (existing feature). |
+| 8 | major | Safari native PTR / gestures reaching the document under overlays | **Changed.** Scroll lock under player and sheets; `overscroll-behavior` verified on device in slice 1. |
+| 9 | major | Pasted `/artist` then browser Back leaves the app | **Changed.** `/following` inserted under any pushed screen landed on directly. |
+| 10 | minor | Double favorites read; two different skips | **Changed.** One shared read; one "Skip for now" → banner. |
+| 11 | minor | Two For You pills | **Changed.** One "Update ranking" pill; one top pill at a time. |
+| 12 | minor | Grid long-press callout | **Changed.** Same no-callout rules. |
+| 13 | minor | Hidden Play pill; overlap with ♥ row | **Changed.** ⋯ always has Play; bottom padding. |
+| 14 | minor | "More in Settings" from inside the player | **Changed.** Closes the player, then pushes `/settings/slideshow`. |
+| 15 | nit | Memory model too heavy | **Changed.** Keep tabs + current stack; rebuild others from anchors. |

@@ -41,3 +41,11 @@ Format: id — question. Options (recommendation first). Status.
   past the new posts; (b) local marker only. Recommendation: (a). **Answered:** (a).
 - **Q7 — More feed chips.** Hide favorited, Sort New/Top/Hot, Date Today/Week/Month, Score above 50.
   Recommendation: Hide favorited. **Answered:** all four. (UX must keep the chip row light: see UX.md.)
+
+## Phase 2 sign-off (asked 2026-11-25)
+
+- **Q8 — Moving e621's "seen" marker automatically.** e621 can only move it to its newest post and
+  never back. (a) Auto: after you scroll a screen past "You're caught up" with no filters on, with a
+  "Marked as seen on e621" toast; plus ⋯ › Mark all as seen. (b) Manual only: ⋯ › Mark all as seen.
+  Recommendation: (a). Status: open.
+- **Q9 — UX sign-off** on the wireframe page. Status: open.
