@@ -854,6 +854,30 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* the sidebar: the tab bar stood on its side. A floating panel, 8 from the window, with the same sliding capsule. */
 .side6 { position: absolute; z-index: 4; top: 8px; left: 8px; bottom: 8px; width: 232px; border-radius: var(--r-panel); background: linear-gradient(var(--panel-a), var(--panel-b) 220px); box-shadow: var(--lit), var(--lit-b); padding: 12px; display: flex; flex-direction: column; }
+/* The goo on a computer: it pools in the foot of the sidebar (picked by the owner: "Pool"). */
+.dg6 { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
+.dg6 svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.dg6.pool { bottom: 0; height: 120px; border-radius: 0 0 var(--r-panel) var(--r-panel); overflow: hidden; }
+.dgink6 { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 120px; pointer-events: none; color: #35527F; }
+.dgink6 .in { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 12px; padding: 8px; }
+.dgink6 i { width: 36px; height: 36px; border-radius: 999px; flex: none; box-shadow: inset 0 0 0 3px #35527F; background: rgba(53,82,127,.16); }
+.dgink6 b { display: block; font: var(--t-head); line-height: 20px; } .dgink6 small { font: var(--t-foot); }
+.goorow6 { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; justify-content: center; }
+.goorow6 > figure { margin: 0; display: flex; flex-direction: column; gap: 8px; align-items: center; font: var(--t-foot); color: var(--muted); }
+.scrop6 { position: relative; width: 248px; height: 232px; overflow: hidden; border-radius: 16px; background: var(--ground); flex: none; }
+.scrop6.bot .side6 { top: auto; height: 784px; }
+/* The pool on a phone: it rises inside the "Tab bar goo" row's card in Settings (picked by the owner: "jar row"). */
+.jar6 { position: relative; }
+.mp6 { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.mp6 svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.mpink6 { position: absolute; inset: 0; z-index: 3; pointer-events: none; color: #35527F; clip-path: inset(100% 0 0 0); }
+.mpink6 .srow6::before, .mpink6 .srow6::after { display: none; }
+.p6 .mpink6 .srow6 :is(small, .ic) { color: #35527F; }
+.p6 .mpink6 .srow6 .ico { background: rgba(53,82,127,.16); box-shadow: inset 0 0 0 2px #35527F; }
+.jar6 .srow6 > .btn6 { position: relative; z-index: 4; }
+.mpboard6 { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.mpboard6 > figure { margin: 0; display: flex; flex-direction: column; gap: 6px; font: var(--t-foot); color: var(--muted); text-align: center; }
+.mpboard6 .group6 { margin: 0; text-align: left; }
 .sbrand6 { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 4px; font: var(--w-d) 20px/25px var(--f-r); letter-spacing: var(--ls-d); }
 .stabs6 { position: relative; display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
 .sind6 { position: absolute; left: 0; right: 0; top: 0; height: var(--h); border-radius: 999px; background: var(--raised-hi-a); box-shadow: var(--lit); transform: translateY(calc(var(--k, 0) * 48px)); transition: transform .5s cubic-bezier(.3,1.35,.5,1); }
@@ -1287,6 +1311,10 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <figure class="dfig6"><figcaption><h2 class="pg-h3">4. Settings</h2><p>All the sub-pages on one page in the 600 column, each under its name. Sign out sits on the account row.</p></figcaption><div class="desk-holder" id="d-settings"></div></figure>
       <figure class="dfig6"><figcaption><h2 class="pg-h3">5. A dialog</h2><p>A titled sheet (shortcuts, Quick settings, sign-in, install steps) opens in the middle of the window, 420 wide, over the dim.</p></figcaption><div class="desk-holder" id="d-dialog"></div></figure>
     </div>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="gooD" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="2"/><feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/></filter></defs></svg>
+    <h2 class="pg-h2">Where the goo lives on a computer</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Pool</span>On a phone a drop falls from the heart onto the tab bar and the goo builds up along its top edge. On a computer the tab bar is a sidebar at the left, so the goo collects in its foot. The windows above show it at 40 favorites. The other two options (along the top edge, and no goo) are gone.</p>
+    <div class="under" id="u-dgoo" style="margin-top:24px"></div>
     <div class="cols" style="margin-top:48px" id="u-desk-cols"><section class="col" style="width:375px"><div class="under" id="u-desk"></div></section></div>
     <h2 class="pg-h2">What I decided in this pass</h2>
     <div class="tbl"><table>
@@ -1464,7 +1492,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     </section>
     <section class="col" aria-label="Settings">
       <div class="col-head"><h2 class="pg-h3">Settings</h2><p>Groups are panels with rows. The goo row now sits in a group like any other row with an action.</p></div>
+      <p class="pg-p dimtxt" style="margin:0 0 16px"><span class="prop6">Picked by you: Jar row</span>The pool comes to the phone: the "Tab bar goo" row fills up as you favorite, and "Wipe clean" drains it. Favorite a post in any phone here and watch the row.</p>
       <div class="phone-holder" id="s-settings"></div>
+      <div class="under" id="u-mpool"></div>
     </section>
     <section class="col" aria-label="Slideshow settings">
       <div class="col-head"><h2 class="pg-h3">Settings › Slideshow</h2><p>The controls a sub-page needs: style previews, a stepper, a small segmented control, switches and value rows.</p></div>
@@ -1567,6 +1597,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   // The app mark: the same generator held to e621's gold, cream and link blue, 8-fold
   const MARK = { ...AV, symmetryWeights: { 8: 1 }, mirrorChance: 1, layers: [3, 3], themeColors: ['linkActive', 'artistAlt', 'code', 'link', 'linkHover'], themePull: 1 };
   const f3 = n => Math.round(n * 1e3) / 1e3;
+  // Copy under goo is cut to the goo's own shape: the same shapes, used as a mask.
+  const gooMaskVal = (shapes, W, H) => `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${shapes}</svg>`)}') 0 0 / 100% 100% no-repeat`;
   const rpoly = (pts, c) => pts.map((q, i) => { const n = pts.length, p0 = pts[(i + n - 1) % n], p1 = pts[(i + 1) % n], v0 = [p0[0] - q[0], p0[1] - q[1]], v1 = [p1[0] - q[0], p1[1] - q[1]], l0 = Math.hypot(...v0), l1 = Math.hypot(...v1),
     t = c / Math.tan(Math.acos((v0[0] * v1[0] + v0[1] * v1[1]) / (l0 * l1)) / 2); return `${i ? 'L' : 'M'}${f3(q[0] + v0[0] / l0 * t)} ${f3(q[1] + v0[1] / l0 * t)}A${f3(c)} ${f3(c)} 0 0 1 ${f3(q[0] + v1[0] / l1 * t)} ${f3(q[1] + v1[1] / l1 * t)}`; }).join('') + 'Z';
   const ring = (n, r, a0) => Array.from({ length: n }, (_, i) => [r * Math.cos((a0 + i * 360 / n) * Math.PI / 180), r * Math.sin((a0 + i * 360 / n) * Math.PI / 180)]);
@@ -1844,6 +1876,11 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   /* ---------- settings ---------- */
   const srow = (i, t, s, val = '', cls = '') => `<button class="srow6" type="button"><span class="ico ${cls}">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span>${val ? `<span class="val">${val}</span>` : ''}${chev()}</button>`;
+  // The pool on a phone lives in the "Tab bar goo" row. n = a fixed amount for a board specimen; without it the drawing follows the live count.
+  const gooRow = (n, extra = '') => `<div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Tab bar goo</b><small ${n == null ? 'data-goo-count' : ''}>${n == null ? '' : n + ' favorites'}</small></span><${extra ? 'span' : 'button'} class="btn6 lip6" ${extra || 'type="button" data-goo-act="wipe"'}>Wipe clean</${extra ? 'span' : 'button'}></div>`;
+  const setGoo = n => `<div class="group6 jar6">${gooRow(n)}<span class="mp6 row" data-mp ${n == null ? '' : `data-n="${n}"`}></span><div class="mpink6 row" aria-hidden="true">${gooRow(n, 'style="visibility:hidden"')}</div></div>`;
+  $('u-mpool').innerHTML = strip('The goo row fills up', 'The row that holds "Wipe clean" is the jar. The level rises inside its card and stops just over the title: 7 tall at 5 favorites, 24 at 40, 43 at 150, of 56. The words show through in navy, cut to the goo\'s own edge. "Wipe clean" sits on top of the goo and drains it.',
+    `<div class="strip p6 mpboard6">${[5, 40, 150].map(n => `<figure>${setGoo(n)}<span>${n} favorites</span></figure>`).join('')}</div>`);
   $('s-settings').innerHTML = phone(`
     <div class="scroll6">
       <div class="head6"><div class="titlerow"><h3 class="title6">Settings</h3></div></div>
@@ -1851,7 +1888,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <div class="group6">
         ${srow('eye', 'Content', 'Ratings, blacklist')}${srow('film', 'Slideshow', 'Style, timing, videos', '6 s')}${srow('spark', 'For You', 'Tune, hidden artists')}${srow('app', 'App', 'Install, shortcuts, about')}
       </div>
-      <div class="group6"><div class="srow6"><span class="ico">${ic('drops', 20, 2, 'flat')}</span><span class="lbl"><b>Tab bar goo</b><small data-goo-count></small></span><button class="btn6 lip6" type="button" data-goo-act="wipe">Wipe clean</button></div></div>
+      ${setGoo()}
       <div class="caught6" style="padding-top:16px"><button type="button" class="markbtn" aria-label="e621 Slideshow" style="border-radius:999px;margin-bottom:8px">${mark('l')}</button><b>e621 Slideshow</b><small>Version 2.0</small></div>
     </div>` + bottom('Settings'));
 
@@ -2470,7 +2507,14 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* ================= Desktop, 900 px and wider (proposed) ================= */
   Object.assign(P, { full: '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>' });
   const desk = (inner, cls = '') => `<div class="desk6 p6 ${cls}">${inner}</div>`;
-  const side = (active, cls = '', n = 12) => `<nav class="side6 ${cls}" aria-label="Tabs"><div class="sbrand6">${mark('')}<span>Slideshow</span></div>
+  // The goo on a computer: static drawings of two places it could live, at a given number of favourites since the last wipe.
+  const gooTint = n => mixHex('#FFFFFF', '#F3E6A8', 1 - Math.exp(-n / 70));
+  const poolH = n => 10 + 56 * (1 - Math.exp(-n / 60));
+  const sidePool = n => { const h = poolH(n), y = 120 - h, c = gooTint(n), m = gooMaskVal,
+      sh = `<rect x="-12" y="${f3(y)}" width="256" height="${f3(h + 24)}"/><circle cx="1" cy="${f3(y + 1)}" r="6"/><circle cx="231" cy="${f3(y + 1)}" r="6"/><ellipse cx="62" cy="${f3(y + 1.5)}" rx="34" ry="4"/><ellipse cx="158" cy="${f3(y + 1)}" rx="${f3(26 + Math.min(18, n / 6))}" ry="${f3(3.5 + Math.min(4, n / 30))}"/>`;
+    return `<span class="dg6 pool"><svg viewBox="0 0 232 120" preserveAspectRatio="none" aria-hidden="true"><g filter="url(#gooD)" fill="${c}">${sh}</g></svg></span>` +
+      `<span class="dgink6" style="-webkit-mask:${m(sh, 232, 120)};mask:${m(sh, 232, 120)}" aria-hidden="true"><span class="in"><i></i><span><b>wolfie</b><small>42 follows</small></span></span></span>`; };
+  const side = (active, cls = '', n = 12, goo = 40) => `<nav class="side6 ${cls}" aria-label="Tabs">${cls.includes('rail') ? '' : sidePool(goo)}<div class="sbrand6">${mark('')}<span>Slideshow</span></div>
     <div class="stabs6" style="--k:${Math.max(0, TABS.findIndex(t => t[1] === active))}"><span class="sind6"></span>${TABS.map(([i, l]) => `<button type="button" class="stab6 ${l === active ? 'on' : ''}" ${l === active ? 'aria-current="page"' : ''} aria-label="${l}" data-stab>${ic(i, 22, 2)}<span>${l}</span>${l === 'Following' ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
     <button type="button" class="field6 ssearch6" aria-label="Search">${ic('search', 18, 2.2)}<span>Search</span><span class="kbd6">/</span></button>
     <button type="button" class="sacct6" aria-label="Account: wolfie">${avatar('wolfie')}<span><b>wolfie</b><small>42 follows</small></span></button></nav>`;
@@ -2480,6 +2524,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const feedMain = `<div class="dmain6"><div class="dcol6">${dhead()}${post(PD)}${post(P2)}</div>${fab(12)}</div>`;
 
   // 1. Following: the sidebar, the 600 column, Play beside it
+  const gooCrops = () => `<div class="strip p6 goorow6">${[5, 40, 150].map(n => `<figure><div class="scrop6 bot">${side('Following', '', 12, n)}</div><span>${n} favorites</span></figure>`).join('')}</div>`;
+  $('u-dgoo').innerHTML = strip('The goo collects in the foot of the sidebar', 'The sidebar is the jar. A drop falls from the heart and arcs left into it. The level rises fast at first and then slows, so it never passes the account row: 14 tall at 5 favorites, 37 at 40, 61 at 150. Your name shows through in navy where the goo covers it, as tab names do on the phone. With the icon-only sidebar there is no goo.', gooCrops());
   $('d-feed').innerHTML = desk(side('Following') + feedMain);
 
   // 2. Grid: the full width; a chip's sheet becomes a popover under the chip
@@ -2759,7 +2805,15 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   const gooLive = () => [...document.querySelectorAll('nav.tabbar6[data-goo="live"], nav.tabbar6[data-goo="own"]')];
   const gooTick = (now) => { let live = false; gooLive().forEach(nav => { const st = gooSt.get(nav); if (!st) return; if (gooStep(nav, st, now)) live = true; gooDraw(nav, st); }); gooRaf = live ? requestAnimationFrame(gooTick) : 0; };
   const gooKick = () => { if (!gooRaf) gooRaf = requestAnimationFrame(gooTick); };
-  const gooLabels = () => document.querySelectorAll('[data-goo-count]').forEach(el => { el.textContent = gooCount === 1 ? '1 favorite' : gooCount + ' favorites'; });
+  // The pool in the "Tab bar goo" row, drawn at the live count (or at a specimen's own data-n).
+  const jarLv = n => 4 + 42 * (1 - Math.exp(-n / 60));
+  const poolDraw = () => document.querySelectorAll('[data-mp]').forEach(el => {
+    const n = el.dataset.n != null ? +el.dataset.n : gooCount, c = gooTint(n), H = 56, h = n > 0 ? jarLv(n) : 0, y = H - h, ink = el.nextElementSibling,
+      sh = `<rect x="-12" y="${f3(y)}" width="367" height="${f3(h + 24)}"/><circle cx="1" cy="${f3(y + 1)}" r="5"/><circle cx="342" cy="${f3(y + 1)}" r="5"/><ellipse cx="96" cy="${f3(y + 1.5)}" rx="44" ry="3.5"/><ellipse cx="236" cy="${f3(y + 1)}" rx="${f3(36 + Math.min(20, n / 6))}" ry="${f3(3 + Math.min(3.5, n / 30))}"/>`;
+    el.innerHTML = n > 0 ? `<svg viewBox="0 0 343 ${H}" preserveAspectRatio="none" aria-hidden="true"><g filter="url(#gooD)" fill="${c}">${sh}</g></svg>` : '';
+    if (ink) { ink.style.clipPath = n > 0 ? 'none' : 'inset(100% 0 0 0)'; ink.style.webkitMask = ink.style.mask = n > 0 ? gooMaskVal(sh, 343, H) : 'none'; }
+  });
+  const gooLabels = () => { document.querySelectorAll('[data-goo-count]').forEach(el => { el.textContent = gooCount === 1 ? '1 favorite' : gooCount + ' favorites'; }); poolDraw(); };
   const gooSnap = (st) => { st.cur = { uL: st.T.uL, uR: st.T.uR, t: st.T.t, tint: st.T.tint }; st.drips = st.T.drips; st.len = new Map(st.drips.map(d => [d.id, { l: d.len, v: 0 }])); };
   // Draw a bar's goo where it should be right now, with no animation. Called whenever a bar is drawn.
   const gooSync = (nav) => {

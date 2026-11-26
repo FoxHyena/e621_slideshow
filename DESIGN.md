@@ -979,7 +979,21 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **Player.** The sidebar leaves and the window is black. ✕ is 16 from the top left; the count and a 44 glass full-screen button are 16 from the top right, 12 apart. At the bottom, 24 from the sides and 20 from the bottom: the progress bar, and 12 under it one row: the artist at the left, the transport in the middle (44 glass Previous and Next round a 56 gold Play), then Favorite, Post info, Slideshow settings and Share at the right, 12 apart. **Post info** is a panel, not a sheet: 360 wide, 8 from the window's top, right and bottom, 24 radius, 16 padding, the sheet's content as it is. While it is open the picture is centred in the space left of it (the window less 376); the shades and the controls end there too; the Post info button wears the gold ring. Its ✕ closes it.
 - **Settings** is one page in the 600 column: each sub-page's groups under its name (rounded 600 20/25, 16 in from the column's edge), in the order Account, Content, Slideshow, For You, App. Group labels inside a section stay as on the phone. Sign out is a tonal 36 button on the account row.
 - **Pointer.** Replaced by "Under the pointer" in the next section. Focus is the gold ring; the card reached with J or K wears it round its panel.
-- **Not designed:** the goo and the secret tab on a computer. The sidebar is drawn clean.
+- **The goo on a computer: it pools in the foot of the sidebar.** Owner-picked 2026-11-26 ("Pool"). Drawn in the mock under "Where the goo lives on a computer".
+  - **Level:** 10 + 56(1 − e^(−n/60)) px above the sidebar's bottom edge, n = favorites since the last wipe: 14 at 5, 37 at 40, 61 at 150. It never passes the account row (12 padding + 52 row = 64).
+  - **Shape:** the tab bar goo's filter (blur 2, alpha ×20 −8) over a full-width slab with a low swell or two on its surface and a small rise where it meets each side. Clipped to the sidebar's 24 bottom corners. It lies over the account row and takes no clicks.
+  - **Colour:** the tab bar goo's ramp, white to Goo Cream #F3E6A8 with tint 1 − e^(−n/70).
+  - **Copy under the goo:** the account's name, its count and its avatar ring are drawn again in Goo Ink #35527F, cut to the goo's own shape (the same shapes used as a mask, so the cut follows the wavy surface), as tab names are on the phone.
+  - **No goo** with the icon-only sidebar (900 to 1099 wide).
+  - **Not drawn:** the drop's flight from the heart into the sidebar's foot, the wipe on a computer, and what the "Tab bar goo" row is called there. The mock's pool is a still drawing.
+- **The pool on a phone: the "Tab bar goo" row is a jar.** Owner's idea ("Maybe we bring the pool to mobile somewhere too? … Maybe the settings or something?"), owner-picked 2026-11-26 ("jar row"). Drawn in the mock's Settings phone and under it.
+  - **Where:** inside the card of the "Tab bar goo" row in Settings. The tab bar's own goo does not change.
+  - **Level:** 4 + 42(1 − e^(−n/60)) px above the card's bottom edge, of the row's 56: 7 at 5 favorites, 24 at 40, 43 at 150. Nothing at 0.
+  - **Shape and colour:** as the computer's pool (same filter, a full-width slab with low swells, the tab bar goo's colour ramp), clipped to the card's 24 corners. It takes no clicks.
+  - **Copy under the goo:** the row's title, its count and its icon well (a 2 px ring and the drops icon) are drawn again in Goo Ink #35527F, cut to the goo's own shape.
+  - **"Wipe clean"** sits above the goo, unchanged, and empties the jar.
+  - **Not drawn:** the level's motion as it rises, and how the jar empties during the wipe. In the mock the level jumps.
+- **Not designed:** the secret tab on a computer.
 
 ### The top bar, the pointer, grid loading, one head, chip dropdowns
 *Written 2026-11-26. Drawn in `mocks/screens-v6.html`: "The top bar after you scroll", "Under the pointer (hover)", "Grid loading", "The head stays one size", "A chip drops its panel under itself". Each part says whether the owner picked it.*
@@ -1018,7 +1032,7 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **"From a link":** the same Panel dropdown, 343 wide, holding the line, the six rows, the note and the tonal "Use my settings".
 
 ### Not drawn yet
-The goo and the secret tab on a computer. Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
+The secret tab on a computer, and for the goo there: the drop's flight and the wipe. Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |
