@@ -47,18 +47,6 @@ export function PlaceholderScreen({
   onSection: (s: SettingsSection) => void;
 }) {
   switch (screen.kind) {
-    case "tab":
-      if (screen.tab === "for-you")
-        return (
-          <Frame title="For You">
-            <Soon>Posts picked from your favorites will show up here. For now, start For You from Settings › Account.</Soon>
-          </Frame>
-        );
-      return (
-        <Frame title="Artists">
-          <Soon>The artists you follow, and ones you might like, will show up here.</Soon>
-        </Frame>
-      );
     case "settings":
       if (screen.section)
         return (
@@ -101,6 +89,7 @@ export function PlaceholderScreen({
           <Soon>This artist&rsquo;s posts will show up here.</Soon>
         </Frame>
       );
+    case "tab":
     case "notFound":
     case "root":
       return null;

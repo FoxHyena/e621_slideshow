@@ -8,7 +8,7 @@
  * it), with no filter on and nothing newer on e621, the marker moves (owner Q8), and a toast says so.
  */
 import { ArrowUp, CheckCheck, MoreHorizontal, RotateCw, Search } from "lucide-react";
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { DEFAULT_FILTERS, filtersOn, isDefaultFilters, type Filters } from "@/lib/feed/filters";
 import type { Post } from "@/lib/e621/types";
 import { dividerIndex, feedRows, isNew, newCountLabel } from "@/lib/following/feed";
@@ -111,39 +111,61 @@ export function FollowingScreen() {
   const follows = fs.anchor !== null && (fs.anchor.tag_count ?? 1) > 0;
   const feedReady = signedIn && fs.status === "ready" && follows;
 
+  const tools = (
+    <div className="tools">
+      <button
+        type="button"
+        className="toolbar-circle"
+        aria-label="Search"
+        onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "following" })}
+      >
+        <Search aria-hidden />
+      </button>
+      <GridToggle grid={grid} setGrid={setGrid} />
+      {feedReady && (
+        <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
+          <MoreHorizontal aria-hidden />
+        </button>
+      )}
+    </div>
+  );
+  // the title row, with something else in place of the tools on the first run's pick list
+  const head = (right: ReactNode = tools) => (
+    <div className="title-row">
+      <h1 tabIndex={-1} className="screen-title">
+        Following
+      </h1>
+      {right}
+    </div>
+  );
+  const noOne = session.ready && signedIn && fs.status === "ready" && !follows;
+
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
-      <div className="title-row">
-        <h1 tabIndex={-1} className="screen-title">
-          Following
-        </h1>
-        <div className="tools">
-          <button
-            type="button"
-            className="toolbar-circle"
-            aria-label="Search"
-            onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "following" })}
-          >
-            <Search aria-hidden />
-          </button>
-          <GridToggle grid={grid} setGrid={setGrid} />
-          {feedReady && (
-            <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
-              <MoreHorizontal aria-hidden />
-            </button>
-          )}
-        </div>
-      </div>
-      {!session.ready || (signedIn && (fs.status === "idle" || fs.status === "loading")) ? (
-        <div className="feed-list" data-testid="feed-waiting" />
-      ) : !signedIn ? (
-        <Landing grid={grid} />
-      ) : fs.status === "error" ? (
-        <ErrorPanel error={fs.error ?? "e621 didn't answer"} onRetry={() => void following.load()} testId="following-error" />
-      ) : !follows ? (
-        <FollowsNoOne grid={grid} />
+      {noOne ? (
+        <Suspense
+          fallback={
+            <>
+              {head()}
+              <div className="feed-list" data-testid="feed-waiting" />
+            </>
+          }
+        >
+          <FirstRun key={session.user?.name} head={head} popular={<Popular grid={grid} />} />
+        </Suspense>
       ) : (
-        <FollowingFeed fs={fs} grid={grid} sheet={sheet} />
+        <>
+          {head()}
+          {!session.ready || (signedIn && (fs.status === "idle" || fs.status === "loading")) ? (
+            <div className="feed-list" data-testid="feed-waiting" />
+          ) : !signedIn ? (
+            <Landing grid={grid} />
+          ) : fs.status === "error" ? (
+            <ErrorPanel error={fs.error ?? "e621 didn't answer"} onRetry={() => void following.load()} testId="following-error" />
+          ) : (
+            <FollowingFeed fs={fs} grid={grid} sheet={sheet} />
+          )}
+        </>
       )}
     </div>
   );
@@ -481,17 +503,28 @@ function Landing({ grid }: { grid: boolean }) {
   );
 }
 
-/** Signed in, following nothing yet (slice 5 brings Follow from favorites here). */
-function FollowsNoOne({ grid }: { grid: boolean }) {
+/**
+ * Signed in, following nothing yet: the first run (src/screens/FirstRun.tsx) in its own chunk. If
+ * the chunk can't come (offline), the plain state and Popular today.
+ */
+const FirstRun = lazy(() =>
+  import("./FirstRun").then(
+    (m) => ({ default: m.FirstRun }),
+    () => ({ default: FollowsNoOne }),
+  ),
+);
+
+function FollowsNoOne({ head, popular }: { head: (right?: ReactNode) => ReactNode; popular: ReactNode }) {
   return (
     <>
+      {head()}
       <StateBlock
         mood="snooze"
         head="You don't follow anyone yet"
         text="Tap Follow on an artist, and their new posts show up here first."
         testId="following-none"
       />
-      <Popular grid={grid} />
+      {popular}
     </>
   );
 }

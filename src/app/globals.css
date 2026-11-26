@@ -4096,6 +4096,48 @@ button.field6:focus-visible {
     opacity: 0.6;
   }
 }
+/* busy: the face holds left, slides right, holds, slides back every 3.2 s; the dots light in turn */
+.goo[data-mood="busy"] .goo-face {
+  animation: goo-look 3.2s ease-in-out infinite;
+}
+@keyframes goo-look {
+  0%,
+  30% {
+    transform: translateX(-3.5px);
+  }
+  45%,
+  80% {
+    transform: translateX(3.5px);
+  }
+  95%,
+  100% {
+    transform: translateX(-3.5px);
+  }
+}
+.goo .goo-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.35;
+  animation: goo-dot 1.2s ease-in-out infinite;
+}
+.goo .goo-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.goo .goo-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes goo-dot {
+  0%,
+  40%,
+  100% {
+    opacity: 0.35;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .goo *,
   .goo.goo-pop .goo-bd {
@@ -4282,4 +4324,281 @@ button.field6:focus-visible {
   opacity: 0;
   transform: translateY(24px);
   pointer-events: none;
+}
+
+/* First run after sign-in (DESIGN.md "First run after sign-in"): the read, the pick list, the gold
+   Follow N artists where Play stands, and the row it folds into after Skip for now. */
+.first-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.first-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 248px;
+  max-width: 100%;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.first-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: var(--color-muted);
+}
+.first-steps li[data-state="now"] {
+  color: var(--color-fg);
+}
+.first-steps li > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.first-steps em {
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+.first-step-n,
+.pick-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  font-size: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+}
+.first-step-n svg,
+.pick-check svg {
+  width: 16px;
+  height: 16px;
+}
+li[data-state="done"] .first-step-n {
+  color: var(--color-score);
+}
+li[data-state="done"] .first-step-n svg,
+.pick-row[data-just] .pick-check svg {
+  animation: check-pop 320ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+.first-spin {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid var(--color-raised);
+  border-top-color: var(--color-link);
+  animation: spin 800ms linear infinite;
+}
+.first-skipped {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+.first-pick {
+  padding-bottom: 196px;
+}
+.first-sub {
+  margin-bottom: 16px;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.list-label > .list-label-two {
+  display: inline-flex;
+  padding: 0 4px 0 0;
+}
+.list-label-two button {
+  position: relative;
+  height: 28px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--color-link);
+}
+.list-label-two button::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.row-mark {
+  width: var(--spacing-avatar);
+  height: var(--spacing-avatar);
+}
+.list-group:has(.row-mark) {
+  --div: 64px;
+}
+.pick-check {
+  color: transparent;
+  transition: background-color 150ms ease-out;
+}
+.pick-row[aria-checked="true"] .pick-check {
+  background: var(--color-score);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: var(--color-ground);
+}
+.pick-row:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.first-cta {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: calc(var(--bar-bottom) + 78px);
+  width: min(calc(100% - 2 * var(--spacing-inset)), 480px);
+  translate: -50% 0;
+}
+.first-cta .btn-gold {
+  width: 100%;
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    var(--shadow-float);
+}
+.first-cta .btn-gold svg {
+  width: 18px;
+  height: 18px;
+}
+.first-cta .btn-gold:disabled {
+  opacity: 1;
+  background: var(--color-panel);
+  color: var(--color-muted);
+  box-shadow:
+    var(--inset-shadow-lit),
+    var(--shadow-float);
+}
+@media (prefers-reduced-motion: reduce) {
+  li[data-state="done"] .first-step-n svg,
+  .pick-row[data-just] .pick-check svg,
+  .first-spin {
+    animation: none;
+  }
+  .pick-check {
+    transition: none;
+  }
+}
+
+/* Artists (DESIGN.md "Artists"): the 44 segmented control, the filter row, artist rows, the
+   footnote, and Suggested's artist cards at full width. */
+.artists-seg {
+  margin: 8px 0 12px;
+}
+.seg-count {
+  margin-left: 2px;
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.artists-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.artists-tools > .field6 {
+  flex: 1;
+  min-width: 0;
+}
+.artists-tools > .chip {
+  flex: none;
+}
+.artist-row {
+  min-height: 60px;
+  padding: 0 16px 0 0;
+}
+.artist-row-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 8px 0 8px 16px;
+  text-align: left;
+}
+.artist-row-open:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+.artist-row-open:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+.artist-row .row-text > b {
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+}
+.list-foot {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.artists-banner {
+  margin-bottom: 16px;
+}
+.sugg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+.sugg-card {
+  padding: 8px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+.sugg-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+}
+.sugg-tile {
+  aspect-ratio: 1;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+}
+.sugg-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sugg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px 0 0;
+}
+.sugg-who {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 0 0 4px;
+  text-align: left;
+}
+.sugg-who:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+.sugg-head .follow-pill {
+  flex: none;
+}
+.sheet-cta .btn-gold {
+  width: 100%;
+}
+.first-pick-sheet .first-sub {
+  margin-top: 0;
 }

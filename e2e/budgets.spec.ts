@@ -30,6 +30,8 @@ test("JS transferred on a cold load of /following", async ({ page }) => {
   const load = await page.evaluate(scripts);
   const kb = load.reduce((n, s) => n + s.kb, 0);
   console.log(`JS transferred, cold load of /following: ${kb.toFixed(1)} KB (encoded, ${load.length} files)`);
+  // E6_BUDGET_FILES=1 lists them, biggest first, to see what grew
+  if (process.env.E6_BUDGET_FILES) for (const s of [...load].sort((a, b) => b.kb - a.kb)) console.log(`  ${s.kb.toFixed(1).padStart(6)} KB  ${s.name}`);
 
   const page2 = await page.context().newPage();
   await mockE621(page2);

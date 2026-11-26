@@ -231,6 +231,15 @@ export const storage = {
   },
   /** Kept only with Remember on, like the first posts. */
   saveSubs: (username: string, r: SubsRecord | null, remember: boolean) => writeAccount(`subs:${username}`, remember ? r : null, remember),
+  /** Artists you said "Not interested" to (a choice, kept like pins and mutes). */
+  loadHiddenArtists: (username: string): string[] => {
+    const v = read<unknown>(`hiddenArtists:${username}`, []);
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x !== "") : [];
+  },
+  saveHiddenArtists: (username: string, names: string[]) => write(`hiddenArtists:${username}`, names.length ? names : null),
+  /** Following's first run was skipped ("Skip for now"): kept like the marker. */
+  loadFirstRunSkipped: (username: string): boolean => readAccount<boolean>(`firstRunSkipped:${username}`) === true,
+  saveFirstRunSkipped: (username: string, on: boolean, remember: boolean) => writeAccount(`firstRunSkipped:${username}`, on || null, remember),
   /** Everything kept for an account (sign-out, or a sign-in without Remember). */
   purgeAccount: (username: string) => {
     writeAccount(`subs:${username}`, null, false);
@@ -239,6 +248,7 @@ export const storage = {
     write(`ranked:${username}`, null);
     writeAccount(`marker:${username}`, null, false);
     writeAccount(`seen:${username}`, null, false);
+    writeAccount(`firstRunSkipped:${username}`, null, false);
   },
 };
 

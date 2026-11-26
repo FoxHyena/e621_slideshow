@@ -20,7 +20,7 @@ import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
-import { ArtistScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, PlaceholderScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, TuneScreen } from "./lazy";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
@@ -236,9 +236,9 @@ export default function Shell() {
       {TABS.filter((t) => visited.has(t)).map((t) => (
         <Activity key={t} mode={curRoot === t ? "visible" : "hidden"}>
           <section ref={ref} data-id={t} className="screen" data-screen={t}>
-            {(t === "for-you" || t === "following") && roots[t] ? (
+            {(t === "for-you" || t === "following" || t === "artists") && roots[t] ? (
               <ScreenContext value={ctx(curRoot === t ? cur : roots[t]!, curRoot === t)}>
-                <Suspense fallback={null}>{t === "following" ? <FollowingScreen /> : <ForYouScreen />}</Suspense>
+                <Suspense fallback={null}>{t === "following" ? <FollowingScreen /> : t === "artists" ? <ArtistsScreen /> : <ForYouScreen />}</Suspense>
               </ScreenContext>
             ) : (
               <Suspense fallback={null}>

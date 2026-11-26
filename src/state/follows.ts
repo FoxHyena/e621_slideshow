@@ -53,6 +53,11 @@ export interface FollowsApi {
   ensure(lane?: Lane, force?: boolean): Promise<void>;
   /** Follow (`on`) or unfollow, optimistically, with a toast and Undo. */
   setFollowed(name: string, on: boolean): void;
+  /**
+   * Follow several in one write (Follow from favorites). Shown at once; what e621 skipped comes back
+   * (already followed counts as followed). Null when it couldn't be sent or failed (said in a toast).
+   */
+  followMany(names: string[]): Promise<{ added: string[]; skipped: { name: string; reason: string }[] } | null>;
   setAccount(creds: Credentials | null, user: string | null, remember: boolean, checking?: boolean): void;
 }
 
@@ -122,7 +127,6 @@ export function createFollows(
     const gen = writes;
     const shownAlready = s.status === "ready";
     let again = false;
-    if (!shownAlready) store.set((x) => ({ ...x, status: "loading" }));
     loading = api
       .list(creds, undefined, shownAlready ? "bg" : lane)
       .then((rows) => {
@@ -155,6 +159,8 @@ export function createFollows(
             void ensure(lane);
           });
       });
+    // after `loading` is set: a listener that asks again gets this read, not a second one
+    if (!shownAlready) store.set((x) => ({ ...x, status: "loading" }));
     return loading;
   };
 
@@ -262,10 +268,58 @@ export function createFollows(
     });
   };
 
+  const followMany = async (raw: string[]) => {
+    const c = creds;
+    const s = store.get();
+    if (!c || !s.user) {
+      ui.signIn();
+      return null;
+    }
+    const names = [...new Set(raw.map((n) => n.trim().toLowerCase()))].filter((n) => n && !/\s/.test(n) && !s.followed.has(n));
+    const room = Math.max(0, FOLLOW_LIMIT - s.followed.size);
+    if (names.length > room) {
+      ui.say(LIMIT_MESSAGE, { id: "follow:many", error: true });
+      return null;
+    }
+    if (!names.length) return { added: [], skipped: [] };
+    const mine = epoch;
+    for (const n of names) intent.set(n, true);
+    publish();
+    writes++;
+    let res: Awaited<ReturnType<typeof api.subscribe>>;
+    try {
+      res = await api.subscribe(names, c);
+    } catch (e) {
+      if (mine !== epoch) return null;
+      for (const n of names) intent.delete(n);
+      publish();
+      ui.say(`Couldn't follow them: ${e instanceof Error ? e.message : String(e)}`, { id: "follow:many", error: true });
+      return null;
+    } finally {
+      if (mine === epoch) writes++;
+    }
+    if (mine !== epoch) return null;
+    for (const row of res.added) server.set(row.tag_name, row.id);
+    const skipped: { name: string; reason: string }[] = [];
+    for (const k of res.skipped) {
+      if (/already/i.test(k.reason)) server.set(k.name, null);
+      else skipped.push({ name: k.name, reason: skipReason(k.reason) });
+    }
+    const missed = new Set(skipped.map((k) => k.name));
+    // asked for, not skipped, not under its own name in the answer: an alias e621 followed under its new name
+    for (const n of names) if (!missed.has(n) && !server.has(n)) server.set(n, null);
+    for (const n of names) intent.delete(n);
+    persist();
+    if (s.user) storage.saveFeedHead(s.user, null, remember);
+    store.set((x) => ({ ...x, followed: shown(), changed: x.changed + 1 }));
+    return { added: names.filter((n) => !missed.has(n)), skipped };
+  };
+
   return {
     store,
     ensure,
     setFollowed,
+    followMany,
     setAccount(c, user, keep, checking = false) {
       remember = keep;
       if (store.get().checking !== checking) store.set((s) => ({ ...s, checking }));

@@ -16,6 +16,7 @@ import type { TagAction } from "@/components/TagActions";
 import { FollowButton } from "@/feed/FollowPill";
 import { ChipsRow, FilterSheet, type ChipId } from "@/feed/Chips";
 import { getNav } from "@/nav/history";
+import { getArtistList } from "@/state/artistList";
 import { useScreen } from "@/shell/context";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFavs } from "@/state/favs";
@@ -278,6 +279,8 @@ export function ArtistScreen({ name }: { name: string }) {
   const feed = useFeed(spec, null);
   const [grid, setGrid] = useState(false);
   const route = entry.route;
+  // opening an artist's page clears their New dot on Artists for the session
+  useEffect(() => getArtistList().opened(name), [name]);
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
       <Toolbar>

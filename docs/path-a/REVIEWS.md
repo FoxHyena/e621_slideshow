@@ -579,3 +579,46 @@ Visual check at 375×812: landing, needs sign-in, no match, error, slow down, of
 **Budgets** (production build, 375×812, mock e621): JS cold load of `/following` **194.5 KB** (≤ 200; R2b 198.6),
 259.5 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first feed content 0.36 s; scroll at 4× CPU: 0
 long tasks.
+
+## Slice 5 review (2026-11-26): Artists tab, artist score, first run after sign-in
+
+**code-review skill (high), 5 findings: 5 fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Follow from favorites in a sheet went Back after e621 answered: with the sheet already closed, that Back left the Artists tab | Med | The sheet closes at the tap (the follow shows at once) |
+| 2 | Every rec progress tick patched the artists store, so Suggested re-rendered every card during the learn phase | Med | `same()` patches only what changed; `cut()` skips when its inputs are the same objects |
+| 3 | The segment read "Following3" | Low | A space before the count |
+| 4 | The sort chip looked "on" at the default Recent | Low | On only when the sort isn't Recent |
+| 5 | The New dot cleared only from the row, not when the artist's page opened from anywhere | Low | The artist page marks the artist opened |
+
+**Fresh reviewer, 11 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | Account switch: the artists store could read the last account's rec profile and follow list (rec and follows follow the session on their own) and keep that for an hour | High | Waits until rec's `name` and the follow list's `user` are the new account's |
+| 2 | Sign-out didn't cancel a read in flight; it could finish and show the old account's list | Med | Sign-out bumps the epoch and drops the in-flight read, the kept hour and the last cut |
+| 3 | `wanted` never reset: after one visit, every later sign-in read favorites and searched from any tab | Med | Reset with the account; the screens ask again when the account changes |
+| 4 | After an error, any store tick restarted the read: a failing e621 got asked again and again | Med | An error waits for Try again |
+| 5 | An account without an id would spin forever | Low | **No change**: the session never keeps a user without an id (/users/me with no id is a refused sign-in) |
+| 6 | Following N artists unmounted the list and focus fell to the page | Med | Focus moves to the Following title; a toast says "Following N artists" (and what was skipped, with why) |
+| 7 | Pick rows had no group name; the count could include names followed or hidden since the list opened | Low | `role="group"` "Artists to follow"; only names on the list count and are sent |
+| 8 | The Follow-from-favorites sheet could open empty from history before the read | Low | It closes itself when there's nothing to pick |
+| 9 | The first run's Skip flag could carry over to another account | Low | Keyed by the account |
+| 10 | `hiddenArtists` survives sign-out and isn't tied to Remember | Low | **No change** for now, like Tune's overrides (a choice list, no account data); on MORNING to decide |
+| 11 | The read block's status region covers only the line, not the numbers | Low | **No change**: the numbers tick every page; announcing them would talk over everything. `data-screen` is the state's "whole screen" spacing |
+
+**Gates:** typecheck, lint clean; unit tests 303 pass (artist score: ordering, smoothing, exclusions,
+recency, batching, grouping, synthetic backtest; follows: bulk with skips, failure rollback and limit).
+New e2e: e2e/first-run.spec.ts (4: read → pick → one POST → feed; Skip and its row across a reload; no
+favorites; a failed read and Try again), e2e/artists.spec.ts (4: signed out; Following with dot, filter,
+sort, Unfollow and Undo; Suggested with Follow kept in place and Not interested with Undo; Follow from
+favorites as a sheet, one POST). Full e2e: 183 passed, 1 failed (the old "following nobody" test, which the
+first run replaces: updated), 2 skipped. Found by the e2e and fixed: the ranking ran before the tag counts
+came (counts missing from rows), suggestions cut before the follow list loaded (a followed artist offered),
+and a re-entrant `follows.ensure` loop.
+Visual check at 375×812: the read, the pick list, the skipped row, Artists › Following, Suggested, the sheet.
+
+**Budgets** (production build, mock e621): JS cold load of `/following` **197.1 KB** (≤ 200; R3 194.5);
+274.3 KB with the idle prefetch; CLS 0.0000; first feed content 0.37 s; 12 cards in the DOM; 0 long tasks
+at 4× CPU. `E6_BUDGET_FILES=1` now lists the first-load files by size.

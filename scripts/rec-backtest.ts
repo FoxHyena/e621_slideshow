@@ -7,6 +7,10 @@
 //
 // Usage: fill in .env.backtest (gitignored), then
 //   node_modules/.bin/jiti scripts/rec-backtest.ts [days=30] [breadth=15]
+//   node_modules/.bin/jiti scripts/rec-backtest.ts --artists
+//     The artist score instead (ENGINEERING.md §6): hide 20% of each account's favorites, rank
+//     artists from the rest, report recall@10 of the hidden favorites' artists against the raw
+//     favorite count. Reads favorites and tag counts only.
 // Env (wins over the file):
 //   E621_USER, E621_API_KEY   one account; the key is optional when its favorites are public
 //   BACKTEST_USERS            comma-separated public accounts instead (run without a key)
@@ -56,6 +60,7 @@ import { allTags, type Post } from "../src/lib/e621/types";
 import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "../src/lib/query/build";
 import { coverTags } from "../src/lib/recommend/cover";
 import { features, learnedScore, learnWeights } from "../src/lib/recommend/learn";
+import { artistRecall } from "../src/lib/recommend/artistBacktest";
 import { addFavorites, emptyProfile } from "../src/lib/recommend/profile";
 import { byRank, rankAll, scorePost, type Ranked } from "../src/lib/recommend/rank";
 import { REC_PAGE_BUDGET, REC_PAGE_SIZE } from "../src/lib/recommend/stream";
@@ -66,8 +71,10 @@ import { acceptPost } from "../src/lib/slideshow/queue";
 
 if (existsSync(".env.backtest")) process.loadEnvFile(".env.backtest");
 const DAY = 24 * 3600_000;
-const days = Number(process.argv[2] ?? 30);
-const breadth = Number(process.argv[3] ?? 15);
+const artistsMode = process.argv.includes("--artists");
+const argv = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const days = Number(argv[0] ?? 30);
+const breadth = Number(argv[1] ?? 15);
 const many = (process.env.BACKTEST_USERS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 const single = process.env.E621_USER;
 const users = many.length ? many : single ? [single] : [];
@@ -321,6 +328,40 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     rows.push(row);
   }
   return rows;
+}
+
+if (artistsMode) {
+  const out: Record<string, string | number>[] = [];
+  let hidden = 0;
+  let score = 0;
+  let baseline = 0;
+  for (const name of users) {
+    try {
+      const user = await findUser(name);
+      const favs = await allFavorites(name, user.id);
+      const profile = addFavorites(emptyProfile(name), favs, Date.now());
+      const api: RecApi = {
+        favoriteCount: async () => favs.length,
+        favorites: async () => [],
+        tagCounts: (names) => getTags(names, creds),
+        newestPostId: () => newestPostId(creds),
+      };
+      tagCache = await refreshTagCache(tagCache, tagsToLookUp(profile), api, Date.now());
+      writeFileSync(tagCacheFile, JSON.stringify(tagCache));
+      const r = artistRecall(favs, countsOf(tagCache));
+      hidden += r.hidden;
+      score += r.score;
+      baseline += r.baseline;
+      out.push({ account: name, favorites: favs.length, candidates: r.candidates, hidden: r.hidden, "score@10": r.score, "raw count@10": r.baseline });
+    } catch (e) {
+      log(`${name}: failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  const p = (a: number) => (hidden ? `${((a / hidden) * 100).toFixed(1)}%` : "-");
+  console.log("\nArtist score: hidden favorites (20%) by an artist in the top 10.");
+  console.table(out);
+  console.log(`score ${p(score)} · raw favorite count ${p(baseline)} · ${hidden} hidden favorites`);
+  process.exit(0);
 }
 
 const share = await windowShare();

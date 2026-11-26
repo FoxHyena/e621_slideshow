@@ -4,7 +4,7 @@
  * Goo the mascot (DESIGN.md "Goo (the mascot)"): a drop of the app's goo with a face, made the way
  * the tab bar's goo and the heart's drip are — white shapes under a blur-and-threshold filter, so
  * body, spill and arm read as one liquid — with a Goo Shade copy under it and the face on top.
- * Four moods. A tap squashes it and spurts one to three drops onto the tab bar's goo; it is a toy,
+ * Five moods. A tap squashes it and spurts one to three drops onto the tab bar's goo; it is a toy,
  * pointer-only (not focusable, no label), and nothing depends on it.
  */
 import { useId, useRef } from "react";
@@ -13,7 +13,7 @@ import { liveGoo } from "@/shell/gooLive";
 import { motionFx } from "@/shell/lazy";
 import { getGoo } from "@/state/goo";
 
-export type GooMood = "wave" | "snooze" | "look" | "oops";
+export type GooMood = "wave" | "snooze" | "look" | "oops" | "busy";
 
 const INK = "#020F23";
 const PINK = "#FF8A95";
@@ -82,12 +82,13 @@ function Face({ mood }: { mood: GooMood }) {
     );
   const bx = DX + 11.5;
   return (
-    <>
+    // busy: the whole face looks left and right (CSS)
+    <g className="goo-face">
       <ellipse cx={X - bx} cy={MY} rx={5} ry={3} fill={PINK} opacity={0.5} />
       <ellipse cx={X + bx} cy={MY} rx={5} ry={3} fill={PINK} opacity={0.5} />
       {eyes}
       {mouth}
-    </>
+    </g>
   );
 }
 
@@ -199,6 +200,14 @@ export function Goo({ mood, size = 112, className }: { mood: GooMood; size?: num
         <text x={98} y={38} fontFamily="var(--font-rounded), sans-serif" fontWeight={600} fontSize={24} fill={BLUE} textAnchor="middle">
           ?
         </text>
+      )}
+      {mood === "busy" && (
+        <g fill={BLUE}>
+          {/* three dots rising from its right shoulder, each 3 higher and 0.5 bigger, taking turns */}
+          <circle className="goo-dot" cx={86} cy={38} r={2.4} />
+          <circle className="goo-dot" cx={94.5} cy={35} r={2.9} />
+          <circle className="goo-dot" cx={103} cy={32} r={3.4} />
+        </g>
       )}
       {mood === "oops" && <path d="M98 28c3.4 4.6 5 7 5 9.4a5 5 0 0 1-10 0c0-2.4 1.6-4.8 5-9.4Z" fill={BLUE} />}
     </svg>

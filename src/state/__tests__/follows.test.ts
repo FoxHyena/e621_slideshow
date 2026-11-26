@@ -369,4 +369,39 @@ describe("follows", () => {
     expect(isFollowed(f.store.get(), "artist_b")).toBe(false);
     expect(f.store.get().changed).toBe(0);
   });
+
+  it("follows many in one write; already-followed counts, other skips come back", async () => {
+    const { f, api } = setup({ list: ["artist_a"] });
+    await f.ensure();
+    api.subscribe.mockImplementationOnce(async (names: string[]) => ({
+      added: names.filter((n) => n === "artist_b").map((n) => row(n, 7)),
+      skipped: [
+        { name: "artist_c", reason: "already subscribed" },
+        { name: "gone_artist", reason: "tag does not exist" },
+      ],
+    }));
+    const p = f.followMany(["Artist_B", "artist_c", "gone_artist", "artist_a"]);
+    // shown at once
+    expect(isFollowed(f.store.get(), "artist_b")).toBe(true);
+    const res = await p;
+    expect(api.subscribe).toHaveBeenCalledTimes(1);
+    // artist_a was already followed, so it isn't asked for
+    expect(api.subscribe.mock.calls[0][0]).toEqual(["artist_b", "artist_c", "gone_artist"]);
+    expect(res).toEqual({ added: ["artist_b", "artist_c"], skipped: [{ name: "gone_artist", reason: "e621 has no tag by that name" }] });
+    expect(isFollowed(f.store.get(), "artist_c")).toBe(true);
+    expect(isFollowed(f.store.get(), "gone_artist")).toBe(false);
+    expect(f.store.get().changed).toBe(1);
+  });
+
+  it("follows many: a failure rolls all of them back and says so; past 500 it doesn't send", async () => {
+    const { f, said, api } = setup({ fail: true });
+    await f.ensure();
+    expect(await f.followMany(["artist_b", "artist_c"])).toBeNull();
+    expect(isFollowed(f.store.get(), "artist_b")).toBe(false);
+    expect(said.at(-1)).toMatchObject({ error: true });
+    const many = Array.from({ length: FOLLOW_LIMIT + 1 }, (_, i) => `artist_${i}`);
+    expect(await f.followMany(many)).toBeNull();
+    expect(said.at(-1)?.message).toBe(LIMIT_MESSAGE);
+    expect(api.subscribe).toHaveBeenCalledTimes(1);
+  });
 });

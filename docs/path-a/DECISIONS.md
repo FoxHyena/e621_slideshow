@@ -601,3 +601,35 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md ("First run after sign-in"; Goo's busy mood; Disabled button; motion rows),
   .impeccable/design.json (Checklist, Pick Row, Disabled Button; Goo with five moods), the surface brief,
   docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+
+## 2026-11-26 — Slice 5 build (Artists tab, artist score, first run after sign-in)
+
+Built overnight without the owner; every item below is on MORNING.md to approve or change.
+
+- **Two passes, kept an hour per user in memory** (state/artists.ts). The first pass ranks every artist
+  tag with 3+ favorites by `affinity × (0.5 + learned)`; the top 32 (24 in ENGINEERING.md; 32 fills four
+  batches of 8) get their newest posts in 4 batched `~a … order:id_desc` searches of 320, plus up to 8
+  single `limit=3` looks at `bg` for those a prolific neighbour crowded out. Then recency, then show.
+  The looked-up set is kept for the hour, so a later learned fit doesn't reorder a list being read.
+- **It waits for two things before ranking:** the tag counts (a first read gets the profile before the
+  counts, and ranking then would favour artists with unknown counts) and the follow list (a list cut before
+  it loads would offer artists you already follow).
+- **`all` beside `list`:** Suggested keeps a card you just followed in place, showing ✓ Following, until
+  you leave the tab; the first run and the Follow-from-favorites list only ever show unfollowed artists.
+- **Follow from favorites is one `followMany` POST** (follows.ts): optimistic, rolled back on failure, the
+  limit checked before sending, "already followed" counted as followed, aliases kept under the asked name.
+- **The first run is its own chunk**, loaded only when you follow no one; offline it falls back to the
+  plain "You don't follow anyone yet" state and Popular today. Skip is kept with `writeAccount` (Remember
+  on: on disk; off: this tab), and sign-out purges it.
+- **Artists › Following** reads one page of `search:subscriptions` (320) when the tab opens, kept 10 min
+  (state/artistList.ts, memory only). New is Following's threshold; opening Artists first reads it.
+  The dot clears when you open the artist's page from the row.
+- **Hidden suggestions** are stored like Tune's overrides (`hiddenArtists:<user>`, plain write).
+- **follows.ensure re-entrancy fix:** it now sets "loading" after it records the request. Before, a
+  listener that called `ensure()` again on that change started a second read, endlessly (found when
+  the artists store began asking for the follow list).
+- **The backtest:** `scripts/rec-backtest.ts --artists` (live, read-only, needs an account: on MORNING
+  "Needs you") and a synthetic run in the unit tests. Synthetic: 115 hidden favorites; the score's top 10
+  holds 49, the raw favorite count's 50. Even, as expected: hidden favorites follow volume, and the score
+  deliberately trades volume for share of an artist's work.
+- **Budget:** first load 197.1 KB (R3 194.5); the first run and Artists are lazy.

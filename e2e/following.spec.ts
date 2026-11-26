@@ -71,11 +71,11 @@ test("signed out, Following says what it's for, and shows what's popular", async
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
 });
 
-test("following nobody yet says so, over what's popular", async ({ page }) => {
+test("following nobody and no favorites: the first run sends you to Search, over what's popular", async ({ page }) => {
   await mockE621(page);
   await signIn(page);
   await page.goto("/following");
-  await expect(page.getByTestId("following-none")).toBeVisible();
+  await expect(page.getByTestId("first-run-none")).toBeVisible();
   await expect(page.getByTestId("post-card").first()).toBeVisible();
 });
 

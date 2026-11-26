@@ -37,6 +37,20 @@ export function openResults(tags: string, filters?: Filters): void {
   getNav().push(resultsRoute(tags, filters));
 }
 
+/** Share an artist's page in this app (no sign-in rides along). */
+export async function shareArtist(name: string): Promise<void> {
+  const url = `${location.origin}/artist/${encodeURIComponent(name)}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ url });
+      return;
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
+    }
+  }
+  await copyText(url, "Link to the artist copied");
+}
+
 /** Open an artist's page. */
 export function openArtist(name: string): void {
   getNav().push({ screen: { kind: "artist", name }, play: null });
