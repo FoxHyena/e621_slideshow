@@ -20,6 +20,7 @@ PRODUCT.md written (repo root).
 - [x] Phase 2: UX.md v3.2, 3 review rounds, owner signed off — GATE MET
 - [x] Phase 3: DESIGN.md (root) + mocks v5.2 + 2 review rounds + owner OK — GATE MET
 - [x] Phase 4: ENGINEERING.md target + Plan review — GATE MET
+- [x] Design update: feed components v6 (mocks/feed-v6.html) → DESIGN.md, sidecar, surface brief (DECISIONS 2026-11-25)
 - [ ] Phase 5: slices 1–9
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over

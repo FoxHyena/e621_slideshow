@@ -389,7 +389,7 @@ score    = affinity × recency × (0.5 + learned)
 
 - **Add `sonner`** for toasts. It gives Undo actions, pause on hover/focus, a `role="status"` live region
   and swipe-dismiss, matching UX §9.6. About 10 KB.
-- **Nunito via `next/font/google`** (700, 800; latin subset). It downloads at build time and serves the
+- **Fredoka via `next/font/google`** (500, 600; latin subset; DESIGN.md v6, replacing Nunito). It downloads at build time and serves the
   files from our own domain, so there is no runtime Google request and no extra dependency.
 - **A CSP** in `next.config.ts` `headers()`: `connect-src 'self' https://e621.net`;
   `img-src 'self' data: blob: https://static1.e621.net`; `media-src https://static1.e621.net`;

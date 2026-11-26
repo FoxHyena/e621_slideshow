@@ -46,8 +46,8 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 - **Search button** in every tab header. `/` key opens it on desktop.
 - **Grid/feed toggle** in every feed screen's header.
 - `/artist/*` and `/search*` work signed out (anonymous e621 results, with this browser's blacklist).
-- **Avatars** everywhere (cards, rows, suggestions, artist page, account) are the existing generated
-  kaleidoscope avatars, seeded by name. e621 has no artist pictures, and we never use post art as an
+- **Avatars** everywhere (cards, rows, suggestions, artist page, account) are generated
+  marks seeded by name ("Bends", DESIGN.md; the kaleidoscope is now the app mark only). e621 has no artist pictures, and we never use post art as an
   avatar, so no explicit art leaks into lists or share previews.
 
 ### Links from outside (must keep working)
@@ -127,7 +127,7 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 - **Chrome on scroll:** the large title collapses to a 44 px bar; the chips row and the Play button hide on
   scroll down and return on scroll up.
 - **Bottom stack** (bottom to top, each above `env(safe-area-inset-bottom)`): tab bar → Play button
-  (56 px gold circle with ▶, right edge at 16, 12 px above the bar; a small count badge shows how many new
+  (56 px gold circle with ▶, left edge at 16, above the bar (v6, DESIGN.md); a small count badge shows how many new
   posts it plays; owner, 2026-11-25 visual sign-off) → toasts (above it). It fades while scrolling down;
   "Play from this post" is always in each card's ⋯ menu, so a hidden button never blocks anything. Feeds
   get bottom padding so the last card's ♥ row clears it. The offline banner and new-posts pill sit
@@ -137,7 +137,7 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 ## 5. Screens
 
 Every feed screen shares one layout: **header** (title, actions on the right), **chips row**, the
-**feed or grid**, a **floating round ▶ Play button** (bottom right), and a **footer** state.
+**feed or grid**, a **floating round ▶ Play button** (bottom left), and a **footer** state.
 
 ### Shared feed states
 
@@ -174,7 +174,7 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 - **Media taps** (media has `touch-action: manipulation`, no selection, no callout):
   - **Single tap** (after a 200 ms double-tap guard, media only): images open the player **paused** on
     that post (a full-screen viewer that can start the slideshow); videos play/pause in place.
-  - **Double tap** favorites (never unfavorites) with a heart burst.
+  - **Double tap** favorites (never unfavorites) with one big heart over the picture.
   - Videos: one live `<video>` at a time (the card nearest the middle, muted, `playsinline`); others are
     posters with a ▶ glyph. A mute button sits bottom-right. If autoplay is blocked (Low Power Mode) the
     poster and glyph stay until tapped. With reduced motion, feeds don't autoplay.
@@ -474,7 +474,7 @@ A grouped list; on phone each group is a sub-page, on desktop all on one page.
 | Pull down at top | Following, For You, Artists, Artist, Results, Favorites | Refresh (§4) |
 | Single tap image | Cards, grid tiles | Player, paused on it |
 | Single tap video | Cards | Play / pause |
-| Double tap media | Cards, player | Favorite (never unfavorites) + heart burst |
+| Double tap media | Cards, player | Favorite (never unfavorites) + big heart |
 | Hold a tag (450 ms) | Tag strips | Targets: Search/Pin, Blacklist (drag or tap) |
 | Long-press tile | Grid | Tile menu |
 | Swipe sideways | Tag strip, chips row, suggestions card | Scroll that row (contained; 16 px start gutter) |

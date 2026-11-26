@@ -127,3 +127,32 @@ Format: date — decision. Why. Rejected alternatives.
 - **Dependencies:** add `sonner` (toasts with Undo, `role="status"`, pause on hover/focus). Nunito through
   `next/font/google` (self-served, build-time download). No Motion, Vaul, Serwist or state library.
 - **CSP** limiting `connect-src` to self + e621 (slice 8).
+
+## 2026-11-25 — Feed components v6 (materials, sizes, voice, tab bar, goo)
+
+- Owner on v5.3's feed: "Currently it feels very cheap and like it has not a lot of design care or personality
+  in it". v6 (mocks/feed-v6.html, artifact https://claude.ai/artifact/41mUVNmCov6mLaFabE5AY8) was iterated by
+  showing switches and locking each pick. Owner: "Yes, write it" (into DESIGN.md).
+- **Voice face: Fredoka** (owner pick over the rounded system face), 600 / 500 only. Self-hosted. Replaces
+  Nunito in the plan's dependency list.
+- **Surfaces: "Flat + top light"** (owner pick over gradients): three materials (raised with a lip, panel,
+  sunk wells), no hairline outlines.
+- **Sizes:** heights 44 / 36 / 28, gaps 4 / 8 / 12 / 16 / 24, one 8 edge inside a panel, radii 24 with 16
+  nested, 16 between posts. Owner approved after a last pass.
+- **Post:** post number moves to the header line; heart at the right end of the footer with the score left of
+  it; names and tags shown with spaces; video length chip allowed on the picture (with play and mute).
+- **Play: bottom left**, soft shadow (owner: "Play to the left", "Play shadow: soft").
+- **Tab bar:** one tube bent 10 px with a capsule that slides along the curve (owner: "Love the slight bend").
+  It scrolls along its curve to a **secret fifth "Goo" tab** that adds ten to the goo count.
+- **Goo:** favouriting drips white goo under the heart and builds it up on the tab bar; thick and slow, runs
+  over the tabs with navy show-through, yellows as it grows (owner: "It feels runnier instead of thicker",
+  "the more it grows the more off-white with a tinge of yellow"). Wipe clean is in Settings only; a secret
+  clean button was proposed and dropped (owner: "we'll leave it in settings").
+- **Avatars: "Bends"** for artists (owner pick); the kaleidoscope stays as the app mark.
+- **Scroll physics: "Tuck"** (owner pick).
+- **Dot burst lives on Follow only**, centred on the artist's mark and subtle (owner: "need to make sure
+  burst is properly centered on icon, and make it a little more subtle"). Double tap shows a big heart only.
+- Not redrawn in v6: artist page, player, Settings groups, sign-in sheet. DESIGN.md carries them over from
+  v5.3 in v6 tokens; check each by eye when built. Open: whether un-favouriting removes goo.
+- Updated to match: DESIGN.md, .impeccable/design.json, the surface brief, docs/path-a/DESIGN.md, and the
+  Play / avatar / double-tap lines in UX.md.
