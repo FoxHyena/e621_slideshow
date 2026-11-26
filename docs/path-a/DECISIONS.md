@@ -56,3 +56,14 @@ Format: date — decision. Why. Rejected alternatives.
   screen must use, shown on the next comparison page.
 - Process fix: the first comparison shipped with chips, Play and Follow unstyled (a `.phone button`
   reset beat the component classes). Every mock now gets a Playwright screenshot before it's shown.
+
+## 2026-11-25 — Direction A v3 (owner feedback on v2)
+- Owner: v2 "too close to an Instagram clone": single full-width feed, post header + heart row, flat
+  minimal dark look, icon tab bar all contributed. "Definitely want to stick with e621 theming (navy)."
+- Owner chose: **navy post panels** (art inside, navy frames are fine), **tag category colours**, **post
+  numbers and scores**, **navy panels and borders**. Not chosen: hexagon motif.
+- v3 uses e621ng's Hexagon theme values (background #020F23, foreground #152F56, section #1F3C67, link
+  #B4C7D9, active gold #E8C446, tag/rating/score colours). Six small-text colours fail 4.5:1 on panels in
+  e621 itself; v3 keeps each hue and lightens it to pass. Verdana stack for type. Text tabs with a gold
+  marker replace the icon tab bar. Play is a squared gold button bottom-right.
+- Gold changes from the app's #FCB328 to e621's own active colour #E8C446.
