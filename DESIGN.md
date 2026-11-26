@@ -730,7 +730,7 @@ Every favourite adds goo to the tab bar. It is the same liquid as the drip under
 - **Colour:** white, yellowing toward Goo Cream as it grows.
 - **Over tabs:** wherever goo covers an icon or label, a Goo Ink copy shows through, so every tab stays readable.
 - **Wipe clean** lives in Settings only: a list row "Goo" (owner-picked name, 2026-11-26: "Goo, everywhere"; it was "Tab bar goo") (drops icon in a round well, the count "23 favorites" underneath) with a compact tonal "Wipe clean" button at its right end. A blade sweeps the bar (900 ms), flings the goo off the right end, and the bar gleams (520 ms). The count restarts at zero.
-- The count is kept on the device. The mock only ever adds; whether un-favouriting removes goo is not decided.
+- The count is kept on the device. **Goo only ever adds (owner-picked 2026-11-26: "Goo stays").** Un-favouriting a post takes no goo away and does not change the count; only "Wipe clean" empties it. So the row's count, "23 favorites", means favorites pressed since the last wipe, not how many posts are favorited now. Mine, not owner-approved: favouriting the same post again after un-favouriting it adds goo again (nothing remembers which posts added).
 
 ### Section header and artist card
 **Section header:** section type on the left, "See all ›" (callout, Link Blue, 44 tall) on the right; 12 below.
