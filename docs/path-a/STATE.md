@@ -8,7 +8,7 @@ seed:03339dd96a2c6b22, assigned index 5 = "plush hang tag". Directions to show t
 owner-required baseline), (2) plush hang tag (assigned), (3) reference sheet (my pick). Then: owner picks
 -> telemetry ping (concept-seed --from <key> --scope direction --mode operate --kind <...>) -> direction
 contract in surface brief -> DESIGN.md -> 1:1 key-screen mocks -> 2 review rounds -> owner OK.
-Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). Waiting on owner review of v3.
+Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). v3 → owner asked for iOS floating bar + AllTrails study (not copy). v4 published (copy: mocks/direction-a-v4.html). Owner said "resume the goal": next = design review round 1 on v4, fix, mock remaining screens (player, Settings, sign-in, empty), round 2, owner sign-off.
 Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-libraries.md
 (deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
 PRODUCT.md written (repo root).
@@ -24,6 +24,6 @@ PRODUCT.md written (repo root).
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over
 ## Blocked on
-owner: review v3 (e621 Hexagon panels)
+nothing (owner sign-off needed at end of Phase 3)
 ## Research notes (outside repo)
 /Users/oreo/Library/Application Support/Claude/side-session-notes/local_5efac6e1-a06e-48e6-abe6-3849cfda0671/path-a-*.md

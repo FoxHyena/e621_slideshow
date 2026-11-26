@@ -67,3 +67,15 @@ Format: date — decision. Why. Rejected alternatives.
   e621 itself; v3 keeps each hue and lightens it to pass. Verdana stack for type. Text tabs with a gold
   marker replace the icon tab bar. Play is a squared gold button bottom-right.
 - Gold changes from the app's #FCB328 to e621's own active colour #E8C446.
+
+## 2026-11-25 — Direction A v4 (owner references)
+- Owner: bottom bar should float, "mimicking iOS standards and approach to clean ui". Shared AllTrails iOS
+  screens as a reference for organised visual architecture, buttons and structure.
+- Owner: "I don't want to rip it directly. It should be treated as a study for things like spacing,
+  component design ... take those learnings into our own design as a designer would, not directly
+  copying." Study recorded in research/alltrails-study.md (principles → ours, plus a Not taken list).
+- v4: e621 Hexagon colours (v3) + iOS structure: large titles, round toolbar buttons, floating navy glass
+  tab bar (icon + label, selected tab in its own capsule, gold), Play pill floating above it, posts with
+  rounded art and three fixed lines under it (artist / e621 stats with favourite pill / coloured tags), no
+  card boxes, nothing on top of art except video controls. System font (SF Pro) replaces Verdana; the
+  owner didn't answer the font question, so this follows "iOS standards".
