@@ -704,6 +704,64 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 .btn6 .ic.popped { animation: pop6 .32s cubic-bezier(.2,.9,.3,1.4); }
 .btns6 { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 20px; }
 @media (prefers-reduced-motion: reduce) { .spin6, .check6 .done .n .ic, .pkrow6.just .chk6 .ic { animation: none; } .chk6 { transition: none; } }
+
+/* ---------- the list as a sheet, toasts, Popular artists ---------- */
+/* toast: a mark, what happened, and at most one way back. It floats, so it has the floating shadow and no lip. */
+.toast6 { position: absolute; z-index: 7; left: var(--inset); right: var(--inset); bottom: 168px; margin: 0 auto; width: fit-content; max-width: calc(100% - 2 * var(--inset));
+  min-height: var(--h); display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 22px; text-align: left;
+  background: linear-gradient(var(--raised-hi-a), var(--raised-hi-b)); box-shadow: var(--lit), 0 12px 24px rgba(0,0,0,.4); color: var(--text); }
+.toast6.low { bottom: 112px; }
+.toast6.static { position: relative; inset: auto; }
+.tmark6 { width: var(--h-w); height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); flex: none; }
+.tmark6.ok { background: var(--score); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); color: var(--ground); }
+.tmark6.bad { color: var(--danger); }
+.toast6 > .av6 { margin: 0; }
+.tmsg6 { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-right: 8px; }
+.tmsg6 b { font: var(--t-count); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tmsg6 small { font: var(--t-foot); color: var(--link); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tmsg6 .tt { font: 500 15px/20px var(--f); color: var(--t-general); } .tmsg6 .tt.s { color: var(--t-species); }
+.tundo6 { height: var(--h-w); padding: 0 12px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); font: var(--t-foot-r); color: var(--text); flex: none; position: relative; }
+.tundo6::before { content: ""; position: absolute; inset: -8px -8px -8px -4px; }
+.tundo6:active { color: var(--link); }
+.tmsg6:has(+ .tundo6) { padding-right: 4px; }
+/* the ring around Undo empties clockwise in the 6 s the toast stays */
+.tring6 { position: absolute; inset: .75px; width: calc(100% - 1.5px); height: calc(100% - 1.5px); overflow: visible; pointer-events: none; }
+.tring6 rect { fill: none; stroke: var(--link); stroke-width: 1.5; stroke-dasharray: 100 100; animation: tdrain6 6s linear infinite; }
+.toast6:hover .tring6 rect, .toast6:focus-within .tring6 rect { animation-play-state: paused; }
+@keyframes tdrain6 { to { stroke-dashoffset: -100; } }
+.toast6.in { animation: tin6 .32s cubic-bezier(.3,1.35,.5,1) backwards; }
+.toast6.out { animation: tout6 .2s ease-in forwards; }
+@keyframes tin6 { from { opacity: 0; transform: translateY(12px); } }
+@keyframes tout6 { to { opacity: 0; transform: translateY(8px); } }
+.toasts6 { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px 24px; }
+.toasts6 .toast6 { margin: 0; max-width: 100%; }
+
+/* Follow from favorites as a sheet: the list scrolls inside it, the button stays at its foot */
+.fsheet6.in { top: 76px; display: flex; flex-direction: column; padding-bottom: 0; }
+.fsheet6 .sub6 { margin: -4px 0 12px; }
+.fsheet6 .glabel6 { margin: 0 0 4px; padding-left: 0; }
+.fsheet6 .glabel6 button:last-child { margin-right: -12px; }
+.fsheet6 .list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding-bottom: 16px;
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
+.fsheet6 .list::-webkit-scrollbar { display: none; }
+.fsheet6 .qrows6 { --div: 48px; }
+.fsheet6 .srow6 { min-height: 60px; }
+.fsheet6 .srow6 .lbl b { font: var(--t-head); line-height: 20px; }
+.fsheet6 .foot { padding: 4px 0 37px; }
+
+/* Artists, Suggested: the offer row, then one card per artist */
+.sugg6 { display: flex; flex-direction: column; gap: 16px; padding: 0 var(--inset); }
+.sugg6 .acard6 { width: auto; }
+
+/* Popular artists: a state block with a list under it */
+.state6.above { margin: 16px 0 24px; }
+.poprow6 .follow6 { margin-right: -4px; }
+.poprow6 .num { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .tring6 rect, .toast6.in, .toast6.out { animation: none; } }
+
+/* Artists: a suggestion's own menu button, the filter with a match, the proposal note */
+.sugg6 .ph .more6 { margin-left: -4px; }
+.prop6 { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font: 600 13px var(--f-page); color: var(--fg); margin-right: 8px; }
 </style>
 
 <div class="wrap" id="root">
@@ -788,6 +846,55 @@ button.srow6:active { background: rgba(255,255,255,.04); }
         <tr><th>The Follow button</th><td>A button under the list</td><td>One gold button that floats where Play stands, with Play's shadow. It keeps the count. With nothing picked, or past 500 follows, it goes flat and says why.</td><td>The list is 30 rows long, so a button at its end is out of sight. There is no feed here, so Play's place is free and gold stays one fill.</td></tr>
         <tr><th>Skip for now</th><td>Under the button</td><td>A quiet button in the title row</td><td>Under a floating button it would float too. In the title row it is always in reach and clearly the lesser choice.</td></tr>
         <tr><th>After skipping</th><td>A banner "Follow artists from your favorites ›"</td><td>A list row in a panel: pink heart in a well, the line, how many, a chevron</td><td>It is something you press, so it is the app's pressable row, not the sunk offline banner.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="more" aria-label="Artists, toasts and Popular artists">
+    <h2 class="pg-h2" style="margin-top:40px">Artists, toasts and Popular artists</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Proposed, not owner-approved</span>Drawn overnight for the Artists tab. Toasts had not been drawn anywhere in v6, so this is also the first look at them for the whole app. The two toast choices that had switches are set to my picks (a ring around Undo, a toast that hugs its words); the other options are in the table. In the fifth phone, tap Follow on a row.</p>
+    <div class="cols">
+      <section class="col" aria-label="Artists, Suggested">
+        <div class="col-head"><h2 class="pg-h3">1. Artists, Suggested</h2><p>The offer row leads when three or more artists stand out. Under it, each suggestion is the artist card from the feed at full width, with a ⋯ of its own.</p></div>
+        <div class="phone-holder" id="s-sugg"></div>
+        <div class="under" id="u-sugg"></div>
+      </section>
+      <section class="col" aria-label="Follow from favorites as a sheet">
+        <div class="col-head"><h2 class="pg-h3">2. Follow from favorites, as a sheet</h2><p>Opened from the offer row. The same rows and check wells as the first run. A sheet has no tab bar and no Play, so the gold button sits at the sheet's foot and the list scrolls above it.</p></div>
+        <div class="phone-holder" id="s-fsheet"></div>
+        <div class="under" id="u-fsheet"></div>
+      </section>
+      <section class="col" aria-label="Artists, Following: the row menu">
+        <div class="col-head"><h2 class="pg-h3">3. Following: a row's ⋯</h2><p>The app's ⋯ sheet, headed by the artist. Unfollow is not red: a toast gives it back with Undo.</p></div>
+        <div class="phone-holder" id="s-amenu"></div>
+        <div class="under" id="u-amenu"></div>
+      </section>
+    </div>
+    <div class="cols" style="margin-top:48px">
+      <section class="col" aria-label="After following">
+        <div class="col-head"><h2 class="pg-h3">4. After following</h2><p>The feed loads and a toast says what happened. e621 can skip an artist (renamed, gone, already followed); the second line names them.</p></div>
+        <div class="phone-holder" id="s-toast"></div>
+        <div class="under" id="u-toast"></div>
+      </section>
+      <section class="col" aria-label="Popular artists">
+        <div class="col-head"><h2 class="pg-h3">5. No favorites: Popular artists</h2><p>Goo, the way to Search, then the artists with the most posts on e621. Follow turns in place and a toast offers Undo. In this mock a toast stays put so you can look at it; in the app it leaves after 6 seconds.</p></div>
+        <div class="phone-holder" id="s-pop"></div>
+        <div class="under" id="u-pop"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>UX.md said</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The toast</th><td>Toasts sit above Play. Not drawn before.</td><td>A floating capsule in Raised Highlight with the floating shadow and no lip: a 28 mark, the message in the rounded voice, at most one action. It hugs its words, centred.</td><td>It floats like the new-posts pill and the tag targets, so it takes their fill and shadow. Other option: full width, edge to edge.</td></tr>
+        <tr><th>The mark</th><td>Nothing</td><td>The artist's own mark when the toast is about one artist. Otherwise an icon in a well: the green check well for "done", red for a failure or a blacklist.</td><td>It says who or what before you read. The green check is the one you just tapped in the list.</td></tr>
+        <tr><th>Undo</th><td>"Following artist_x · Undo", stays 6 s</td><td>A sunk 28 capsule at the right end. A ring around it empties clockwise in the 6 s, and stops while you hover or focus the toast.</td><td>Sunk, so the toast still has no lip. The ring shows how long the way back is open. Other option: no ring.</td></tr>
+        <tr><th>Skipped artists</th><td>toast "2 skipped: …"</td><td>Two lines: "Following 8 artists", then "2 skipped: saffron hare, harbor seal". Past two names it says "and 3 more".</td><td>It leads with what worked. The names tell you who to look for.</td></tr>
+        <tr><th>Where a toast sits</th><td>Above Play</td><td>12 above Play (168 from the bottom). On a screen with no Play it takes Play's place, 16 above the tab bar. One at a time: a new toast replaces the last.</td><td>The same two heights the Follow button and Play already use.</td></tr>
+        <tr><th>The sheet</th><td>"a sheet from Artists › Suggested"</td><td>A tall sheet, 76 from the top. The close button replaces "Skip for now". The list fades out above the gold button at the foot.</td><td>The sign-in sheet already ends in one gold button. A floating button has nothing to float over here.</td></tr>
+        <tr><th>A suggestion's ⋯</th><td>⋯ → Not interested</td><td>A ⋯ after Follow on the card (Suggested only; the feed's card stays as it is). It opens the ⋯ sheet: Not interested, Open on e621.</td><td>The card had no place for it. Other option: hold the card.</td></tr>
+        <tr><th>A followed artist's ⋯</th><td>⋯ → Unfollow (toast + Undo), Share</td><td>The ⋯ sheet headed by the artist: Share artist, Open on e621, Unfollow. Unfollow is not red.</td><td>It can be undone, and red is kept for what cannot (Blacklist).</td></tr>
+        <tr><th>Popular artists</th><td>Search + "Popular artists" (by post count)</td><td>A heading and one panel of rows: mark, name, post count, the feed's Follow button. Following one swaps the button for "Following" in place.</td><td>The Artists list and the feed's Follow button already exist; nothing new is needed.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -881,7 +988,6 @@ button.srow6:active { background: rgba(255,255,255,.04); }
 
   <h2 class="pg-h2">Not drawn yet</h2>
   <ul class="pg-list dimtxt">
-    <li>Follow from favorites as a sheet (from Artists › Suggested), the "2 skipped" toast after following, and the "Popular artists" list.</li>
     <li>The "From a link" chip on Results.</li>
     <li>The hold menu on a grid tile (it uses the ⋯ sheet from the feed).</li>
     <li>Desktop layouts.</li>
@@ -1555,7 +1661,7 @@ button.srow6:active { background: rgba(255,255,255,.04); }
     <div class="scrim6"></div><div class="cta6">${goBtn('Follow 10 artists')}</div>${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
   $('u-pick').innerHTML = strip('The button', 'Gold while something is picked. With nothing picked, or past e621\'s limit of 500 follows, it goes flat and says why.',
     `<div class="strip p6 btns6">${goBtn('Follow 10 artists').replace(' data-fgo', '')}${goBtn('Pick artists to follow', true)}${goBtn('e621 allows 500 follows (12 left)', true)}</div>`);
-  const pickSync = phoneEl => { const n = phoneEl.querySelectorAll('[data-pick][aria-checked="true"]').length, b = phoneEl.querySelector('.cta6 .btn6'); if (!b) return;
+  const pickSync = phoneEl => { const n = phoneEl.querySelectorAll('[data-pick][aria-checked="true"]').length, b = phoneEl.querySelector('.cta6 .btn6, .fsheet6 .foot .btn6'); if (!b) return;
     b.disabled = !n; b.classList.toggle('lip6', !!n); b.querySelector('span').textContent = n ? `Follow ${n} artist${n === 1 ? '' : 's'}` : 'Pick artists to follow'; b.querySelector('.ic').style.display = n ? '' : 'none'; };
   document.addEventListener('click', e => {
     const row = e.target.closest('[data-pick]');
@@ -1575,8 +1681,92 @@ button.srow6:active { background: rgba(255,255,255,.04); }
       ${post(POP)}${post(POP2)}
     </div>
     <div class="scrim6"></div>${fab(0)}${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`, '', 'data-compact="120"');
-  $('u-skip').innerHTML = strip('No favorites at all', 'Nothing to suggest from, so it sends you to Search. UX.md puts a "Popular artists" list under it; that list is not drawn.',
+  $('u-skip').innerHTML = strip('No favorites at all', 'Nothing to suggest from, so it sends you to Search. The "Popular artists" list that goes under it is in the next section.',
     `<div class="strip p6">${state('look', 'Find artists to follow', 'You have no favorites yet, so there is nothing to suggest from.', act('Search', 'lip6', 'search'), 'pad')}</div>`);
+
+  /* ================= the list as a sheet, toasts, Popular artists ================= */
+  Object.assign(P, { alert: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>' });
+  // Toast: a mark (the artist's own, or an icon in a 28 well), what happened, and at most one way back.
+  const tmark = o => o.artist ? avatar(o.artist, 'p') : `<span class="tmark6 ${o.kind || ''}">${ic(o.icon || 'check', 16, o.kind === 'ok' ? 3 : 2.4)}</span>`;
+  const toast = (o, cls = '') => `<div class="toast6 ${cls}" role="status" ${o.artist ? `data-artist="${o.artist}"` : ''}>${tmark(o)}<span class="tmsg6"><b>${o.title}</b>${o.sub ? `<small>${o.sub}</small>` : ''}</span>${o.undo
+    ? `<button class="tundo6" type="button" data-undo>Undo<svg class="tring6" aria-hidden="true"><rect width="100%" height="100%" rx="13.25" pathLength="100"/></svg></button>` : ''}</div>`;
+  const toasts = (...list) => `<div class="strip p6 toasts6">${list.map(o => toast(o, 'static')).join('')}</div>`;
+
+  // Artists, Suggested: the offer row leads, then one card per artist. The sheet opens from the row.
+  const offer = `<div class="group6"><button class="srow6" type="button"><span class="ico pink">${ic('heart', 20, 2.2)}</span><span class="lbl"><b>Follow from your favorites</b><small>30 artists you favorite a lot</small></span>${chev()}</button></div>`;
+  const seg2 = `<div class="seg6 big" style="--n:2;--i:1;margin:8px 0 16px" role="group" aria-label="Which artists"><span class="thumb"></span><button type="button" aria-pressed="false">Following<small>42</small></button><button type="button" aria-pressed="true">Suggested</button></div>`;
+  const scard = (a, s) => acard(a, s).replace('</header>', `<button class="more6" type="button" aria-label="More">${ic('more', 22, 2.4)}</button></header>`);
+  const suggCards = n => `<div class="sugg6">${[['pastelbat', 'You faved 23 of 140'], ['cedar lynx', 'You faved 17 of 77'], ['tidepool newt', 'You faved 14 of 431']].slice(0, n).map(([a, s]) => scard(a, s)).join('')}</div>`;
+  const artHead = `<div class="head6"><div class="titlerow"><h3 class="title6">Artists</h3><div class="tools6"><button type="button" aria-label="Search">${ic('search', 20, 2.2)}</button></div></div>${seg2}</div>`;
+  const rows6 = (...r) => `<div class="rows6">${r.map(([i, t, note = '']) => `<button class="row6" type="button">${ic(i, 20, 2)}${t}${note ? `<small>${note}</small>` : ''}</button>`).join('')}</div>`;
+  const ctx = (a, small) => `<div class="grab"></div><div class="ctx">${avatar(a)}<div><b>${a}</b><small>${small}</small></div></div>`;
+  $('s-sugg').innerHTML = phone(`<div class="scroll6">${artHead}${offer}${suggCards(3)}</div>` + bottom('Artists'));
+  $('u-sugg').innerHTML = [
+    strip('While it reads your favorites', 'The same read as the first run, with no way to skip: there is nothing to show until it ends.', `<div class="strip p6" style="padding:24px 0">${find('').replace(`<div class="acts">${quiet('Skip for now')}</div>`, '')}</div>`),
+    strip('Too few favorites', 'It says where suggestions come from and sends you to Search.', `<div class="strip p6">${state('look', 'Not enough favorites yet', 'Suggestions come from the artists you favorite. Favorite a few more posts, or look for artists yourself.', act('Search', 'lip6', 'search'), 'pad')}</div>`),
+  ].join('');
+  $('s-fsheet').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">${artHead}${offer}${suggCards(2)}</div>
+    <div class="scrim6"></div>${tabbar('Artists', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 fsheet6 in" role="dialog" aria-label="Follow from favorites">${shtop('Follow from favorites')}
+      <p class="sub6">You've favorited these artists a lot.</p>
+      <div class="glabel6"><span>Top 30</span><span class="two"><button type="button" data-pickall="1">Select all</button><button type="button" data-pickall="0">None</button></span></div>
+      <div class="list"><div class="qrows6">${PICKS.map((p, i) => prow(p, i < 10)).join('')}</div></div>
+      <div class="foot">${goBtn('Follow 10 artists')}</div>
+    </div><span class="home6"></span>`);
+  $('u-fsheet').innerHTML = strip('A suggestion\'s ⋯', 'The app\'s ⋯ sheet with two rows. "Not interested" hides the artist from suggestions and a toast offers Undo.',
+    sheetStrip(ctx('pastelbat', 'pastelbat') + rows6(['eyeoff', 'Not interested'], ['ext', 'Open on e621', 'e621.net']))) + `<div class="strip p6 toasts6" style="margin-top:-8px">${toast({ artist: 'pastelbat', title: 'Hidden from suggestions', undo: true }, 'static')}</div>`;
+
+  // Artists, Following: a row's ⋯, Sort, and the filter
+  $('s-amenu').innerHTML = phone(`
+    <div class="scroll6" style="overflow:hidden">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Artists</h3><div class="tools6"><button type="button" aria-label="Search">${ic('search', 20, 2.2)}</button></div></div>${seg2.replace('--i:1', '--i:0').replace('aria-pressed="false">Following', 'aria-pressed="true">Following').replace('aria-pressed="true">Suggested', 'aria-pressed="false">Suggested').replace('margin:8px 0 16px', 'margin:8px 0 12px')}
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><button class="field6" type="button">${ic('search', 18, 2.2)}Filter your artists</button>${chip('Recent')}</div></div>
+      <div class="group6 who">${arow('inkwell fox', 'posted 2h ago · you faved 48', true)}${arow('mossy otter', 'posted 3h ago · you faved 31', true)}${arow('dune jackal', 'posted yesterday · you faved 22')}${arow('pastelbat', 'posted 3d ago · you faved 12')}${arow('berry wolf', 'posted 5d ago · you faved 9')}${arow('cedar lynx', 'posted 2w ago · you faved 7')}</div>
+    </div>
+    <div class="scrim6"></div>${tabbar('Artists', '', 343, 'live')}
+    <div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="cedar lynx">${ctx('cedar lynx', 'cedar_lynx')}${rows6(['share', 'Share artist'], ['ext', 'Open on e621', 'e621.net'], ['minus', 'Unfollow'])}</div><span class="home6"></span>`);
+  $('u-amenu').innerHTML = [
+    strip('Sort', 'The Recent chip opens the app\'s menu: one capsule slides to the choice.', sheetStrip(`${shtop('Sort')}${menu('Sort', mrow('Recent', true) + mrow('A–Z') + mrow('Most faved'))}`)),
+    strip('Filter your artists', 'Typing narrows the list as you go. With no match the list is one muted line: No artist you follow matches "zz".', `<div class="strip p6" style="padding:16px 0 0"><div style="display:flex;padding:0 16px;margin-bottom:16px"><div class="field6 focus has">${ic('search', 18, 2.2)}<span class="val">ot<span class="caret"></span></span><button class="clr" type="button" aria-label="Clear" style="margin-right:6px">${ic('x', 14, 2.8)}</button></div></div><div class="group6 who">${arow('mossy otter', 'posted 3h ago · you faved 31', true)}</div><p class="foot6">1 of 42</p></div>`),
+  ].join('');
+
+  // After following: the feed loads, and a toast says what happened and who e621 skipped.
+  $('s-toast').innerHTML = phone(`<div class="scroll6">${head()}${post(P1)}${post(P2)}</div>` + bottom('Following', 12).replace('<span class="home6">',
+    toast({ kind: 'ok', title: 'Following 8 artists', sub: '2 skipped: saffron hare, harbor seal' }) + '<span class="home6">'));
+  $('u-toast').innerHTML = strip('Messages', 'One line when it can be. A failure gets the red mark and says what did not happen.',
+    toasts({ icon: 'eye', title: 'Marked as seen on e621' }, { icon: 'alert', title: 'e621 allows 500 follows' }, { kind: 'bad', icon: 'alert', title: "Couldn't follow dune jackal", sub: "e621 didn't answer. Nothing was changed." }));
+
+  // No favorites at all: the way to Search, then e621's artists with the most posts.
+  const POPS = [['velvet moth', '18.2k'], ['tin robin', '14.9k'], ['quill badger', '12.4k'], ['opal gecko', '11k'], ['juniper hare', '9.8k'], ['cobalt finch', '9.1k'], ['marsh heron', '8.7k'], ['ash marten', '8.2k']];
+  const poprow = ([a, n], on = false) => `<div class="srow6 poprow6" data-artist="${a}">${avatar(a)}<span class="lbl"><b>${a}</b><small class="num">${n} posts</small></span>${follow(on)}</div>`;
+  $('s-pop').innerHTML = phone(`
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow"><h3 class="title6">Following</h3>${tools()}</div></div>
+      ${state('look', 'Find artists to follow', 'You have no favorites yet, so there is nothing to suggest from.', act('Search', 'lip6', 'search'), 'above', 96)}
+      <div class="shead6"><b>Popular artists</b></div>
+      <div class="group6 who">${POPS.map((p, i) => poprow(p, i === 2)).join('')}</div>
+      <p class="foot6">The artists with the most posts on e621</p>
+    </div>
+    <div class="scrim6"></div>${toast({ artist: 'quill badger', title: 'Following quill badger', undo: true }, 'low')}${tabbar('Following', 'nobadge', 343, 'live')}<span class="home6"></span>`);
+  $('u-pop').innerHTML = strip('With Undo', 'About one artist, the mark is theirs. A tag keeps its e621 colour.',
+    toasts({ artist: 'dune jackal', title: 'Following dune jackal', undo: true }, { artist: 'dune jackal', title: 'Unfollowed dune jackal', undo: true }, { kind: 'bad', icon: 'ban', title: 'Blacklisted <span class="tt s">otter</span>', undo: true }));
+
+  // Follow in the list: the feed's own handler turns the button in place; this adds the toast and its way back.
+  let undoing = false;
+  const putToast = (ph, o, cls = '') => { ph.querySelectorAll('.toast6').forEach(n => n.remove()); ph.querySelector('.home6').insertAdjacentHTML('beforebegin', toast(o, cls + (calm ? '' : ' in'))); };
+  const dropToast = t => { if (calm) return t.remove(); t.classList.remove('in'); t.classList.add('out'); t.addEventListener('animationend', () => t.remove(), { once: true }); };
+  document.addEventListener('click', e => {
+    const fo = e.target.closest('.poprow6 .follow6');
+    if (fo) { const row = fo.closest('.poprow6'), ph = row.closest('.phone6'), a = row.dataset.artist; if (undoing || !ph) return;
+      return putToast(ph, { artist: a, title: `${fo.classList.contains('on') ? 'Unfollowed' : 'Following'} ${a}`, undo: true }, 'low'); }
+    const un = e.target.closest('[data-undo]');
+    if (un) { const t = un.closest('.toast6'); if (t.classList.contains('static')) return;
+      const row = t.parentElement.querySelector(`.poprow6[data-artist="${t.dataset.artist}"]`);
+      if (row) { undoing = true; row.querySelector('.follow6').click(); undoing = false; } dropToast(t); }
+  });
 
   /* ---------- behaviour ---------- */
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;

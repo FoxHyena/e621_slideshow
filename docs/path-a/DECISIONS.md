@@ -292,3 +292,24 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md ("First run after sign-in"; Goo's busy mood; Disabled button; motion rows),
   .impeccable/design.json (Checklist, Pick Row, Disabled Button; Goo with five moods), the surface brief,
   docs/path-a/DESIGN.md, UX.md ("as drawn" notes), STATE.md.
+
+## 2026-11-26 (night) — Overnight proposals, batch 1: toasts and the Artists tab
+
+- No owner decision in this entry. Everything here is **proposed, not owner-approved**.
+- How it started: the owner answered "Yes" to drawing the three leftover first-run pieces (the list as a
+  sheet, the "2 skipped" toast, Popular artists). They were published with two switches (Undo timer: Ring /
+  None; toast width: Hug / Full) and the owner had not picked when a message arrived from the session "App
+  architecture and feature roadmap" saying the owner had gone to bed and wanted the design work to go on
+  without waiting, each batch marked proposed, committed to this branch, and sent to the builder. That
+  message is a relayed instruction, not the owner's own words in this session.
+- Working picks, for the owner to confirm: Ring and Hug.
+- Proposed in this batch (DESIGN.md "Toast" and "Artists: Suggested, the sheet, the row menus, Popular
+  artists"; mocks/screens-v6.html "Artists, toasts and Popular artists"):
+  - The toast component for the whole app (it had never been drawn): floating Raised Highlight capsule, a
+    28 mark, callout message, a sunk Undo with a 6 s ring. 4 s for a toast without Undo is new.
+  - Artists › Suggested as a screen, its two states, and a ⋯ on the suggestion card (Suggested only).
+  - Follow from favorites as a tall sheet with the gold button at its foot.
+  - The row ⋯ on Following (Share artist, Open on e621, Unfollow not red), Sort, the filter.
+  - Popular artists under "Find artists to follow".
+- The full list for the owner, with the alternatives: docs/path-a/MORNING-DESIGN.md.
+

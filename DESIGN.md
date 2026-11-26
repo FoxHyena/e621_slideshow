@@ -478,6 +478,20 @@ components:
     rounded: "{rounded.full}"
     padding: "0 24px"
     height: "44px"
+  toast:
+    backgroundColor: "{colors.raised-hi}"
+    textColor: "{colors.text}"
+    typography: "{typography.callout}"
+    rounded: "22px"
+    padding: "8px"
+    height: "44px"
+  toast-undo:
+    backgroundColor: "{colors.well}"
+    textColor: "{colors.text}"
+    typography: "{typography.footnote-rounded}"
+    rounded: "{rounded.full}"
+    padding: "0 12px"
+    height: "28px"
   goo-mascot:
     backgroundColor: "{colors.goo}"
     textColor: "{colors.ground}"
@@ -495,7 +509,7 @@ components:
 
 Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, Goo the mascot, and the first run after sign-in. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
 
-Still not drawn in v6: the "From a link" chip, the hold menu on a grid tile, Follow from favorites as a sheet, the "2 skipped" toast, the "Popular artists" list and desktop. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
+Still not drawn in v6: the "From a link" chip, the hold menu on a grid tile and desktop. Sections headed *Proposed* were drawn overnight on 2026-11-26 and are not owner-approved yet; the list is in `docs/path-a/MORNING-DESIGN.md`. Build those from `docs/path-a/UX.md` out of the parts below and show the owner before they ship. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
 
 ## Overview
 
@@ -888,10 +902,32 @@ What Following shows the first time you sign in, before you follow anyone. Three
 
 **3. After "Skip for now".** The list folds into one row above a real feed: a Panel group holding one list row, 8 below the header and 24 above "Popular today". A Heart Pink heart in the 32 icon well, "Follow from your favorites" in callout, "30 artists you favorite a lot" in Muted footnote, a chevron. It opens the list. It is a row you press, so it is raised chrome, not the sunk offline banner. Under it the landing's feed: the "Popular today" header, posts with Follow pills, and Play.
 
-**No favorites at all:** the state block with Goo looking: "Find artists to follow", "You have no favorites yet, so there is nothing to suggest from.", a tonal "Search". UX.md puts a "Popular artists" list under it; that list is not drawn.
+**No favorites at all:** the state block with Goo looking: "Find artists to follow", "You have no favorites yet, so there is nothing to suggest from.", a tonal "Search". The "Popular artists" list goes under it (see Artists, below).
+
+### Toast
+*Proposed 2026-11-26, not owner-approved. Drawn in `mocks/screens-v6.html`, "Artists, toasts and Popular artists".* The app's one way to say what just happened: a mark, the message, and at most one way back.
+- **Body:** a floating capsule: Raised Highlight fill, the top light, the floating shadow (`0 12px 24px rgba(0,0,0,.4)`, the new-posts pill's and the tag targets'), no lip, because the toast itself is not a button. 44 tall with one line, 54 with two; radius 22 either way; 8 padding all round; 8 between its parts.
+- **Mark,** 28 round, always there. About one artist: that artist's 28 mark. Otherwise a 28 well with a 16 icon in Link Blue. "Done" is the picked check well (Score Green, Ground navy check). A failure or a blacklist turns the icon Danger.
+- **Message:** callout, white, one line, ellipsis. A second line, when there is one, is footnote in Link Blue (Muted is 3.8:1 on Raised Highlight, so it is not used here). 8 between the words and the toast's edge, 4 before Undo. A tag's name in a message is system 500 15/20 in its e621 colour.
+- **Undo:** a sunk 28 capsule at the right end, footnote-rounded in white, 12 side padding, 8 from the toast's edge; its hit area reaches 44. A 1.5 Link Blue ring on its edge empties clockwise from the top left in the 6 s the toast stays (linear), and stops while the toast is hovered or holds focus.
+- **Width and place:** it hugs its words, centred, and never passes the 16 insets. On a screen with Play it floats 168 from the bottom (12 above Play). With no Play it takes Play's place, 112 from the bottom (16 above the tab bar's highest point). One at a time: a new toast replaces the one showing.
+- **Time:** 6 s with Undo (`docs/path-a/UX.md`), 4 s without (proposed). `role="status"`.
+- **Skipped artists:** two lines: "Following 8 artists", then "2 skipped: saffron hare, harbor seal". Past two names: "5 skipped: saffron hare, harbor seal and 3 more". With none skipped it is the one line, "Following 10 artists".
+- **Copy, as drawn:** "Marked as seen on e621" (eye); "e621 allows 500 follows" (alert); "Couldn't follow dune jackal" / "e621 didn't answer. Nothing was changed." (alert, Danger); "Following dune jackal", "Unfollowed dune jackal", "Hidden from suggestions" (the artist's mark, Undo); "Blacklisted otter" (ban, Danger, Undo).
+
+### Artists: Suggested, the sheet, the row menus, Popular artists
+*Proposed 2026-11-26, not owner-approved. Same section of the mock.*
+- **Suggested.** The 44 segmented control, then 16. When three or more artists stand out, the offer row leads: the row from "After Skip for now" ("Follow from your favorites" / "30 artists you favorite a lot"), 16 above the cards. Then one artist card per suggestion at full width, 16 apart, its line reading "You faved 23 of 140". On Suggested only, the card's header ends in a 36 ⋯ after Follow.
+- **A suggestion's ⋯** opens the ⋯ sheet headed by the artist (36 mark, name in headline, the raw e621 name in mono): "Not interested" (eye-off), "Open on e621". Not interested hides the artist and shows the toast "Hidden from suggestions" with Undo.
+- **Suggested, reading:** the read block from the first run (Goo busy, "Finding artists you love", the checklist) with no "Skip for now". **Too few favorites:** Goo looking, "Not enough favorites yet", "Suggestions come from the artists you favorite. Favorite a few more posts, or look for artists yourself.", a tonal "Search".
+- **Follow from favorites, as a sheet** (from the offer row). A tall sheet whose top edge is 76 from the top of the screen: the grabber, the title row "Follow from favorites" with the close well (it replaces "Skip for now"), "You've favorited these artists a lot." in Muted body, then 12, the label row ("Top 30"; "Select all", "None", whose words end on the 16 inset), then the rows. Rows are sheet rows (no side padding of their own), 60 tall, divided from 48, with the same check well. The list scrolls inside the sheet and fades out over its last 24. The gold 44 button sits at the sheet's foot, 37 from the bottom of the screen, with its count and its two disabled states. No tab bar, no Play.
+- **Following: a row's ⋯** opens the ⋯ sheet headed by the artist: "Share artist", "Open on e621" (with "e621.net" at the right), "Unfollow" (a minus; not Danger, because the toast "Unfollowed cedar lynx" gives it back with Undo).
+- **Sort** (the Recent chip): a titled sheet "Sort" with the Menu: Recent, A–Z, Most faved.
+- **Filter your artists:** the field takes the gold ring and a clear well; the list narrows as you type; the foot line counts ("1 of 42"). With no match the list is one Muted footnote line: No artist you follow matches "zz".
+- **Popular artists** (Following, signed in, no favorites). The state block with Goo looking at 96, 16 below the header ("Find artists to follow", its sentence, a tonal "Search"), then 24, the section header "Popular artists", and one Panel group of 60 rows: the 36 mark, the name in headline, "18.2k posts" in Muted footnote with tabular figures, and the feed's Follow pill, 12 from the panel's edge. Under it, in Muted footnote: "The artists with the most posts on e621". Following one swaps the pill for "Following" in place and shows the toast, 112 from the bottom.
 
 ### Not drawn yet
-The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯ sheet: Favorite, Open artist, Play from here, Open on e621); Follow from favorites as a sheet from Artists › Suggested (the same list in the app's sheet); the "2 skipped" toast after following; the "Popular artists" list; desktop. Build them from UX.md with the parts above, and show the owner before they ship.
+The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯ sheet: Favorite, Open artist, Play from here, Open on e621); desktop. Build them from UX.md with the parts above, and show the owner before they ship.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |
@@ -938,10 +974,11 @@ The "From a link" chip on Results; the hold menu on a grid tile (it uses the ⋯
 | Player controls | auto-hide after 2.5 s playing; stay while paused or focused; 250 ms double-tap guard | opacity | spec (not in mock) |
 | Sheets | spring up; drag to dismiss with rubber-banding | translateY | spec (not in mock) |
 | Pull to refresh | indicator follows at half the finger; 144 px travel arms; spinner holds at 48 px for at least 400 ms | translateY | spec (not in mock) |
-| Toasts | stay 6 s, pause on hover or focus, `role="status"` | opacity, translateY | spec (not in mock) |
+| Toast in / out | in: 320 ms `cubic-bezier(.3,1.35,.5,1)`, rises 12 px and fades in; out: 200 ms ease-in, drops 8 px and fades. Stays 6 s with Undo, 4 s without; `role="status"` | opacity, translateY | mock (proposed) |
+| Undo ring | empties clockwise in 6 s, linear; paused on hover or focus | stroke-dashoffset | mock (proposed) |
 
 Grammar: two speeds. **Touch feedback** is 100 to 200 ms, ease-out, no overshoot (press, hide, fade). **Celebrations** (favourite, follow, tab change) overshoot once and are done within 720 ms. **Goo** is the one slow thing. Everything animates transform and opacity only, except the goo's shapes.
-**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab, segmented and menu capsules, the switch knob and Play move instantly; tag targets appear without the pop; Goo holds still, and a tap adds its drops to the bar in place; the checklist's spinner stands still and checks appear without the pop; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
+**Reduced motion:** no pop, wiggle, spin, hop, dots, drip, flying drops, Tuck or shimmer; the lip, the tab, segmented and menu capsules, the switch knob and Play move instantly; tag targets appear without the pop; a toast appears and leaves without moving and its Undo ring holds still; Goo holds still, and a tap adds its drops to the bar in place; the checklist's spinner stands still and checks appear without the pop; the caret does not blink; the tab bar's goo still shows and updates in place, because it is state, not motion. Per UX.md §7: feeds don't autoplay video; the player defaults to Classic with no transition.
 
 ## Build rulings (where the mock leaves a gap)
 

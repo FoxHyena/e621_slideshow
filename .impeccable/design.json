@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-26T08:02:17+00:00",
+  "generatedAt": "2026-11-26T08:24:43+00:00",
   "title": "Design System: e621 Slideshow",
   "extensions": {
     "colorMeta": {
@@ -843,9 +843,14 @@
         "purpose": "translateY. Spec (not in mock)."
       },
       {
-        "name": "toasts",
-        "value": "stay 6 s, pause on hover or focus, role=\"status\"",
+        "name": "toast-in-out",
+        "value": "in: 320 ms cubic-bezier(.3,1.35,.5,1), rises 12 px and fades in; out: 200 ms ease-in, drops 8 px and fades. Stays 6 s with Undo, 4 s without; role=\"status\"",
         "purpose": "opacity, translateY. Spec (not in mock)."
+      },
+      {
+        "name": "undo-ring",
+        "value": "empties clockwise in 6 s, linear; paused on hover or focus",
+        "purpose": "stroke-dashoffset. Spec (not in mock)."
       },
       {
         "name": "reduced-motion",
@@ -1056,6 +1061,14 @@
       "description": "A button that cannot be pressed right now: Panel fill, muted label, no lip, no icon. Its label says why.",
       "html": "<button class=\"ds-btn ds-off\" disabled>Pick artists to follow</button>",
       "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-btn{height:44px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;font:600 17px/22px var(--f-r)}.ds-btn.ds-c{height:36px;gap:6px;padding:0 18px;font:600 15px/20px var(--f-r)}.ds-off{background:var(--panel);color:var(--muted);box-shadow:var(--lit),inset 0 -1px 0 rgba(0,0,0,.25);cursor:default} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "Proposed, not owner-approved. What just happened: a floating Raised Highlight capsule with a 28 mark, the message in callout, and at most one action. Undo is a sunk 28 capsule whose ring empties in the 6 s the toast stays.",
+      "html": "<div class=\"ds-toasts\"><div class=\"ds-toast\" role=\"status\"><span class=\"ds-tm ds-ok\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span><span class=\"ds-tx\"><b>Following 8 artists</b><small>2 skipped: saffron hare, harbor seal</small></span></div><div class=\"ds-toast\" role=\"status\"><span class=\"ds-tm\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg></span><span class=\"ds-tx\"><b>Marked as seen on e621</b></span><button class=\"ds-undo\">Undo<svg aria-hidden=\"true\"><rect width=\"100%\" height=\"100%\" rx=\"13.25\" pathLength=\"100\"/></svg></button></div></div>",
+      "css": ":host{--ground:#020F23;--well:#0A1D3B;--panel:#152F56;--bar:#1A3660;--raised:#1F3C67;--raised-hi:#2B4D80;--outline:rgba(180,199,217,.22);--fg:#FFFFFF;--link:#B4C7D9;--muted:#A0ADC1;--gold:#E8C446;--on-gold:#020F23;--lip-gold:#A8871F;--lip-navy:#0A1B38;--fav-on:#553659;--lip-fav:#291A35;--score:#5EC06A;--heart:#FF8A95;--lit:inset 0 1px 0 rgba(255,255,255,.09);--lit-gold:inset 0 1px 0 rgba(255,255,255,.5);--lip:3px;--f-r:Fredoka,ui-rounded,'SF Pro Rounded',system-ui,sans-serif;--f:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,'Segoe UI',Roboto,sans-serif;--f-m:ui-monospace,'SF Mono',Menlo,monospace} button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer} .ds-lip{box-shadow:var(--lit),0 var(--lip) 0 var(--lip-c,var(--lip-navy));transition:transform .1s ease-out,box-shadow .1s ease-out}.ds-lip:active{transform:translateY(var(--lip));box-shadow:var(--lit),0 0 0 var(--lip-c,var(--lip-navy))}.ds-av{display:block;flex:none;width:36px;height:36px;border-radius:999px}.ds-av svg{display:block;width:100%;height:100%;border-radius:999px;background:var(--raised);box-shadow:var(--lit),0 0 0 1px rgba(2,15,35,.35)}.ds-av.ds-s{width:24px;height:24px} .ds-toasts{display:flex;flex-direction:column;align-items:center;gap:12px;width:343px;box-sizing:border-box;padding:20px 16px 24px;border-radius:24px;background:var(--ground)}.ds-toast{min-height:44px;box-sizing:border-box;max-width:100%;display:flex;align-items:center;gap:8px;padding:8px;border-radius:22px;background:var(--raised-hi);box-shadow:var(--lit),0 12px 24px rgba(0,0,0,.4);color:var(--fg)}.ds-tm{width:28px;height:28px;flex:none;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);display:grid;place-items:center;color:var(--link)}.ds-tm.ds-ok{background:var(--score);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);color:var(--ground)}.ds-tx{flex:1;min-width:0;display:flex;flex-direction:column;padding-right:8px}.ds-tx b{font:600 15px/20px var(--f-r);white-space:nowrap}.ds-tx small{font:400 13px/18px var(--f);color:var(--link);white-space:nowrap}.ds-tx:has(+ .ds-undo){padding-right:4px}.ds-undo{position:relative;height:28px;padding:0 12px;border-radius:999px;background:var(--well);box-shadow:inset 0 1px 0 rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05);font:500 13px/18px var(--f-r);color:var(--fg);flex:none}.ds-undo svg{position:absolute;inset:.75px;width:calc(100% - 1.5px);height:calc(100% - 1.5px);overflow:visible;pointer-events:none}.ds-undo rect{fill:none;stroke:var(--link);stroke-width:1.5;stroke-dasharray:100 100;animation:ds-drain 6s linear infinite}.ds-toast:hover .ds-undo rect{animation-play-state:paused}@keyframes ds-drain{to{stroke-dashoffset:-100}}@media (prefers-reduced-motion:reduce){.ds-undo rect{animation:none}} :focus-visible{outline:2px solid var(--gold);outline-offset:2px} @media (prefers-reduced-motion:reduce){.ds-lip,.ds-chip,.ds-tb-ind{transition:none}.ds-pop svg,.ds-wig{animation:none}.ds-thumb,.ds-mthumb,.ds-tgt,.ds-sw i,.ds-sw i::after{transition:none}}"
     }
   ],
   "narrative": {
