@@ -3,7 +3,7 @@
  * e621; they're written to localStorage only with Remember on. A share link's sign-in is for this
  * tab only: never saved, and it doesn't replace a key this browser saved.
  */
-import { getCurrentUser, type Credentials } from "@/lib/e621/client";
+import { E621Error, getCurrentUser, type Credentials } from "@/lib/e621/client";
 import type { CurrentUser } from "@/lib/e621/types";
 import { decodeShareCreds } from "@/lib/share";
 import { storage } from "@/lib/storage";
@@ -19,7 +19,10 @@ export interface Session {
   link: boolean;
   /** share links carry the sign-in (off until turned on; cleared on sign-out) */
   shareSignIn: boolean;
-  /** the key (if any) has been checked: feeds wait for this, so they don't fetch twice */
+  /**
+   * Feeds may start: the key (if any) has been checked, or a remembered key has the profile e621
+   * confirmed last time (checked behind the first paint). Feeds wait for this, so they don't fetch twice.
+   */
   ready: boolean;
 }
 
@@ -37,14 +40,17 @@ export interface SessionApi {
 export function createSession(linkFragment: string | null, prefs: PrefsApi = getPrefs()): SessionApi {
   const linkCreds = linkFragment ? decodeShareCreds(linkFragment) : null;
   const saved = storage.loadCredentials();
+  // A remembered key with the account e621 confirmed last time: signed in from the first paint.
+  const profile = !linkCreds && saved ? storage.loadAccount(saved.username) : null;
   const store = createStore<Session>({
     creds: linkCreds ?? saved,
-    user: null,
+    user: profile,
     remember: !linkCreds && saved !== null,
     link: linkCreds !== null,
     shareSignIn: storage.loadShareSignIn(),
-    ready: (linkCreds ?? saved) === null,
+    ready: (linkCreds ?? saved) === null || profile !== null,
   });
+  let verified = (linkCreds ?? saved) === null;
   const adopt = (u: CurrentUser) => {
     store.set((s) => ({ ...s, user: u }));
     return prefs.syncAccount(u.blacklisted_tags ?? "", store.get().link);
@@ -53,14 +59,28 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
   return {
     store,
     verify() {
-      const { creds, user } = store.get();
-      if (!creds || user) return Promise.resolve();
+      const { creds } = store.get();
+      if (!creds || verified) return Promise.resolve();
       verifying ??= getCurrentUser(creds)
+        .catch((e) => {
+          // e621 refused the key: same as an anonymous answer. Anything else (offline, busy)
+          // keeps the remembered profile; the next load checks again.
+          if (e instanceof E621Error && (e.status === 401 || e.status === 403)) return { id: null, name: "" };
+          throw e;
+        })
         .then((u) => {
           // A sign-out or another sign-in while this was in flight wins.
           if (store.get().creds !== creds) return;
-          if (u.id === null) throw new Error("e621 didn't accept the saved username and API key");
+          if (u.id === null) {
+            // Signed in from the saved profile: not any more.
+            const s = store.get();
+            if (s.user) storage.saveAccount(s.user.name, null);
+            store.set((x) => ({ ...x, user: null }));
+            throw new Error("e621 didn't accept the saved username and API key");
+          }
+          verified = true;
           adopt(u);
+          if (store.get().remember) storage.saveAccount(u.name, u);
         })
         .finally(() => {
           verifying = null;
@@ -73,8 +93,10 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
       if (u.id === null) throw new Error("e621 didn't accept that username and API key");
       prefs.endVisit();
       store.set((s) => ({ ...s, creds: c, user: u, remember, link: false, ready: true }));
+      verified = true;
       adopt(u);
       storage.saveCredentials(remember ? c : null);
+      storage.saveAccount(u.name, remember ? u : null);
       // Without Remember nothing per-account stays behind, not even an earlier session's list.
       if (!remember) storage.purgeAccount(u.name);
     },
@@ -90,6 +112,7 @@ export function createSession(linkFragment: string | null, prefs: PrefsApi = get
         storage.saveShareSignIn(false);
         storage.saveCredentials(null);
       }
+      verified = true;
       store.set({ creds: null, user: null, remember: false, link: false, shareSignIn: link ? storage.loadShareSignIn() : false, ready: true });
     },
     setShareSignIn(on) {

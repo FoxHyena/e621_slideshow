@@ -250,6 +250,28 @@ test("coming back to Following counts newer posts in the pill, and they go in on
   await expect(page.getByTestId("new-posts-pill")).toHaveCount(0);
 });
 
+test("with Remember, a reload is signed in and painted before e621 confirms the sign-in", async ({ page }) => {
+  const mock = await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await expect(page.locator('[data-post-id="1150"]')).toBeVisible();
+  mock.meDelay = 5000;
+  await page.reload();
+  await expect(page.locator('[data-post-id="1150"]')).toBeVisible({ timeout: 1500 });
+  await expect(status(page)).toHaveText("10 new since your last visit");
+});
+
+test("a key e621 refuses on reload signs the saved account out", async ({ page }) => {
+  await followingSignedIn(page);
+  await page.goto("/following");
+  await expect(status(page)).toHaveText("10 new since your last visit");
+  await page.evaluate(() => localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "revoked" })));
+  await page.reload();
+  await expect(page.getByText(/e621 sign-in failed/)).toBeVisible();
+  await expect(page.getByTestId("following-signed-out")).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("e6ss:v1:account:tester"))).toBeNull();
+});
+
 test("a reload paints the first posts saved last time before e621 answers, then offers what's newer", async ({ page }) => {
   const mock = await followingSignedIn(page);
   await page.goto("/following");

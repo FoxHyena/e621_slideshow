@@ -42,6 +42,47 @@ describe("session", () => {
     expect(saved("accountBlacklist")).toBe("gore\nscat");
   });
 
+  it("is signed in from the first paint with a remembered key and the account e621 confirmed last time", async () => {
+    ls.set("e6ss:v1:creds", JSON.stringify(KEY));
+    ls.set("e6ss:v1:account:fox", JSON.stringify(user()));
+    let resolve!: (u: unknown) => void;
+    getCurrentUser.mockReturnValue(new Promise((r) => (resolve = r)));
+    const s = createSession(null, createPrefs());
+    // Before e621 answers: ready, as fox.
+    expect(s.store.get()).toMatchObject({ ready: true, user: { id: 1, name: "fox" } });
+    const v = s.verify();
+    resolve(user("gore\nnew_rule"));
+    await v;
+    expect(saved("account:fox")).toMatchObject({ id: 1, name: "fox", blacklisted_tags: "gore\nnew_rule" });
+    // The account record never holds the key.
+    expect(JSON.stringify(saved("account:fox"))).not.toContain("k123");
+  });
+
+  it("signs the saved account out when e621 refuses the key, and keeps it when e621 can't be reached", async () => {
+    ls.set("e6ss:v1:creds", JSON.stringify(KEY));
+    ls.set("e6ss:v1:account:fox", JSON.stringify(user()));
+    getCurrentUser.mockRejectedValue(new TypeError("Failed to fetch"));
+    const offline = createSession(null, createPrefs());
+    await expect(offline.verify()).rejects.toThrow(/Failed to fetch/);
+    expect(offline.store.get().user?.name).toBe("fox");
+    getCurrentUser.mockRejectedValue(new E621Error("Invalid API key", 401));
+    const refused = createSession(null, createPrefs());
+    await expect(refused.verify()).rejects.toThrow(/didn't accept/);
+    expect(refused.store.get()).toMatchObject({ user: null, ready: true });
+    expect(saved("account:fox")).toBeNull();
+  });
+
+  it("keeps the account only with Remember, and forgets it on sign-out", async () => {
+    getCurrentUser.mockResolvedValue(user());
+    const s = createSession(null, createPrefs());
+    await s.signIn(KEY, false);
+    expect(saved("account:fox")).toBeNull();
+    await s.signIn(KEY, true);
+    expect(saved("account:fox")).toMatchObject({ name: "fox" });
+    s.signOut();
+    expect(saved("account:fox")).toBeNull();
+  });
+
   it("uses a link's key for this tab only: nothing saved, the saved key untouched", async () => {
     ls.set("e6ss:v1:creds", JSON.stringify({ username: "me", apiKey: "mine" }));
     getCurrentUser.mockResolvedValue(user("sharer_rule"));

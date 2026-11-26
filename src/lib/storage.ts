@@ -1,5 +1,5 @@
 import type { Credentials } from "./e621/client";
-import type { Post, SavedSearchRow } from "./e621/types";
+import type { CurrentUser, Post, SavedSearchRow } from "./e621/types";
 import { DEFAULT_BLACKLIST } from "./query/blacklist";
 import type { DateFilter } from "./query/date";
 import type { Profile } from "./recommend/profile";
@@ -137,6 +137,16 @@ export const storage = {
   savePlayback: (p: PlaybackSettings) => write("playback", p),
   /** Only present when the user ticked "remember on this device". */
   loadCredentials: (): Credentials | null => read<Credentials | null>("creds", null),
+  /**
+   * The account as e621 last confirmed it (Remember only), so a reload is signed in at once and
+   * checks the key behind the first paint. No key in it.
+   */
+  loadAccount: (username: string): CurrentUser | null => {
+    const u = read<CurrentUser | null>(`account:${username}`, null);
+    return u && typeof u.id === "number" && u.id > 0 && u.name === username ? u : null;
+  },
+  saveAccount: (username: string, u: CurrentUser | null) =>
+    write(`account:${username}`, u && { id: u.id, name: u.name, blacklisted_tags: u.blacklisted_tags, tag_query_limit: u.tag_query_limit }),
   saveCredentials: (c: Credentials | null) => write("creds", c),
   /** Whether share links carry the sign-in. Off until the user turns it on; cleared on sign-out. */
   loadShareSignIn: (): boolean => read("shareSignIn", false),
@@ -203,6 +213,7 @@ export const storage = {
     writeAccount(`feedHead:${username}`, remember ? head : null, remember),
   /** Everything kept for an account (sign-out, or a sign-in without Remember). */
   purgeAccount: (username: string) => {
+    write(`account:${username}`, null);
     writeAccount(`feedHead:${username}`, null, false);
     write(`ranked:${username}`, null);
     writeAccount(`marker:${username}`, null, false);

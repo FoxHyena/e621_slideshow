@@ -285,3 +285,13 @@ Format: date — decision. Why. Rejected alternatives.
   the feed over; the spinner waits for the first page. For You says "Already fresh, ranked N min ago"
   under 10 minutes, otherwise ranks again behind the Update ranking pill. Results and Favorites get it
   with their own slices.
+
+## 2026-11-25 — Signed in from the first paint (live check follow-up)
+
+- **With Remember on, the account e621 last confirmed is kept** (`account:<user>`: id, name, blacklist,
+  tag limit; never the key). A reload with that and the remembered key is signed in and `ready` at once,
+  so feeds (and Following's saved first page) paint before `/users/me` answers; the check runs behind.
+  The live check showed why: e621 took 4.5 s for `/users/me`, and nothing painted until then.
+- **A refused key (anonymous answer, 401, 403) signs the saved account out** and drops the record, with
+  the "e621 sign-in failed" toast. Offline or busy keeps the account; the next load checks again.
+- Sign-out and a sign-in without Remember remove the record (`purgeAccount`).

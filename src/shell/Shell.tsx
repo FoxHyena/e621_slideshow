@@ -96,7 +96,7 @@ export default function Shell() {
     boot(nav);
     getSession()
       .verify()
-      .catch((e: Error) => toast.error(`e621 sign-in failed: ${e.message}`));
+      .catch((e: Error) => toast.error(`e621 sign-in failed: ${e.message}`, { id: "sign-in-failed" }));
     booting = false;
     if (nav.store.get() !== before) quiet.current = true;
     return () => {

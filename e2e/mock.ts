@@ -76,6 +76,8 @@ export interface E621Mock {
   searchDelay: (tags: string, page: number) => number;
   /** ms each GET /favorites.json waits before answering */
   favoritesDelay: number;
+  /** ms /users/me.json (the sign-in check) waits before answering */
+  meDelay: number;
   /** /posts.json searches that fail with e621's 422 */
   searchFails: (tags: string) => boolean;
   /**
@@ -116,6 +118,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     filterPositive: false,
     searchDelay: () => 0,
     favoritesDelay: 0,
+    meDelay: 0,
     searchFails: () => false,
     subscriptions: null,
     lastSeen: 0,
@@ -197,6 +200,7 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     }
 
     if (url.pathname === "/users/me.json") {
+      if (state.meDelay) await new Promise((r) => setTimeout(r, state.meDelay));
       if (!auth) return json(route, { id: null, name: "Anonymous", blacklisted_tags: "gore" });
       const [user, key] = Buffer.from(auth.replace("Basic ", ""), "base64").toString().split(":");
       if (key !== "goodkey") return json(route, { success: false, message: "Invalid API key" }, 401);

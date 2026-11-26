@@ -380,3 +380,9 @@ feed content 0.37 s; scroll at 4× CPU: 2 long tasks, longest 51 ms. **Borderlin
 | `visit.json` with `redirect: "manual"` (owner OK'd one call) | Pass: `opaqueredirect` (status 0); marker moved 6882662 → 6884634, the site's newest post; `new_count` 0 |
 | `tag_subscriptions` POST output | Not run: follow arrives in slice 5 |
 | **Gap** | Instant paint waits for the sign-in check: e621 was slow (`/users/me` 4.5 s, the anchor 3.2 s), so cards showed after ~5 s. Fix: keep the profile with Remember and paint before the check |
+
+**Follow-up fix (signed in from the first paint):** self-review of the session change (no findings);
+unit tests for the at-once sign-in, a refused vs unreachable check, and Remember/sign-out; e2e: a
+reload with `/users/me` held 5 s shows Following's cards within 1.5 s, and a refused key on reload
+signs the saved account out. The sign-in-failed toast now has an id (React's dev double effect showed
+it twice).
