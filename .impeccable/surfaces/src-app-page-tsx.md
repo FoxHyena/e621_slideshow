@@ -7,7 +7,7 @@ related_targets: []
 
 # Surface: the app shell (all tabs, artist page, player, sheets)
 
-Mode: Operate. Build path: code-led (Operate surface). Approved composition: docs/path-a/mocks/feed-v6.html for the system, the feed and the shared chrome (owner sign-off 2026-11-25, v6); docs/path-a/mocks/direction-a-v5-3.html for the screens v6 did not redraw (artist page, player, Settings, sign-in), restated in v6 tokens.
+Mode: Operate. Build path: code-led (Operate surface). Approved composition: docs/path-a/mocks/feed-v6.html for the system, the feed and the shared chrome (owner sign-off 2026-11-25, v6); docs/path-a/mocks/screens-v6.html for the artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet and the player (owner sign-off 2026-11-25). Not drawn yet: landing, empty and error states, the player's sheets, filter menus, desktop; build those from UX.md with DESIGN.md's parts and show the owner.
 
 ## Direction contract
 
