@@ -202,7 +202,14 @@ test("the app mark at the foot of Settings is the hexagon with Play, and pops wh
   expect(await foot.evaluate((m) => m.querySelectorAll("clipPath").length)).toBe(2);
   await expect(foot).not.toHaveAttribute("data-pop");
   // the app's name (owner, 2026-11-26: "eLicks21"), in the foot and the page's title
-  await expect(page.locator(".app-foot b")).toHaveText("eLicks21");
+  // the two-tone wordmark (owner, "Two-tone"): one name to a screen reader, "e" and "21" in Link
+  const wm = page.locator(".app-foot").getByRole("img", { name: "eLicks21" });
+  await expect(wm).toHaveText("eLicks21");
+  expect(await wm.locator("i").evaluateAll((is) => is.map((i) => [i.textContent, getComputedStyle(i).color]))).toEqual([
+    ["e", "rgb(180, 199, 217)"],
+    ["21", "rgb(180, 199, 217)"],
+  ]);
+  expect(await wm.evaluate((e) => [getComputedStyle(e).color, getComputedStyle(e).fontWeight, getComputedStyle(e).fontSize])).toEqual(["rgb(255, 255, 255)", "600", "17px"]);
   await expect(page).toHaveTitle("eLicks21");
   await page.getByRole("button", { name: "eLicks21" }).click();
   await expect(foot).toHaveAttribute("data-pop", "");

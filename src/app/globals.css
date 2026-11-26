@@ -664,18 +664,47 @@ html {
   flex: none;
 }
 .side-name {
-  font-family: var(--font-rounded);
   font-size: var(--text-section);
   line-height: var(--text-section--line-height);
-  font-weight: 600;
-  color: var(--color-fg);
 }
 .side-tabs {
+  position: relative;
+  flex: none;
+  margin-top: 8px;
+}
+.side-rail {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 8px;
+}
+/* The secret tab (DESIGN.md, owner-picked "Scroll"): the rail is clipped to the four rows (3 spare for
+   the focus ring); scrolled, it slides up one row and "Goo" shows under Settings. */
+.side-tabs[data-secret] {
+  height: 188px;
+  clip-path: inset(-3px -4px round 24px);
+}
+.side-tabs[data-secret] .side-rail {
+  transition: transform 500ms var(--ease-slide);
+}
+.side-tabs[data-open] .side-rail {
+  transform: translateY(-48px);
+}
+.side-secret {
+  color: var(--color-fg);
+  text-align: left;
+}
+/* the wordmark (DESIGN.md "The wordmark", owner-picked "Two-tone"): "e" and "21" in Link */
+.wm {
+  font-family: var(--font-rounded);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--color-fg);
+}
+.wm i {
+  font-style: normal;
+  color: var(--color-link);
 }
 .side-ind {
   position: absolute;
@@ -4221,11 +4250,9 @@ button.field6:focus-visible {
   height: var(--spacing-avatar-l);
   margin-bottom: 8px;
 }
-.app-foot b {
-  font-family: var(--font-rounded);
+.app-foot .wm {
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 600;
 }
 .app-foot small {
   font-size: var(--text-footnote);

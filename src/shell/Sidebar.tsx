@@ -8,15 +8,23 @@
  *
  * The goo pools in its foot (owner-picked, "Pool"), over the account row, which shows through in Goo
  * Ink; none with icons only. A heart's drop falls off the bottom of the window and the pool rises
- * (`Pool`). Not designed yet, so not here: the wipe's control on a computer, and the secret tab.
+ * (`Pool`).
+ *
+ * The secret tab (owner-picked, "Scroll"): the four tabs ride a rail clipped to their own height. A
+ * wheel turn down over them, or focus past Settings, slides it up one row and "Goo" comes in under
+ * Settings; it throws ten drops into the pool. Not with icons only. Not designed yet, so not here:
+ * the wipe's control on a computer.
  */
-import { CircleUser, Rss, Search, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
-import { useEffect, useSyncExternalStore } from "react";
+import { CircleUser, Droplets, Rss, Search, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Avatar, { AppMark } from "@/components/Avatar";
 import { Pool } from "@/components/Pool";
+import { Wordmark } from "@/components/Wordmark";
 import type { Tab } from "@/nav/routes";
+import { livePool } from "@/shell/gooLive";
 import { getFollows } from "@/state/follows";
 import { newOnFollowing } from "@/state/following";
+import { getGoo } from "@/state/goo";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 
@@ -60,6 +68,21 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
   const followsUser = useStore(getFollows().store, (f) => f.user);
   const idx = Math.max(0, TABS.findIndex((t) => t.tab === current));
+  // the rail scrolled one row past Settings, showing the secret "Goo" row
+  const [open, setOpen] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const secret = !narrow;
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el || !secret) return;
+    const wheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault();
+      setOpen(e.deltaY > 0);
+    };
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => el.removeEventListener("wheel", wheel);
+  }, [secret]);
   // the account's follow count (one read of e621's list, shared with Artists and Settings)
   useEffect(() => {
     if (user && followsUser) void getFollows().ensure();
@@ -107,34 +130,64 @@ export default function Sidebar({ current, onTab, onSearch, hidden }: SidebarPro
       )}
       <div className="side-brand">
         <AppMark className="side-mark" />
-        <span className="side-name">eLicks21</span>
+        <Wordmark className="side-name" />
       </div>
-      <div className="side-tabs">
-        <span className="side-ind" aria-hidden style={{ transform: `translateY(${idx * 48}px)` }} />
-        {TABS.map(({ tab, label, Icon }) => (
-          <a
-            key={tab}
-            href={hrefOf(tab)}
-            className="side-tab"
-            aria-current={tab === current ? "page" : undefined}
-            aria-label={tab === "following" && badge ? `${label}, ${badge} new` : undefined}
-            title={tip(label)}
-            data-testid={`tab-${tab}`}
-            onClick={(e) => {
-              if (!plain(e)) return;
-              e.preventDefault();
-              onTab(tab);
-            }}
-          >
-            <Icon aria-hidden className="side-icon" />
-            <span className="side-label">{label}</span>
-            {tab === "following" && badge && (
-              <span className="side-badge" aria-hidden data-testid="side-badge">
-                {badge}
-              </span>
-            )}
-          </a>
-        ))}
+      <div
+        ref={tabsRef}
+        className="side-tabs"
+        data-secret={secret || undefined}
+        data-open={(secret && open) || undefined}
+        // reaching "Goo" with the keyboard brings it in; Following, back out
+        onFocus={(e) => {
+          const t = e.target as HTMLElement;
+          if (t.dataset.secret !== undefined) setOpen(true);
+          else if (t.dataset.testid === "tab-following") setOpen(false);
+        }}
+      >
+        <div className="side-rail">
+          <span className="side-ind" aria-hidden style={{ transform: `translateY(${idx * 48}px)` }} />
+          {TABS.map(({ tab, label, Icon }) => (
+            <a
+              key={tab}
+              href={hrefOf(tab)}
+              className="side-tab"
+              aria-current={tab === current ? "page" : undefined}
+              aria-label={tab === "following" && badge ? `${label}, ${badge} new` : undefined}
+              title={tip(label)}
+              data-testid={`tab-${tab}`}
+              onClick={(e) => {
+                if (!plain(e)) return;
+                e.preventDefault();
+                onTab(tab);
+              }}
+            >
+              <Icon aria-hidden className="side-icon" />
+              <span className="side-label">{label}</span>
+              {tab === "following" && badge && (
+                <span className="side-badge" aria-hidden data-testid="side-badge">
+                  {badge}
+                </span>
+              )}
+            </a>
+          ))}
+          {secret && (
+            <button
+              type="button"
+              className="side-tab side-secret"
+              aria-label="Goo: ten more favorites of goo in the sidebar"
+              data-secret=""
+              data-testid="tab-goo"
+              onClick={(e) => {
+                const pool = livePool();
+                if (pool) pool.spurt(e.currentTarget.querySelector("svg"));
+                else getGoo().add(10);
+              }}
+            >
+              <Droplets aria-hidden className="side-icon" />
+              <span className="side-label">Goo</span>
+            </button>
+          )}
+        </div>
       </div>
       <a
         href="/search"

@@ -298,3 +298,77 @@ test("with reduced motion the level changes at once: no drop, no catch-up, no dr
   expect((await samples(page, "pool-jar", 50))[0]).toBe(0);
 });
 
+
+test("on a computer the secret is one row past Settings: the wheel or focus scrolls to Goo, which throws ten drops into the pool", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 40);
+  await page.goto("/settings");
+  const nav = page.getByTestId("sidebar");
+  const tabs = nav.locator(".side-tabs");
+  const goo = nav.getByTestId("tab-goo");
+  const pool = page.getByTestId("pool-side");
+  await expect(pool).toHaveAttribute("data-drawn", "37");
+  // at rest: the four tabs, clipped to their own height; Goo waits under Settings
+  await expect(tabs).not.toHaveAttribute("data-open");
+  const tb = (await tabs.boundingBox())!;
+  expect(Math.round(tb.height)).toBe(188);
+  expect((await goo.boundingBox())!.y).toBeGreaterThanOrEqual(tb.y + tb.height);
+
+  // a wheel turn down over the tabs slides the rail up one row; up brings it back
+  await nav.getByTestId("tab-artists").hover();
+  await page.mouse.wheel(0, 120);
+  await expect(tabs).toHaveAttribute("data-open");
+  await expect.poll(async () => Math.round((await goo.boundingBox())!.y - tb.y)).toBe(144);
+  await expect.poll(async () => Math.round((await nav.getByTestId("tab-following").boundingBox())!.y - tb.y)).toBe(-48);
+  await shot(page, "goo-side-secret");
+  await page.mouse.wheel(0, -120);
+  await expect(tabs).not.toHaveAttribute("data-open");
+  // the keyboard: reaching Goo brings it in, Following takes it out
+  await goo.focus();
+  await expect(tabs).toHaveAttribute("data-open");
+
+  // pressing it: ten drops, thrown in three spurts, and the pool rises with each that lands
+  await page.evaluate(() => {
+    const w = window as unknown as { drops: number; levels: string[] };
+    w.drops = 0;
+    w.levels = [];
+    new MutationObserver((ms) => {
+      for (const m of ms) for (const n of m.addedNodes) if (n instanceof HTMLElement && n.classList.contains("goo-drop")) w.drops++;
+    }).observe(document.body, { childList: true });
+    const p = document.querySelector<HTMLElement>("[data-testid=pool-side]")!;
+    new MutationObserver(() => w.levels.push(p.dataset.level!)).observe(p, { attributeFilter: ["data-level"] });
+  });
+  await page.keyboard.press("Enter");
+  // (no goo row in Settings on a computer yet: its name is still open)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("e6ss:v1:goo"))).toBe("50");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { drops: number }).drops)).toBe(10);
+  await expect(page.locator(".goo-drop")).toHaveCount(0, { timeout: 5000 });
+  await expect(pool).toHaveAttribute("data-drawn", "42");
+  // (it rose drop by drop, not all at once)
+  expect(new Set(await page.evaluate(() => (window as unknown as { levels: string[] }).levels)).size).toBeGreaterThan(2);
+  await nav.getByTestId("tab-following").focus();
+  await expect(tabs).not.toHaveAttribute("data-open");
+
+  // with icons only (900 to 1099) there is no secret
+  await page.setViewportSize({ width: 1000, height: 800 });
+  await expect(nav.getByTestId("tab-goo")).toHaveCount(0);
+});
+
+test("on a computer with reduced motion, the secret adds its ten at once", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await mockE621(page);
+  await signIn(page);
+  await seedGoo(page, 40);
+  await page.goto("/settings");
+  const pool = page.getByTestId("pool-side");
+  await expect(pool).toHaveAttribute("data-drawn", "37");
+  await page.getByTestId("sidebar").getByTestId("tab-goo").focus();
+  await page.keyboard.press("Enter");
+  // (no goo row in Settings on a computer yet: its name is still open)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("e6ss:v1:goo"))).toBe("50");
+  await expect(pool).toHaveAttribute("data-drawn", "42");
+  await expect(page.locator(".goo-drop")).toHaveCount(0);
+});

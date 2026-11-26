@@ -1272,3 +1272,20 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Still mine, not approved: where the wordmark sits, and that the landing card now carries it.
 - No wordmark file exists yet. The builder can set it as text with two spans; an SVG would need the
   letters turned into outlines.
+
+## 2026-11-26 — Built: the two-tone wordmark, the secret tab on a computer (design 30ea838)
+
+- **Wordmark (owner: "Two-tone"):** `src/components/Wordmark.tsx`, text in two spans with one
+  accessible name, "eLicks21". Used only where the name already stood: beside the mark in the
+  sidebar (20/25) and at the foot of Settings (17/22). Not added under Goo on the landing card: that
+  spot is the designer's, not owner-approved.
+- **Secret tab on a computer (owner: "Scroll"):** the sidebar's four tabs ride a rail clipped to
+  188; a wheel turn down over them (or focus on Goo) slides it up 48 on the tab bar's spring, and
+  up (or focus on Following) slides it back. "Goo" throws ten drops in spurts of 4, 3, 3 into the
+  pool; the ten are counted at once (none lost if the sidebar goes) and the pool shows them one by
+  one as each lands, with a swell where it lands. None with icons only; reduced motion adds ten at
+  once. The wheel snaps open or shut, as in the mock: hand-following is not designed.
+- **Not built (waiting on the owner):** the goo row in Settings on a computer and its name.
+- **Fix carried over:** a pool swell's progress is clamped to 0 to 1, so its first frame can't give
+  an ellipse a negative height.
+

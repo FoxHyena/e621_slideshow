@@ -38,6 +38,8 @@ export function setLiveGoo(bar: GooBar | null, was?: GooBar) {
 export interface GooPool {
   /** a drop that lets go at `x, y` (viewport); false when nothing falls (reduced motion) */
   dropFrom(x: number, y: number): boolean;
+  /** the secret row's ten drops, thrown from its `icon` down into the pool */
+  spurt(icon: Element | null): void;
 }
 
 let pool: GooPool | null = null;

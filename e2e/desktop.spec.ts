@@ -42,7 +42,8 @@ test("the sidebar: brand, tabs with names, the capsule on the current one, Searc
   const box = (await side(page).boundingBox())!;
   expect(box.x).toBe(8);
   expect(box.width).toBe(232);
-  await expect(side(page).locator(".side-name")).toHaveText("eLicks21");
+  await expect(side(page).getByRole("img", { name: "eLicks21" })).toHaveText("eLicks21");
+  expect(await side(page).locator(".side-name").evaluate((e) => getComputedStyle(e).fontSize)).toBe("20px");
   await expect(side(page).getByTestId("tab-following")).toHaveAttribute("aria-current", "page");
   await expect(side(page).getByTestId("tab-following")).toContainText("Following");
   await expect(side(page).getByTestId("side-account")).toContainText("tester");

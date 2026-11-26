@@ -7,6 +7,7 @@
 import { ChevronRight, Droplets, LogIn, Play, Shield, Smartphone, Sparkles, type LucideIcon } from "lucide-react";
 import { useRef } from "react";
 import Avatar, { AppMark } from "@/components/Avatar";
+import { Wordmark } from "@/components/Wordmark";
 import { popMark } from "@/feed/motion";
 import { SETTINGS_SECTIONS, type SettingsSection } from "@/nav/routes";
 import { SECTION_LABEL } from "@/shell/screens";
@@ -119,7 +120,7 @@ function AppFoot() {
       <button type="button" ref={ref} aria-label="eLicks21" onClick={() => popMark(ref.current?.querySelector(".mark"))}>
         <AppMark />
       </button>
-      <b>eLicks21</b>
+      <Wordmark />
       <small>Version {process.env.APP_VERSION}</small>
     </div>
   );

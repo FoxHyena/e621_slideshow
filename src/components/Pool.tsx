@@ -56,6 +56,8 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
     let dead = false;
     let raf = 0;
     let air = 0;
+    // the secret's drops: already on the store's count, shown one by one as each lands
+    let held = 0;
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const drops = new Set<HTMLElement>();
     const later = (fn: () => void, ms: number) => {
@@ -66,7 +68,7 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
       timers.add(t);
     };
 
-    const count = () => goo.store.get().count;
+    const count = () => Math.max(0, goo.store.get().count - held);
     const levelOf = (n: number) => (n > 0 ? poolLevel(kind, n) : 0);
     // h: the surface now; tgt: where it's going; cn: the count that sets colour and swell size
     const st = {
@@ -84,7 +86,11 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
       shown[kind] = st.h;
       el.dataset.drawn = String(Math.round(st.h));
       if (!W || !H) return;
-      const plops = st.plops.map((p) => ({ x: p.x, p: Math.min(1, (now - p.t0) / POOL_PLOP_MS) }));
+      // clamped: a frame stamped just before the swell began would give it a negative height
+      const plops = st.plops.map((p) => ({
+        x: p.x,
+        p: Math.min(1, Math.max(0, (now - p.t0) / POOL_PLOP_MS)),
+      }));
       const shapes = poolShapesAt(kind, st.cn, W, H, st.h, st.tilt, plops);
       if (shapes.length === 0) {
         svg.style.display = "none";
@@ -142,17 +148,24 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
       if (!raf && !dead) raf = requestAnimationFrame(tick);
     };
 
-    /** Aim at the count's level; a rise brings a swell where the goo arrives. */
-    const aim = () => {
+    /** Aim at the count's level; a rise brings a swell where the goo arrives (`x` along, if given). */
+    const aim = (x?: number) => {
       const n = count();
       const t = levelOf(n);
       el.dataset.level = String(Math.round(t));
       if (n > 0) st.cn = n;
       if (calm()) {
-        Object.assign(st, { h: t, v: 0, tgt: t, drain: null, plops: [], tilt: 0 });
+        Object.assign(st, {
+          h: t,
+          v: 0,
+          tgt: t,
+          drain: null,
+          plops: [],
+          tilt: 0,
+        });
         return paint(performance.now());
       }
-      if (!st.drain && t > st.tgt + 0.01) st.plops.push({ x: W * POOL_LAND[kind], t0: performance.now() });
+      if (!st.drain && t > st.tgt + 0.01) st.plops.push({ x: x ?? W * POOL_LAND[kind], t0: performance.now() });
       st.tgt = t;
       kick();
     };
@@ -191,6 +204,7 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
       const s = goo.store.get();
       if (s.wipes !== wipes) {
         wipes = s.wipes;
+        held = 0;
         return drain();
       }
       // a drop still falling: the pool waits for it
@@ -228,6 +242,72 @@ export function Pool({ kind, ink, className }: { kind: PoolKind; ink?: ReactNode
             };
           }, DROP_DELAY_MS);
           return true;
+        },
+        spurt(icon) {
+          if (calm() || typeof document.body.animate !== "function") return void goo.add(10);
+          // counted now, so none is lost if the sidebar goes; the pool takes them in one by one
+          held += 10;
+          goo.add(10);
+          icon?.animate(
+            [0, 1, 2]
+              .flatMap((k): Keyframe[] => [
+                {
+                  transform: "scale(1)",
+                  offset: k / 3,
+                  easing: "cubic-bezier(.3,0,.4,1)",
+                },
+                {
+                  transform: `translateY(${3 - k * 0.5}px) scale(${1.24 - k * 0.04}, ${0.74 + k * 0.05})`,
+                  offset: k / 3 + 0.1,
+                  easing: "cubic-bezier(.3,1.6,.5,1)",
+                },
+              ])
+              .concat({ transform: "scale(1)" }),
+            { duration: 400 },
+          );
+          const r = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+          [4, 3, 3].forEach((n, pulse) => {
+            for (let j = 0; j < n; j++) {
+              later(
+                () => {
+                  const ir = icon?.getBoundingClientRect();
+                  const pr = el.getBoundingClientRect();
+                  const x0 = ir ? ir.left + ir.width / 2 : pr.left + pr.width / 2;
+                  const y0 = ir ? ir.top + ir.height / 2 : pr.top;
+                  // thrown up a little, then down onto the surface somewhere along the pool
+                  const along = r(28, Math.max(29, pr.width - 28));
+                  const dx = pr.left + along - x0;
+                  const dy = Math.max(0, pr.bottom - st.h - 2 - y0);
+                  const U = r(180, 320);
+                  const k = r(0.8, 1.2);
+                  const frames: Keyframe[] = Array.from({ length: 13 }, (_, i) => {
+                    const t = i / 12;
+                    return {
+                      offset: t,
+                      transform: `translate(${(dx * t).toFixed(1)}px, ${(-U * t + (dy + U) * t * t).toFixed(1)}px) scale(${(k * 0.85).toFixed(2)}, ${(k * (1 + 0.5 * t)).toFixed(2)})`,
+                    };
+                  });
+                  const d = document.createElement("span");
+                  d.className = "goo-drop";
+                  d.style.left = `${x0.toFixed(1)}px`;
+                  d.style.top = `${y0.toFixed(1)}px`;
+                  document.body.appendChild(d);
+                  drops.add(d);
+                  d.animate(frames, {
+                    duration: 300 + 17 * Math.sqrt(dy) + r(0, 80),
+                    fill: "forwards",
+                  }).onfinish = () => {
+                    d.remove();
+                    drops.delete(d);
+                    if (held > 0) held--;
+                    // (a heart's drop still falling: the pool waits for that one too)
+                    if (air === 0) aim(along);
+                  };
+                },
+                pulse * 133 + j * 26,
+              );
+            }
+          });
         },
       };
       setLivePool(api);
