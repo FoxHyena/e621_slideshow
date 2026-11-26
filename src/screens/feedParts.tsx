@@ -6,7 +6,7 @@
  * apart from Results, Favorites and the artist page (FeedScreens.tsx), so those stay out of the first
  * load while Following, which uses these, is in it.
  */
-import { ChevronLeft, ExternalLink, LayoutGrid, Play, Rows3, Share, UserX } from "lucide-react";
+import { ChevronLeft, ExternalLink, Heart, LayoutGrid, Play, Rows3, Share, User, UserX } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { postPageUrl } from "@/lib/e621/client";
@@ -24,7 +24,9 @@ import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
-import { blacklistLine, openSignIn, sharePost } from "./actions";
+import { favedOf, getFavs } from "@/state/favs";
+import { getGoo } from "@/state/goo";
+import { blacklistLine, openArtist, openSignIn, sharePost } from "./actions";
 import { openPaused } from "@/player/intent";
 import { scrollY } from "@/nav/scroll";
 
@@ -191,8 +193,11 @@ export function PlayFab({ feed, route, count = 0, gate }: { feed: Feed | null; r
 
 export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
   const post = feed?.queue.posts.find((p) => p.id === id);
-  const { entry } = useScreen();
+  const { entry, sheet } = useScreen();
+  const faved = useStore(getFavs().store, (s) => (post ? favedOf(s, post) : false));
   if (!post) return null;
+  // a held or right-clicked grid tile: Favorite, Open artist, Play from here, Open on e621
+  const tile = sheet?.startsWith("tile:") ?? false;
   const artist = artists(post)[0];
   const close = () => getNav().back();
   const name = artist?.replaceAll("_", " ");
@@ -210,6 +215,54 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
         </div>
       }
     >
+      {tile ? (
+        <div className="well-group">
+          <button
+            type="button"
+            className="well-row"
+            data-on={faved || undefined}
+            onClick={async () => {
+              await close();
+              if (!faved && getSession().store.get().creds) getGoo().addFav(post.id);
+              getFavs().toggle(post);
+            }}
+            data-testid="tile-fav"
+          >
+            <Heart aria-hidden />
+            <span>{faved ? "Unfavorite" : "Favorite"}</span>
+          </button>
+          {artist && (
+            <button
+              type="button"
+              className="well-row"
+              onClick={async () => {
+                await close();
+                openArtist(artist);
+              }}
+            >
+              <User aria-hidden />
+              <span>Open artist</span>
+            </button>
+          )}
+          <button
+            type="button"
+            className="well-row"
+            onClick={async () => {
+              await close();
+              openPaused(false);
+              getNav().push({ screen: entry.route.screen, play: String(post.id) });
+            }}
+          >
+            <Play aria-hidden />
+            <span>Play from here</span>
+          </button>
+          <a className="well-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
+            <ExternalLink aria-hidden />
+            <span>Open on e621</span>
+            <small>e621.net</small>
+          </a>
+        </div>
+      ) : (
       <div className="well-group">
         <button
           type="button"
@@ -247,6 +300,7 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
           </button>
         )}
       </div>
+      )}
     </Sheet>
   );
 }
@@ -289,15 +343,16 @@ export function FeedBody({
         openPaused(true);
         getNav().push({ screen: route.screen, play: String(p.id) });
       }}
-      onMenu={(p: Post) => getNav().openSheet(`post:${p.id}`)}
+      onMenu={(p: Post, tile?: boolean) => getNav().openSheet(`${tile ? "tile" : "post"}:${p.id}`)}
       onTag={onTag}
     />
     </>
   );
 }
 
+/** The post a ⋯ sheet is for: a card's (`post:<id>`) or a grid tile's (`tile:<id>`). */
 export function postSheet(sheet: string | null): number | null {
-  const m = sheet?.match(/^post:(\d+)$/);
+  const m = sheet?.match(/^(?:post|tile):(\d+)$/);
   return m ? Number(m[1]) : null;
 }
 

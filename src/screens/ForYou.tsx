@@ -319,7 +319,7 @@ export function ForYouScreen() {
           )}
           <button
             type="button"
-            className="toolbar-circle"
+            className="toolbar-circle tool-search"
             aria-label="Search"
             onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "for-you" })}
           >

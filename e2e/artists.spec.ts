@@ -66,7 +66,8 @@ test("Following lists who you follow: newest poster first, a dot for new, filter
   await expect(page.getByTestId("artists-seg")).toContainText("Following 3");
   await expect(rows(page)).toHaveCount(3);
   // one page of search:subscriptions for "posted …"
-  expect(mock.searches.filter((s) => s.tags.startsWith("search:subscriptions order:id_desc") && s.limit === 320)).toHaveLength(1);
+  // (the list can show before it: the sidebar on a computer already asked for the follows)
+  await expect.poll(() => mock.searches.filter((s) => s.tags.startsWith("search:subscriptions order:id_desc") && s.limit === 320).length).toBe(1);
   await expect(rows(page).nth(0)).toHaveAttribute("data-artist", "fox_artist");
   await expect(rows(page).nth(0)).toContainText("you faved 6");
   await expect(rows(page).nth(2)).toHaveAttribute("data-artist", "quiet_artist");

@@ -1,11 +1,12 @@
 "use client";
 
-import { Droplets, Rss, Search, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { Droplets, Rss, Settings, Sparkle, Users, type LucideIcon } from "lucide-react";
+import { lazy, Suspense, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Tab } from "@/nav/routes";
 import { calm } from "@/feed/motion";
 import { getGoo } from "@/state/goo";
 import { liveGoo, type GooBar } from "./gooLive";
+import { useRail } from "./rail";
 import { TAB_COUNT, tabAngle, tabTransform, tubeGeo, type TubeGeo } from "./tube";
 
 const TABS: { tab: Tab; label: string; Icon: LucideIcon }[] = [
@@ -15,19 +16,9 @@ const TABS: { tab: Tab; label: string; Icon: LucideIcon }[] = [
   { tab: "settings", label: "Settings", Icon: Settings },
 ];
 
-const RAIL_QUERY = "(min-width: 900px)";
-
-function useRail(): boolean {
-  return useSyncExternalStore(
-    (cb) => {
-      const m = matchMedia(RAIL_QUERY);
-      m.addEventListener("change", cb);
-      return () => m.removeEventListener("change", cb);
-    },
-    () => matchMedia(RAIL_QUERY).matches,
-    () => false,
-  );
-}
+/** On a computer: the sidebar, its own chunk (a phone never loads it). */
+const Sidebar = lazy(() => import("./Sidebar"));
+export { RAIL_QUERY, useRail } from "./rail";
 
 /** The tube is 343 on a 375 phone: the screen less 16 each side, within reason. */
 function tubeWidth(viewport: number): number {
@@ -57,8 +48,8 @@ interface Props {
 }
 
 /**
- * The tab bar (DESIGN.md "Tab bar"): one bent tube on a phone, a left rail at 900 px and up
- * (UX §8). `current` lights the tab; tapping the current tab's root asks the screen to scroll to
+ * The tab bar (DESIGN.md "Tab bar"): one bent tube on a phone, the sidebar at 900 px and up
+ * (DESIGN.md "On a computer"). `current` lights the tab; tapping the current tab's root asks the screen to scroll to
  * top. Also draws the goo filter the heart's drip uses.
  */
 export function TabBar(props: Props) {
@@ -73,44 +64,14 @@ export function TabBar(props: Props) {
           </filter>
         </defs>
       </svg>
-      {rail ? <Rail {...props} /> : <Tube {...props} />}
+      {rail ? (
+        <Suspense fallback={null}>
+          <Sidebar {...props} />
+        </Suspense>
+      ) : (
+        <Tube {...props} />
+      )}
     </>
-  );
-}
-
-function Rail({ current, onTab, onSearch, hidden }: Props) {
-  return (
-    <nav className="tabbar" aria-label="Tabs" data-hidden={hidden || undefined} inert={hidden}>
-      {TABS.map(({ tab, label, Icon }) => (
-        <a
-          key={tab}
-          href={tab === "settings" ? "/settings" : `/${tab}`}
-          className="tab"
-          aria-current={tab === current ? "page" : undefined}
-          data-testid={`tab-${tab}`}
-          onClick={(e) => {
-            if (!plain(e)) return;
-            e.preventDefault();
-            onTab(tab);
-          }}
-        >
-          <Icon aria-hidden className="tab-icon" />
-          <span>{label}</span>
-        </a>
-      ))}
-      <a
-        href="/search"
-        className="tab tab-rail-only"
-        onClick={(e) => {
-          if (!plain(e)) return;
-          e.preventDefault();
-          onSearch();
-        }}
-      >
-        <Search aria-hidden className="tab-icon" />
-        <span>Search</span>
-      </a>
-    </nav>
   );
 }
 

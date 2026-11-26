@@ -221,6 +221,9 @@ export function createFollowing(
   };
 }
 
+/** Following's count of new posts, for the sidebar's badge on a computer. */
+export const newOnFollowing = createStore<{ user: string | null; count: number; more: boolean }>({ user: null, count: 0, more: false });
+
 let instance: Following | null = null;
 /** The app's one Following marker, following the session's own sign-in (never a borrowed one). */
 export function getFollowing(): Following {

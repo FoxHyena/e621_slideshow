@@ -10,6 +10,7 @@
 import { X, type LucideIcon } from "lucide-react";
 import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { getNav } from "@/nav/history";
+import { RAIL_QUERY, useRail } from "./rail";
 
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
 
@@ -45,6 +46,7 @@ export function Sheet({
   footer,
   testId,
   full,
+  side,
 }: {
   /** the sheet's name; shown as its title unless `head` takes the title row's place */
   title: string;
@@ -56,9 +58,13 @@ export function Sheet({
   testId?: string;
   /** fills the screen (the search editor) */
   full?: boolean;
+  /** on a computer, a panel at the window's right with no dim (the player's Post info) */
+  side?: boolean;
 }) {
   const id = useId();
   const box = useRef<HTMLDivElement>(null);
+  // a side panel on a computer sits beside what it describes: not modal, no Tab trap
+  const panel = useRail() && !!side;
 
   // Focus the first control; keep Tab inside; Esc closes (wherever focus is: after a tap on the dim
   // it may be outside the sheet).
@@ -74,7 +80,8 @@ export function Sheet({
     };
     window.addEventListener("keydown", onEsc);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
+      // (a side panel on a computer isn't modal: Tab leaves it for the player)
+      if (e.key !== "Tab" || (side && matchMedia(RAIL_QUERY).matches)) return;
       // Real tab stops only: a menu's other rows are -1 (roving), so the last row isn't always one.
       const all = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.tabIndex >= 0 && n.getClientRects().length > 0);
       if (all.length === 0) return;
@@ -92,7 +99,7 @@ export function Sheet({
       el.removeEventListener("keydown", onKey);
       window.removeEventListener("keydown", onEsc);
     };
-  }, []);
+  }, [side]);
 
   // Drag the grabber down to dismiss (rubber-bands upward).
   const drag = useRef<{ y: number; dy: number } | null>(null);
@@ -123,14 +130,14 @@ export function Sheet({
   };
 
   return (
-    <div className="sheet-layer" data-testid={testId}>
+    <div className="sheet-layer" data-side={side || undefined} data-testid={testId}>
       <div className="sheet-dim" onClick={close} aria-hidden />
       <div
         ref={box}
         className="sheet"
         data-full={full || undefined}
         role="dialog"
-        aria-modal="true"
+        aria-modal={panel ? undefined : "true"}
         aria-labelledby={head ? undefined : id}
         aria-label={head ? title : undefined}
       >

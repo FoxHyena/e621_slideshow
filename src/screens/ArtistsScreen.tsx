@@ -65,7 +65,7 @@ export function ArtistsScreen() {
           Artists
         </h1>
         <div className="tools">
-          <button type="button" className="toolbar-circle" aria-label="Search" onClick={search}>
+          <button type="button" className="toolbar-circle tool-search" aria-label="Search" onClick={search}>
             <Search aria-hidden />
           </button>
         </div>

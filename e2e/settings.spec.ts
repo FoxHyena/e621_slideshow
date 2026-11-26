@@ -81,8 +81,8 @@ test("a Follow you backed out of (closed the sheet) doesn't happen when you sign
   await page.keyboard.press("Escape");
   await expect(sheet(page)).toHaveCount(0);
   // (in the app, not a reload: a reload forgets the tap anyway)
+  // (on a computer Settings is one page, Account first)
   await page.getByTestId("tab-settings").click();
-  await page.getByTestId("settings-account").click();
   await page.getByTestId("account-sign-in").click();
   await page.getByTestId("sign-in-username").fill("tester");
   await page.getByTestId("sign-in-key").fill("goodkey");

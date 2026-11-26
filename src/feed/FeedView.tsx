@@ -9,7 +9,7 @@
 import { ArrowUp, ChevronDown, Heart, Play } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { mediaKind, type Post } from "@/lib/e621/types";
-import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
+import { gridRange, indexAt, layoutGrid, layoutRows, mediaHeight, plainRows, tallCap, tileAt, visibleRange, type FeedRow } from "@/lib/feed/layout";
 import { TagActionsOverlay, tagTargets, useTagHold, type TagAction } from "@/components/TagActions";
 import type { Feed } from "@/state/feeds";
 import type { QueueStats } from "@/lib/slideshow/queue";
@@ -22,6 +22,7 @@ import { isLocked, registerRevealer, scrollY } from "@/nav/scroll";
 import { applyTuck } from "./tuck";
 import { AppMark } from "@/components/Avatar";
 import { PostCard } from "./PostCard";
+import { RAIL_QUERY } from "@/shell/rail";
 
 /** Start the next page this far before the end (UX §5). */
 const PREFETCH_PX = 1500;
@@ -112,7 +113,8 @@ export interface FeedViewProps {
   /** Following: where the view is, and the divider's top (list coordinates), as the page scrolls */
   onView?: (v: { top: number; height: number; dividerTop: number | null; total: number }) => void;
   onOpen: (post: Post, index: number) => void;
-  onMenu: (post: Post) => void;
+  /** a card's ⋯, or a held or right-clicked tile (`tile`) */
+  onMenu: (post: Post, tile?: boolean) => void;
   onTag: (tag: string, action: TagAction) => void;
 }
 
@@ -165,7 +167,8 @@ export function FeedView({
 
   // Cheap (one pass over the loaded posts), so it's simply recomputed with each render.
   const rows = rowsFor ? rowsFor(posts, q.exhausted) : plainRows(posts.length);
-  const layout = layoutRows(rows, posts, width);
+  const cap = useTallCap();
+  const layout = layoutRows(rows, posts, width, cap);
   /** The post a row stands for: itself, else the nearest shown post above it (then below). */
   const postAt = (r: number): number => {
     for (let k = r; k >= 0; k--) if (rows[k]?.kind === "post") return (rows[k] as { index: number }).index;
@@ -362,6 +365,7 @@ export function FeedView({
                   fresh={fresh?.(p) ?? false}
                   style={tileAt(tiles, i)}
                   onOpen={() => onOpen(p, i)}
+                  onMenu={() => onMenu(p, true)}
                 />
               );
             })
@@ -394,7 +398,7 @@ export function FeedView({
                   <PostCard
                     post={p}
                     index={r.index}
-                    mediaHeight={mediaHeight(p, width)}
+                    mediaHeight={mediaHeight(p, width, cap)}
                     live={r.index === live}
                     still={still}
                     now={now}
@@ -474,19 +478,83 @@ function Skeletons() {
   );
 }
 
+/** The window's cap on a feed picture's height (none on a phone). */
+function useTallCap(): number {
+  return useSyncExternalStore(
+    (cb) => {
+      addEventListener("resize", cb);
+      return () => removeEventListener("resize", cb);
+    },
+    () => tallCap(matchMedia(RAIL_QUERY).matches, innerHeight),
+    () => Infinity,
+  );
+}
+
 /** A grid tile (DESIGN.md "Grid view"): the picture cropped square, the score and favs under it. */
-function Tile({ post, fresh, style, onOpen }: { post: Post; fresh: boolean; style: React.CSSProperties; onOpen: () => void }) {
+function Tile({ post, fresh, style, onOpen, onMenu }: { post: Post; fresh: boolean; style: React.CSSProperties; onOpen: () => void; onMenu: () => void }) {
   const src = post.files.preview.jpg ?? post.files.sample.jpg;
   const favs = getFavs();
   const faved = useStore(favs.store, (s) => favedOf(s, post));
   const count = useStore(favs.store, (s) => favCountOf(s, post));
   const score = post.stats.score.total;
+  // Holding a tile (400 ms) or right-clicking it opens its menu (DESIGN.md "Holding a grid tile"; on a
+  // computer, right-click or the menu key). Nothing shows on the tile under the pointer.
+  const held = useRef<{ t: ReturnType<typeof setTimeout>; x: number; y: number; done: boolean } | null>(null);
+  /** when a hold last opened the menu: the click or menu event that follows it isn't a tap */
+  const heldAt = useRef(0);
+  const [sunk, setSunk] = useState(false);
+  useEffect(() => () => clearTimeout(held.current?.t), []);
+  const justHeld = () => performance.now() - heldAt.current < 600;
+  const cancel = () => {
+    if (held.current) clearTimeout(held.current.t);
+    if (!held.current?.done) held.current = null;
+    setSunk(false);
+  };
   return (
     <button
       type="button"
       className="feed-tile"
       style={style}
-      onClick={onOpen}
+      data-held={sunk || undefined}
+      onClick={(e) => {
+        // the click that ends a hold isn't a tap
+        if (justHeld()) {
+          heldAt.current = 0;
+          e.preventDefault();
+          return;
+        }
+        onOpen();
+      }}
+      onPointerDown={(e) => {
+        held.current = null;
+        if (e.pointerType === "mouse") return;
+        const at = { x: e.clientX, y: e.clientY };
+        const t = setTimeout(() => {
+          if (!held.current) return;
+          held.current.done = true;
+          heldAt.current = performance.now();
+          setSunk(false);
+          onMenu();
+        }, 400);
+        held.current = { t, ...at, done: false };
+        setSunk(true);
+      }}
+      onPointerMove={(e) => {
+        const h = held.current;
+        if (h && !h.done && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 10) cancel();
+      }}
+      onPointerUp={() => {
+        if (held.current && !held.current.done) cancel();
+        else setSunk(false);
+      }}
+      onPointerCancel={cancel}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        // (a phone's own long-press menu event, after the hold already opened it)
+        if (justHeld()) return;
+        cancel();
+        onMenu();
+      }}
       aria-label={`Post ${post.id}${fresh ? ", new" : ""}, score ${score}, ${count} ${count === 1 ? "favorite" : "favorites"}${faved ? ", favorited" : ""}`}
       data-testid="grid-tile"
       data-post-id={post.id}

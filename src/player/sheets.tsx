@@ -211,6 +211,7 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
     <Sheet
       title={`Post ${post.id}${name ? ` by ${name}` : ""}`}
       testId="sheet-info"
+      side
       head={
         <div className="sheet-head info-head">
           {by ? (

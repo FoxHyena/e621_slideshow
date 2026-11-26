@@ -29,12 +29,18 @@ export function cardAspect(post: Pick<Post, "files">): number {
   return Math.min(a, MAX_TALL);
 }
 
-export function mediaHeight(post: Pick<Post, "files">, column: number): number {
-  return Math.round((column - 2 * CARD.edge) * cardAspect(post));
+/** `cap`: on a computer a picture is never taller than the window less 160 (DESIGN.md "On a computer"). */
+export function mediaHeight(post: Pick<Post, "files">, column: number, cap = Infinity): number {
+  return Math.min(Math.round((column - 2 * CARD.edge) * cardAspect(post)), Math.max(0, Math.round(cap)));
 }
 
-export function cardHeight(post: Pick<Post, "files">, column: number): number {
-  return CARD_CHROME + mediaHeight(post, column);
+export function cardHeight(post: Pick<Post, "files">, column: number, cap = Infinity): number {
+  return CARD_CHROME + mediaHeight(post, column, cap);
+}
+
+/** The tallest a feed picture may be at this window size: no cap on a phone. */
+export function tallCap(computer: boolean, h: number): number {
+  return computer ? Math.max(240, h - 160) : Infinity;
 }
 
 export interface FeedLayout {
@@ -108,7 +114,8 @@ export interface GridLayout {
 
 /** Square tiles: 3 across on a phone, more as the width grows (about 180 px each). */
 export function layoutGrid(count: number, width: number): GridLayout {
-  const cols = Math.max(3, Math.floor((width + GRID.colGap) / (180 + GRID.colGap)));
+  // as many columns as fit at 176 or wider (DESIGN.md "On a computer"); 3 on a phone
+  const cols = Math.max(3, Math.floor((width + GRID.colGap) / (176 + GRID.colGap)));
   const tile = Math.max(0, (width - GRID.colGap * (cols - 1)) / cols);
   const cell = tile + GRID.foot;
   const pitch = cell + GRID.rowGap;
@@ -150,13 +157,13 @@ export function plainRows(count: number): FeedRow[] {
   return Array.from({ length: count }, (_, index) => ({ kind: "post", index }));
 }
 
-export function layoutRows(rows: FeedRow[], posts: Pick<Post, "files">[], column: number): RowLayout {
+export function layoutRows(rows: FeedRow[], posts: Pick<Post, "files">[], column: number, cap = Infinity): RowLayout {
   const tops: number[] = [];
   const heights: number[] = [];
   const rowOf = new Array<number>(posts.length).fill(-1);
   let y = 0;
   rows.forEach((r, i) => {
-    const h = r.kind === "post" ? cardHeight(posts[r.index], column) : ROW[r.kind];
+    const h = r.kind === "post" ? cardHeight(posts[r.index], column, cap) : ROW[r.kind];
     if (r.kind === "post") rowOf[r.index] = i;
     tops.push(y);
     heights.push(h);

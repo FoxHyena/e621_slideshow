@@ -59,6 +59,8 @@ test("every route serves the shell and opens its screen", async ({ page }) => {
 });
 
 test("tabs and pushed screens move without RSC requests, and Back/Forward retrace them", async ({ page }) => {
+  // (Settings › a row is a pushed page on a phone; on a computer Settings is one page)
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/following");
   await expect(heading(page, "Following")).toBeVisible();
   const rsc = watchRsc(page);
@@ -126,6 +128,8 @@ test("Back on a pasted URL with nothing under it goes to its parent", async ({ p
 });
 
 test("a reload keeps the place and its depth", async ({ page }) => {
+  // (Settings › a row is a pushed page on a phone; on a computer Settings is one page)
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/following");
   await tab(page, "Settings").click();
   await page.getByRole("link", { name: "Slideshow" }).click();
@@ -140,6 +144,8 @@ test("a reload keeps the place and its depth", async ({ page }) => {
 });
 
 test("focus moves to a pushed screen's heading and comes back to what opened it", async ({ page }) => {
+  // (Settings › a row is a pushed page on a phone; on a computer Settings is one page)
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/settings");
   const row = page.getByRole("link", { name: "Content" });
   await row.focus();
@@ -171,6 +177,8 @@ test("a share link's sign-in fragment is gone before the app starts, and is kept
 });
 
 test("Esc goes back on every screen, even after the legacy home has mounted", async ({ page }) => {
+  // (Settings › a row is a pushed page on a phone; on a computer Settings is one page)
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/settings/classic");
   await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "true");
   await tab(page, "Settings").click();
@@ -236,7 +244,7 @@ test("the legacy show keeps its place across a tab round-trip", async ({ page })
   await tab(page, "Artists").click();
   await expect(heading(page, "Artists")).toBeVisible();
   await tab(page, "Settings").click();
-  await page.getByRole("link", { name: "App" }).click();
+  // (on a computer Settings is one page: App's rows are on it)
   await page.getByTestId("app-classic").click();
   await expect(page.getByTestId("play-button")).toHaveText(/Resume/);
   await page.getByTestId("play-button").click();

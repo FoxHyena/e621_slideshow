@@ -1300,8 +1300,8 @@ test("with the account toggle on, a share link signs the visitor in for that tab
   await expect(p2).toHaveURL(/\/following$/);
   // Following never uses a borrowed sign-in; Settings › Account shows it.
   await expect(p2.getByTestId("following-sign-in")).toBeVisible();
+  // (on a computer Settings is one page, Account first)
   await p2.getByTestId("tab-settings").click();
-  await p2.getByTestId("settings-account").click();
   await expect(p2.getByTestId("account-name")).toHaveText("tester");
   await expect(p2.getByTestId("settings-page-account")).toContainText("On a shared link, for this tab");
   await expect(p2.getByTestId("share-sign-in")).toHaveCount(0); // a borrowed key can't be re-shared

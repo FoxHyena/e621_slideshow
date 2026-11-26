@@ -20,8 +20,8 @@ import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { ScreenContext } from "./context";
-import { TabBar } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsHome, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
+import { TabBar, useRail } from "./TabBar";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -217,6 +217,7 @@ export default function Shell() {
     return unlockScroll;
   }, [held]);
 
+  const rail = useRail();
   const barHidden = (immersive && onAccount) || overlay?.route.play != null;
   const ctx = (e: Entry, visible: boolean) => ({
     entry: e,
@@ -232,7 +233,15 @@ export default function Shell() {
         current={lit}
         hidden={barHidden}
         onTab={(t) => void onTab(t)}
-        onSearch={() => nav.push({ screen: { kind: "search" }, play: null }, { from: lit })}
+        onSearch={() => {
+          // already on Search ("/" again): its field, not a second Search
+          const c = nav.current();
+          if (c.route.screen.kind === "search" && !isOverlay(c)) {
+            document.querySelector<HTMLElement>(`section[data-id="${c.key}"] [role=search] :is(input, textarea)`)?.focus();
+            return;
+          }
+          nav.push({ screen: { kind: "search" }, play: null }, { from: lit });
+        }}
       />
       {accountMounted && (
         <section
@@ -253,6 +262,13 @@ export default function Shell() {
             {(t === "for-you" || t === "following" || t === "artists") && roots[t] ? (
               <ScreenContext value={ctx(curRoot === t ? cur : roots[t]!, curRoot === t)}>
                 <Suspense fallback={null}>{t === "following" ? <FollowingScreen /> : t === "artists" ? <ArtistsScreen /> : <ForYouScreen />}</Suspense>
+              </ScreenContext>
+            ) : rail && roots[t] ? (
+              // on a computer Settings is one page, its sheets (keyboard shortcuts, choices) over it
+              <ScreenContext value={ctx(curRoot === t ? cur : roots[t]!, curRoot === t)}>
+                <Suspense fallback={null}>
+                  <SettingsAll />
+                </Suspense>
               </ScreenContext>
             ) : (
               <Suspense fallback={null}>

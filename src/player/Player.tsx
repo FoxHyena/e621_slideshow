@@ -413,19 +413,22 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
       onPointerCancel={() => (drag.current = null)}
       data-testid="player"
       data-post-id={current?.id}
+      data-info={sheet === "player-info" || undefined}
     >
       {current && (
-        <Stage
-          post={current}
-          trail={trail}
-          upcoming={posts.slice(index + 1, index + 1 + UPCOMING_SHOWN)}
-          playback={playback}
-          currentReady={isReady}
-          durationMs={durationMs}
-          running={running}
-          onReady={(id, durationSec) => setReady({ id, durationSec })}
-          onError={(id) => queue?.remove(id)}
-        />
+        <div className="player-stage">
+          <Stage
+            post={current}
+            trail={trail}
+            upcoming={posts.slice(index + 1, index + 1 + UPCOMING_SHOWN)}
+            playback={playback}
+            currentReady={isReady}
+            durationMs={durationMs}
+            running={running}
+            onReady={(id, durationSec) => setReady({ id, durationSec })}
+            onError={(id) => queue?.remove(id)}
+          />
+        </div>
       )}
       {current && !isReady && (
         <div className="player-center" data-testid="slide-loading">
@@ -494,7 +497,15 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
             >
               <Heart aria-hidden />
             </button>
-            <button type="button" className="art-circle" aria-label="Post info" onClick={() => nav.openSheet("player-info")} disabled={!current} data-testid="info-button">
+            <button
+              type="button"
+              className="art-circle"
+              aria-label="Post info"
+              aria-expanded={sheet === "player-info"}
+              onClick={() => (sheet === "player-info" ? void nav.back() : nav.openSheet("player-info"))}
+              disabled={!current}
+              data-testid="info-button"
+            >
               <Info aria-hidden />
             </button>
             <button type="button" className="art-circle" aria-label="Slideshow settings" onClick={() => nav.openSheet("player-settings")} data-testid="quick-settings-button">

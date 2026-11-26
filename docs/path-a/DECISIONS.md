@@ -788,3 +788,20 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The Following suggestion card (UX.md) is **not built**: the first run and Artists › Suggested cover the
   same need. MORNING Decide 3.
 - Dead `PlaceholderScreen`/`Soon` removed; the Settings tab renders Settings home directly.
+
+## 2026-11-26 — Slice 9b (on a computer, overnight)
+
+- Built from DESIGN.md "On a computer (900 px and wider)" (proposed, batch 5): the floating sidebar (232
+  with names from 1100 px, 68 with icons and tooltips from 900), the tab bar's sliding capsule, Following's
+  count badge (hidden while Following is current), Search with the "/" key, the account at the bottom;
+  the 600 column, the grid at full width (columns at 176 or wider), Play beside the column, toasts centred
+  on the column 24 from the bottom, tall pictures capped at the window less 160, Settings on one page with
+  Sign out on the account row, the player's one-row controls and Post info as a 360 panel.
+- The sidebar is its own chunk: a phone never loads it (the old rail's code left the first load).
+- **Every sheet is a 420 dialog on a computer.** Popovers (a sheet opened from a chip, ⋯, tile or tag,
+  shown at that thing) are not built: they need each opener's position. MORNING Decide.
+- **Not built, as the design says:** the goo and the secret tab on a computer (the sidebar is drawn
+  clean, so the goo isn't shown there at all).
+- The account row opens Settings (Account is its first section on one page). `/settings/account` and the
+  other sub-page URLs still open the single sub-page on a computer.
+- Settings › Goo's row isn't on the one page (the goo isn't on a computer).

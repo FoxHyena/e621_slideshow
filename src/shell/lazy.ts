@@ -33,6 +33,7 @@ export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYou
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));
 export const ArtistsScreen = lazy(() => artists().then((m) => ({ default: m.ArtistsScreen })));
 export const SettingsPage = lazy(() => settingsPages().then((m) => ({ default: m.SettingsPage })));
+export const SettingsAll = lazy(() => settingsPages().then((m) => ({ default: m.SettingsAll })));
 export const SignInSheet = lazy(() => signIn().then((m) => ({ default: m.SignInSheet })));
 export const SettingsHome = lazy(() => settingsHome().then((m) => ({ default: m.SettingsHome })));
 export const NotFoundScreen = lazy(() => shellScreens().then((m) => ({ default: m.NotFoundScreen })));

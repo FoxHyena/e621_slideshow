@@ -74,6 +74,20 @@ at the top once Phase 7 hands over.
    - The Undo ring pauses while the pointer is over the toast (sonner's timer does too), not on focus.
    - Popular artists shows a skeleton (4 rows) while e621's tag list loads, instead of a spinner.
 
+13. **On a computer (slice 9b)** follows the proposed batch 5. My calls:
+   - Every sheet opens as a 420 dialog in the middle, including the ones the design wants as popovers at
+     the chip, ⋯, tile or tag that opened them (Decide 9).
+   - The sidebar's account row opens Settings; signed out it reads "Not signed in" / "Sign in".
+   - Following's count badge shows on the sidebar only (the phone's tab bar has none yet).
+   - Built without a mock: Search, Artists and the artist page on a computer (the 600 column, as the design
+     says), and the 68 sidebar's tooltips (the browser's own).
+   - A grid tile's menu (batch 2, "Holding a grid tile"): hold 400 ms on a phone, right-click on a computer.
+     Its rows are the design's (Favorite, Open artist, Play from here, Open on e621), in the ⋯ sheet.
+   - "/" opens Search from anywhere but a text field; on Search it goes to the field.
+   - In the player on a computer, toasts sit 120 from the bottom, above the controls.
+   - Post info on a computer is a panel beside the picture, not a dialog: Tab reaches the player's buttons
+     while it is open. The show still pauses while it is open, as on a phone.
+
 ## Try in the app (steps)
 
 (Filled in at Phase 7 with the local URL.)
@@ -96,6 +110,11 @@ at the top once Phase 7 hands over.
 7. **Delete the classic one-page app** once its 66 e2e flows are ported to the new screens. Default:
    keep it behind Settings › App › Classic slideshow until then.
 8. **"What's new"** in Settings › App isn't built (no changelog yet). Default: leave it out.
+9. **Popovers on a computer** (a chip's or ⋯'s sheet shown at the thing you clicked, no dim). Default: not
+   built; every sheet is a centred dialog. Building them means each opener passes its position.
+10. **The goo on a computer** isn't designed (the design session's suggestion: along the sidebar's top edge,
+   dripping down its face; the secret tab as a row under Settings). Default: no goo on a computer.
+
 ## Needs you (things I held)
 
 1. **Live `tag_subscriptions` POST check** with you signed in (a write to your e621 account). Tested

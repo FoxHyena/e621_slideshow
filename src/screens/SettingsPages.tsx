@@ -46,6 +46,29 @@ export function SettingsPage({ section }: { section: Exclude<SettingsSection, "c
   );
 }
 
+const ONE_PAGE: Exclude<SettingsSection, "classic">[] = ["account", "content", "slideshow", "for-you", "app"];
+
+/** Settings on a computer (DESIGN.md "On a computer", proposed): every sub-page's groups on one page. */
+export function SettingsAll() {
+  return (
+    <div className="screen-frame settings-page settings-all" data-testid="settings-all">
+      <div className="title-row">
+        <h1 tabIndex={-1} className="screen-title">
+          Settings
+        </h1>
+      </div>
+      {ONE_PAGE.map((s) => (
+        <section key={s} className="settings-section" aria-labelledby={`settings-h-${s}`} data-testid={`settings-page-${s}`}>
+          <h2 id={`settings-h-${s}`} className="settings-section-title">
+            {SECTION_LABEL[s]}
+          </h2>
+          {s === "account" ? <Account onePage /> : s === "content" ? <Content /> : s === "slideshow" ? <Slideshow /> : s === "for-you" ? <ForYouPage /> : <AppPage />}
+        </section>
+      ))}
+    </div>
+  );
+}
+
 /** A note under a group: Muted footnote, lined up with the rows' text. */
 const Note = ({ children, warn, testId }: { children: ReactNode; warn?: boolean; testId?: string }) => (
   <p className="group-note" data-warn={warn || undefined} data-testid={testId}>
@@ -69,7 +92,7 @@ function SwitchRow({ title, line, on, set, disabled, testId, icon }: { title: st
 
 // ---- Account ------------------------------------------------------------------
 
-function Account() {
+function Account({ onePage = false }: { onePage?: boolean }) {
   const s = useStore(getSession().store, (x) => ({ user: x.user, creds: x.creds, remember: x.remember, link: x.link, shareSignIn: x.shareSignIn, ready: x.ready }), shallow);
   const follows = useStore(getFollows().store, (f) => (f.status === "ready" ? f.followed.size : null));
   const followsUser = useStore(getFollows().store, (f) => f.user);
@@ -104,6 +127,11 @@ function Account() {
             <b data-testid="account-name">{label(s.user.name)}</b>
             <small>{s.link ? "On a shared link, for this tab" : `Signed in to e621${follows !== null ? ` · ${follows.toLocaleString("en-US")} follow${follows === 1 ? "" : "s"}` : ""}`}</small>
           </span>
+          {onePage && (
+            <button type="button" className="btn-tonal" data-size="compact" onClick={() => session.signOut()} data-testid="sign-out">
+              Sign out
+            </button>
+          )}
         </div>
       </div>
       <ul className="list-group">
@@ -156,10 +184,12 @@ function Account() {
           </ul>
         </>
       )}
-      <button type="button" className="btn-tonal settings-wide" onClick={() => session.signOut()} data-testid="sign-out">
-        <LogOut aria-hidden className="state-icon" />
-        Sign out
-      </button>
+      {!onePage && (
+        <button type="button" className="btn-tonal settings-wide" onClick={() => session.signOut()} data-testid="sign-out">
+          <LogOut aria-hidden className="state-icon" />
+          Sign out
+        </button>
+      )}
     </>
   );
 }

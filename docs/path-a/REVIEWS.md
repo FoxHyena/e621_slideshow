@@ -770,3 +770,49 @@ placement above the bar with no Play), first-run's skeleton test. Full e2e befor
 
 **Budgets** (production build, mock e621): JS cold load **198.4 KB** (≤ 200; +1.2 KB for the toast icons);
 301.1 KB with idle prefetch; CLS 0.0000. Headroom is 1.6 KB: slice 9b makes room before adding.
+
+## Slice 9b — the layout on a computer (2026-11-26)
+
+Built from DESIGN.md "On a computer (900 px and wider)" (batch 5, proposed): the sidebar (232 with
+names from 1100, 68 icons-only from 900), the 600 column, grids at full width, Play beside the column,
+titled sheets as 420 dialogs, Settings on one page, Post info as a 360 panel beside the picture, tile
+menu on right-click (a hold on a phone), "/" for Search, hover states. Not built: the goo and the secret
+tab on a computer (not designed), popovers (MORNING Decide 9).
+
+**Code-review (high), 5 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The desktop toast offset lost to the phone rule's `:root:not(:has(…))` specificity | Med | Moved onto `.shell` |
+| 2 | "/" on Search pushed a second Search | Med | Focuses Search's field instead |
+| 3 | Toast centred with `100vw`, off by half the scrollbar gutter | Low | `100%` |
+| 4 | Following's badge stayed after sign-out | Low | Shown only when signed in |
+| 5 | The click that ends a hold also opened the post | Med | Swallowed |
+
+**Fresh reviewer, 12 findings**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A hold's flag swallowed a later keyboard click or menu key | Med | Only within 600 ms of the hold |
+| 2 | The hold timer outlived the tile | Low | Cleared on unmount |
+| 3 | DESIGN.md's tile menu is a popover, not a dialog | Low | Skipped: MORNING Decide 9 |
+| 4 | Post info's side panel was aria-modal with a Tab trap beside a live player | Med | Not modal and no trap on a computer |
+| 5 | The badge lost the pill's "+" and could show another account's count | Med | Stored with its account and "+" |
+| 6 | Hover hid the on state of chips and pressed toolbar circles | Med | Hover skips them |
+| 7 | "/" fired on key repeat and mid-IME | Low | Ignored |
+| 8 | Narrow sidebar labels were `display:none` (no accessible names) | Med | Visually hidden instead |
+| 9 | The tall-picture cap used `innerWidth`, the layout a media query | Low | One shared query; unit tests for the cap |
+| 10 | Player's Stage props not re-indented in the new wrapper | Nit | Fixed |
+| 11 | `/settings/content` on a computer shows the sub-page | Low | No change: deep links stay useful |
+| 12 | The sidebar's follow count never loaded (asked before the follows store knew the account) | Med | Waits for the store's account, as Settings does |
+
+**Gates:** typecheck and lint clean; unit 308 pass. New e2e: e2e/desktop.spec.ts (9 tests: sidebar,
+narrow sidebar, under 900, grid and tile menu, phone hold, Settings one page with toast placement,
+"/" on Search, player side panel not modal). Older tests now set a phone viewport where they test the
+phone (nav.spec), or skip the phone's Settings › Account step. artists.spec polls for the "posted …"
+search (the sidebar now asks for the follows first, so the list can show before it). `useRail` moved
+to src/shell/rail.ts: Sheet importing TabBar had merged the filter menus' dev chunk with shared code.
+Full e2e: 218 passed, 3 skipped. Service worker test passes.
+
+**Budgets** (production build, mock e621): JS cold load **198.6 KB** at 375 (≤ 200; the sidebar is its
+own chunk, so a phone never loads it); 301.5 KB with idle prefetch; CLS 0.0000; 0 long tasks.

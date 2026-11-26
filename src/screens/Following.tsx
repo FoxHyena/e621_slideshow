@@ -19,7 +19,7 @@ import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 import { getFeeds, feedQuery, type Feed, type FeedSpec } from "@/state/feeds";
-import { getFollowing, RETRY_FAILED_MS, type FollowingState } from "@/state/following";
+import { getFollowing, newOnFollowing, RETRY_FAILED_MS, type FollowingState } from "@/state/following";
 import { FEED_HEAD_POSTS, storage } from "@/lib/storage";
 import { favCountOf, favedOf, getFavs } from "@/state/favs";
 import { getPrefs } from "@/state/prefs";
@@ -115,7 +115,7 @@ export function FollowingScreen() {
     <div className="tools">
       <button
         type="button"
-        className="toolbar-circle"
+        className="toolbar-circle tool-search"
         aria-label="Search"
         onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "following" })}
       >
@@ -265,6 +265,8 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
   // A failed page doesn't end the list: more new posts may still be past it.
   const more = !!q && !q.exhausted && (!last || isNew(last, threshold));
   const label = newCountLabel(newCount, more);
+  const me = useStore(getSession().store, (s) => s.user?.name ?? null);
+  useEffect(() => newOnFollowing.set({ user: me, count: newCount, more }), [me, newCount, more]);
   const filtered = !isDefaultFilters(filters);
 
   const rowsFor = useCallback(

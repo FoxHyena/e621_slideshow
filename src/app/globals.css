@@ -96,7 +96,8 @@
   --spacing-avatar-row: 44px;
   --spacing-avatar-l: 56px;
   --spacing-avatar-hero: 80px;
-  --spacing-rail: 88px;
+  /* content starts right of the sidebar on a computer: 8 + 68 + 8, or 8 + 232 + 8 */
+  --spacing-rail: 84px;
 
   --radius-badge: 6px;
   --radius-field: 12px;
@@ -600,6 +601,11 @@ html {
   /* toasts sit 12 above the stack: Play when it shows, else the bar (Play steps aside on scroll) */
   --toast-bottom: calc(var(--stack-top) + 12px);
 }
+@media (min-width: 1100px) {
+  :root {
+    --spacing-rail: 248px;
+  }
+}
 :root:not(:has(.play-fab:not([data-away]))) {
   --toast-bottom: calc(var(--bar-top) + 16px);
 }
@@ -609,72 +615,267 @@ html {
   color: var(--color-fg);
 }
 
-.tabbar {
+.btn-gold:focus-visible,
+.toolbar-circle:focus-visible,
+.post-by:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* The sidebar on a computer (DESIGN.md "On a computer", proposed): the tab bar stood on its side. */
+.side {
   position: fixed;
   z-index: 50;
-  left: var(--spacing-inset);
-  right: var(--spacing-inset);
-  bottom: var(--bar-bottom);
-  height: var(--spacing-bar);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 4px;
-  border-radius: 999px;
-  background-color: var(--color-glass-base);
-  background-image: linear-gradient(var(--color-glass), var(--color-glass));
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
-  backdrop-filter: blur(var(--blur-glass)) saturate(1.6);
-  box-shadow: var(--shadow-bar);
-  /* Its own transition layer, so push/back motion moves the screen and not the bar. */
+  top: 8px;
+  left: 8px;
+  bottom: 8px;
+  width: 232px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--shadow-float);
   view-transition-name: tabbar;
   transition:
     opacity 200ms ease-out,
     transform 200ms ease-out;
 }
-.tabbar[data-hidden] {
+.side[data-hidden] {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateX(-24px);
+  visibility: hidden;
   pointer-events: none;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out,
+    visibility 0s 200ms;
 }
-.tab {
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding-left: 4px;
+}
+.side-mark {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.side-name {
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.side-tabs {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.side-ind {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--color-raised-hi);
+  box-shadow: var(--inset-shadow-lit);
+  transition: transform 500ms var(--ease-slide);
+}
+.side-tab,
+.side-search,
+.side-account {
+  position: relative;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
+  gap: 12px;
   min-width: 0;
   border-radius: 999px;
-  color: var(--color-link);
-  font-family: var(--font-rounded);
-  font-size: var(--text-tab);
-  line-height: var(--text-tab--line-height);
-  font-weight: 600;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.tab-icon {
-  width: 24px;
-  height: 24px;
-  stroke-width: 1.75;
+.side-tab {
+  height: 44px;
+  padding: 0 12px;
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
 }
-.tab[aria-current="page"] {
-  background: rgba(255, 255, 255, 0.1);
+.side-tab[aria-current="page"] {
   color: var(--color-gold);
 }
-.tab[aria-current="page"] .tab-icon {
-  stroke-width: 2.2;
+.side-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  stroke-width: 1.9;
 }
-.tab:focus-visible,
-.toolbar-circle:focus-visible,
-.post-by:focus-visible,
-.btn-gold:focus-visible {
+.side-tab[aria-current="page"] .side-icon {
+  stroke-width: 2.4;
+}
+.side-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.side-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-rounded);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.side-search {
+  height: 44px;
+  margin-top: 12px;
+  padding: 0 8px 0 14px;
+  border-radius: var(--radius-field);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-muted);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+.side-search-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.side-key {
+  margin-left: auto;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 7px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+.side-account {
+  margin-top: auto;
+  padding: 6px 8px 6px 4px;
+  border-radius: 18px;
+  color: var(--color-fg);
+}
+.side-avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.side-nobody {
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--color-well);
+  color: var(--color-link);
+  stroke-width: 1.75;
+}
+.side-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.side-who b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+}
+.side-who small {
+  color: var(--color-muted);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+}
+.side-tab:focus-visible,
+.side-search:focus-visible,
+.side-account:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
-.tab-rail-only {
-  display: none;
+/* 900 to 1099: icons only, names as tooltips */
+@media (max-width: 1099px) {
+  .side {
+    width: 68px;
+    align-items: center;
+  }
+  .side-brand {
+    padding: 0;
+  }
+  .side-name,
+  .side-key {
+    display: none;
+  }
+  /* hidden from sight, not from screen readers */
+  .side-label,
+  .side-who {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .side-ind,
+  .side-tab,
+  .side-search {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .side-badge {
+    position: absolute;
+    top: 3px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .side-account {
+    padding: 4px;
+    border-radius: 999px;
+  }
+}
+@media (hover: hover) {
+  .side-tab:hover,
+  .side-account:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .side-tab:hover {
+    color: var(--color-fg);
+  }
+  .side-tab[aria-current="page"]:hover {
+    color: var(--color-gold);
+  }
+  .side-search:hover {
+    color: var(--color-link);
+  }
 }
 
 /* The tab bar on a phone (DESIGN.md v6 "Tab bar"): one solid tube that bends. Its fill is a
@@ -1023,39 +1224,37 @@ html {
 }
 
 @media (min-width: 900px) {
-  .tabbar {
-    top: 0;
-    left: 0;
-    right: auto;
-    bottom: 0;
-    width: var(--spacing-rail);
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: calc(env(safe-area-inset-top) + 16px) 12px 16px;
-    border-radius: 0;
-    background-image: none;
-    box-shadow: inset -1px 0 0 var(--color-hairline);
-  }
-  .tabbar[data-hidden] {
-    transform: translateX(-24px);
-  }
-  .tab {
-    height: 64px;
-    border-radius: var(--radius-panel);
-  }
-  .tab-rail-only {
-    display: flex;
-    margin-top: auto;
-  }
   .screen {
     margin-left: var(--spacing-rail);
   }
-  .legacy-home {
-    left: var(--spacing-rail);
+  /* the 600 column, centred right of the sidebar; 18 above the title */
+  .screen-frame {
+    max-width: calc(600px + 2 * var(--spacing-inset));
+    padding-top: calc(env(safe-area-inset-top) + 18px);
+  }
+  /* a grid uses the full width, 24 at each side, and keeps 104 under it for Play */
+  .screen-frame[data-grid] {
+    max-width: none;
+    padding: calc(env(safe-area-inset-top) + 18px) 24px 104px;
+  }
+  /* Search is in the sidebar */
+  .tool-search {
+    display: none;
+  }
+  /* toasts centre on the column and float 24 from the bottom; in the player, centred on the window
+     above its controls (set on the shell, so it wins over :root's Play rules whatever their weight) */
+  .shell {
+    --toast-bottom: 24px;
+  }
+  .shell[data-immersive] {
+    --toast-bottom: 120px;
+  }
+  .shell:not([data-immersive]) [data-sonner-toaster][data-x-position="center"] {
+    /* (% of the window less any scrollbar gutter, unlike vw) */
+    left: calc(var(--spacing-rail) + (100% - var(--spacing-rail)) / 2);
   }
   .legacy-home {
+    left: var(--spacing-rail);
     bottom: 0;
   }
   .legacy-home[data-immersive] {
@@ -1064,19 +1263,14 @@ html {
 }
 
 @media (hover: hover) {
-  .tab:hover {
-    color: var(--color-fg);
-  }
-  .tab[aria-current="page"]:hover {
-    color: var(--color-gold);
-  }
   .settings-row:hover {
     background: var(--color-raised);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tabbar,
+  .side,
+  .side-ind,
   .btn-gold {
     transition: none;
   }
@@ -2424,18 +2618,28 @@ html {
 }
 
 @media (min-width: 900px) {
-  /* Desktop isn't drawn yet (STATE R2): Play keeps its bottom-left spot, just past the rail. */
+  /* DESIGN.md "On a computer": Play at the content's bottom left, 24 from the sidebar and the bottom */
   .play-fab {
     bottom: 24px;
-    left: calc(var(--spacing-rail) + 24px);
+    left: calc(var(--spacing-rail) + 16px);
   }
   .sheet-layer {
     justify-content: center;
     align-items: center;
   }
+  /* a titled sheet is a 420 dialog in the middle of the window, its dim over the sidebar too */
   .sheet {
-    width: min(480px, calc(100vw - 48px));
+    width: min(420px, calc(100vw - 48px));
+    max-height: calc(100dvh - 48px);
+    padding-bottom: 16px;
     border-radius: var(--radius-sheet);
+    box-shadow: var(--inset-shadow-lit), var(--shadow-float);
+  }
+  .sheet-grab {
+    display: none;
+  }
+  .sheet-head {
+    padding-top: 16px;
   }
   .sheet[data-full] {
     height: min(720px, calc(100dvh - 48px));
@@ -2694,15 +2898,85 @@ html {
   .player-desktop {
     display: grid;
   }
-  .player-bottom {
-    align-items: center;
+  /* DESIGN.md "On a computer" player: ✕ top left; the count and full screen top right, 12 apart */
+  .player-top {
+    gap: 12px;
+    padding: 16px 16px 0;
   }
-  .player-rail {
-    width: 280px;
+  .count-pill {
+    margin-top: 8px;
+  }
+  /* the progress bar, and 12 under it one row: the artist, the transport, then the four buttons */
+  .player-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      "bar bar bar"
+      "who transport rail";
+    align-items: center;
+    column-gap: 24px;
+    row-gap: 12px;
+    padding: 104px 24px 20px;
   }
   .player-bar {
-    width: min(720px, 100%);
+    grid-area: bar;
   }
+  .player-who {
+    grid-area: who;
+  }
+  .player-transport {
+    grid-area: transport;
+    gap: 12px;
+  }
+  .player-rail {
+    grid-area: rail;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  /* Post info: a 360 panel at the right; the picture, the shades and the controls end beside it */
+  .player-stage,
+  .player-chrome,
+  .player-center {
+    transition: right 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .player[data-info] .player-stage,
+  .player[data-info] .player-chrome,
+  .player[data-info] .player-center {
+    right: 376px;
+  }
+  .player [aria-expanded="true"].art-circle {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 0 0 2px var(--color-gold);
+  }
+  .sheet-layer[data-side] {
+    inset: 8px 8px 8px auto;
+    width: 360px;
+    justify-content: stretch;
+    align-items: stretch;
+  }
+  .sheet-layer[data-side] .sheet-dim,
+  .sheet-layer[data-side] .sheet-grab {
+    display: none;
+  }
+  .sheet-layer[data-side] .sheet {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    padding: 0 0 16px;
+    box-shadow: var(--inset-shadow-lit), var(--shadow-float);
+    animation: side-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+@keyframes side-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+.player-stage {
+  position: absolute;
+  inset: 0;
 }
 @media (prefers-reduced-motion: reduce) {
   .player,
@@ -5296,5 +5570,65 @@ li[data-state="done"] .first-step-n svg,
 @media (prefers-reduced-motion: reduce) {
   .toast6-undo::after {
     animation: none;
+  }
+}
+
+/* Settings on one page (a computer): each sub-page's groups under its name */
+.settings-section-title {
+  margin: 32px 16px 10px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.settings-section:first-of-type .settings-section-title {
+  margin-top: 12px;
+}
+.list-row[data-account] .btn-tonal {
+  margin-left: auto;
+  flex: none;
+}
+
+/* Holding a grid tile: the picture sinks to 96% before its menu rises */
+.tile-art {
+  transition: transform 120ms ease-out;
+}
+.feed-tile[data-held] .tile-art {
+  transform: scale(0.96);
+}
+.well-row[data-on] svg {
+  color: var(--color-heart);
+  fill: currentColor;
+}
+
+/* Under the pointer (DESIGN.md "On a computer"): a row gets the wash it has when pressed, a raised
+   control steps up one; gold and pictures don't change */
+@media (hover: hover) and (pointer: fine) {
+  button.list-row:hover,
+  a.list-row:hover,
+  label.list-row:hover,
+  .well-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .sheet-rows > .list-row:hover {
+    background: none;
+  }
+  .btn-tonal:not(:disabled):hover {
+    background: var(--color-raised-hi);
+  }
+  .toolbar-circle:hover {
+    background: var(--color-raised);
+  }
+  .tools .toolbar-circle:not([aria-pressed="true"]):hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .chip:not([data-on]):hover {
+    background: var(--color-raised);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-art {
+    transition: none;
   }
 }

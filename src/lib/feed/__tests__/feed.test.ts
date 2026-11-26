@@ -9,6 +9,7 @@ import {
   layoutGrid,
   tileAt,
   mediaHeight,
+  tallCap,
   visibleRange,
 } from "../layout";
 import {
@@ -35,6 +36,11 @@ describe("feed layout", () => {
     expect(mediaHeight(post(1000, 500), 343)).toBe(Math.round(327 / 2));
     expect(mediaHeight(post(500, 1000), 343)).toBe(654);
     expect(mediaHeight(post(100, 1000), 343)).toBe(654); // a 1:10 strip shows at 1:2
+    // on a computer a tall picture stops at the window less 160
+    expect(mediaHeight(post(500, 1000), 600, tallCap(true, 800))).toBe(640);
+    expect(mediaHeight(post(1000, 500), 600, tallCap(true, 800))).toBe(292); // (the card padding comes off the width)
+    expect(tallCap(true, 300)).toBe(240);
+    expect(tallCap(false, 800)).toBe(Infinity);
     expect(mediaHeight(post(0, 0), 343)).toBe(327); // unknown size: square
   });
 
@@ -62,7 +68,9 @@ describe("feed layout", () => {
     expect(g.pitch).toBeCloseTo(g.tile + 34);
     expect(g.total).toBeCloseTo(10 * g.pitch - 12);
     expect(tileAt(g, 4)).toEqual({ top: g.pitch, left: g.tile + 8, width: g.tile, height: g.cell });
-    expect(layoutGrid(30, 1100).cols).toBe(5);
+    // as many as fit at 176 or wider (DESIGN.md "On a computer")
+    expect(layoutGrid(30, 1100).cols).toBe(6);
+    expect(layoutGrid(30, 1000).cols).toBe(5);
     const [a, b] = gridRange(g, 0, g.pitch, 0);
     expect(a).toBe(0);
     expect(b).toBe(3);
