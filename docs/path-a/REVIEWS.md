@@ -116,3 +116,28 @@ Rendered at 1:1 with Playwright; screenshots in the session scratchpad (not comm
 | 13 | Mute control 32 hit, a span | Low | Fixed: 44-hit button. |
 | 14 | Artist actions leave dead space; badge duplicates subtitle; new dot colour-only | Low | Fixed: buttons flex:1; badge only when off Following; dot has a "New" label for assistive tech. |
 | 15 | "Explicit" on every post is noise; fav pill accessible name | Low | Fixed: rating shown only when it differs from the user's default; aria-label "Favorite, 1.2k". |
+
+## Design review round 2 — v5 mocks (2026-11-25)
+
+Fresh reviewer (general-purpose agent), rendered at 1:1 with Playwright. No P0. Contrast pairs all pass AA. Outcomes in v5.1
+(`mocks/direction-a-v5-1.html`).
+
+| # | Finding | Sev | Outcome (v5.1) |
+|---|---|---|---|
+| 1 | Post anatomy still reads Instagram-like | P1 | Fixed: posts sit in navy panels (owner's v3 pick, e621's post boxes); picture inset 8, radius 8; tags and fav on raised navy. |
+| 2 | Artist compact header not shown | P1 | Fixed: added "Artist page, scrolled" phone (glass bar: back, avatar, name, Following). |
+| 3 | Gold on ~6 things on Following | P1 | Fixed: avatar ring removed; "12 new" subtitle white. Gold at rest = "New" labels, Play, active tab. |
+| 4 | Neon tag colours compete with art | P1 | Kept: tag category colours are the owner's explicit e621 pick. Panels now separate them from the picture. Revisit if the owner agrees. |
+| 5 | Play pill over art at rest; peeks under tab bar | P1 | Partly: peek fixed (fades out while scrolling down). Floating position kept: UX v3.2 (signed off) puts it above the tab bar, and it is chrome like the bar. |
+| 6 | Stats/tags hit areas overlap | P1 | Fixed: 12 between the stats line and tags. |
+| 7 | Settings tiles off-palette; "S Q E" cryptic; empty lower half | P2 | Fixed: one navy tile style; "All ratings · 4 blacklisted tags"; Sign out group. |
+| 8 | Player gear = Settings icon; gold twice; chunky bar | P2 | Fixed: sliders icon; 4 px white progress; gold only on pause. |
+| 9 | Following pill in player not in UX | P2 | Fixed: removed; name + time instead. |
+| 10 | Sign-in: no key-privacy line, no close | P2 | Fixed: "Your key stays in this browser and is only sent to e621."; ✕ close. Error/disabled states go to the build (UX already specifies them). |
+| 11 | Chip copy ambiguous | P2 | Kept: "Media" and "Hide favorited" are UX v3.2 labels. |
+| 12 | Handle in artist colour; missing chips | P2 | Fixed: handle in link blue, mono; Media, Hide favorited, Sort, Date, Score chips. |
+| 13 | Trophy tiles look like buttons | P2 | Fixed: plain coloured icon + number. |
+| 14 | Suggested selected; banner repeats cards | P2 | Kept: the phone shows the Suggested state on purpose; the banner is UX's bulk-follow entry. |
+| 15 | Burst / caught-up not visible at rest | P2 | Fixed: added "Following, scrolled" phone. |
+
+Round-1 items the reviewer found not landed: #8 compact bar (now landed), #1 pill overlap (see #5), #2 gold count (see #3).

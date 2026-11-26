@@ -8,7 +8,7 @@ seed:03339dd96a2c6b22, assigned index 5 = "plush hang tag". Directions to show t
 owner-required baseline), (2) plush hang tag (assigned), (3) reference sheet (my pick). Then: owner picks
 -> telemetry ping (concept-seed --from <key> --scope direction --mode operate --kind <...>) -> direction
 contract in surface brief -> DESIGN.md -> 1:1 key-screen mocks -> 2 review rounds -> owner OK.
-Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). v3 → owner asked for iOS floating bar + AllTrails study (not copy). v4 published (copy: mocks/direction-a-v4.html). Owner said "resume the goal" (studies, not copies) and asked for a Duolingo study (research/duolingo-study.md, duolingo-research.md). Design review round 1 on v4 logged in REVIEWS.md. v5 published (Version 5; copy: mocks/direction-a-v5.html): all round-1 fixes, Duolingo lessons (pressable lip, rounded type, stat trophies, chunky progress, caught-up mark), and 6 screens incl. player, Settings, sign-in. Next: design review round 2 on v5 (fresh agent) -> fix -> owner sign-off -> direction contract (surface brief) -> DESIGN.md.
+Comparison published: https://claude.ai/artifact/1jmXk6LFCtH12zrHZ7pYUG (copy: docs/path-a/mocks/directions.html). Owner picked A (neutral ground around art). v2 published to same URL: 3 screens + closed size system (copy: docs/path-a/mocks/direction-a-v2.html). Telemetry sent (kind canon). v2 rejected ("Instagram clone"); v3 = e621 Hexagon panels, published to same URL (copy: docs/path-a/mocks/direction-a-v3.html). v3 → owner asked for iOS floating bar + AllTrails study (not copy). v4 published (copy: mocks/direction-a-v4.html). Owner said "resume the goal" (studies, not copies) and asked for a Duolingo study (research/duolingo-study.md, duolingo-research.md). Design review round 1 on v4 logged in REVIEWS.md. v5 published (Version 5; copy: mocks/direction-a-v5.html): all round-1 fixes, Duolingo lessons (pressable lip, rounded type, stat trophies, chunky progress, caught-up mark), and 6 screens incl. player, Settings, sign-in. Review round 2 logged; v5.1 published (Version 6; copy: mocks/direction-a-v5-1.html). Next: owner sign-off -> direction contract (surface brief) -> DESIGN.md -> Phase 4.
 Research done: research/spacing-hierarchy.md, indie-inspiration.md, component-libraries.md
 (deps: add sonner; Base UI Drawer or hand-rolled sheet; no Vaul; Motion optional).
 PRODUCT.md written (repo root).
@@ -24,6 +24,6 @@ PRODUCT.md written (repo root).
 - [ ] Phase 6: manual testing pass (phone + desktop)
 - [ ] Phase 7: final review, README, push, draft PR, local URL handed over
 ## Blocked on
-nothing (owner sign-off needed at end of Phase 3)
+owner sign-off on v5.1 (Phase 3 gate)
 ## Research notes (outside repo)
 /Users/oreo/Library/Application Support/Claude/side-session-notes/local_5efac6e1-a06e-48e6-abe6-3849cfda0671/path-a-*.md
