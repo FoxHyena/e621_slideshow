@@ -1223,3 +1223,52 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   storage keys, cache names, the service worker, the repo and the domain (renaming would lose saved
   data or links). The app mark and icon have no text in them.
 
+## 2026-11-26 — The goo row and the secret tab on a computer: options drawn, not picked
+
+- I asked: "do you want me to design those two" (the goo row's name on a computer, and the secret
+  tab on a computer, the last two on the builder's list). Owner's word: "Yes, show options".
+- **The goo row:** drawn as the last group of the Settings page on a computer, a plain row with
+  "Wipe clean" (mine). Two names behind a switch: "Goo" everywhere (my pick, renames the phone's row
+  too) or "Sidebar goo" / "Tab bar goo".
+- **The secret tab:** three options behind a switch, live in the desktop windows: Scroll (my pick,
+  the phone's mechanic stood on its side), Mark (hold the app mark 600 ms), None.
+- **Nothing here is picked or approved.**
+
+## 2026-11-26 — The secret tab on a computer: Scroll
+
+- I asked: "which secret do you want on a computer — Scroll, Mark, or None?" Owner's word: "Scroll".
+- **Picked:** the four tabs ride a rail; a wheel turn down (or focus past Settings) slides it up one
+  row and "Goo" comes in under Settings; pressing it throws ten drops into the pool. The switch and
+  the Mark and None options are removed from the mock.
+- Fixed while locking it, my mistake: the pool's swell could be drawn with a negative height on its
+  first frame (a console error, nothing visible). It is in commit ae6b77a; the fix is in the mock now.
+- Still open: the goo row's name on a computer.
+
+## 2026-11-26 — The app is named eLicks21; wordmark options drawn, not picked
+
+- Passed on by the "App architecture and feature roadmap" session, not typed to me by the owner: the
+  owner's words there were "Let's do eLicks21". I found the same words in that session's transcript.
+  Spelling: lowercase e, capital L.
+- Renamed in the mock wherever the app names itself: the sidebar's brand, the foot of Settings, the
+  label under the home-screen icon, the install sheet, "Add eLicks21 to your dock", "Adds an
+  eLicks21 button to e621". Added, mine: the wordmark under Goo on the landing card.
+- Not changed, because they do not name the app: the update toast ("New version ready"), the
+  Version row, the first run after sign-in, and the app icon. "Settings › Slideshow" keeps its name:
+  it is the feature's page.
+- **Later the same day, owner: "Don't add the drop to the i, just keep it text".** Drop is out of
+  the mock and the spec. Left to pick: Plain or Two-tone. What follows is the record before that.
+- **Proposed, not owner-approved:** three wordmarks behind a switch: Plain, Two-tone, Drop (my
+  pick). Nothing is picked.
+- DESIGN.md, PRODUCT.md and `.impeccable/design.json` now say eLicks21. The surface brief does not
+  name the product, so it is unchanged. `docs/path-a/GOAL.md` still says "e621 Slideshow" in its
+  title; I left it, since it is the record of the original goal.
+
+## 2026-11-26 — The wordmark: Two-tone
+
+- Owner, typed to me: "Don't add the drop to the i, just keep it text", then, asked Plain or
+  Two-tone: "Two-tone".
+- Locked: "e" and "21" in Link #B4C7D9, "Licks" in the text colour, Fredoka 600. Type only. The
+  switch and the other two options are out of the mock.
+- Still mine, not approved: where the wordmark sits, and that the landing card now carries it.
+- No wordmark file exists yet. The builder can set it as text with two spans; an SVG would need the
+  letters turned into outlines.
