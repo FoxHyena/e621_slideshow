@@ -14,7 +14,7 @@ export type Screen =
   | { kind: "tune" }
   | { kind: "search" }
   | { kind: "results"; params: string }
-  | { kind: "favorites" }
+  | { kind: "favorites"; params: string }
   | { kind: "artist"; name: string }
   | { kind: "root"; params: string }
   | { kind: "notFound"; path: string };
@@ -56,7 +56,7 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
       if (parts.length !== 1) return notFound(path);
       return new URLSearchParams(params).get("tags") !== null ? { kind: "results", params } : { kind: "search" };
     case "favorites":
-      return parts.length === 1 ? { kind: "favorites" } : notFound(path);
+      return parts.length === 1 ? { kind: "favorites", params } : notFound(path);
     case "artist": {
       if (parts.length !== 2) return notFound(path);
       let name: string;
@@ -87,7 +87,7 @@ export function screenPath(s: Screen): string {
     case "results":
       return `/search?${s.params}`;
     case "favorites":
-      return "/favorites";
+      return s.params ? `/favorites?${s.params}` : "/favorites";
     case "artist":
       return `/artist/${encodeURIComponent(s.name)}`;
     case "root":

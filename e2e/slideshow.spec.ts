@@ -1224,20 +1224,24 @@ test.describe("touch", () => {
 
 // ---- Share links ----------------------------------------------------------
 
-test("a share link plays straight away without touching saved settings", async ({ page }) => {
+test("a share link opens its Results and plays them, without touching saved settings", async ({ page }) => {
   const mock = await mockE621(page, defaultSpecs().map((s) => (s.id === 1150 ? { ...s, tags: ["badtag"] } : s)));
   const own = { tags: "my_search", blacklist: "badtag" };
   await seed(page, { search: own, playback: { intervalSec: 60 } });
   await page.goto("/?v=1&tags=wolf&style=kenburns&int=30&mute=0");
 
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(slide(page)).toBeVisible();
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1149"); // the visitor's own blacklist still applies
   expect(mock.searches[0].tags).toContain("wolf");
-  expect(await slideId(page)).toBe(1149); // the visitor's own blacklist still applies
-  await expect(page.getByTestId("toast")).toContainText("Videos start muted");
-  expect(new URL(page.url()).search).toBe("");
+  await expect(page.getByText("Videos start muted")).toBeVisible();
+  await expect(page).toHaveURL(/\/search\?v=1&tags=wolf&.*play=1149$/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!))).toEqual(own);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({ intervalSec: 60 });
+  // Back steps down: the link's Results, then Following.
+  await page.goBack();
+  await expect(page.getByTestId("player")).toHaveCount(0);
+  await expect(page.getByText("From a link")).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/following$/);
 });
 
 test("the share button copies a link to what's playing", async ({ page, context }) => {
@@ -1286,10 +1290,14 @@ test("with the account toggle on, a share link signs the visitor in for that tab
     localStorage.setItem("e6ss:v1:sections", JSON.stringify({ account: true }));
   });
   await p2.goto(url);
-  await expect(slide(p2)).toBeVisible();
+  await expect(p2.getByTestId("player")).toHaveAttribute("data-post-id", /\d+/);
   expect(mock2.searches[0].auth).toBe(`Basic ${Buffer.from("tester:goodkey").toString("base64")}`);
   expect(p2.url()).not.toContain("goodkey");
-  await p2.keyboard.press("s");
+  // Close the player, leave the link's Results: the home's settings show the borrowed sign-in.
+  await p2.keyboard.press("Escape");
+  await expect(p2.getByTestId("player")).toHaveCount(0);
+  await p2.keyboard.press("Escape");
+  await expect(p2).toHaveURL(/\/following$/);
   await expect(p2.getByTestId("signed-in")).toContainText("tester");
   await expect(p2.getByTestId("share-sign-in")).toHaveCount(0); // a borrowed key can't be re-shared
   expect(await p2.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:creds")!))).toEqual({ username: "mine", apiKey: "goodkey" });
@@ -1318,12 +1326,10 @@ test("a ?tags= link plays the e621 search as-is, with the visitor's playback and
   await seed(page, { search: own, playback: { intervalSec: 60, style: "kenburns" } });
   await page.goto("/?tags=wolf++solo");
 
-  await expect(page.getByTestId("settings-panel")).toHaveAttribute("data-open", "false");
-  await expect(slide(page)).toBeVisible();
-  expect(mock.searches[0].tags).toBe("wolf solo"); // no saved filters added
-  expect(await slideId(page)).toBe(1149); // saved blacklist still applies
-  expect(new URL(page.url()).search).toBe("");
-  // nothing saved: a reload is a plain visit with the visitor's own search
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1149"); // saved blacklist still applies
+  expect(mock.searches[0].tags).toBe("wolf solo"); // no saved filters or ratings added
+  await expect(page).toHaveURL(/\/search\?l=1&tags=wolf\+solo&play=1149$/);
+  // nothing saved: a later visit has the visitor's own search
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:search")!))).toEqual(own);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("e6ss:v1:playback")!))).toEqual({
     intervalSec: 60,

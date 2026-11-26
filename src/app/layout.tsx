@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: LINK_FRAGMENT_SCRIPT }} />
       </head>
-      <body className="h-full overflow-hidden bg-black text-neutral-100 antialiased">
+      <body className="min-h-full bg-black text-neutral-100 antialiased">
         <ClientShell />
         {children}
       </body>

@@ -153,3 +153,30 @@ Format: date — decision. Why. Rejected alternatives.
 - **Gestures:** a Back from the edge swipe or from the browser (popstate we didn't start) never animates;
   only our own push and Back buttons do. Tab switches cross-fade 120 ms.
 - **Desktop rail** is 88 px (16 + 56 + 16), not in the mock; logged as a spec value.
+
+## 2026-11-25 — Slice 2a build (Results, Favorites, Search, player, links)
+
+- **Slice 2 ships in two commits:** 2a (stores, document scroll, post card, windowed feed and grid, chips
+  and sheets, Search, Results, Favorites, interim Artist, the player as `?play=`, links) and 2b (For You,
+  Tune). Same tests and reviews per commit.
+- **Results' default filters come from the legacy saved search** (`prefs.search`: media, order, date, min
+  score) while the legacy panel exists. Slice 3 moves them to per-feed filters.
+- **Hide favorited** adds `-fav:<you>` to the e621 query (no client-side pass, so counts and paging stay right).
+- **The blacklist is not part of a feed's key.** A new line hides matching posts in place in every live
+  feed; taking a line away starts the feeds over (hidden posts can't come back otherwise).
+- **Share and launch links** become three entries at boot: Following, the link's Results (`v=1` or `l=1`
+  in its URL, so a reload keeps the link's settings for the visit), then the player from the first post.
+  The legacy home no longer reads links.
+- **Quick settings during a link visit save as yours** (no "this visit only" switch in the sheet).
+- **Saved searches** from Results keep tags, order and date; ratings are the account-wide ones (no
+  per-search ratings).
+- **Interim Artist screen** (`/artist/<name>`): the artist tag's posts with your ratings and blacklist, no
+  chips (the route has no filter params until the artist page, slice 6). Card names open it.
+- **Favorites "Sign in"** goes to the Following tab (the interim home has the sign-in form) until the
+  sign-in sheet lands in slice 7.
+- **Later slices:** pull to refresh, new-posts pill and Follow pills (3–4); signed-out ♥ → sign-in sheet (7).
+- **Toasts:** sonner, bottom centre above the tab bar, 6 s, dark theme.
+- **Budgets:** the card-count budget is covered by e2e (windowing); scroll fps, first content and JS size
+  are measured at the end of slice 2b.
+- **Request lanes** (ENGINEERING.md §3 priority and aging) are deferred to slice 3, when Following's
+  background reads first compete with a screen's feed. Slice 2 feeds fetch directly.

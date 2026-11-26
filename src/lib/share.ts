@@ -38,11 +38,16 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export function encodeShare(search: SearchSettings, playback: PlaybackSettings): string {
   const p = new URLSearchParams({ v: VERSION });
-  const s = search;
+  writeSearch(p, search);
+  writePlayback(p, playback);
+  return p.toString();
+}
+
+/** The search part of a share link, also the filters part of a Results URL. Only non-defaults. */
+export function writeSearch(p: URLSearchParams, s: SharedShow["search"]): void {
   const set = (key: string, value: string, fallback: string) => {
     if (value !== fallback) p.set(key, value);
   };
-
   set("tags", s.tags.trim(), "");
   set("r", RATINGS.filter((r) => s.ratings[r]).join(""), "sqe");
   const media = Object.entries(MEDIA).filter(([, m]) => s.media[m]).map(([k]) => k).join("");
@@ -61,7 +66,12 @@ export function encodeShare(search: SearchSettings, playback: PlaybackSettings):
       if (s.date.mode === "between") p.set("d2", s.date.date2);
     }
   }
+}
 
+export function writePlayback(p: URLSearchParams, playback: SharedShow["playback"]): void {
+  const set = (key: string, value: string, fallback: string) => {
+    if (value !== fallback) p.set(key, value);
+  };
   const d = DEFAULT_PLAYBACK;
   set("style", playback.style, d.style);
   set("int", String(playback.intervalSec), String(d.intervalSec));
@@ -71,7 +81,6 @@ export function encodeShare(search: SearchSettings, playback: PlaybackSettings):
   set("mute", playback.videoMuted ? "1" : "0", d.videoMuted ? "1" : "0");
   set("vmax", String(playback.videoMaxSec), String(d.videoMaxSec));
   set("loop", playback.loop ? "1" : "0", d.loop ? "1" : "0");
-  return p.toString();
 }
 
 function oneOf<T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
@@ -91,9 +100,13 @@ function bool(value: string | null, fallback: boolean): boolean {
 /** The show a link describes, or null if the URL isn't a share link. */
 export function decodeShare(params: URLSearchParams): SharedShow | null {
   if (params.get("v") !== VERSION) return null;
+  return { search: readSearch(params), playback: readPlayback(params) };
+}
+
+/** The search part of a share link or Results URL; anything missing or invalid takes the default. */
+export function readSearch(params: URLSearchParams): SharedShow["search"] {
   const get = (k: string) => params.get(k);
   const S = DEFAULT_SEARCH;
-  const P = DEFAULT_PLAYBACK;
 
   const r = get("r");
   const ratings = r === null || !/^[sqe]*$/.test(r) ? S.ratings : { s: r.includes("s"), q: r.includes("q"), e: r.includes("e") };
@@ -116,16 +129,20 @@ export function decodeShare(params: URLSearchParams): SharedShow | null {
       : S.date;
 
   return {
-    search: {
-      tags: (get("tags") ?? "").trim(),
-      ratings,
-      media,
-      order: oneOf(get("order"), Object.keys(ORDER_LABELS) as Order[], S.order),
-      seed: int(get("seed"), 1, 1_000_000, S.seed),
-      date,
-      minScore: int(get("min"), -1_000_000, 1_000_000, null),
-    },
-    playback: {
+    tags: (get("tags") ?? "").trim(),
+    ratings,
+    media,
+    order: oneOf(get("order"), Object.keys(ORDER_LABELS) as Order[], S.order),
+    seed: int(get("seed"), 1, 1_000_000, S.seed),
+    date,
+    minScore: int(get("min"), -1_000_000, 1_000_000, null),
+  };
+}
+
+export function readPlayback(params: URLSearchParams): SharedShow["playback"] {
+  const get = (k: string) => params.get(k);
+  const P = DEFAULT_PLAYBACK;
+  return {
       style: oneOf(get("style"), Object.keys(STYLE_LABELS) as SlideStyle[], P.style),
       intervalSec: int(get("int"), 1, 300, P.intervalSec),
       fit: oneOf(get("fit"), FITS, P.fit),
@@ -134,7 +151,6 @@ export function decodeShare(params: URLSearchParams): SharedShow | null {
       videoMuted: bool(get("mute"), P.videoMuted),
       videoMaxSec: int(get("vmax"), 0, 3600, P.videoMaxSec),
       loop: bool(get("loop"), P.loop),
-    },
   };
 }
 

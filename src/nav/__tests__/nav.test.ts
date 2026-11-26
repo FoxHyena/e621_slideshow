@@ -17,7 +17,8 @@ describe("routes", () => {
     expect(p("/settings/content").screen).toEqual({ kind: "settings", section: "content" });
     expect(p("/search").screen).toEqual({ kind: "search" });
     expect(p("/search?tags=wolf+solo&o=top").screen).toEqual({ kind: "results", params: "tags=wolf+solo&o=top" });
-    expect(p("/favorites").screen).toEqual({ kind: "favorites" });
+    expect(p("/favorites").screen).toEqual({ kind: "favorites", params: "" });
+    expect(p("/favorites?m=v&order=score").screen).toEqual({ kind: "favorites", params: "m=v&order=score" });
     expect(p("/artist/some%20one").screen).toEqual({ kind: "artist", name: "some one" });
     expect(p("/").screen).toEqual({ kind: "root", params: "" });
     expect(p("/?v=1&tags=fox").screen).toEqual({ kind: "root", params: "v=1&tags=fox" });
@@ -231,7 +232,7 @@ describe("nav", () => {
     const nav = createNav(w);
     nav.push({ screen: { kind: "search" }, play: null });
     const back = nav.back();
-    nav.push({ screen: { kind: "favorites" }, play: null });
+    nav.push({ screen: { kind: "favorites", params: "" }, play: null });
     await back;
     expect(path(w)).toBe("/following");
     expect(nav.store.get().index).toBe(0);
@@ -264,12 +265,37 @@ describe("nav", () => {
 describe("boot", () => {
   const urls = (w: ReturnType<typeof fakeWin>) => w.entries.map((e) => e.url);
 
-  it("sends / to /following, keeping a legacy link's params", async () => {
+  it("sends / to /following", async () => {
     const { boot, resetBoot } = await import("../boot");
     resetBoot();
-    const w = fakeWin("/?tags=wolf");
+    const w = fakeWin("/?utm=x");
     boot(createNav(w));
-    expect(urls(w)).toEqual(["/following?tags=wolf"]);
+    expect(urls(w)).toEqual(["/following"]);
+  });
+
+  it("opens a launch link as Following, its Results, then the player from the first post", async () => {
+    const { boot, resetBoot } = await import("../boot");
+    resetBoot();
+    const w = fakeWin("/?tags=wolf++solo");
+    const nav = createNav(w);
+    boot(nav);
+    expect(urls(w)).toEqual(["/following", "/search?l=1&tags=wolf+solo", "/search?l=1&tags=wolf+solo&play=first"]);
+    await nav.back();
+    expect(path(w)).toBe("/search?l=1&tags=wolf+solo");
+  });
+
+  it("keeps a share link's settings on its Results, for this visit only", async () => {
+    const { boot, resetBoot, linkResults } = await import("../boot");
+    resetBoot();
+    const w = fakeWin("/?v=1&tags=fox&r=s&order=score&int=9");
+    boot(createNav(w));
+    expect(w.entries[1].url).toBe("/search?v=1&tags=fox&order=score&r=s&int=9");
+    expect(linkResults("v=1&tags=fox&r=s&order=score&int=9")).toMatchObject({
+      tags: "fox",
+      filters: { order: "score" },
+      link: { kind: "share", ratings: { s: true, q: false, e: false }, playback: { intervalSec: 9 } },
+    });
+    expect(linkResults("q=1")).toBeNull();
   });
 
   it("puts /following under a pasted deep URL, and the screen under its player", async () => {

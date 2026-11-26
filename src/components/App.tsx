@@ -17,14 +17,13 @@ import {
 } from "lucide-react";
 import {
   addFavorite,
-  getCurrentUser,
   postPageUrl,
   removeFavorite,
   searchPosts,
   type Credentials,
 } from "@/lib/e621/client";
-import { allTags, mediaKind, type CurrentUser, type Post } from "@/lib/e621/types";
-import { DEFAULT_BLACKLIST, mergeBlacklists, parseBlacklist, syncAccountBlacklist } from "@/lib/query/blacklist";
+import { allTags, mediaKind, type Post } from "@/lib/e621/types";
+import { DEFAULT_BLACKLIST, mergeBlacklists, parseBlacklist } from "@/lib/query/blacklist";
 import {
   buildQuery,
   buildRecommendedQuery,
@@ -35,18 +34,11 @@ import {
 } from "@/lib/query/build";
 import { RecommendedQueue, REC_PAGE_BUDGET, REC_POPULAR_PAGES } from "@/lib/recommend/stream";
 import { searchPlan, topTags } from "@/lib/recommend/weights";
-import { DEFAULT_PLAYBACK, DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
-import {
-  decodeLaunch,
-  decodeShare,
-  decodeShareCreds,
-  encodeShare,
-  encodeShareCreds,
-  type SharedShow,
-} from "@/lib/share";
+import { DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
+import { encodeShare, encodeShareCreds } from "@/lib/share";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
 import { PostQueue, type SlideQueue } from "@/lib/slideshow/queue";
-import { pushHistory, storage, type HistoryEntry, type SavedSearch } from "@/lib/storage";
+import type { SavedSearch } from "@/lib/storage";
 import Feed from "./Feed";
 import Gallery from "./Gallery";
 import InfoOverlay from "./InfoOverlay";
@@ -55,6 +47,9 @@ import SettingsPanel from "./SettingsPanel";
 import Stage from "./Stage";
 import { useRecommendations } from "./useRecommendations";
 import { ownState } from "@/nav/history";
+import { getPrefs } from "@/state/prefs";
+import { getSession } from "@/state/session";
+import { useStore } from "@/state/store";
 
 const HIDE_CONTROLS_MS = 2500;
 /** A touch drag at least this far sideways changes the slide. */
@@ -103,23 +98,6 @@ interface ArtistFeed {
   needMore: () => void;
 }
 
-/** A share link's settings on top of the visitor's own blacklist and preload. Not saved. */
-function sharedSearch(shared: SharedShow): SearchSettings {
-  return { ...DEFAULT_SEARCH, ...shared.search, blacklist: storage.loadSearch().blacklist };
-}
-function sharedPlayback(shared: SharedShow): PlaybackSettings {
-  // Unmuted video can't autoplay without a click, so a link always starts muted.
-  return { ...DEFAULT_PLAYBACK, ...shared.playback, preloadCount: storage.loadPlayback().preloadCount, videoMuted: true };
-}
-
-/**
- * A launch link's tags with default filters, so the show matches the e621 search it came
- * from; only the visitor's blacklist carries over (e621 hides the same posts). Not saved.
- */
-function launchedSearch(tags: string): SearchSettings {
-  return { ...DEFAULT_SEARCH, tags, blacklist: storage.loadSearch().blacklist };
-}
-
 export default function App({
   onScreen = true,
   onImmersive,
@@ -129,39 +107,25 @@ export default function App({
   onImmersive?: (on: boolean) => void;
 } = {}) {
   // ---- persisted settings -------------------------------------------------
-  // A share link's settings apply for this visit; they're saved only once the visitor edits something.
-  const [shared] = useState(() => decodeShare(new URLSearchParams(location.search)));
-  // A launch link (the userscript's button) plays an e621 search with the visitor's own playback.
-  const [launch] = useState(() => (shared ? null : decodeLaunch(new URLSearchParams(location.search))));
-  const [search, setSearchState] = useState<SearchSettings>(() =>
-    shared ? sharedSearch(shared) : launch ? launchedSearch(launch) : storage.loadSearch(),
+  // Saved settings and the sign-in live in the shell's stores (src/state). Share and launch
+  // links open Results now (src/nav/boot.ts), so this home always shows your own settings.
+  const prefs = getPrefs();
+  const session = getSession();
+  const savedSearch = useStore(prefs.store, (p) => p.search);
+  const visitBlacklist = useStore(prefs.store, (p) => p.visitBlacklist);
+  const search = useMemo(
+    () => (visitBlacklist === null ? savedSearch : { ...savedSearch, blacklist: visitBlacklist }),
+    [savedSearch, visitBlacklist],
   );
-  const [playback, setPlaybackState] = useState<PlaybackSettings>(() =>
-    shared ? sharedPlayback(shared) : storage.loadPlayback(),
-  );
-  const [saved, setSaved] = useState<SavedSearch[]>(storage.loadSaved);
-  const [history, setHistory] = useState<HistoryEntry[]>(storage.loadHistory);
-  // A link's sign-in is used for this tab only: never saved, and it doesn't replace a saved key.
-  // The shell's head script moved the fragment into memory before hydration (src/app/link-fragment.ts).
-  const [linkCreds] = useState(() => decodeShareCreds(window.__e6link ?? location.hash));
-  const [linkSession, setLinkSession] = useState(linkCreds !== null);
-  const [creds, setCreds] = useState<Credentials | null>(() => linkCreds ?? storage.loadCredentials());
-  const [remember, setRemember] = useState(() => !linkCreds && storage.loadCredentials() !== null);
-  const [shareSignIn, setShareSignInState] = useState(storage.loadShareSignIn);
-  const setShareSignIn = (on: boolean) => {
-    setShareSignInState(on);
-    storage.saveShareSignIn(on);
-  };
-  const [user, setUser] = useState<CurrentUser | null>(null);
+  const playback = useStore(prefs.store, (p) => p.playback);
+  const saved = useStore(prefs.store, (p) => p.saved);
+  const history = useStore(prefs.store, (p) => p.history);
+  const { creds, user, remember, link: linkSession, shareSignIn } = useStore(session.store, (s) => s);
 
-  const setSearch = (s: SearchSettings) => {
-    setSearchState(s);
-    storage.saveSearch(s);
-  };
-  const setPlayback = (p: PlaybackSettings) => {
-    setPlaybackState(p);
-    storage.savePlayback(p);
-  };
+  // `search` shows a link visit's blacklist; an edit to anything else saves your own list, not that one.
+  const setSearch = (s: SearchSettings) =>
+    prefs.setSearch(visitBlacklist !== null && s.blacklist === visitBlacklist ? { ...s, blacklist: savedSearch.blacklist } : s);
+  const setPlayback = (p: PlaybackSettings) => prefs.setPlayback(p);
 
   const tagLimit = user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
 
@@ -251,62 +215,6 @@ export default function App({
     return buildQuery(fav ? { ...search, tags: favoritesTags(userName) } : search, tagLimit);
   }, [search, recTagNames, tagLimit, userName]);
 
-  /** Replace defaults/old account lines with the account's current blacklist. */
-  const syncBlacklist = (u: CurrentUser) => {
-    const account = u.blacklisted_tags ?? "";
-    // A link's sign-in applies the sharer's blacklist for this visit without saving it.
-    const keep = !linkSession;
-    setSearchState((prev) => {
-      const blacklist = syncAccountBlacklist(prev.blacklist, storage.loadAccountBlacklist(), account);
-      // Save only the blacklist: `prev` may be an unsaved share link's search.
-      if (keep) storage.saveSearch({ ...storage.loadSearch(), blacklist });
-      return { ...prev, blacklist };
-    });
-    if (keep) storage.saveAccountBlacklist(account);
-    return account.split("\n").filter((l) => l.trim()).length;
-  };
-
-  // ---- credentials: re-verify a remembered key on load --------------------
-  useEffect(() => {
-    if (!creds || user) return;
-    let cancelled = false;
-    getCurrentUser(creds)
-      .then((u) => {
-        if (cancelled || u.id === null) return;
-        setUser(u);
-        syncBlacklist(u);
-      })
-      .catch((e: Error) => {
-        if (!cancelled) showToast(`e621 sign-in failed: ${e.message}`);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // only on mount / when creds change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [creds]);
-
-  const signIn = async (c: Credentials, keep: boolean) => {
-    const u = await getCurrentUser(c);
-    if (u.id === null) throw new Error("e621 didn't accept that username and API key");
-    setLinkSession(false);
-    setCreds(c);
-    setUser(u);
-    syncBlacklist(u);
-    setRemember(keep);
-    storage.saveCredentials(keep ? c : null);
-  };
-
-  const signOut = () => {
-    setCreds(null);
-    setUser(null);
-    setRemember(false);
-    setShareSignIn(false);
-    // Leaving a link's sign-in keeps whatever key this browser had saved.
-    if (linkSession) setLinkSession(false);
-    else storage.saveCredentials(null);
-  };
-
   // ---- starting / applying ------------------------------------------------
   const startQueue = (s: SearchSettings) => {
     const b = buildFor(s);
@@ -339,11 +247,7 @@ export default function App({
     setTrail([]);
     setReady(null);
     void q.ensure(0);
-    if (s.source === "search") {
-      const h = pushHistory(history, s.tags, Date.now());
-      setHistory(h);
-      storage.saveHistory(h);
-    }
+    if (s.source === "search") prefs.addHistory(s.tags);
     return true;
   };
 
@@ -429,26 +333,6 @@ export default function App({
   // Starting a show that was waiting on the favorites is a reaction to the sync ending.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => onSynced(), [waiting, rec.syncing]);
-
-  // A share link plays straight away, then leaves the address bar so a reload is a plain visit.
-  const sharedStarted = useRef(false);
-  const onShared = useEffectEvent(() => {
-    // Strict Mode mounts twice in dev; a second start would orphan the first queue.
-    if (!(shared || launch || linkCreds) || sharedStarted.current) return;
-    sharedStarted.current = true;
-    // Also drops a sign-in fragment, so the key doesn't sit in the address bar or history.
-    // Keeps the entry's state: the shell's navigation key lives there (src/nav/history.ts).
-    window.history.replaceState(ownState(), "", location.pathname);
-    if (launch) {
-      apply(true);
-      return;
-    }
-    if (!shared) return;
-    if (apply(true) && shared.playback.videoMuted === false) showToast("Videos start muted: unmute in settings");
-  });
-  // Starting the show is the point of the link, so this one effect sets state on mount.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => onShared(), []);
 
   // The shell hides its tab bar while the show or a browse view fills the screen.
   const immersive = !panelOpen && queue !== null;
@@ -659,7 +543,7 @@ export default function App({
   const blacklistTag = (tag: string) => {
     if (parseBlacklist(search.blacklist).some((r) => r.line === tag)) return showToast(`${tag} is already blacklisted`);
     const blacklist = mergeBlacklists(search.blacklist, tag);
-    setSearch({ ...search, blacklist });
+    prefs.editBlacklist((b) => mergeBlacklists(b, tag));
     if (!active) return showToast(`Blacklisted ${tag}`);
     const before = active.queue.posts.length;
     const keep = current?.id;
@@ -873,26 +757,22 @@ export default function App({
       date: search.date,
       order: search.order,
     };
-    const list = [entry, ...saved];
-    setSaved(list);
-    storage.saveSaved(list);
+    prefs.setSaved([entry, ...saved]);
   };
   const loadSaved = (e: SavedSearch) =>
     setSearch({ ...search, source: "search", tags: e.tags, ratings: e.ratings, date: e.date, order: e.order });
   const deleteSaved = (id: string) => {
-    const list = saved.filter((s) => s.id !== id);
-    setSaved(list);
-    storage.saveSaved(list);
+    prefs.setSaved(saved.filter((s) => s.id !== id));
   };
   const importBlacklist = async () => {
     if (creds) {
-      const n = syncBlacklist(await getCurrentUser(creds));
+      const n = await session.importBlacklist();
       return `Synced ${n} rule${n === 1 ? "" : "s"} from your account.`;
     }
     const count = (t: string) => t.split("\n").filter((l) => l.trim()).length;
     const merged = mergeBlacklists(search.blacklist, DEFAULT_BLACKLIST);
     const added = count(merged) - count(search.blacklist);
-    setSearch({ ...search, blacklist: merged });
+    prefs.editBlacklist((b) => mergeBlacklists(b, DEFAULT_BLACKLIST));
     return added > 0 ? `Added ${added} rule${added === 1 ? "" : "s"}.` : "Nothing new to add.";
   };
 
@@ -1296,9 +1176,9 @@ export default function App({
         remember={remember}
         linkSession={linkSession}
         shareSignIn={shareSignIn}
-        setShareSignIn={setShareSignIn}
-        onSignIn={signIn}
-        onSignOut={signOut}
+        setShareSignIn={session.setShareSignIn}
+        onSignIn={session.signIn}
+        onSignOut={session.signOut}
         onImportBlacklist={importBlacklist}
         saved={saved}
         onSave={saveSearch}
@@ -1307,8 +1187,7 @@ export default function App({
         history={history}
         onLoadHistory={(tags) => setSearch({ ...search, source: "search", tags })}
         onClearHistory={() => {
-          setHistory([]);
-          storage.saveHistory([]);
+          prefs.clearHistory();
         }}
         stats={queue?.stats ?? null}
       />

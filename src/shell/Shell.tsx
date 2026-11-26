@@ -9,22 +9,35 @@ import { Activity, useCallback, useEffect, useLayoutEffect, useRef, useState } f
 import { boot } from "@/nav/boot";
 import { installEdgeSwipe } from "@/nav/edgeSwipe";
 import { focusScreen, restoreFocus, trackOpeners } from "@/nav/focus";
-import { getNav, type Entry, type NavState } from "@/nav/history";
-import { restoreOffset, saveOffset } from "@/nav/scroll";
+import { baseIndex, getNav, isOverlay, type Entry, type NavState } from "@/nav/history";
+import { lockScroll, restoreOffset, saveOffset, unlockScroll } from "@/nav/scroll";
 import { runTransition, type NavDirection } from "@/nav/transition";
 import { activeTab, screenKey, tab as tabRoute, tabRoot, TABS, type Tab } from "@/nav/routes";
 import { LegacyHome } from "./LegacyHome";
 import { NotFoundScreen, PlaceholderScreen } from "./screens";
 import { migrate } from "@/state/migrate";
+import { getSession } from "@/state/session";
+import { Toaster, toast } from "sonner";
+import { ScreenContext } from "./context";
 import { TabBar } from "./TabBar";
+import { ArtistScreen, FavoritesScreen, ResultsScreen } from "@/screens/FeedScreens";
+import { SearchScreen } from "@/screens/SearchScreen";
+import { Player } from "@/player/Player";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
 const rootOf = (e: Entry): Tab | null => tabRoot(e.route.screen) ?? (e.route.screen.kind === "root" ? "following" : null);
 
+/** The entry whose screen is on show (under any player or sheet). */
+const baseOf = (s: NavState): Entry => s.stack[baseIndex(s.stack, s.index)];
+/** Scroll offsets belong to a screen, not an entry: `replace` (a tab, a new filter) keeps the key. */
+const offsetKey = (e: Entry) => `${e.key}:${screenKey(e.route.screen)}`;
+const sameScreen = (a: Entry, b: Entry) => a.key === b.key && screenKey(a.route.screen) === screenKey(b.route.screen);
+
 function direction(prev: NavState, next: NavState): NavDirection {
-  const a = prev.stack[prev.index];
-  const b = next.stack[next.index];
-  if (a.key === b.key && screenKey(a.route.screen) === screenKey(b.route.screen)) return "none";
+  const a = baseOf(prev);
+  const b = baseOf(next);
+  // Opening or closing the player or a sheet: the overlay animates itself.
+  if (sameScreen(a, b)) return "none";
   if (rootOf(a) && rootOf(b)) return "tab";
   switch (next.cause) {
     case "push":
@@ -63,10 +76,10 @@ export default function Shell() {
     const unsub = nav.store.subscribe(() => {
       const next = nav.store.get();
       const dir = booting ? "none" : direction(prev, next);
-      const left = prev.stack[prev.index];
+      const left = baseOf(prev);
       const box = screenOf(left);
       // A screen already hidden by an earlier, uncommitted move reads 0: keep its last offset.
-      if (box && box.getClientRects().length > 0) saveOffset(left.key, box);
+      if (!sameScreen(left, baseOf(next)) && box && box.getClientRects().length > 0) saveOffset(offsetKey(left));
       prev = next;
       // Commit the latest state, not `next`: a transition's callback runs later, and a quicker
       // move (a second Forward) may already have landed.
@@ -74,6 +87,9 @@ export default function Shell() {
     });
     const before = nav.store.get();
     boot(nav);
+    getSession()
+      .verify()
+      .catch((e: Error) => toast.error(`e621 sign-in failed: ${e.message}`));
     booting = false;
     if (nav.store.get() !== before) quiet.current = true;
     return () => {
@@ -89,7 +105,7 @@ export default function Shell() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented || isTyping(e.target)) return;
       const cur = nav.current();
-      if (rootOf(cur) === "following" && !cur.route.play) return;
+      if (rootOf(cur) === "following" && !isOverlay(cur)) return;
       // An open dialog handles Esc itself (closed ones stay in the DOM, inert or hidden).
       const open = [...document.querySelectorAll<HTMLElement>("[role=dialog][aria-modal=true]")].some(
         (d) => !d.closest("[inert],[aria-hidden=true],[hidden]") && d.getClientRects().length > 0,
@@ -101,7 +117,10 @@ export default function Shell() {
     return () => window.removeEventListener("keydown", onKey);
   }, [nav]);
 
-  const cur = shown.stack[shown.index];
+  const top = shown.stack[shown.index];
+  const cur = baseOf(shown);
+  // An overlay with nothing under it (a reload) shows its own screen too.
+  const overlay = isOverlay(top) ? top : null;
   const curRoot = rootOf(cur);
   const lit = curRoot ?? activeTab(cur.route.screen, cur.from);
 
@@ -109,8 +128,10 @@ export default function Shell() {
   const [visited, setVisited] = useState<ReadonlySet<Tab>>(() => new Set(curRoot ? [curRoot] : []));
   if (curRoot && !visited.has(curRoot)) setVisited(new Set(visited).add(curRoot));
 
-  // Pushed screens below and at the current entry; popped ones unmount.
-  const pushed = shown.stack.slice(0, shown.index + 1).filter((e) => !rootOf(e));
+  // Pushed screens below and at the current entry; popped ones unmount. Overlays aren't screens.
+  const pushed = shown.stack
+    .slice(0, shown.index + 1)
+    .filter((e, i) => !rootOf(e) && baseIndex(shown.stack, i) === i);
 
   // Focus and scroll after the new screen is on screen.
   const last = useRef(shown);
@@ -118,16 +139,24 @@ export default function Shell() {
     const prev = last.current;
     last.current = shown;
     if (prev === shown) return;
-    const from = prev.stack[prev.index];
-    const to = shown.stack[shown.index];
-    if (from.key === to.key && screenKey(from.route.screen) === screenKey(to.route.screen)) return;
-    if (quiet.current) {
-      // Boot's own rewrite of a pasted URL: leave focus where the page load put it.
-      quiet.current = false;
+    const from = baseOf(prev);
+    const to = baseOf(shown);
+    const left = prev.stack[prev.index];
+    // Boot's own rewrite of a pasted URL: leave focus where the page load put it.
+    const wasQuiet = quiet.current;
+    quiet.current = false;
+    if (sameScreen(from, to)) {
+      // An overlay closed (a sheet over the player included): focus goes back to what opened it.
+      const now = shown.stack[shown.index];
+      if (isOverlay(left) && left.key !== now.key && (shown.cause === "back" || shown.cause === "pop")) {
+        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=player]") : screenOf(to);
+        restoreFocus(left.key, box);
+      }
       return;
     }
+    if (wasQuiet) return;
     const el = screenOf(to);
-    restoreOffset(to.key, el);
+    restoreOffset(offsetKey(to));
     if (shown.cause === "push") focusScreen(el);
     else if (shown.cause === "back" || shown.cause === "pop") restoreFocus(from.key, el);
   }, [shown]);
@@ -144,10 +173,24 @@ export default function Shell() {
   }, []);
 
   const onTab = async (t: Tab) => {
-    if ((await nav.goTab(t)) === "top") screenOf(nav.current())?.scrollTo({ top: 0, behavior: "smooth" });
+    if ((await nav.goTab(t)) === "top") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const barHidden = immersive && curRoot === "following";
+  // The player and sheets hold the page still underneath them.
+  const held = overlay !== null;
+  useLayoutEffect(() => {
+    if (!held) return;
+    lockScroll();
+    return unlockScroll;
+  }, [held]);
+
+  const barHidden = (immersive && curRoot === "following") || overlay?.route.play != null;
+  const ctx = (e: Entry, visible: boolean) => ({
+    entry: e,
+    visible,
+    sheet: visible ? (overlay?.sheet ?? null) : null,
+    play: visible ? (overlay?.route.play ?? null) : null,
+  });
 
   return (
     <div className="shell" data-immersive={barHidden || undefined}>
@@ -177,14 +220,33 @@ export default function Shell() {
       {pushed.map((e) => (
         <Activity key={`${e.key}:${screenKey(e.route.screen)}`} mode={e === cur ? "visible" : "hidden"}>
           <section ref={ref} data-id={e.key} className="screen" data-screen={e.route.screen.kind}>
-            {e.route.screen.kind === "notFound" ? (
-              <NotFoundScreen path={e.route.screen.path} onHome={() => void nav.goTab("following")} />
-            ) : (
-              <PlaceholderScreen screen={e.route.screen} onBack={() => void nav.back()} onSection={() => {}} />
-            )}
+            <ScreenContext value={ctx(e, e === cur)}>
+              <PushedScreen e={e} />
+            </ScreenContext>
           </section>
         </Activity>
       ))}
+      {overlay?.route.play != null && <Player key={cur.key} base={cur} top={overlay} />}
+      <Toaster position="bottom-center" theme="dark" duration={6000} offset={{ bottom: "calc(var(--bar-top) + 12px)" }} mobileOffset={{ bottom: "calc(var(--bar-top) + 12px)" }} />
     </div>
   );
+}
+
+function PushedScreen({ e }: { e: Entry }) {
+  const nav = getNav();
+  const screen = e.route.screen;
+  switch (screen.kind) {
+    case "notFound":
+      return <NotFoundScreen path={screen.path} onHome={() => void nav.goTab("following")} />;
+    case "search":
+      return <SearchScreen />;
+    case "results":
+      return <ResultsScreen params={screen.params} />;
+    case "favorites":
+      return <FavoritesScreen params={screen.params} />;
+    case "artist":
+      return <ArtistScreen name={screen.name} />;
+    default:
+      return <PlaceholderScreen screen={screen} onBack={() => void nav.back()} onSection={() => {}} />;
+  }
 }

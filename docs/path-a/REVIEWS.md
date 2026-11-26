@@ -208,3 +208,43 @@ after the fixes: typecheck, lint, 174 unit tests, 86 e2e.
 | 10 | Legacy artist-feed entries share the `/following` entry's key | Low | Deferred: reachable only with the bar hidden; artist feeds move to `nav.push` in slice 2 |
 | 11 | `.legacy-home`'s containing block offsets viewport-positioned overlays at ≥ 900 px | Low | Deferred: those overlays only show in immersive mode, where `left: 0`; recheck in slice 2 |
 | 12 | The first-entry stamp ran during render | Low | Stamp moved into boot (layout effect) |
+
+## Slice 2a review (2026-11-25): Results, Favorites, Search, player, links
+
+**code-review skill (high), 8 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | A filter or tag change kept the old scroll offset, so the new results opened mid-list | High | `replaceScreen` lands at the top; shell offsets keyed by entry + screen (a `replace` keeps the entry key); e2e |
+| 2 | Copy share link ran after `await back()`, outside the tap's user gesture (Safari blocks it); the legacy prompt fallback was gone | High | Copy first, then close; `copyText` falls back to `window.prompt` |
+| 3 | Favorite overlay survived a sign-out or account switch | Med | `favs.reset()` on a creds change; in-flight requests from the old account change nothing; unit test |
+| 4 | A launch-link Results shared your saved ratings, not the every-rating view it showed | Low | Share uses all ratings for `l=1` |
+| 5 | A dropped push left "open paused" set for the next player | Low | ▶ and Play from this post reset it |
+| 6 | The saved place was written to localStorage every scroll frame | Low | Written after 250 ms of rest, and on pagehide/unmount |
+| 7 | Close-reveal fallback assumed newest-first order | Low | Falls back only on newest-first lists |
+| 8 | Sheet sprang back up before a swipe-down dismiss | Low | Stays down while Back lands |
+
+**Fresh reviewer, 15 findings: 13 fixed, 2 deferred** (4 overlapped the list above)
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The player jumped to the first post when its post left the queue (failed load, blacklist, Undo) | High | Remembers its index; a vanished post moves to the one that took its place, no paging or toast |
+| 2 | An evicted feed stranded the player on an endless loader (bindings held keys) | High | Bindings hold the feed object; capped at 64 |
+| 3 | A link visit's (sharer's) blacklist was saved over yours on any edit; UX §2 says unsaved | High | `prefs.editBlacklist` writes your list and the visit's separately; `setSearch` keeps the visit unless the blacklist itself was edited; legacy setters follow; unit test |
+| 4 | Favorites overlay across accounts | Med | Same fix as code-review #3 |
+| 5 | Offsets leaked between screens that `replace` each other | Med | Same fix as code-review #1 |
+| 6 | Closing a sheet over the player dropped focus to `body`; Esc did nothing with focus outside the sheet | Med | Focus returns to the opener inside the player; the sheet listens for Esc on `window` |
+| 7 | A reload on a sheet entry could lock the page under no dialog | Med | Boot closes a sheet left open by a reload |
+| 8 | Blacklisting posts above the view shifted the feed under the finger | Med | The first card in view keeps its place across removals and width changes |
+| 9 | Favorites never refreshed after a change elsewhere | Med | Re-read on return when favorites changed; a removal stays (dimmed) while you're on it |
+| 10 | Editing a link's Results kept the link's ratings and chip; edits skipped Recent | Low | A new search from Results drops the link marker and adds to Recent; adding a tag already there is ignored |
+| 11 | Custom score accepted an empty field as 0 | Low | Done needs a number |
+| 12 | A rejected saved key was silent; a link sign-out cleared your saved share opt-in | Low | Verify rejects (shell toasts); link sign-out leaves your settings |
+| 13 | A card windowed out within 200 ms of a tap still opened the player; open-paused leak | Low | Timer cleared on unmount; leak as code-review #5 |
+| 14 | Anchor writes per frame | Low | Same fix as code-review #6 |
+| 15 | Body lock hid the desktop scrollbar (feed re-laid out); 422 might also mean "favorite limit" | Low | `scrollbar-gutter: stable`. Deferred: 422 meaning, recheck against e621ng when signed-in testing is possible |
+
+Also deferred (spec gaps the reviewer listed, owned by later slices): a signed-out ♥ opens the sign-in sheet
+(slice 7, today a toast); the "+N" artists picker (slice 6); pull to refresh and the new-posts pill (slice 3).
+Slice 1 reviewer #10 (legacy artist feeds share an entry key) and #11 (`.legacy-home` containing block)
+stay deferred to slice 3, which deletes the legacy home.

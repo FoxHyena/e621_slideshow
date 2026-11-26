@@ -16,7 +16,7 @@ export const SECTION_LABEL: Record<SettingsSection, string> = {
   app: "App",
 };
 
-function Frame({ title, onBack, children }: { title: string; onBack?: () => void; children?: ReactNode }) {
+export function Frame({ title, onBack, children }: { title: string; onBack?: () => void; children?: ReactNode }) {
   return (
     <div className="screen-frame">
       <div className="screen-toolbar">

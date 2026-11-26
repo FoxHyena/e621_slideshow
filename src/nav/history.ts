@@ -6,7 +6,17 @@
  * store, never from usePathname, and nothing here triggers a Next navigation.
  */
 import { createStore, type Store } from "@/state/store";
-import { activeTab, parentOf, parseRoute, routeUrl, tab as tabRoute, tabRoot, type Route, type Tab } from "./routes";
+import {
+  activeTab,
+  parentOf,
+  parseRoute,
+  routeUrl,
+  screenKey,
+  tab as tabRoute,
+  tabRoot,
+  type Route,
+  type Tab,
+} from "./routes";
 
 export interface EntryState {
   /** stable id of this history entry, for keeping its screen and its opener */
@@ -15,6 +25,8 @@ export interface EntryState {
   depth: number;
   /** the tab a pushed screen was opened from */
   from: Tab | null;
+  /** a sheet open over the screen: same URL, its own entry, so Back closes it */
+  sheet: string | null;
 }
 
 export interface Entry extends EntryState {
@@ -47,7 +59,12 @@ const newKey = () => `${Date.now().toString(36)}-${(++keySeq).toString(36)}`;
 function readE6(state: unknown): EntryState | null {
   const e6 = (state as { e6?: unknown } | null)?.e6 as Partial<EntryState> | undefined;
   if (!e6 || typeof e6.key !== "string" || typeof e6.depth !== "number") return null;
-  return { key: e6.key, depth: e6.depth, from: (e6.from as Tab | null) ?? null };
+  return {
+    key: e6.key,
+    depth: e6.depth,
+    from: (e6.from as Tab | null) ?? null,
+    sheet: typeof e6.sheet === "string" ? e6.sheet : null,
+  };
 }
 
 /**
@@ -63,14 +80,32 @@ export function ownState(state: unknown = history.state): Record<string, unknown
   return rest;
 }
 
+/** The player and sheets sit over a screen instead of replacing it. */
+export const isOverlay = (e: Entry): boolean => e.route.play !== null || e.sheet !== null;
+
+/**
+ * The entry whose screen shows under stack[i]: itself, or for an overlay the nearest entry below
+ * it for the same screen with no overlay. An overlay with nothing under it (a reload) shows its own.
+ */
+export function baseIndex(stack: readonly Entry[], i: number): number {
+  if (!isOverlay(stack[i])) return i;
+  const key = screenKey(stack[i].route.screen);
+  for (let j = i - 1; j >= 0; j--) {
+    if (screenKey(stack[j].route.screen) !== key) break;
+    if (!isOverlay(stack[j])) return j;
+  }
+  return i;
+}
+
 export interface Nav {
   store: Store<NavState>;
   current(): Entry;
   /** true when the current entry has no e6 state, i.e. a fresh load: boot stamps and may rewrite history */
   fresh: boolean;
   push(route: Route, opts?: { from?: Tab | null }): void;
-  /** `legacyParams`: slice 1 only, a query the legacy home still reads (share and launch links) */
-  replace(route: Route, opts?: { from?: Tab | null; legacyParams?: string }): void;
+  /** Open a sheet over the current screen: a same-URL entry, so Back (or a swipe) closes it. */
+  openSheet(name: string): void;
+  replace(route: Route, opts?: { from?: Tab | null }): void;
   /** UX §3 helper: history.back() if there's an in-app entry below, else replace with the parent */
   back(opts?: { gesture?: boolean }): Promise<void>;
   /** tab bar tap; resolves to "top" when it was the current tab's root (caller scrolls to top) */
@@ -82,7 +117,9 @@ export function createNav(win: Win): Nav {
   const here = (): Route => parseRoute(win.location.pathname, win.location.search);
   const existing = readE6(win.history.state);
   const fresh = existing === null;
-  const first: Entry = existing ? { ...existing, route: here() } : { key: newKey(), depth: 0, from: null, route: here() };
+  const first: Entry = existing
+    ? { ...existing, route: here() }
+    : { key: newKey(), depth: 0, from: null, sheet: null, route: here() };
   // A fresh entry is stamped by boot (a layout effect): writing here would run during render.
 
   const store = createStore<NavState>({ stack: [first], index: 0, cause: "init" });
@@ -91,11 +128,12 @@ export function createNav(win: Win): Nav {
     return s.stack[s.index];
   };
 
-  function write(kind: "push" | "replace", e: Entry, legacyParams?: string) {
+  function write(kind: "push" | "replace", e: Entry) {
     const prev = ownState(win.history.state);
     // Keep keys other code put on this entry (the legacy app's) when replacing; Next adds its own.
-    const data = kind === "replace" ? { ...prev, e6: { key: e.key, depth: e.depth, from: e.from } } : { e6: { key: e.key, depth: e.depth, from: e.from } };
-    const url = routeUrl(e.route) + (legacyParams ? `?${legacyParams}` : "");
+    const e6 = { key: e.key, depth: e.depth, from: e.from, ...(e.sheet ? { sheet: e.sheet } : {}) };
+    const data = kind === "replace" ? { ...prev, e6 } : { e6 };
+    const url = routeUrl(e.route);
     if (kind === "push") win.history.pushState(data, "", url);
     else win.history.replaceState(data, "", url);
   }
@@ -136,7 +174,7 @@ export function createNav(win: Win): Nav {
       }
     } else {
       // An entry nobody stamped (another document's): treat it as a root and stamp it.
-      const e: Entry = { key: newKey(), depth: 0, from: null, route };
+      const e: Entry = { key: newKey(), depth: 0, from: null, sheet: null, route };
       write("replace", e);
       store.set({ stack: [e], index: 0, cause });
     }
@@ -149,6 +187,12 @@ export function createNav(win: Win): Nav {
   win.addEventListener("pageshow", onPop);
   if (win.history.scrollRestoration !== undefined) win.history.scrollRestoration = "manual";
 
+  function add(e: Entry) {
+    write("push", e);
+    const { stack, index } = store.get();
+    store.set({ stack: [...stack.slice(0, index + 1), e], index: index + 1, cause: "push" });
+  }
+
   const nav: Nav = {
     store,
     current,
@@ -158,18 +202,21 @@ export function createNav(win: Win): Nav {
       if (pending) return;
       const cur = current();
       // A double tap, or Search while on Search: one entry, not two.
-      if (routeUrl(route) === routeUrl(cur.route)) return;
+      if (routeUrl(route) === routeUrl(cur.route) && !cur.sheet) return;
       const from = opts && opts.from !== undefined ? opts.from : (tabRoot(cur.route.screen) ?? cur.from);
-      const e: Entry = { key: newKey(), depth: cur.depth + 1, from, route };
-      write("push", e);
-      const { stack, index } = store.get();
-      store.set({ stack: [...stack.slice(0, index + 1), e], index: index + 1, cause: "push" });
+      add({ key: newKey(), depth: cur.depth + 1, from, sheet: null, route });
+    },
+    openSheet(name) {
+      if (pending) return;
+      const cur = current();
+      if (cur.sheet === name) return;
+      add({ key: newKey(), depth: cur.depth + 1, from: cur.from, sheet: name, route: cur.route });
     },
     replace(route, opts) {
       if (pending) return;
       const cur = current();
-      const e: Entry = { ...cur, route, from: opts?.from !== undefined ? opts.from : cur.from };
-      write("replace", e, opts?.legacyParams);
+      const e: Entry = { ...cur, route, from: opts?.from !== undefined ? opts.from : cur.from, sheet: null };
+      write("replace", e);
       // Entries above stay: replaceState leaves the browser's Forward entries in place.
       const { stack, index } = store.get();
       const next = stack.slice();
@@ -210,11 +257,11 @@ export function createNav(win: Win): Nav {
   async function goTabNow(t: Tab): Promise<"top" | "moved"> {
     const start = current();
     const startTab = activeTab(start.route.screen, start.from);
-    if (startTab === t && tabRoot(start.route.screen) === t && !start.route.play) return "top";
+    if (startTab === t && tabRoot(start.route.screen) === t && !isOverlay(start)) return "top";
     // Pop pushed screens one at a time, each awaited, so nothing races the next write.
     for (let guard = 0; guard < 50; guard++) {
       const c = current();
-      if (tabRoot(c.route.screen) && !c.route.play) break;
+      if (tabRoot(c.route.screen) && !isOverlay(c)) break;
       const before = c.key;
       if (c.depth === 0) {
         nav.replace(parentOf(c.route, c.from) ?? tabRoute("following"), { from: null });
