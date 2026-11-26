@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Fredoka } from "next/font/google";
 import ClientShell from "@/shell/ClientShell";
 import { LINK_FRAGMENT_SCRIPT } from "./link-fragment";
 import "./globals.css";
 
-// The rounded voice off Apple (DESIGN.md Typography); downloaded at build time and served
-// from our own origin, so pages make no Google request.
-const nunito = Nunito({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-nunito", display: "swap" });
+// The rounded voice (DESIGN.md Typography): Fredoka 600 for titles and names, 500 for small labels.
+// Downloaded at build time and served from our own origin, so pages make no Google request.
+const fredoka = Fredoka({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-fredoka", display: "swap" });
 
 export const metadata: Metadata = {
   title: "e621 Slideshow",
@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`h-full ${nunito.variable}`}>
+    <html lang="en" className={`h-full ${fredoka.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: LINK_FRAGMENT_SCRIPT }} />
       </head>

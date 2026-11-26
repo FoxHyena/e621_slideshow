@@ -214,6 +214,7 @@ export default function Shell() {
 
   return (
     <div className="shell" data-immersive={barHidden || undefined}>
+      {!barHidden && <div className="bottom-scrim" aria-hidden />}
       <TabBar
         current={lit}
         hidden={barHidden}
@@ -265,7 +266,7 @@ export default function Shell() {
           <Player key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
-      <Toaster position="bottom-center" theme="dark" duration={6000} offset={{ bottom: "calc(var(--bar-top) + 12px)" }} mobileOffset={{ bottom: "calc(var(--bar-top) + 12px)" }} />
+      <Toaster position="bottom-center" theme="dark" duration={6000} offset={{ bottom: "calc(var(--stack-top) + 12px)" }} mobileOffset={{ bottom: "calc(var(--stack-top) + 12px)" }} />
     </div>
   );
 }

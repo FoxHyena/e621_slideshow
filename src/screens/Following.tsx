@@ -27,7 +27,7 @@ import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { shallow, useStore } from "@/state/store";
 import type { TagAction } from "@/components/TagActions";
-import Avatar from "@/components/Avatar";
+import { AppMark } from "@/components/Avatar";
 import { blacklistLine, openResults, openSignIn } from "./actions";
 import { FeedBody, GridToggle, PlayFab, PostMenu, postSheet, useFeed } from "./FeedScreens";
 
@@ -111,26 +111,27 @@ export function FollowingScreen() {
 
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
-      <div className="screen-toolbar">
-        <div className="flex-1" />
-        <button
-          type="button"
-          className="toolbar-circle"
-          aria-label="Search"
-          onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "following" })}
-        >
-          <Search aria-hidden />
-        </button>
-        <GridToggle grid={grid} setGrid={setGrid} />
-        {feedReady && (
-          <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
-            <MoreHorizontal aria-hidden />
+      <div className="title-row">
+        <h1 tabIndex={-1} className="screen-title">
+          Following
+        </h1>
+        <div className="tools">
+          <button
+            type="button"
+            className="toolbar-circle"
+            aria-label="Search"
+            onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "following" })}
+          >
+            <Search aria-hidden />
           </button>
-        )}
+          <GridToggle grid={grid} setGrid={setGrid} />
+          {feedReady && (
+            <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
+              <MoreHorizontal aria-hidden />
+            </button>
+          )}
+        </div>
       </div>
-      <h1 tabIndex={-1} className="screen-title">
-        Following
-      </h1>
       {!session.ready || (signedIn && (fs.status === "idle" || fs.status === "loading")) ? (
         <div className="feed-list" data-testid="feed-waiting" />
       ) : !signedIn ? (
@@ -455,7 +456,7 @@ function Landing({ grid }: { grid: boolean }) {
   return (
     <>
       <div className="feed-empty following-landing" data-testid="following-signed-out">
-        <Avatar seed="e621-slideshow" className="following-mascot" />
+        <AppMark seed="e621-slideshow" className="following-mascot" />
         <p className="feed-empty-title">Follow the artists you love and see their new posts first.</p>
         <button type="button" className="btn-gold" onClick={openSignIn} data-testid="following-sign-in">
           Sign in with e621

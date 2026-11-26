@@ -247,3 +247,18 @@ export function pushHistory(history: HistoryEntry[], tags: string, now: number):
   if (!t) return history;
   return [{ tags: t, at: now }, ...history.filter((h) => h.tags !== t)].slice(0, HISTORY_MAX);
 }
+
+// ---- tab bar goo ------------------------------------------------------------------------------
+
+/**
+ * How many favourites of goo are on the tab bar (DESIGN.md "Tab bar goo"). A device toy, not
+ * account data: it isn't per user and survives sign-out.
+ */
+export function loadGoo(): number {
+  const n = read<unknown>("goo", 0);
+  return typeof n === "number" && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+export function saveGoo(n: number): void {
+  write("goo", n > 0 ? n : null);
+}

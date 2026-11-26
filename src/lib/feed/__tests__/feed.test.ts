@@ -31,17 +31,17 @@ describe("feed layout", () => {
   });
 
   it("keeps each picture's own aspect, capping anything taller than 1:2", () => {
-    expect(mediaHeight(post(1000, 500), 343)).toBe(Math.round(319 / 2));
-    expect(mediaHeight(post(500, 1000), 343)).toBe(638);
-    expect(mediaHeight(post(100, 1000), 343)).toBe(638); // a 1:10 strip shows at 1:2
-    expect(mediaHeight(post(0, 0), 343)).toBe(319); // unknown size: square
+    expect(mediaHeight(post(1000, 500), 343)).toBe(Math.round(327 / 2));
+    expect(mediaHeight(post(500, 1000), 343)).toBe(654);
+    expect(mediaHeight(post(100, 1000), 343)).toBe(654); // a 1:10 strip shows at 1:2
+    expect(mediaHeight(post(0, 0), 343)).toBe(327); // unknown size: square
   });
 
   it("adds the panel's fixed rows around the picture", () => {
-    expect(cardHeight(post(1, 1), 343)).toBe(44 + 319 + 12 + 32 + 12 + 32 + 12);
+    expect(cardHeight(post(1, 1), 343)).toBe(8 + 36 + 8 + 327 + 36 + 8 + 39 + 8);
   });
 
-  it("stacks cards with the 24 gap and finds the ones in view", () => {
+  it("stacks cards with the 16 gap and finds the ones in view", () => {
     const l = layoutFeed([post(1, 1), post(2, 1), post(1, 1)], 343);
     expect(l.tops[1]).toBe(l.heights[0] + CARD.gap);
     expect(l.total).toBe(l.tops[2] + l.heights[2]);

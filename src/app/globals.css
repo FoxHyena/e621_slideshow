@@ -8,11 +8,16 @@
   --color-panel-2: #16243a;
   --color-line: #263a57;
 
-  /* DESIGN.md tokens (Tailwind mapping section). */
+  /* DESIGN.md v6 tokens (Tailwind mapping section). Three materials: raised (lit + lip), panel
+     (lit top, dark bottom), sunk (wells). No hairline outlines on panels. */
   --color-ground: #020f23;
+  --color-well: #0a1d3b;
   --color-panel: #152f56;
+  --color-bar: #1a3660;
   --color-raised: #1f3c67;
-  --color-raised-hi: #2a4b7c;
+  --color-raised-hi: #2b4d80;
+  --color-outline: rgba(180, 199, 217, 0.22);
+  /* The quiet outline, kept under its old name for the screens still on token swaps. */
   --color-hairline: rgba(180, 199, 217, 0.14);
   --color-fg: #ffffff;
   --color-link: #b4c7d9;
@@ -20,84 +25,113 @@
   --color-gold: #e8c446;
   --color-on-gold: #020f23;
   --color-lip-gold: #a8871f;
-  --color-lip-navy: #0b1f3e;
+  --color-lip-navy: #0a1b38;
+  --color-fav-on: #553659;
+  --color-lip-fav: #291a35;
   --color-glass: rgba(21, 47, 86, 0.88);
   --color-glass-base: #0b1f3e;
   --color-glass-art: rgba(2, 15, 35, 0.55);
   --color-score: #5ec06a;
   --color-heart: #ff8a95;
   --color-danger: #ed9393;
+  --color-rating-q: #e4d24f;
+  --color-goo: #ffffff;
+  --color-goo-aged: #f3e6a8;
+  --color-goo-ink: #35527f;
   --color-tag-artist: #f2ac08;
   --color-tag-character: #00c900;
   --color-tag-species: #f3946b;
   --color-tag-general: #b4c7d9;
   --color-tag-meta: #ffffff;
-  --color-tag-copyright: #f07af0;
-  --color-tag-lore: #6fd36f;
+  --color-tag-copyright: #ee7bee;
+  --color-tag-lore: #5fdb5f;
   --color-tag-contributor: #c8c8c8;
   --color-tag-invalid: #ff8f8f;
 
-  --font-rounded: ui-rounded, var(--font-nunito), "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
+  /* Fredoka (next/font, 500 and 600 only; never 700) for voice, the system face for reading. */
+  --font-rounded: var(--font-fredoka), ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, sans-serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --text-large-title: 34px;
   --text-large-title--line-height: 41px;
-  --text-large-title--font-weight: 800;
-  --text-large-title--letter-spacing: -0.01em;
+  --text-large-title--font-weight: 600;
+  --text-large-title--letter-spacing: -0.005em;
   --text-section: 20px;
   --text-section--line-height: 25px;
-  --text-section--font-weight: 800;
+  --text-section--font-weight: 600;
   --text-headline: 17px;
   --text-headline--line-height: 22px;
-  --text-headline--font-weight: 700;
+  --text-headline--font-weight: 600;
   --text-callout: 15px;
   --text-callout--line-height: 20px;
-  --text-callout--font-weight: 700;
+  --text-callout--font-weight: 600;
+  --text-label: 15px;
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 500;
   --text-body: 15px;
   --text-body--line-height: 20px;
   --text-footnote: 13px;
   --text-footnote--line-height: 18px;
   --text-tab: 11px;
   --text-tab--line-height: 13px;
-  --text-tab--font-weight: 700;
+  --text-tab--font-weight: 500;
 
+  --spacing-edge: 8px;
   --spacing-inset: 16px;
   --spacing-control: 44px;
-  --spacing-control-compact: 32px;
+  --spacing-control-compact: 36px;
+  --spacing-control-well: 28px;
   --spacing-row: 52px;
   --spacing-fab: 56px;
-  --spacing-bar: 62px;
+  --spacing-bar: 64px;
   --spacing-avatar-s: 24px;
+  --spacing-avatar-pile: 28px;
   --spacing-avatar: 36px;
   --spacing-avatar-row: 44px;
+  --spacing-avatar-l: 56px;
   --spacing-avatar-hero: 80px;
   --spacing-rail: 88px;
 
+  --radius-badge: 6px;
   --radius-thumb: 8px;
   --radius-field: 12px;
-  --radius-panel: 16px;
+  --radius-art: 16px;
+  --radius-panel: 24px;
   --radius-sheet: 24px;
 
-  --shadow-bar: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.45);
-  --inset-shadow-hairline: inset 0 0 0 1px var(--color-hairline);
+  --inset-shadow-lit: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --inset-shadow-lit-gold: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --inset-shadow-lit-fav: inset 0 1px 0 rgba(255, 190, 200, 0.22);
+  --inset-shadow-lit-b: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  /* Panels used to carry a hairline; v6 lights their top edge instead. */
+  --inset-shadow-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --shadow-sunk: inset 0 1px 0 rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-sunk-art: 0 0 0 1px rgba(2, 15, 35, 0.6), 0 1.5px 0 rgba(255, 255, 255, 0.06);
+  --shadow-float: 0 14px 28px rgba(0, 0, 0, 0.45);
+  --shadow-bar: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 24px rgba(0, 0, 0, 0.4);
 
   --blur-glass: 24px;
-  --blur-glass-art: 16px;
+  --blur-glass-art: 12px;
 
   --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1.4);
-  --animate-pop: pop 300ms var(--ease-pop);
+  --ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --ease-slide: cubic-bezier(0.3, 1.35, 0.5, 1);
+  --animate-pop: pop 320ms var(--ease-pop);
   --animate-wiggle: wiggle 360ms ease-out;
+  --animate-hop: hop 420ms var(--ease-spring);
   @keyframes pop {
-    0% { transform: scale(0.8); }
-    50% { transform: scale(1.25); }
+    0% { transform: scale(0.7); }
+    60% { transform: scale(1.3); }
     100% { transform: scale(1); }
   }
   @keyframes wiggle {
-    0% { transform: rotate(0); }
-    35% { transform: rotate(-3deg); }
-    70% { transform: rotate(2deg); }
-    100% { transform: rotate(0); }
+    25% { transform: rotate(-3deg); }
+    60% { transform: rotate(2deg); }
+    100% { transform: none; }
+  }
+  @keyframes hop {
+    40% { transform: translateY(-5px) scale(1.12); }
   }
 }
 
@@ -484,7 +518,7 @@ html {
 
 /* Inline, so `shadow-lip` reads --lip-c on the control itself rather than on :root. */
 @theme inline {
-  --shadow-lip: 0 3px 0 var(--lip-c, var(--color-lip-navy));
+  --shadow-lip: 0 var(--lip, 3px) 0 var(--lip-c, var(--color-lip-navy));
   --shadow-lip-s: 0 2px 0 var(--lip-c, var(--color-lip-navy));
 }
 
@@ -493,7 +527,10 @@ html {
 :root {
   /* DESIGN.md bottom stack: the bar sits 22 from the bottom, above any larger safe area. */
   --bar-bottom: max(22px, calc(env(safe-area-inset-bottom) - 12px));
-  --bar-top: calc(var(--bar-bottom) + var(--spacing-bar));
+  /* the tube's middle stands 10 above its ends */
+  --bar-top: calc(var(--bar-bottom) + var(--spacing-bar) + 10px);
+  /* the top of the bottom stack: Play's disc, 100 from the bottom and 56 tall */
+  --stack-top: calc(var(--bar-bottom) + 134px);
 }
 
 ::selection {
@@ -541,7 +578,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-tab);
   line-height: var(--text-tab--line-height);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -570,6 +607,226 @@ html {
   display: none;
 }
 
+/* The tab bar on a phone (DESIGN.md v6 "Tab bar"): one solid tube that bends. Its fill is a
+   clipped layer, a blurred copy is the shadow, a stroked outer edge is the light. Tabs and the
+   current-tab capsule ride a rail that turns about the bend's centre, so they stay tangent to it,
+   the capsule slides along the curve, and the rail can scroll one tab further to the secret one. */
+.goo-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tube {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: var(--bar-bottom);
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  view-transition-name: tabbar;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.tube[data-hidden] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+.tube-clip,
+.tube-rail {
+  position: absolute;
+  inset: 0;
+}
+.tube-rail {
+  transform-origin: 50% calc(32px + var(--R));
+  transform: rotate(var(--sc, 0rad));
+}
+.tube-shadow {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  opacity: 0.5;
+  filter: blur(14px);
+  pointer-events: none;
+  overflow: visible;
+}
+.tube-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bar);
+}
+.tube-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  overflow: visible;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.tube-light .ring {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+.tube-ind,
+.tube-tab {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: var(--tw);
+  height: 54px;
+  margin-left: calc(var(--tw) / -2);
+  transform-origin: 50% calc(27px + var(--R));
+  border-radius: 999px;
+}
+.tube-ind {
+  background: var(--color-raised-hi);
+  box-shadow: var(--inset-shadow-lit);
+  transition: transform 500ms var(--ease-slide);
+}
+.tube-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: var(--text-tab);
+  line-height: var(--text-tab--line-height);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 200ms ease-out;
+}
+.tube-tab[aria-current="page"] {
+  color: var(--color-gold);
+}
+.tube-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+.tube-tab[aria-current="page"] .tube-icon {
+  stroke-width: 2.4;
+}
+.tube-icon[data-hop] {
+  animation: var(--animate-hop);
+}
+.tube-secret {
+  color: #fff;
+}
+.tube-tab:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+/* The goo: white shapes under the bar's blur-and-threshold filter, so the bead, necks and drips
+   read as one liquid (src/shell/gooBar.ts). It runs over the tabs; an ink copy of each icon and
+   label, masked to the goo, shows through wherever it covers one. */
+.tube-goo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.goo-ink {
+  transform: rotate(var(--sc, 0rad));
+}
+.goo-ink-tab svg {
+  color: var(--color-goo-ink);
+}
+.goo-ink-tab text {
+  fill: var(--color-goo-ink);
+  font-family: var(--font-rounded);
+  font-size: var(--text-tab);
+  font-weight: 500;
+}
+.goo-ink-tab[data-on] svg {
+  color: #0a1d3b;
+}
+.goo-ink-tab[data-on] text {
+  fill: #0a1d3b;
+}
+.tube-blade {
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 8px;
+  height: 74px;
+  margin-left: -4px;
+  border-radius: 999px;
+  background: #e9f2fa;
+  box-shadow:
+    0 0 0 1.5px rgba(2, 15, 35, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+  transform-origin: 50% calc(37px + var(--R));
+  pointer-events: none;
+  opacity: 0;
+}
+.tube-gleam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 70px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  transform: translateX(-100px);
+  pointer-events: none;
+}
+.tube-fling {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+/* A drop on its way to the bar: from a heart (fixed, over the page) or from the Goo tab. */
+.goo-drop {
+  position: fixed;
+  z-index: 60;
+  width: 8px;
+  height: 10px;
+  margin: -5px 0 0 -4px;
+  border-radius: 999px;
+  background: var(--color-goo);
+  pointer-events: none;
+}
+.goo-drop-bar {
+  position: absolute;
+}
+/* The ground fade behind the bottom stack, so Play and the bar never sit on a hard edge. */
+.bottom-scrim {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(2, 15, 35, 0.86) 62%, var(--color-ground));
+}
+@media (prefers-reduced-motion: reduce) {
+  .tube,
+  .tube-ind,
+  .tube-tab {
+    transition: none;
+  }
+  .tube-icon[data-hop] {
+    animation: none;
+  }
+}
+@media (min-width: 900px) {
+  .bottom-scrim {
+    display: none;
+  }
+}
+
 .screen {
   position: relative;
   display: flow-root;
@@ -580,7 +837,8 @@ html {
 .screen-frame {
   max-width: 600px;
   margin: 0 auto;
-  padding: env(safe-area-inset-top) var(--spacing-inset) 156px;
+  /* 176 below, so the last post's heart clears the Play button and the tab bar */
+  padding: env(safe-area-inset-top) var(--spacing-inset) 176px;
 }
 /* The grid uses the full width on desktop (DESIGN.md "Layout"). */
 .screen-frame[data-grid] {
@@ -600,19 +858,54 @@ html {
   height: var(--spacing-control);
   border-radius: 999px;
   background: var(--color-panel);
-  box-shadow: var(--inset-shadow-hairline);
+  box-shadow: var(--inset-shadow-lit);
   color: var(--color-link);
 }
 .toolbar-circle svg {
   width: 20px;
   height: 20px;
+  stroke-width: 2.2;
+}
+.toolbar-circle:active {
+  color: var(--color-fg);
+}
+/* A tab's header (DESIGN.md "Screen header"): the large title and the tools capsule share a row. */
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding-top: 6px;
+}
+.title-row .screen-title {
+  margin: 0;
+  min-width: 0;
+}
+/* The tools capsule: one 44 panel, 40 wide link-blue tools inside it. */
+.tools {
+  display: flex;
+  flex: none;
+  height: var(--spacing-control);
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit);
+}
+.tools .toolbar-circle {
+  width: 40px;
+  background: none;
+  box-shadow: none;
+}
+.tools .toolbar-circle[aria-pressed="true"] {
+  color: var(--color-gold);
 }
 .screen-title {
   margin-top: 4px;
   font-family: var(--font-rounded);
   font-size: var(--text-large-title);
   line-height: var(--text-large-title--line-height);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.01em;
   text-wrap: balance;
   overflow-wrap: anywhere;
@@ -629,7 +922,7 @@ html {
   margin-top: 24px;
   border-radius: var(--radius-panel);
   background: var(--color-panel);
-  box-shadow: var(--inset-shadow-hairline);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
   overflow: hidden;
 }
 .settings-group li + li {
@@ -653,12 +946,60 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-fg);
   text-decoration: none;
 }
 .settings-row:active {
   background: var(--color-raised);
+}
+/* A row with an action (DESIGN.md "Tab bar goo"): label and count, a compact tonal button. */
+.settings-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+}
+.settings-action b {
+  display: block;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: var(--text-headline--line-height);
+  font-weight: 600;
+}
+.settings-action small {
+  display: block;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.btn-wipe {
+  flex: none;
+  height: var(--spacing-control-compact);
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: var(--inset-shadow-lit);
+  color: var(--color-fg);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+}
+.btn-wipe:active {
+  background: var(--color-raised-hi);
+  transform: translateY(1px);
+}
+.btn-wipe:disabled {
+  opacity: 0.5;
+}
+.btn-wipe:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
 }
 .settings-chevron {
   width: 20px;
@@ -666,7 +1007,6 @@ html {
   color: var(--color-muted);
 }
 .btn-gold {
-  --lip-c: var(--color-lip-gold);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -678,15 +1018,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 700;
-  box-shadow: 0 3px 0 var(--lip-c);
-  transition:
-    transform 100ms ease-out,
-    box-shadow 100ms ease-out;
-}
-.btn-gold:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 var(--lip-c);
+  font-weight: 600;
 }
 
 /* Interim home (slice 1): the legacy app in a box that keeps its fixed layers off the bar.
@@ -819,92 +1151,192 @@ html {
   position: relative;
   margin-top: 16px;
 }
+/* Under the chips, whose own 16 already separates them from the first panel */
+.chips ~ .feed-list,
+.chips ~ * > .feed-list:first-child {
+  margin-top: 0;
+}
 .feed-slot {
   position: absolute;
   left: 0;
   right: 0;
 }
 
-/* The post panel (DESIGN.md): its height is set inline from layout.ts. */
+/* Marks (DESIGN.md "Avatars"): Bends on a raised disc for artists, the kaleidoscope for the app.
+   The svg turns inside the wrapper (`turnMark`); the wrapper holds the size and the New dot. */
+.mark {
+  position: relative;
+  display: block;
+  flex: none;
+  border-radius: 999px;
+}
+.mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-raised);
+  box-shadow: var(--inset-shadow-lit), 0 0 0 1px rgba(2, 15, 35, 0.35);
+  transition: transform 600ms var(--ease-spring);
+}
+.mark-app svg {
+  box-shadow: 0 0 0 1.5px rgba(180, 199, 217, 0.26);
+}
+.mark[data-new]::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 2.5px var(--color-panel);
+}
+/* Following: six dots leave the mark's rim (`followBurst`). */
+.mark .dots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.mark .dots i {
+  position: absolute;
+  border-radius: 999px;
+}
+
+/* The post panel (DESIGN.md v6): lit navy, one 8 edge, radii that nest (24 > 16). Its height is
+   set inline from layout.ts. Nothing clips it, so the heart's goo can hang below. */
 .post {
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  padding: 0 12px 12px;
+  padding: 8px;
   border-radius: var(--radius-panel);
   background: var(--color-panel);
-  box-shadow: var(--inset-shadow-hairline);
-  contain: layout paint;
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+  contain: layout style;
 }
 .post-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 44px;
+  gap: 12px;
+  height: 36px;
+  margin-bottom: 8px;
   flex: none;
   min-width: 0;
 }
-.post-by {
+.post-who {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  flex: 1;
   min-width: 0;
-  height: 44px;
-  color: inherit;
-  text-align: left;
-  border-radius: var(--radius-field);
 }
 .post-avatar {
-  width: var(--spacing-avatar-s);
-  height: var(--spacing-avatar-s);
-  flex: none;
+  width: var(--spacing-avatar);
+  height: var(--spacing-avatar);
+}
+.post-idn {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 .post-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
-  line-height: var(--text-headline--line-height);
-  font-weight: 700;
+  line-height: 20px;
+  font-weight: 600;
 }
-.post-more-artists {
+.post-name > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.post-name-none {
   color: var(--color-muted);
 }
-.post-time {
+.post-also {
   flex: none;
-  font-size: var(--text-footnote);
-  line-height: var(--text-footnote--line-height);
-  color: var(--color-muted);
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--color-well);
+  color: var(--color-link);
+  font-size: var(--text-tab);
+  line-height: 20px;
+  font-weight: 500;
 }
-.post-time::before {
-  content: "· ";
+.post-when {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-footnote);
+  line-height: 16px;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.post-new {
+  color: var(--color-gold);
+  font-family: var(--font-rounded);
+  font-weight: 500;
+}
+.post-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+/* The whole who-made-it block is one target; the text under it stays plain text. */
+.post-by {
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  -webkit-tap-highlight-color: transparent;
 }
 .post-menu {
   position: relative;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 44px;
-  margin: 0 -12px 0 auto;
-  padding-right: 12px;
-  box-sizing: content-box;
+  width: 36px;
+  height: 36px;
+  margin-right: -6px;
   flex: none;
+  border-radius: 999px;
   color: var(--color-muted);
 }
-.post-menu svg {
-  width: 20px;
-  height: 20px;
+.post-menu::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
 }
+.post-menu svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.4;
+}
+.post-menu:active {
+  background: var(--color-well);
+  color: var(--color-fg);
+}
+/* Material 3, sunk: the picture sits in the panel. */
 .post-media {
   position: relative;
   flex: none;
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: var(--radius-thumb);
-  background: var(--color-raised);
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+  isolation: isolate;
   touch-action: manipulation;
   -webkit-touch-callout: none;
   user-select: none;
@@ -927,136 +1359,274 @@ html {
   width: 56px;
   height: 56px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(2, 15, 35, 0.5);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
   color: #fff;
   pointer-events: none;
 }
 .post-play svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   fill: currentColor;
   translate: 2px 0;
 }
 .post-mute {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 8px;
+  bottom: 8px;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: var(--spacing-control-well);
+  height: var(--spacing-control-well);
   border-radius: 999px;
   background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
   color: #fff;
 }
-.post-mute::before,
-.fav-pill::before,
-.post-tag::before,
-.chip::before {
+.post-mute::before {
   content: "";
   position: absolute;
-  inset: -6px 0;
+  inset: -8px;
 }
 .post-mute svg {
   width: 16px;
   height: 16px;
+  stroke-width: 2.2;
 }
+/* The double tap's one heart: 88, 640 ms. */
 .post-burst {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   fill: var(--color-heart);
   color: var(--color-heart);
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
   pointer-events: none;
+  animation-duration: 640ms;
 }
-.post-stats {
+
+/* Tags: 28 wells in one sideways row. The 8 above and below hold each tag's 44 touch area, so
+   nothing spills and the row never scrolls up or down. An edge fades only while tags hide past it. */
+.post-tags {
+  --fl: 0px;
+  --fr: 28px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 32px;
-  margin-top: 12px;
+  gap: 8px;
   flex: none;
+  height: 44px;
+  margin: 0 -8px -8px;
+  padding: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent);
+  touch-action: pan-x pan-y;
 }
-.fav-pill {
-  --lip-c: var(--color-lip-navy);
+.post-tags::-webkit-scrollbar,
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.post-tag {
   position: relative;
+  flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
+  height: var(--spacing-control-well);
+  padding: 0 10px;
   border-radius: 999px;
-  background: var(--color-raised);
-  box-shadow: 0 2px 0 var(--lip-c);
-  font-family: var(--font-rounded);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
-  font-weight: 700;
+  font-weight: 500;
+  white-space: nowrap;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: transform 150ms ease-out;
+}
+.post-tag::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.post-tag:active {
+  background: #071631;
+}
+.post-tag[data-picked] {
+  transform: scale(1.05);
+  background: var(--color-raised-hi);
+}
+.post-tag-more {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px rgba(180, 199, 217, 0.18);
+  color: var(--color-muted);
+  font-family: var(--font-rounded);
+}
+
+/* Footer: score, then the favourite pill at the right end, under the thumb. */
+.post-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: none;
+  height: 39px;
+  margin-top: 8px;
+  padding-bottom: 3px;
   font-variant-numeric: tabular-nums;
-  color: var(--color-fg);
+}
+.post-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+}
+.post-score svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-score);
+  fill: currentColor;
+  stroke-width: 1.6;
+}
+
+/* Material 1, raised: lit from above, a solid lip underneath that closes in 100 ms. */
+.fav-pill,
+.follow-pill,
+.btn-tonal,
+.btn-gold,
+.play-fab,
+.top-pill {
+  --lip: 3px;
+  --lip-c: var(--color-lip-navy);
+  --lit: var(--inset-shadow-lit);
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c);
   transition:
     transform 100ms ease-out,
     box-shadow 100ms ease-out;
 }
+.fav-pill:active,
+.follow-pill:active,
+.btn-tonal:active,
+.btn-gold:active,
+.top-pill:active {
+  transform: translateY(var(--lip));
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c);
+}
+.fav-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--spacing-control-compact);
+  padding: 0 14px 0 11px;
+  border-radius: 999px;
+  background: var(--color-raised);
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-fg);
+}
+.fav-pill::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0 -7px;
+}
 .fav-pill svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.4;
   color: var(--color-heart);
 }
 .fav-pill[aria-pressed="true"] {
-  --lip-c: #7a3a42;
-  background: rgba(255, 138, 149, 0.16);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 138, 149, 0.45),
-    0 2px 0 var(--lip-c);
+  --lip-c: var(--color-lip-fav);
+  --lit: var(--inset-shadow-lit-fav);
+  background: var(--color-fav-on);
 }
 .fav-pill[aria-pressed="true"] svg {
   fill: currentColor;
 }
-.fav-pill:active {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 var(--lip-c);
-}
 .fav-pop {
   animation: var(--animate-pop);
 }
+/* The heart's goo: white shapes under the #goo-drip filter. A bead along the pill's bottom edge,
+   blobs that sag out of it on necks (`drip` in src/feed/motion.ts). */
+.drip {
+  position: absolute;
+  left: 0;
+  top: calc(100% + var(--lip) - 3px);
+  width: 100%;
+  height: 48px;
+  pointer-events: none;
+  -webkit-filter: url(#goo-drip);
+  filter: url(#goo-drip);
+}
+.drip span {
+  position: absolute;
+  top: 0;
+  border-radius: 999px;
+  background: var(--color-goo);
+}
+.drip .bead {
+  left: 22%;
+  right: 16%;
+  height: 4px;
+  transform-origin: 50% 0;
+}
+.drip .neck {
+  top: 2px;
+  transform-origin: 50% 0;
+}
+.drip .blob {
+  top: 2px;
+}
 
-/* Follow pill (DESIGN.md "Follow pill"): raised navy, gold plus, navy lip. It sits at the end of
-   the row, so once tapped it can shrink to a small green ✓ without moving anything beside it. */
+/* Follow pill (DESIGN.md "Follow pill"): raised navy, gold plus, a 2 lip. Following, it goes
+   quiet: no fill, an outline, a green check. */
 .follow-pill {
-  --lip-c: var(--color-lip-navy);
+  --lip: 2px;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   flex: none;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 12px;
+  height: var(--spacing-control-compact);
+  padding: 0 14px 0 10px;
   border-radius: 999px;
   background: var(--color-raised);
-  box-shadow: 0 2px 0 var(--lip-c);
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-fg);
   white-space: nowrap;
-  transition:
-    transform 100ms ease-out,
-    box-shadow 100ms ease-out;
 }
 .follow-pill::before {
   content: "";
   position: absolute;
-  inset: -6px 0;
+  inset: -4px 0;
 }
 .follow-pill svg {
   width: 16px;
   height: 16px;
+  stroke-width: 2.6;
 }
 .follow-plus {
   color: var(--color-gold);
@@ -1064,35 +1634,22 @@ html {
 .follow-check {
   color: var(--color-score);
 }
-.follow-pill[aria-pressed="true"] {
-  padding: 0;
-  background: transparent;
-  box-shadow: var(--inset-shadow-hairline);
-}
-/* On a card: pushed to the end, the ⋯ right after it. */
-.post-head .follow-pill {
-  margin-left: auto;
-}
-.post-head .follow-pill + .post-menu {
-  margin-left: 0;
-}
-.follow-pill:active {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 var(--lip-c);
-}
+.follow-pill[aria-pressed="true"],
 .follow-pill[aria-pressed="true"]:active {
-  box-shadow: var(--inset-shadow-hairline);
+  padding: 0 10px 0 8px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-outline);
+  transform: none;
 }
 /* Over art: no lip (the Lip Is a Promise rule), glass behind it for contrast. */
 .follow-pill-art,
-.follow-pill-art[aria-pressed="true"] {
+.follow-pill-art[aria-pressed="true"],
+.follow-pill-art:active {
   background: var(--color-glass-art);
-  box-shadow: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  transform: none;
   -webkit-backdrop-filter: blur(var(--blur-glass-art));
   backdrop-filter: blur(var(--blur-glass-art));
-}
-.follow-pill-art:active {
-  box-shadow: none;
 }
 .follow-hero {
   display: flex;
@@ -1112,96 +1669,34 @@ html {
   animation: follow-wiggle-b 360ms ease-out;
 }
 @keyframes follow-wiggle-a {
-  0% { transform: rotate(0); }
-  35% { transform: rotate(-3deg); }
-  70% { transform: rotate(2deg); }
-  100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg); }
+  60% { transform: rotate(2deg); }
+  100% { transform: none; }
 }
 @keyframes follow-wiggle-b {
-  0% { transform: rotate(0); }
-  35% { transform: rotate(-3deg); }
-  70% { transform: rotate(2deg); }
-  100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg); }
+  60% { transform: rotate(2deg); }
+  100% { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .follow-pill {
+  .fav-pill,
+  .follow-pill,
+  .btn-tonal,
+  .btn-gold,
+  .play-fab,
+  .top-pill,
+  .mark svg {
     transition: none;
   }
-  [data-wiggle] {
+  [data-wiggle],
+  .fav-pop {
     animation: none;
   }
-}
-.post-score {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-family: var(--font-rounded);
-  font-size: var(--text-footnote);
-  line-height: var(--text-footnote--line-height);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.post-score svg {
-  width: 16px;
-  height: 16px;
-  color: var(--color-score);
-  stroke-width: 2.2;
-}
-.post-id {
-  margin-left: auto;
-  font-size: var(--text-footnote);
-  line-height: var(--text-footnote--line-height);
-  font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-}
-.post-tags {
-  display: flex;
-  gap: 8px;
-  height: 32px;
-  margin: 12px -12px 0;
-  padding: 0 12px;
-  flex: none;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 12px, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 12px, #000 calc(100% - 24px), transparent);
-  touch-action: pan-x;
-}
-.post-tags::-webkit-scrollbar,
-.chips::-webkit-scrollbar {
-  display: none;
-}
-.post-tag {
-  position: relative;
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: var(--color-raised);
-  font-size: var(--text-footnote);
-  line-height: var(--text-footnote--line-height);
-  white-space: nowrap;
-  -webkit-touch-callout: none;
-  user-select: none;
-  transition: transform 150ms ease-out;
-}
-.post-tag[data-picked] {
-  transform: scale(1.05);
-  background: var(--color-raised-hi);
-}
-.post-tag-more {
-  background: transparent;
-  box-shadow: var(--inset-shadow-hairline);
-  color: var(--color-muted);
-  font-family: var(--font-rounded);
-  font-weight: 700;
 }
 
 .post-skeleton {
   height: auto;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 .post-skeleton .post-media {
   width: 100%;
@@ -1214,8 +1709,8 @@ html {
   animation: sk-shimmer 1.4s ease-in-out infinite;
 }
 .sk-dot {
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
 }
 .sk-line {
@@ -1224,9 +1719,16 @@ html {
   border-radius: 6px;
 }
 .sk-pill {
-  width: 64px;
-  height: 32px;
+  width: 72px;
+  height: var(--spacing-control-compact);
   border-radius: 999px;
+}
+.post-skeleton .post-head {
+  gap: 8px;
+}
+.post-skeleton .sk-block {
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
 }
 @keyframes sk-shimmer {
   50% {
@@ -1279,7 +1781,7 @@ html {
 }
 .feed-end {
   font-family: var(--font-rounded);
-  font-weight: 700;
+  font-weight: 600;
 }
 .feed-empty,
 .feed-error {
@@ -1295,7 +1797,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 700;
+  font-weight: 600;
 }
 .feed-empty-mark {
   width: 48px;
@@ -1325,7 +1827,6 @@ html {
 }
 
 .btn-tonal {
-  --lip-c: var(--color-lip-navy);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1338,20 +1839,17 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 700;
-  box-shadow: 0 3px 0 var(--lip-c);
-  transition:
-    transform 100ms ease-out,
-    box-shadow 100ms ease-out;
+  font-weight: 600;
 }
 .btn-tonal svg,
 .btn-gold svg {
   width: 20px;
   height: 20px;
 }
-.btn-tonal:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 var(--lip-c);
+.btn-gold,
+.play-fab {
+  --lip-c: var(--color-lip-gold);
+  --lit: var(--inset-shadow-lit-gold);
 }
 .btn-gold {
   gap: 8px;
@@ -1365,46 +1863,57 @@ html {
 .chips {
   display: flex;
   gap: 8px;
-  margin: 16px calc(-1 * var(--spacing-inset)) 0;
-  padding: 6px var(--spacing-inset);
+  margin: 0 calc(-1 * var(--spacing-inset));
+  padding: 12px var(--spacing-inset) 16px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 }
 .chips-wrap {
   flex-wrap: wrap;
   margin: 8px 0 0;
   padding: 0;
-  -webkit-mask-image: none;
-  mask-image: none;
 }
+/* Filter chip (DESIGN.md v6): 36, panel with top light, no lip; a press shrinks it a touch. */
 .chip {
   position: relative;
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 12px;
+  height: var(--spacing-control-compact);
+  padding: 0 14px;
   border-radius: 999px;
   background: var(--color-panel);
-  box-shadow: var(--inset-shadow-hairline);
+  box-shadow: var(--inset-shadow-lit);
   font-family: var(--font-rounded);
-  font-size: var(--text-footnote);
-  line-height: var(--text-footnote--line-height);
-  font-weight: 700;
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: 500;
   color: var(--color-fg);
   white-space: nowrap;
+  transition: transform 100ms ease-out;
+}
+.chip::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+.chip:active {
+  transform: scale(0.96);
 }
 .chip svg {
   width: 16px;
   height: 16px;
+  stroke-width: 2.4;
   color: var(--color-muted);
+  margin-right: -4px;
 }
 .chip[data-on] {
   background: var(--color-raised-hi);
-  box-shadow: inset 0 0 0 1.5px var(--color-gold);
+  box-shadow:
+    var(--inset-shadow-lit),
+    inset 0 0 0 1.5px var(--color-gold);
 }
 .chip[data-on] svg {
   color: var(--color-gold);
@@ -1432,13 +1941,15 @@ html {
   outline-offset: 2px;
 }
 
-/* The round Play button (DESIGN.md "Play button (floating)") */
+/* The round Play button (DESIGN.md "Play button (floating)"): bottom left, 100 from the bottom
+   (the bar passes 14 under its disc), a 4 lip and a soft shadow. It steps aside while you scroll
+   down. */
 .play-fab {
-  --lip-c: var(--color-lip-gold);
+  --lip: 4px;
   position: fixed;
   z-index: 40;
-  right: var(--spacing-inset);
-  bottom: calc(var(--bar-top) + 12px);
+  left: var(--spacing-inset);
+  bottom: calc(var(--bar-bottom) + 78px);
   display: grid;
   place-items: center;
   width: var(--spacing-fab);
@@ -1446,20 +1957,32 @@ html {
   border-radius: 999px;
   background: var(--color-gold);
   color: var(--color-on-gold);
-  box-shadow: 0 3px 0 var(--lip-c);
+  box-shadow:
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    var(--shadow-float);
   transition:
     transform 100ms ease-out,
-    box-shadow 100ms ease-out;
+    box-shadow 100ms ease-out,
+    opacity 200ms ease-out;
 }
 .play-fab svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   fill: currentColor;
-  translate: 3px 0;
+  translate: 2px 0;
 }
 .play-fab:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 var(--lip-c);
+  transform: translateY(var(--lip));
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c),
+    0 8px 18px rgba(0, 0, 0, 0.45);
+}
+.play-fab[data-away] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
 }
 
 /* Results header: the query as a pill */
@@ -1480,7 +2003,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-fg);
   text-align: left;
 }
@@ -1553,7 +2076,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-section);
   line-height: var(--text-section--line-height);
-  font-weight: 800;
+  font-weight: 600;
 }
 .sheet-head .toolbar-circle {
   background: var(--color-raised);
@@ -1579,7 +2102,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-fg);
   text-align: left;
   text-decoration: none;
@@ -1605,7 +2128,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-muted);
 }
 .sheet-wide {
@@ -1629,15 +2152,16 @@ html {
   margin-top: 16px;
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-muted);
 }
+/* A sunk capsule (DESIGN.md "Field"); R2 restyles the screens that use it. */
 .field {
   height: var(--spacing-control);
-  padding: 0 12px;
-  border-radius: var(--radius-field);
-  background: var(--color-ground);
-  box-shadow: var(--inset-shadow-hairline);
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
   font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 400;
@@ -1723,7 +2247,7 @@ html {
   padding: 0 4px;
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-link);
 }
 .saved-row {
@@ -1781,9 +2305,10 @@ html {
 }
 
 @media (min-width: 900px) {
+  /* Desktop isn't drawn yet (STATE R2): Play keeps its bottom-left spot, just past the rail. */
   .play-fab {
     bottom: 24px;
-    right: 24px;
+    left: calc(var(--spacing-rail) + 24px);
   }
   .sheet-layer {
     justify-content: center;
@@ -1919,7 +2444,7 @@ html {
   background: var(--color-glass-art);
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .player-desktop {
@@ -1940,8 +2465,23 @@ html {
   gap: 8px;
   min-width: 0;
 }
+.player-who .post-avatar {
+  width: var(--spacing-avatar-s);
+  height: var(--spacing-avatar-s);
+}
+.player-who .post-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .player-who .post-time {
+  flex: none;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
   color: rgba(255, 255, 255, 0.7);
+}
+.player-who .post-time::before {
+  content: "· ";
 }
 .player-rail {
   display: flex;
@@ -2019,7 +2559,7 @@ html {
   border-radius: 10px;
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-muted);
   white-space: nowrap;
 }
@@ -2079,29 +2619,36 @@ html {
   height: 0;
   overflow: visible;
 }
+/* The new-posts pill (DESIGN.md): Raised Highlight, gold arrow, a lip and a float shadow. */
 .top-pill {
-  --lip-c: var(--color-lip-gold);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 36px;
-  padding: 0 16px;
+  height: var(--spacing-control-compact);
+  padding: 0 16px 0 12px;
   border-radius: 999px;
-  background: var(--color-gold);
-  color: var(--color-on-gold);
+  background: var(--color-raised-hi);
+  color: var(--color-fg);
   font-family: var(--font-rounded);
-  font-weight: 700;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
   box-shadow:
-    0 3px 0 var(--lip-c),
-    0 6px 16px rgba(2, 15, 35, 0.5);
+    var(--lit),
+    0 var(--lip) 0 var(--lip-c),
+    0 12px 24px rgba(0, 0, 0, 0.4);
 }
 .top-pill svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.4;
+  color: var(--color-gold);
 }
 .top-pill:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 var(--lip-c);
+  box-shadow:
+    var(--lit),
+    0 0 0 var(--lip-c),
+    0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .top-pill:focus-visible {
   outline: 2px solid var(--color-gold);
@@ -2151,7 +2698,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
-  font-weight: 700;
+  font-weight: 600;
 }
 .tune-value {
   font-size: var(--text-footnote);
@@ -2213,7 +2760,7 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-muted);
 }
 .tune-tag {
@@ -2275,10 +2822,6 @@ html {
 }
 
 /* Following (UX §5): New on a card, the caught-up divider, a folded run, the Play count */
-.post-new {
-  color: var(--color-gold);
-  font-weight: 600;
-}
 .feed-tile[data-new]::after {
   content: "";
   position: absolute;
@@ -2290,25 +2833,31 @@ html {
   background: var(--color-gold);
   box-shadow: 0 0 0 2px rgba(2, 15, 35, 0.6);
 }
+/* Caught up (DESIGN.md): the 56 app mark between two 2 px rules that fade toward the edges. */
 .feed-caught {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 2px;
+  padding-top: 8px;
   overflow: hidden;
   text-align: center;
+  background:
+    linear-gradient(90deg, transparent, rgba(180, 199, 217, 0.22)) 0 35px / calc(50% - 44px) 2px no-repeat,
+    linear-gradient(270deg, transparent, rgba(180, 199, 217, 0.22)) 100% 35px / calc(50% - 44px) 2px no-repeat;
 }
 .feed-caught-mark {
-  width: 48px;
-  height: 48px;
+  width: var(--spacing-avatar-l);
+  height: var(--spacing-avatar-l);
+  margin-bottom: 12px;
 }
 .feed-caught b {
   font-family: var(--font-rounded);
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
-  font-weight: 700;
-  color: var(--color-gold);
+  font-weight: 600;
+  color: var(--color-fg);
 }
 .feed-caught small {
   font-size: var(--text-footnote);
@@ -2318,7 +2867,9 @@ html {
 .feed-burst {
   justify-content: space-between;
   width: 100%;
-  padding: 0 16px 0 20px;
+  padding: 0 14px 0 16px;
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
 }
 .feed-burst svg {
   color: var(--color-link);
@@ -2330,25 +2881,25 @@ html {
 }
 .play-fab-count {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  height: 20px;
-  min-width: 20px;
+  top: -6px;
+  right: -6px;
+  height: 24px;
+  min-width: 24px;
   padding: 0 6px;
   border-radius: 999px;
   background: var(--color-ground);
   color: var(--color-fg);
   font-family: var(--font-rounded);
-  font-size: 11px;
-  line-height: 20px;
-  font-weight: 700;
+  font-size: 13px;
+  line-height: 24px;
+  font-weight: 600;
   text-align: center;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 0 0 2px var(--color-gold);
 }
 .screen-sub b {
   font-family: var(--font-rounded);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-fg);
 }
 .following-mascot {

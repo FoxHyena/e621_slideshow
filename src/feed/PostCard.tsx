@@ -1,23 +1,29 @@
 "use client";
 
 /**
- * The post panel (DESIGN.md "Post panel"): artist line, the picture at its own aspect, the stats
- * line and one sideways row of tags. Its height comes from `layout.ts`, so the feed can window
- * cards before their pictures load.
+ * The post panel (DESIGN.md v6 "Post panel"): who made it (mark, name, "New · 2h ago · #id"),
+ * the picture at its own aspect, one sideways row of tags, then score and the favourite pill at
+ * the right end. Its height comes from `layout.ts`, so the feed can window cards before their
+ * pictures load.
  */
 import { ArrowUp, Heart, MoreHorizontal, Play, Volume2, VolumeX } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, type RefObject } from "react";
 import type { Post } from "@/lib/e621/types";
 import { mediaKind, TAG_CATEGORY_COLORS } from "@/lib/e621/types";
 import { ago, artists, cardTags, compact } from "@/lib/feed/format";
 import { getNav } from "@/nav/history";
-import { CARD } from "@/lib/feed/layout";
+import { CARD_CHROME } from "@/lib/feed/layout";
 import { displayUrl } from "@/lib/slideshow/media";
 import { favCountOf, favedOf, getFavs } from "@/state/favs";
+import { getGoo } from "@/state/goo";
+import { getSession } from "@/state/session";
+import { liveGoo } from "@/shell/gooLive";
 import { useStore } from "@/state/store";
 import Avatar from "@/components/Avatar";
 import type { TagHold } from "@/components/TagActions";
 import { FollowPill } from "./FollowPill";
+import { turnMark } from "./motion";
+import { motionFx } from "@/shell/lazy";
 
 /** A second tap this soon is a double tap. */
 const DOUBLE_TAP_MS = 200;
@@ -42,20 +48,40 @@ export interface PostCardProps {
   onMenu: (post: Post) => void;
 }
 
-function FavPill({ post }: { post: Post }) {
+/**
+ * Favouriting, as you see it (DESIGN.md "Fav pill and the heart's goo"): goo drips off the pill,
+ * the artist's mark spins, and the drop that lets go falls onto the tab bar's goo. Signed out
+ * there's no favourite to celebrate (the toggle asks you to sign in).
+ */
+function celebrate(id: number, btn: HTMLElement | null, mark: Element | null) {
+  if (!getSession().store.get().creds) return;
+  void motionFx().then((m) => m.drip(btn));
+  turnMark(mark);
+  const r = btn?.getBoundingClientRect();
+  // the drop leaves from under the middle drip, which hangs about 23 below the pill
+  if (r && r.width > 0) liveGoo()?.dropFrom(r.left + r.width * 0.55, r.bottom + 23);
+  // a post favourited again this session drips, but adds no more goo
+  getGoo().addFav(id);
+}
+
+function FavPill({ post, btnRef, onFaved }: { post: Post; btnRef: RefObject<HTMLButtonElement | null>; onFaved: () => void }) {
   const favs = getFavs();
   const faved = useStore(favs.store, (s) => favedOf(s, post));
   const count = useStore(favs.store, (s) => favCountOf(s, post));
   const [pop, setPop] = useState(0);
   return (
     <button
+      ref={btnRef}
       type="button"
       className="fav-pill"
       aria-pressed={faved}
       aria-label={`Favorite, ${compact(count)}`}
       data-testid="card-fav"
       onClick={() => {
-        if (!faved) setPop((p) => p + 1);
+        if (!faved) {
+          setPop((p) => p + 1);
+          onFaved();
+        }
         favs.toggle(post);
       }}
     >
@@ -65,7 +91,7 @@ function FavPill({ post }: { post: Post }) {
   );
 }
 
-function CardMedia({ post, index, height, live, still, onOpen }: { post: Post; index: number; height: number; live: boolean; still: boolean; onOpen: PostCardProps["onOpen"] }) {
+function CardMedia({ post, index, height, live, still, onOpen, onFaved }: { post: Post; index: number; height: number; live: boolean; still: boolean; onOpen: PostCardProps["onOpen"]; onFaved: () => void }) {
   const kind = mediaKind(post);
   const src = displayUrl(post, "sample");
   const poster = post.files.sample.jpg ?? post.files.preview.jpg ?? undefined;
@@ -88,7 +114,10 @@ function CardMedia({ post, index, height, live, still, onOpen }: { post: Post; i
       lastTap.current = 0;
       setBurst((b) => b + 1);
       // A double tap favorites; it never un-favorites.
-      if (!favedOf(favs.store.get(), post)) favs.toggle(post);
+      if (!favedOf(favs.store.get(), post)) {
+        onFaved();
+        favs.toggle(post);
+      }
       return;
     }
     lastTap.current = t;
@@ -151,66 +180,83 @@ function CardMedia({ post, index, height, live, still, onOpen }: { post: Post; i
   );
 }
 
+/** Fade a tag row's edge only by as much as is hidden past it, so the last tag is whole at the end. */
+function fadeTags(e: React.UIEvent<HTMLDivElement>) {
+  const r = e.currentTarget;
+  const rest = r.scrollWidth - r.clientWidth - r.scrollLeft;
+  r.style.setProperty("--fl", `${Math.min(16, Math.max(0, r.scrollLeft))}px`);
+  r.style.setProperty("--fr", `${Math.min(28, Math.max(0, rest))}px`);
+}
+
 function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
+  const seed = by[0] ?? `post:${post.id}`;
   const tags = cardTags(post);
   const shown = tags.slice(0, TAGS_SHOWN);
   const more = tags.length - shown.length;
-  const height = CARD.header + mediaHeight + CARD.inset + CARD.stats + CARD.inset + CARD.tags + CARD.inset;
+  const who = useRef<HTMLDivElement>(null);
+  const fav = useRef<HTMLButtonElement>(null);
+  const mark = () => who.current?.querySelector(".mark") ?? null;
+  const faved = () => celebrate(post.id, fav.current, mark());
   return (
     <article
       className="post"
-      style={{ height }}
+      style={{ height: CARD_CHROME + mediaHeight }}
       aria-label={`${fresh ? "New post" : "Post"} ${post.id}${name ? ` by ${name}` : ""}`}
       data-testid="post-card"
       data-post-id={post.id}
       data-index={index}
     >
       <header className="post-head">
-        {by[0] ? (
-          <button
-            type="button"
-            className="post-by"
-            onClick={() => getNav().push({ screen: { kind: "artist", name: by[0] }, play: null })}
-            data-testid="card-artist"
-          >
-            <Avatar seed={by[0]} className="post-avatar" />
-            <span className="post-name">
-              {name}
-              {by.length > 1 && <span className="post-more-artists"> +{by.length - 1}</span>}
+        <div ref={who} className="post-who">
+          <Avatar seed={seed} fresh={fresh} className="post-avatar" />
+          <div className="post-idn">
+            <span className={`post-name${name ? "" : " post-name-none"}`}>
+              <span>{name ?? "unknown artist"}</span>
+              {by.length > 1 && <span className="post-also">+{by.length - 1}</span>}
             </span>
-          </button>
-        ) : (
-          <span className="post-by" data-testid="card-artist">
-            <Avatar seed={`post:${post.id}`} className="post-avatar" />
-            <span className="post-name">unknown artist</span>
-          </span>
-        )}
-        <time className="post-time" dateTime={post.created_at} title={new Date(post.created_at).toLocaleString()}>
-          {fresh && (
-            <span className="post-new" data-testid="card-new">
-              New
+            <span className="post-when">
+              {fresh && (
+                <b className="post-new" data-testid="card-new">
+                  New
+                </b>
+              )}
+              {fresh && " · "}
+              <time dateTime={post.created_at} title={new Date(post.created_at).toLocaleString()}>
+                {ago(post.created_at, now)}
+              </time>
+              {" · "}
+              <span className="post-id">#{post.id}</span>
             </span>
+          </div>
+          {by[0] && (
+            <button
+              type="button"
+              className="post-by"
+              aria-label={`More from ${name}${by.length > 1 ? ` and ${by.length - 1} more` : ""}`}
+              onClick={() => getNav().push({ screen: { kind: "artist", name: by[0] }, play: null })}
+              data-testid="card-artist"
+            />
           )}
-          {fresh && " · "}
-          {ago(post.created_at, now)}
-        </time>
-        {follow && by[0] && <FollowPill key={by[0]} name={by[0]} />}
+        </div>
+        {follow && by[0] && (
+          <FollowPill
+            key={by[0]}
+            name={by[0]}
+            onFollowed={() => {
+              const m = mark();
+              void motionFx().then((fx) => fx.followBurst(m as HTMLElement | null, by[0]));
+              turnMark(m);
+            }}
+          />
+        )}
         <button type="button" className="post-menu" aria-label="More" aria-haspopup="dialog" onClick={() => onMenu(post)} data-testid="card-menu">
           <MoreHorizontal aria-hidden />
         </button>
       </header>
-      <CardMedia post={post} index={index} height={mediaHeight} live={live} still={still} onOpen={onOpen} />
-      <div className="post-stats">
-        <FavPill post={post} />
-        <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>
-          <ArrowUp aria-hidden />
-          {compact(post.stats.score.total)}
-        </span>
-        <span className="post-id">#{post.id}</span>
-      </div>
-      <div className="post-tags" data-testid="card-tags">
+      <CardMedia post={post} index={index} height={mediaHeight} live={live} still={still} onOpen={onOpen} onFaved={faved} />
+      <div className="post-tags" data-testid="card-tags" onScroll={fadeTags}>
         {shown.map(([c, t]) => (
           <button
             key={`${c}:${t}`}
@@ -230,6 +276,13 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         ))}
         {more > 0 && <span className="post-tag post-tag-more">+{more}</span>}
       </div>
+      <footer className="post-foot">
+        <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>
+          <ArrowUp aria-hidden />
+          {compact(post.stats.score.total)}
+        </span>
+        <FavPill post={post} btnRef={fav} onFaved={faved} />
+      </footer>
     </article>
   );
 }

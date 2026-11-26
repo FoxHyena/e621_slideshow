@@ -3,9 +3,9 @@
 /**
  * Follow, everywhere an artist shows (UX §5, DESIGN.md "Follow pill").
  *
- * - `FollowPill` (cards, the player): only for artists you don't follow. A tap wiggles it into a
- *   small ✓ in the same space (nothing moves); tapping ✓ unfollows. It waits for your list, so an
- *   artist you follow never flashes a Follow.
+ * - `FollowPill` (cards, the player): only for artists you don't follow. A tap wiggles it into
+ *   a quiet "✓ Following" (the artist's mark spins and throws its dots: `onFollowed`); tapping it
+ *   again unfollows. It waits for your list, so an artist you follow never flashes a Follow.
  * - `FollowButton` (the artist page): always there, "Follow" or "✓ Following".
  * Signed out, both open sign-in, and the artist is followed once you're in.
  */
@@ -30,7 +30,7 @@ function useFollow(name: string) {
   return { ...s, set: (on: boolean) => follows.setFollowed(name, on), retry: () => void follows.ensure("user", true) };
 }
 
-export function FollowPill({ name, art = false }: { name: string; art?: boolean }) {
+export function FollowPill({ name, art = false, onFollowed }: { name: string; art?: boolean; onFollowed?: () => void }) {
   const f = useFollow(name);
   /** tapped here: stays (as ✓) after following, so it can be undone in place */
   const [touched, setTouched] = useState(false);
@@ -47,14 +47,20 @@ export function FollowPill({ name, art = false }: { name: string; art?: boolean 
       onClick={(e) => {
         e.stopPropagation();
         if (f.signedIn) setTouched(true);
-        if (!f.on) setWiggle((w) => w + 1);
+        if (!f.on) {
+          setWiggle((w) => w + 1);
+          if (f.signedIn && !f.full) onFollowed?.();
+        }
         f.set(!f.on);
       }}
       data-testid="follow-pill"
       data-artist={name}
     >
       {f.on ? (
-        <Check aria-hidden className="follow-check" />
+        <>
+          <Check aria-hidden className="follow-check" />
+          Following
+        </>
       ) : (
         <>
           <Plus aria-hidden className="follow-plus" />

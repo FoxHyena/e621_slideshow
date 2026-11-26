@@ -426,3 +426,43 @@ unit tests for the at-once sign-in, a refused vs unreachable check, and Remember
 reload with `/users/me` held 5 s shows Following's cards within 1.5 s, and a refused key on reload
 signs the saved account out. The sign-in-failed toast now has an id (React's dev double effect showed
 it twice).
+
+## Slice R1 review (2026-11-25): v6 feed chrome
+
+**code-review skill (high), 7 findings: all fixed**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The secret tab's ten drops showed at once: `spurt` added 10 before the drops counted as in the air | Med | `inAir += 10` before the add |
+| 2 | The loading skeleton used the deleted `.post-stats` | Med | Rebuilt as a v6 panel (36 dot, sunk media, footer pill) |
+| 3 | `.field` looked raised once the hairline token became the lit edge | Low | A sunk capsule (`--shadow-sunk`, well colour) |
+| 4 | Tube tab links could start a native link drag | Low | `draggable={false}` |
+| 5 | A favourite during a spurt could end one short | Low | The last landing sets the stored count |
+| 6 | `.post-tags` `touch-action: pan-x` blocked vertical page scroll (pre-existing) | Low | `pan-x pan-y` |
+| 7 | Tuck styles stayed when reduced motion or the grid turned on | Low | Cleared when Tuck turns off |
+
+**Fresh reviewer, 10 findings (3 more were already fixed on disk)**
+
+| # | Finding | Sev | Outcome |
+|---|---|---|---|
+| 1 | The goo count persists without Remember and survives sign-out | Med | **Owner's call**: kept as a device count, logged in DECISIONS |
+| 2 | Two goo e2e asserts couldn't fail (no-drop checked too early; drag test never clicked a tab) | Med | No-drop waits 700 ms; new test drags back onto the start tab. Note: it passes with the click guard removed too, because Chromium retargets that click to the bar under pointer capture; it checks the outcome, not the guard |
+| 3 | The desktop rail has no goo or secret tab | Low | **No change**: desktop is undrawn (R2); logged in DECISIONS |
+| 4 | Player artist name lost its ellipsis; the player didn't turn the mark on favourite | Low | `display: block`; `turnMark` in the player |
+| 5 | Goo counted again on un-favourite + favourite | Low | `addFav(id)` counts a post once per page session; unit test |
+| 6 | Play stayed focusable while stepped aside | Low | `inert` with `data-away` |
+| 7 | "favourites" vs the app's "favorites" | Low | US spelling; tests updated. The Settings row's icon well is R2 (list rows) |
+| 8 | Skeleton gap 24 (cards 16), duplicate `.post-new` weight, link-blue tab focus ring | Low | All fixed (16, rule removed, gold ring) |
+| 9 | The bottom scrim may darken the legacy Account home's last 40 px | Low | **No change**: a guess, pointer-events off; R2 restyles Settings |
+| 10 | A wipe with drops in the air drew a plop on the empty bar | Low | No plop at 0 |
+
+e2e failures found by the gate: Play covered the desktop rail (4 tests); it now sits past the rail.
+
+**Gates:** 292 unit tests, 144 e2e passed (2 skipped), typecheck and lint clean. Visual check at 375×812
+(Following, Settings, goo at 60 in the preview, the tube and capsule) and desktop (rail).
+
+**Budgets** (production build, 375×812, mock e621): JS cold load of `/following` 199.3 KB (≤ 200; was
+202.2 before the goo bar, drip and burst moved to idle-loaded chunks; Fredoka is CSS/font, not JS),
+237.5 KB with the idle prefetch; 12 cards in the DOM; CLS 0.0000; first feed content 0.37 s; scroll at
+4× CPU: 0 long tasks. **Risk for R2**: 0.7 KB of headroom; the R2 list parts must stay out of the first
+load or something else must move out.

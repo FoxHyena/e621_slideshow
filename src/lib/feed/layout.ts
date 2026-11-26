@@ -4,8 +4,14 @@
  */
 import type { Post } from "../e621/types";
 
-/** DESIGN.md post panel: header, picture, gap, stats, gap, tags, bottom padding; then the gap to the next. */
-export const CARD = { header: 44, inset: 12, stats: 32, tags: 32, gap: 24 } as const;
+/**
+ * DESIGN.md v6 post panel: one 8 edge around and between everything. Edge, 36 header, edge, the
+ * picture, the tag row (its 8 above and a 28 well), edge, the 36 footer and its 3 lip, edge; then
+ * 16 to the next panel.
+ */
+export const CARD = { edge: 8, header: 36, tags: 36, foot: 39, gap: 16 } as const;
+/** Everything in a panel but the picture. */
+export const CARD_CHROME = CARD.edge + CARD.header + CARD.edge + CARD.tags + CARD.edge + CARD.foot + CARD.edge;
 /** Images taller than 1:2 are capped there and shown whole on the panel colour (DECISIONS). */
 export const MAX_TALL = 2;
 export const FEED_MAX_WIDTH = 600;
@@ -24,11 +30,11 @@ export function cardAspect(post: Pick<Post, "files">): number {
 }
 
 export function mediaHeight(post: Pick<Post, "files">, column: number): number {
-  return Math.round((column - 2 * CARD.inset) * cardAspect(post));
+  return Math.round((column - 2 * CARD.edge) * cardAspect(post));
 }
 
 export function cardHeight(post: Pick<Post, "files">, column: number): number {
-  return CARD.header + mediaHeight(post, column) + CARD.inset + CARD.stats + CARD.inset + CARD.tags + CARD.inset;
+  return CARD_CHROME + mediaHeight(post, column);
 }
 
 export interface FeedLayout {

@@ -6,6 +6,7 @@
  * stages, the timer, preloading and stall skip are today's, moved from the legacy App.
  */
 import { ChevronLeft, ChevronRight, Heart, Info, Maximize, Minimize, Pause, Play, Settings2, Share, X } from "lucide-react";
+import { turnMark } from "@/feed/motion";
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { postPageUrl } from "@/lib/e621/client";
@@ -21,6 +22,7 @@ import Stage from "@/components/Stage";
 import { getNav, type Entry } from "@/nav/history";
 import { revealY, setLockedY } from "@/nav/scroll";
 import { getFavs, favedOf } from "@/state/favs";
+import { getGoo } from "@/state/goo";
 import { getFeeds } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
@@ -255,7 +257,16 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   // ---- favorites ------------------------------------------------------------
   const favs = getFavs();
   const faved = useStore(favs.store, (s) => (current ? favedOf(s, current) : false));
-  const toggleFav = () => current && favs.toggle(current);
+  /** Every favourite adds goo to the tab bar (DESIGN.md "Tab bar goo"); un-favouriting leaves it. */
+  const favorite = (p: Post) => {
+    if (!favedOf(favs.store.get(), p) && getSession().store.get().creds) {
+      getGoo().addFav(p.id);
+      // the artist's mark turns, as on a card (DESIGN.md "Player chrome")
+      turnMark(document.querySelector(".player-who .mark"));
+    }
+    favs.toggle(p);
+  };
+  const toggleFav = () => current && favorite(current);
 
   // ---- taps and swipes --------------------------------------------------------
   const lastTap = useRef(0);
@@ -288,7 +299,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
       clearTimeout(tapTimer.current);
       lastTap.current = 0;
       setBurst((b) => b + 1);
-      if (current && !favedOf(favs.store.get(), current)) favs.toggle(current);
+      if (current && !favedOf(favs.store.get(), current)) favorite(current);
       return;
     }
     lastTap.current = t;

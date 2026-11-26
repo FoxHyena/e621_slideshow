@@ -7,6 +7,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { SETTINGS_SECTIONS, type Screen, type SettingsSection } from "@/nav/routes";
+import { getGoo, gooLabel } from "@/state/goo";
+import { useStore } from "@/state/store";
 
 export const SECTION_LABEL: Record<SettingsSection, string> = {
   account: "Account",
@@ -35,6 +37,23 @@ export function Frame({ title, onBack, children }: { title: string; onBack?: () 
 }
 
 const Soon = ({ children }: { children: ReactNode }) => <p className="screen-note">{children}</p>;
+
+/** Settings' one action row (DESIGN.md "Tab bar goo"): how much goo, and Wipe clean. */
+function GooRow() {
+  const goo = getGoo();
+  const n = useStore(goo.store, (s) => s.count);
+  return (
+    <div className="settings-group settings-action" data-testid="goo-row">
+      <div>
+        <b>Tab bar goo</b>
+        <small data-testid="goo-count">{gooLabel(n)}</small>
+      </div>
+      <button type="button" className="btn-wipe" onClick={() => goo.wipe()} disabled={n === 0} data-testid="goo-wipe">
+        Wipe clean
+      </button>
+    </div>
+  );
+}
 
 export function PlaceholderScreen({
   screen,
@@ -85,6 +104,7 @@ export function PlaceholderScreen({
               </li>
             ))}
           </ul>
+          <GooRow />
         </Frame>
       );
     case "tune":

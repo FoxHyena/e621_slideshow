@@ -299,37 +299,38 @@ export function ForYouScreen() {
   return (
     <div className="screen-frame" data-grid={grid || undefined}>
       {signedIn && <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />}
-      <div className="screen-toolbar">
-        <div className="flex-1" />
-        {signedIn && (
+      <div className="title-row">
+        <h1 tabIndex={-1} className="screen-title">
+          For You
+        </h1>
+        <div className="tools">
+          {signedIn && (
+            <button
+              type="button"
+              className="toolbar-circle"
+              aria-label="Tune For You"
+              onClick={() => getNav().push({ screen: { kind: "tune" }, play: null }, { from: "for-you" })}
+              data-testid="open-tune"
+            >
+              <SlidersHorizontal aria-hidden />
+            </button>
+          )}
           <button
             type="button"
             className="toolbar-circle"
-            aria-label="Tune For You"
-            onClick={() => getNav().push({ screen: { kind: "tune" }, play: null }, { from: "for-you" })}
-            data-testid="open-tune"
+            aria-label="Search"
+            onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "for-you" })}
           >
-            <SlidersHorizontal aria-hidden />
+            <Search aria-hidden />
           </button>
-        )}
-        <button
-          type="button"
-          className="toolbar-circle"
-          aria-label="Search"
-          onClick={() => getNav().push({ screen: { kind: "search" }, play: null }, { from: "for-you" })}
-        >
-          <Search aria-hidden />
-        </button>
-        <GridToggle grid={grid} setGrid={setGrid} />
-        {signedIn && (
-          <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="for-you-more">
-            <MoreHorizontal aria-hidden />
-          </button>
-        )}
+          <GridToggle grid={grid} setGrid={setGrid} />
+          {signedIn && (
+            <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="for-you-more">
+              <MoreHorizontal aria-hidden />
+            </button>
+          )}
+        </div>
       </div>
-      <h1 tabIndex={-1} className="screen-title">
-        For You
-      </h1>
       {subtitle && (
         <p className="screen-sub" aria-live="polite" data-testid="for-you-status">
           {subtitle}

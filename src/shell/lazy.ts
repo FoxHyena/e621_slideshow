@@ -12,6 +12,8 @@ const searchScreen = () => import("@/screens/SearchScreen");
 const forYou = () => import("@/screens/ForYou");
 const tune = () => import("@/screens/Tune");
 const player = () => import("@/player/Player");
+/** The Follow burst and the favourite drip (src/feed/motionFx.ts). */
+export const motionFx = () => import("@/feed/motionFx");
 
 export const ResultsScreen = lazy(() => feedScreens().then((m) => ({ default: m.ResultsScreen })));
 export const FavoritesScreen = lazy(() => feedScreens().then((m) => ({ default: m.FavoritesScreen })));
@@ -24,7 +26,7 @@ export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {
   const go = () => {
-    for (const load of [feedScreens, searchScreen, forYou, tune, player]) void load().catch(() => {});
+    for (const load of [feedScreens, searchScreen, forYou, tune, player, motionFx]) void load().catch(() => {});
   };
   if (typeof requestIdleCallback === "function") {
     const id = requestIdleCallback(go, { timeout: 3000 });

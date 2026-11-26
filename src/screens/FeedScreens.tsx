@@ -29,7 +29,7 @@ import { blacklistLine, copyText, openResults, openSignIn, sharePost } from "./a
 import { SearchForm } from "./SearchScreen";
 import { shareUrlFor } from "@/player/share";
 import { openPaused } from "@/player/intent";
-import { isLocked, setLockedY } from "@/nav/scroll";
+import { isLocked, scrollY, setLockedY } from "@/nav/scroll";
 
 const ALL_RATINGS = { s: true, q: true, e: true };
 
@@ -83,15 +83,51 @@ export function GridToggle({ grid, setGrid }: { grid: boolean; setGrid: (g: bool
   );
 }
 
+/**
+ * Play steps aside while you scroll down (200 ms fade and a 24 drop) and comes back when you scroll
+ * up or rest for a second. Written straight to the button, so scrolling never re-renders it.
+ */
+function useStepAside() {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    let last = scrollY();
+    let rest: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      const y = scrollY();
+      const el = ref.current;
+      // out of sight is out of the tab order too
+      const away = y > last && y > 8;
+      if (el) {
+        el.toggleAttribute("data-away", away);
+        el.inert = away;
+      }
+      last = y;
+      clearTimeout(rest);
+      rest = setTimeout(() => {
+        ref.current?.removeAttribute("data-away");
+        if (ref.current) ref.current.inert = false;
+      }, 1000);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      clearTimeout(rest);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+  return ref;
+}
+
 export function PlayFab({ feed, route, count = 0 }: { feed: Feed | null; route: Route; count?: number }) {
   useStore(feed?.version ?? getFeeds().generation, (v) => v);
+  const ref = useStepAside();
   const first = feed?.queue.posts[0];
   if (!first) return null;
   return (
     <button
+      ref={ref}
       type="button"
       className="play-fab"
-      aria-label={count > 0 ? `Play ${count} new posts` : "Play"}
+      aria-label={count > 0 ? `Play ${count} new posts` : "Play from here"}
       onClick={() => {
         openPaused(false);
         getNav().push({ screen: route.screen, play: String(first.id) });

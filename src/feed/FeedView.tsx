@@ -14,7 +14,8 @@ import { TagActionsOverlay, useTagHold, type TagAction } from "@/components/TagA
 import type { Feed } from "@/state/feeds";
 import { useStore } from "@/state/store";
 import { isLocked, registerRevealer, scrollY } from "@/nav/scroll";
-import Avatar from "@/components/Avatar";
+import { applyTuck } from "./tuck";
+import { AppMark } from "@/components/Avatar";
 import { PostCard } from "./PostCard";
 
 /** Start the next page this far before the end (UX §5). */
@@ -136,6 +137,17 @@ export function FeedView({
   const [now] = useState(() => Date.now());
   const still = useReducedMotion();
   const hold = useTagHold(onTag);
+  /** Tuck the cards as they pass the edges (not in the grid, not with reduced motion). */
+  const tucking = useRef(false);
+  useLayoutEffect(() => {
+    tucking.current = !still && !grid;
+    // turning it off leaves no card half-tucked
+    if (!tucking.current && list.current)
+      for (const slot of list.current.children) {
+        const el = slot.firstElementChild as HTMLElement | null;
+        if (el) el.style.transform = el.style.opacity = el.style.transformOrigin = "";
+      }
+  }, [still, grid]);
 
   useLayoutEffect(() => {
     const el = list.current;
@@ -159,6 +171,11 @@ export function FeedView({
   const tiles = layoutGrid(posts.length, width);
   const total = grid ? tiles.total : layout.total;
 
+  // Rows that just mounted take their tuck at once, from the last measured place.
+  useEffect(() => {
+    if (tucking.current) applyTuck(list.current, -view.top, view.height);
+  });
+
   /** Where the list is in the document, and the window over it. */
   const measure = useCallback(() => {
     const el = list.current;
@@ -177,6 +194,7 @@ export function FeedView({
         raf = 0;
         const m = measure();
         if (!m) return;
+        if (tucking.current) applyTuck(list.current, -m.top, m.height);
         setView((v) => (Math.abs(v.top - m.top) < 1 && v.height === m.height ? v : m));
       });
     };
@@ -340,18 +358,19 @@ export function FeedView({
             })
           : rows.slice(start, end).map((r, k) => {
               const at = { top: layout.tops[start + k], height: layout.heights[start + k] };
+              const tuck = { "data-top": at.top, "data-h": at.height };
               if (r.kind === "divider")
                 return (
                   <div key="divider" className="feed-slot feed-caught" style={at} data-testid="caught-up">
                     {/* a seed that draws in gold and pale blue, the caught-up colours of the approved mock */}
-                    <Avatar seed="caught-up-617" className="feed-caught-mark" />
+                    <AppMark seed="caught-up-617" className="feed-caught-mark" />
                     <b>You&rsquo;re caught up</b>
                     {caughtNote && <small data-testid="caught-note">{caughtNote}</small>}
                   </div>
                 );
               if (r.kind === "more")
                 return (
-                  <div key={`more:${r.run}`} className="feed-slot" style={at}>
+                  <div key={`more:${r.run}`} className="feed-slot" style={at} {...tuck}>
                     <button type="button" className="btn-tonal feed-burst" onClick={() => onExpand?.(r.run)} data-testid="burst-more">
                       <span>
                         {r.count} more from {r.artist.replaceAll("_", " ")}
@@ -362,7 +381,7 @@ export function FeedView({
                 );
               const p = posts[r.index];
               return (
-                <div key={p.id} className="feed-slot" style={at}>
+                <div key={p.id} className="feed-slot" style={at} {...tuck}>
                   <PostCard
                     post={p}
                     index={r.index}
@@ -432,7 +451,7 @@ function Skeletons() {
             <span className="sk-line" />
           </div>
           <div className="post-media sk-block" style={{ aspectRatio: `1 / ${a}` }} />
-          <div className="post-stats">
+          <div className="post-foot">
             <span className="sk-pill" />
           </div>
         </div>

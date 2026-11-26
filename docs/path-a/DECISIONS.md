@@ -392,3 +392,24 @@ Format: date — decision. Why. Rejected alternatives.
 - Updated to match: DESIGN.md (the "carried over" section is replaced by real specs), .impeccable/design.json
   (Field, List Row, Segmented Control, Switch, Stat Wells), the surface brief, docs/path-a/DESIGN.md, UX.md
   (artist page note, dot-separated searches).
+
+## 2026-11-25 — Slice R1 build (v6 feed chrome)
+
+- Slice R split into R1 (feed chrome, mocks/feed-v6.html) and R2 (the other screens,
+  mocks/screens-v6.html) after the second design merge (11cfef5). STATE.md has both scopes.
+- **No rating badge yet**: DESIGN.md shows it only when a post's rating differs from the user's default,
+  and there is no user default rating yet. Arrives with the rating setting.
+- **Deferred to R2 or later**: the compact header bar and the Following tab badge (neither is in R1's list).
+- **Goo is a device count**: `e6ss:v1:goo`, one number, no post ids or names. It isn't per account and
+  sign-out doesn't clear it (DESIGN.md: it stays until Wipe clean). **Open for the owner**: the hard rule
+  says per-user caches persist only with Remember on; if the owner counts this as one, it moves to the
+  account storage (sessionStorage without Remember) and sign-out clears it.
+- **Goo counts a post once per page session** (`addFav`): un-favouriting and favouriting again drips but
+  adds nothing. A favourite e621 refuses keeps its goo (it's counted on the tap, so the drop can fall).
+- **On desktop (900 px and up) the rail has no goo and no secret tab**: desktop isn't drawn yet (R2 shows
+  it to the owner). Settings still counts favourites there.
+- **Tuck** constants: the top edge is 48 px, the bar's top is 86 px above the bottom (from the mock).
+- **JS budget**: the goo bar's drawing code and the drip and Follow burst load when the page is idle
+  (`gooBar.ts`, `motionFx.ts`); the count is kept meanwhile and drawn when the code arrives. A tap on the
+  secret tab before then still adds ten.
+- Desktop Play sits bottom-left just past the rail (it was covering the rail at left 16).
