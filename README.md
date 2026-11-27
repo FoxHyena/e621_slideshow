@@ -123,7 +123,8 @@ well liked they are for their age. Posts you've already favorited are left out.
   learns which tags you seek out and which you pass on. Each favorite's tags are kept in this browser,
   and the sample is retaken once a month.
 - Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
-  so a well-liked post with only some of your tags still gets ranked.
+  so a well-liked post with only some of your tags still gets ranked. When your top tags run out of posts,
+  the search goes on with the next ones by weight, up to 3 rounds, within the same 25 pages.
 - **Tune** (the sliders on For You) holds the rest. **Breadth** sets how many of your top tags are searched together.
   At most a third of them are names (artists and characters together) while other tags are left, since names
   are rare on e621 and would otherwise take every slot for someone with many favorites. Characters also weigh

@@ -30,6 +30,34 @@ const ids = (q: RecommendedQueue) => q.posts.map((p) => p.id);
 const label = (c: { query: string; page: number }) => `${c.query.split(" ")[0]}${c.page}`;
 
 describe("RecommendedQueue", () => {
+  it("goes on with the next round's query when one runs out, within the same page budget", async () => {
+    const api = controlled();
+    const q = new RecommendedQueue([{ ...tq("or", 4), more: ["m q", "n q"] }], api.fetch, weights, filter, none);
+    for (const batch of [full(), [], full(), full()]) {
+      await flush();
+      api.calls[api.calls.length - 1].resolve(batch);
+    }
+    await q.ensure();
+    // or runs out on page 2; m starts at its page 1; the budget of 4 ends the search before n
+    expect(api.calls.map(label)).toEqual(["or1", "or2", "m1", "m2"]);
+    expect(q.progress.max).toBe(4);
+  });
+
+  it("ends when the last round runs out, even with budget left", async () => {
+    const api = controlled();
+    const q = new RecommendedQueue([{ ...tq("or", 25), more: ["m q"] }, tq("pop", 2)], api.fetch, weights, filter, none);
+    // rounds alternate: or, pop, then m (or ran out), pop, then m again
+    for (const batch of [[], full(), full(), []]) {
+      await flush();
+      api.calls[api.calls.length - 1].resolve(batch);
+    }
+    await flush();
+    api.calls[api.calls.length - 1].resolve([]);
+    await q.ensure();
+    expect(api.calls.map(label)).toEqual(["or1", "pop1", "m1", "pop2", "m2"]);
+    expect(q.exhausted).toBe(true);
+  });
+
   it("shows nothing until the search ends, then everything ranked best first", async () => {
     const api = controlled();
     const q = new RecommendedQueue([tq("or", 5)], api.fetch, weights, filter, none);

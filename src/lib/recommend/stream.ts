@@ -1,7 +1,10 @@
 import { allTags, type Post } from "../e621/types";
 import { blacklistedBy, type BlacklistRule } from "../query/blacklist";
+import { buildRecommendedQuery } from "../query/build";
+import type { SearchSettings } from "../settings";
 import { acceptPost, type PostFilter, type QueueStats, type SearchProgress, type SlideQueue } from "../slideshow/queue";
 import { learnedScore } from "./learn";
+import { searchPlan, type Overrides } from "./weights";
 import { QUALITY_WEIGHT, rankAll, scorePost, type Ranked } from "./rank";
 
 /** Most pages of candidates to fetch (8,000 posts). The search usually ends sooner, on a short page. */
@@ -22,9 +25,60 @@ export interface TagQuery {
   tag: string;
   query: string;
   pages: number;
+  /**
+   * Queries to go on with, in order, when this one runs out before its page budget. They share
+   * the budget (`searchTiers`: the next tags by weight once the first ones are used up).
+   */
+  more?: string[];
 }
 
 export type RecFetch = (query: string, page: number, limit: number) => Promise<Post[]>;
+
+/**
+ * How many rounds of `breadth` tags the candidate search may go through. Specific tags run out
+ * fast: a friend's 15 searched tags found every post of a 30-day window in 4 of the 25 pages the
+ * search may use. When a round's tags run out, the search goes on with the next `breadth` tags
+ * by weight, until the page budget is spent or the rounds are.
+ */
+export const SEARCH_TIERS = 3;
+
+/**
+ * The searched tags in rounds: the plan (`searchPlan`), then each next `breadth` tags of a wider
+ * plan, so each round keeps names to their share. Empty rounds are dropped.
+ */
+export function searchTiers(
+  weights: Map<string, number>,
+  overrides: Overrides,
+  breadth: number,
+  isName: (tag: string) => boolean = () => false,
+  tiers = SEARCH_TIERS,
+): string[][] {
+  const out: string[][] = [];
+  const taken = new Set<string>();
+  for (let k = 1; k <= tiers; k++) {
+    const next = searchPlan(weights, overrides, breadth * k, isName)
+      .map((p) => p.tag)
+      .filter((t) => !taken.has(t))
+      .slice(0, breadth);
+    if (!next.length) break;
+    next.forEach((t) => taken.add(t));
+    out.push(next);
+  }
+  return out;
+}
+
+/**
+ * The candidate search For You runs: the tag rounds (`searchTiers`) as one query sharing the page
+ * budget, and the window's popular posts beside it.
+ */
+export function recQueries(s: SearchSettings, tiers: string[][], tagLimit: number): TagQuery[] {
+  // no tags yet: the window alone, as before there were rounds
+  const [first, ...rest] = (tiers.length ? tiers : [[]]).map((t) => buildRecommendedQuery(s, t, tagLimit));
+  return [
+    { tag: "candidates", query: first.query, pages: REC_PAGE_BUDGET, more: rest.map((r) => r.query) },
+    { tag: "popular", query: first.popular, pages: REC_POPULAR_PAGES },
+  ];
+}
 
 /**
  * A slideshow source that fetches every candidate page in the background, then
@@ -55,6 +109,8 @@ export class RecommendedQueue implements SlideQueue {
   private requests = 0;
   /** pages fetched per query tag */
   private fetched = new Map<string, number>();
+  /** per query tag on to its `more`: which one, and the round its page 1 was fetched in */
+  private tier = new Map<string, { i: number; from: number }>();
   private startedAt = Date.now();
   private at = this.startedAt;
   private running = false;
@@ -147,7 +203,11 @@ export class RecommendedQueue implements SlideQueue {
         continue;
       }
       const q = this.queries[this.pos];
-      if (q.pages >= this.round && !this.done.has(q.tag)) return { ...q, page: this.round };
+      if (q.pages >= this.round && !this.done.has(q.tag)) {
+        // each query fetches one page a round, so the budget is the round; a `more` query starts at its page 1
+        const t = this.tier.get(q.tag);
+        return t ? { ...q, query: q.more![t.i], page: this.round - t.from + 1 } : { ...q, page: this.round };
+      }
       this.pos++;
     }
     return null;
@@ -167,7 +227,11 @@ export class RecommendedQueue implements SlideQueue {
         this.requests++;
         this.fetched.set(next.tag, (this.fetched.get(next.tag) ?? 0) + 1);
         this.at = Date.now();
-        if (batch.length < REC_PAGE_SIZE) this.done.add(next.tag);
+        if (batch.length < REC_PAGE_SIZE) {
+          const i = (this.tier.get(next.tag)?.i ?? -1) + 1;
+          if (next.more && i < next.more.length) this.tier.set(next.tag, { i, from: this.round + 1 });
+          else this.done.add(next.tag);
+        }
         this.add(batch);
         this.onChange(); // progress only; posts stay hidden until the end
       }
