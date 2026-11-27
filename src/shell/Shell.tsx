@@ -19,6 +19,7 @@ import { migrate } from "@/state/migrate";
 import { getSession } from "@/state/session";
 import { Toaster, toast } from "sonner";
 import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
+import { watchPresses } from "./opener";
 import { ScreenContext } from "./context";
 import { TabBar, useRail } from "./TabBar";
 import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
@@ -127,6 +128,8 @@ export default function Shell() {
   }, []);
 
   useEffect(() => installEdgeSwipe(() => void nav.back({ gesture: true })), [nav]);
+  // what each press came from, for a popover to hang from (DESIGN.md "On a computer")
+  useEffect(() => watchPresses(), []);
   useEffect(() => prefetchScreens(), []);
   // The service worker, the update toast and the install offer: once the page is idle, in their own
   // chunk (the browser's install offer is held from the first moment by an inline script).

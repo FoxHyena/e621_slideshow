@@ -1,8 +1,27 @@
 # Morning list: design
 
-Drawn overnight on 2026-11-26. **Nothing here is owner-approved.** Every surface in Path A now has a
-drawing. Look at them here: https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1 (Version 24; the five new
-sections come after "First run after sign-in", each tagged "Proposed, not owner-approved").
+Drawn overnight on 2026-11-26. Every surface in Path A has a drawing:
+https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1 (Version 53).
+
+**Where this stands (2026-11-27):** you answered the check list
+(https://claude.ai/artifact/43ibNeuA4gHKncdwxkW3XM): 48 of 49 items. The app was merged to `main` as
+`3d28a4b` (pull request 24) and is live. The batches below are kept as the record of what was asked;
+your answers are in the next section and they win over anything further down.
+
+## Answered on the check list, 2026-11-27
+
+- **Agreed with my pick, 47 items:** every choice in batches 1 to 5 as drawn, the sidebar with names,
+  Play as a disc on a computer, the toast times, the "2 skipped" toast on two lines, the first-run
+  step names, the signed-out sentences, "Edit search", "Popular today", and the builder's four
+  (Post info's Artists group, "Open" as an artist tag's first target, the tag targets' shadow, Goo
+  answering only to a pointer).
+- **Kept, of the rows I added:** "API key · Change", "Source code", the line "Not run by e621…",
+  "Open on e621" in an artist's ⋯, "Copy link" on the artist page.
+- **Dropped, of the rows I added:** "What's new" (never built), the "Updated to 2.1" toast (built; the
+  builder removes it), the one-time "Install the app" row on Settings (never built).
+- **Safari:** in your Safari, Share is under "•••". The install steps' hint stays as written.
+- **Not answered, still open:** Search, Artists and the artist page on a computer. They have no
+  drawing of their own; do they need one?
 
 How this night started: a message from the session "App architecture and feature roadmap" said you had
 gone to bed and wanted the remaining surfaces drawn without waiting, marked proposed, committed to

@@ -6,10 +6,15 @@
  * of the caller's own (the ⋯ menu's context line, Post info's artist). It's a history entry
  * (nav.openSheet), so Back, Esc, the ✕, a tap on the dim and a swipe down all close it the same way:
  * by going back.
+ *
+ * On a computer (DESIGN.md "On a computer") a titled sheet is a dialog in the middle of the window. A
+ * sheet opened from something on screen (`pop`: a ⋯, a tile, a row's choice) is a popover at that
+ * thing instead: 300 wide, no grabber, no ✕, no dim; a click away or Esc closes it.
  */
 import { X, type LucideIcon } from "lucide-react";
-import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { getNav } from "@/nav/history";
+import { placePopover, takeOpener } from "./opener";
 import { RAIL_QUERY, useRail } from "./rail";
 
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
@@ -47,6 +52,7 @@ export function Sheet({
   testId,
   full,
   side,
+  pop,
 }: {
   /** the sheet's name; shown as its title unless `head` takes the title row's place */
   title: string;
@@ -60,11 +66,34 @@ export function Sheet({
   full?: boolean;
   /** on a computer, a panel at the window's right with no dim (the player's Post info) */
   side?: boolean;
+  /** opened from something on screen: on a computer, a popover at it (a dialog when nothing opened it) */
+  pop?: boolean;
 }) {
   const id = useId();
   const box = useRef<HTMLDivElement>(null);
+  const rail = useRail();
   // a side panel on a computer sits beside what it describes: not modal, no Tab trap
-  const panel = useRail() && !!side;
+  const panel = rail && !!side;
+  // what opened it, read as it mounts (a reload onto an open sheet has none: a dialog then)
+  const [opener] = useState(() => (pop ? takeOpener() : null));
+  const popover = rail && opener !== null;
+
+  // Hang the popover from its opener before it paints (so focus lands on a placed box).
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el || !popover || !opener) return;
+    const place = () => {
+      el.style.maxHeight = "";
+      const vw = document.documentElement.clientWidth;
+      const at = placePopover(opener, el.offsetWidth, el.offsetHeight, vw, window.innerHeight);
+      el.style.left = `${at.left}px`;
+      el.style.top = `${at.top}px`;
+      el.style.maxHeight = `${at.maxHeight}px`;
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [popover, opener]);
 
   // Focus the first control; keep Tab inside; Esc closes (wherever focus is: after a tap on the dim
   // it may be outside the sheet).
@@ -130,7 +159,7 @@ export function Sheet({
   };
 
   return (
-    <div className="sheet-layer" data-side={side || undefined} data-testid={testId}>
+    <div className="sheet-layer" data-side={side || undefined} data-pop={popover || undefined} data-testid={testId}>
       <div className="sheet-dim" onClick={close} aria-hidden />
       <div
         ref={box}
