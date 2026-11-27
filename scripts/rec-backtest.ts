@@ -43,6 +43,8 @@
 //                  either lift or that model scores them above 0
 //   mix-3-count    mix-3 with weights damped by count of favorites only, as before SHARE_HALF
 //   mix-3-share    mix-3 with the share damping but not the site-breadth one, as before SITE_HALF
+//   mix-3-tiersN   mix-3 where the tag search goes on with the next `breadth` tags when one round
+//                  runs out, for up to N rounds within the same page budget (searchTiers)
 //                  (the log lines say how many artists and characters, and how many tags on over 1%
 //                  of e621, each plan searches)
 //
@@ -67,7 +69,7 @@ import { features, learnedScore, learnWeights } from "../src/lib/recommend/learn
 import { artistRecall } from "../src/lib/recommend/artistBacktest";
 import { addFavorites, emptyProfile } from "../src/lib/recommend/profile";
 import { byRank, rankAll, scorePost, type Ranked } from "../src/lib/recommend/rank";
-import { REC_PAGE_BUDGET, REC_PAGE_SIZE } from "../src/lib/recommend/stream";
+import { REC_PAGE_BUDGET, REC_PAGE_SIZE, searchTiers } from "../src/lib/recommend/stream";
 import { countsOf, EMPTY_TAG_CACHE, FAV_PAGE, refreshTagCache, tagsToLookUp, type RecApi, type TagCache } from "../src/lib/recommend/sync";
 import { CAT_MULT, computeWeights, isName, searchPlan, NO_OVERRIDES, SHARE_HALF } from "../src/lib/recommend/weights";
 import { DEFAULT_SEARCH } from "../src/lib/settings";
@@ -104,6 +106,9 @@ const PLANS = [
   "mix-3-lr",
   "mix-3-count",
   "mix-3-share",
+  "mix-3-tiers2",
+  "mix-3-tiers3",
+  "mix-3-tiers5",
 ] as const;
 type Plan = (typeof PLANS)[number];
 const DEFAULT_PLANS = PLANS.filter((p) => p !== "cover-max"); // cover-max: 25 uncacheable pages per account
@@ -294,7 +299,11 @@ async function runUser(name: string, share: number): Promise<Row[]> {
   const popular = query([]);
   const sig = await fetchQuery(signature.query, REC_PAGE_BUDGET);
   const same = sig.pages;
-  const specs: Record<Plan, () => { query: string; pages: number }[]> = {
+  const tiered = (n: number) => {
+    const [first, ...rest] = searchTiers(weights, NO_OVERRIDES, breadth, named, n).map((t) => query(t).query);
+    return [{ query: first, pages: REC_PAGE_BUDGET, more: rest }, { query: popular.query, pages: 3 }];
+  };
+  const specs: Record<Plan, () => { query: string; pages: number; more?: string[] }[]> = {
     signature: () => [{ query: signature.query, pages: REC_PAGE_BUDGET }],
     "popular-same": () => [{ query: popular.query, pages: same }],
     "cover-same": () => [{ query: query(cover(same)).query, pages: same }],
@@ -309,6 +318,9 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     "mix-3-lr": () => [{ query: lrSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
     "mix-3-count": () => [{ query: countSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
     "mix-3-share": () => [{ query: shareSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
+    "mix-3-tiers2": () => tiered(2),
+    "mix-3-tiers3": () => tiered(3),
+    "mix-3-tiers5": () => tiered(5),
   };
 
   const rows: Row[] = [];
@@ -320,9 +332,17 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     const ranked: Ranked[] = [];
     let pages = 0;
     for (const q of specs[plan]()) {
-      const got = await fetchQuery(q.query, q.pages);
-      pages += got.pages;
-      for (const post of got.posts) {
+      // a query that runs out goes on with its `more`, within the same budget (RecommendedQueue)
+      const posts: Post[] = [];
+      let left = q.pages;
+      for (const query of [q.query, ...(q.more ?? [])]) {
+        if (left <= 0) break;
+        const got = await fetchQuery(query, left);
+        pages += got.pages;
+        left -= got.pages;
+        posts.push(...got.posts);
+      }
+      for (const post of posts) {
         if (!acceptPost(post, filter)) continue;
         const r = scorePost(post, weights);
         const lrMatch = plan === "mix-3-lr" && !!main && learnedScore(post, main) > 0;

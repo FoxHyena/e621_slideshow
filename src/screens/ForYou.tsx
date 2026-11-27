@@ -11,10 +11,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, recSteps } from "@/components/Loader";
 import { searchPosts } from "@/lib/e621/client";
 import { DEFAULT_FILTERS, type Filters } from "@/lib/feed/filters";
-import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "@/lib/query/build";
+import { DEFAULT_TAG_LIMIT } from "@/lib/query/build";
 import { IdListQueue } from "@/lib/recommend/restore";
-import { RecommendedQueue, REC_PAGE_BUDGET, REC_POPULAR_PAGES } from "@/lib/recommend/stream";
-import { isName, NO_OVERRIDES, searchPlan } from "@/lib/recommend/weights";
+import { recQueries, RecommendedQueue, searchTiers } from "@/lib/recommend/stream";
+import { isName, NO_OVERRIDES } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type SearchSettings } from "@/lib/settings";
 import type { SlideQueue } from "@/lib/slideshow/queue";
 import { storage, type RankedList } from "@/lib/storage";
@@ -140,7 +140,7 @@ export function ForYouScreen() {
   const ready = session.ready && r.loaded && r.name === name;
 
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
-  const plan = useMemo(() => (r.profile ? searchPlan(weights, r.overrides, breadth, (t) => isName(r.profile?.tags[t]?.cat)) : []), [weights, r.profile, r.overrides, breadth]);
+  const plan = useMemo(() => (r.profile ? searchTiers(weights, r.overrides, breadth, (t) => isName(r.profile?.tags[t]?.cat)) : []), [weights, r.profile, r.overrides, breadth]);
   const filterKey = JSON.stringify([name, applied.media, applied.date, applied.minScore, ratings]);
   const inputs = JSON.stringify([signatureOf(r), breadth]);
   const canRank = ready && !!name && plan.length > 0;
@@ -187,13 +187,9 @@ export function ForYouScreen() {
       (onChange, rules) => {
         const s: SearchSettings = { ...DEFAULT_SEARCH, ratings, media: applied.media, date: applied.date, minScore: applied.minScore, breadth };
         const tagLimit = session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
-        const rq = buildRecommendedQuery(s, plan.map((p) => p.tag), tagLimit);
         const holder: { q?: RecommendedQueue } = {};
         const q = new RecommendedQueue(
-          [
-            { tag: "candidates", query: rq.query, pages: REC_PAGE_BUDGET },
-            { tag: "popular", query: rq.popular, pages: REC_POPULAR_PAGES },
-          ],
+          recQueries(s, plan, tagLimit),
           rankFetch,
           weights,
           { media: applied.media, rules, ctx },

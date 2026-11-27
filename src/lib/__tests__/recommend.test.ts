@@ -3,6 +3,7 @@ import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
 import { cohortQuality, percentiles, rankAll, scorePost, type Ranked } from "../recommend/rank";
 import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
 import { CAT_MULT, computeWeights, isName, NO_OVERRIDES, searchPlan, SHARE_HALF, SITE_HALF, topTags } from "../recommend/weights";
+import { searchTiers } from "../recommend/stream";
 import { makePost } from "./fixtures";
 
 const NOW = 1_700_000_000_000;
@@ -265,6 +266,37 @@ describe("refreshTagCache", () => {
   it("only looks up tags with support in a weighted category", () => {
     const p = profile();
     expect(tagsToLookUp(p).sort()).toEqual(["anthro", "fave_artist", "niche_kink"]);
+  });
+});
+
+describe("searchTiers", () => {
+  const w = new Map([
+    ["artist_a", 9],
+    ["artist_b", 8],
+    ["artist_c", 7],
+    ["kink_a", 6],
+    ["kink_b", 5],
+    ["kink_c", 4],
+    ["kink_d", 3],
+  ]);
+  const named = (t: string) => t.startsWith("artist_");
+
+  it("splits the tags into rounds of breadth, strongest first, each keeping names to their share", () => {
+    expect(searchTiers(w, NO_OVERRIDES, 3, named, 3)).toEqual([
+      ["artist_a", "kink_a", "kink_b"],
+      ["artist_b", "kink_c", "kink_d"],
+      ["artist_c"],
+    ]);
+  });
+
+  it("stops at the round limit and drops empty rounds", () => {
+    expect(searchTiers(w, NO_OVERRIDES, 3, named, 2)).toHaveLength(2);
+    expect(searchTiers(w, NO_OVERRIDES, 10, named, 3)).toHaveLength(1);
+  });
+
+  it("starts with the plan For You has always searched, pins first", () => {
+    const o = { pinned: ["kink_d"], muted: [] };
+    expect(searchTiers(w, o, 3, named)[0]).toEqual(searchPlan(w, o, 3, named).map((p) => p.tag));
   });
 });
 

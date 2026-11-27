@@ -1477,3 +1477,24 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   at the shared third (5 of 15). The specific tags run dry in 4 pages of a 30-day window, so most of
   the page budget goes unused; a later change could spend it on more tags.
 - The owner's own account is no longer used for tuning or testing the weights.
+
+## 2026-11-27 — For You: the tag search goes on with the next tags when the first run out
+- Owner, on "the specific tags run dry in 4 of the 25 pages": "yeah sure!"
+- **Change:** the candidate search runs in rounds (`searchTiers`, `SEARCH_TIERS = 3`). Round 1 is the plan
+  For You always searched; when its query runs out of posts, the search goes on with the next `breadth`
+  tags by weight (names still at most a third per round), within the same 25-page budget. Tune and the
+  settings panel still show round 1 only.
+- **Backtest, the friend's account** (last 30 days hidden, 22 favorites; with 3 popular pages; learned
+  model mix10, quality 0.5–1):
+
+  | Rounds | Pages | Candidates | Found | Learned top 200 |
+  |---|---|---|---|---|
+  | 1 (main) | 4 + 3 | 1,912 | 14 | 8–9 |
+  | 2 | 14 + 3 | 4,424 | 17 | 9 |
+  | **3** | 22 + 3 | 5,812 | **19** | **10–11** |
+  | 5 | 25 + 3 | 6,120 | 19 | 10 |
+
+- 3 rounds: 5 more found and about 2 more in the top 200, with nothing broad added (round 2's broadest
+  tag is dominant_male, 1.1% of e621). 5 rounds found no more. One account and 22 favorites; the 7-day
+  window had 1 hidden favorite, too few to test.
+- **Cost:** up to 25 tag pages instead of 4, so a ranking takes longer and makes more e621 requests.

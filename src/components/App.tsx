@@ -32,7 +32,7 @@ import {
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
-import { RecommendedQueue, REC_PAGE_BUDGET, REC_POPULAR_PAGES } from "@/lib/recommend/stream";
+import { recQueries, RecommendedQueue, searchTiers } from "@/lib/recommend/stream";
 import { isName, searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
 import { encodeShare, encodeShareCreds } from "@/lib/share";
@@ -199,6 +199,11 @@ export default function App({
     () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth, (t) => isName(rec.profile?.tags[t]?.cat)) : []),
     [rec.weights, rec.profile, rec.overrides, search.breadth],
   );
+  /** the same in rounds, for when the first tags run out (searchTiers) */
+  const recTiers = useMemo(
+    () => (rec.profile ? searchTiers(rec.weights, rec.overrides, search.breadth, (t) => isName(rec.profile?.tags[t]?.cat)) : []),
+    [rec.weights, rec.profile, rec.overrides, search.breadth],
+  );
   const isRec = (s: SearchSettings) => s.source === "recommended";
   const isFav = (s: SearchSettings) => s.source === "favorites";
   /** The search e621 actually runs: Favorites swaps the tag box for `fav:<name>`. */
@@ -226,12 +231,8 @@ export default function App({
     const ctx = { username: user?.name };
     let q: SlideQueue;
     if (isRec(s)) {
-      const rq = buildRecommendedQuery(s, recTagNames, tagLimit);
       q = new RecommendedQueue(
-        [
-          { tag: "candidates", query: rq.query, pages: REC_PAGE_BUDGET },
-          { tag: "popular", query: rq.popular, pages: REC_POPULAR_PAGES },
-        ],
+        recQueries(s, recTiers, tagLimit),
         (query, page, limit) => searchPosts(query, page, limit, creds),
         rec.weights,
         { media: s.media, rules: b.rules, ctx },
