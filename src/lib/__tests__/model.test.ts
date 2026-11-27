@@ -115,4 +115,14 @@ describe("withOverrides", () => {
     expect(w.get("b")).toBe(2);
     expect(w.has("c")).toBe(false);
   });
+
+  it("with Leave out artists, drops the favorites' artists unless pinned", () => {
+    const l: Learned = { favKey: "k", negAt: 0, weights: [["a", 2], ["artist_one", 3], ["artist_two", 1]] };
+    const isArtist = (t: string) => t.startsWith("artist_");
+    const w = withOverrides(l, { pinned: ["artist_two"], muted: [], noArtists: true }, isArtist);
+    expect([...w.keys()].sort()).toEqual(["a", "artist_two"]);
+    expect(w.get("artist_two")).toBe(2);
+    // off (or an older save without the field): artists stay
+    expect(withOverrides(l, { pinned: [], muted: [] }, isArtist).has("artist_one")).toBe(true);
+  });
 });

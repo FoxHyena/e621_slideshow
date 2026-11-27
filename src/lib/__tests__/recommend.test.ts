@@ -65,6 +65,15 @@ describe("computeWeights", () => {
     expect(w.has("hi_res")).toBe(false);
   });
 
+  it("with Leave out artists, gives artist tags no weight unless pinned", () => {
+    expect(w.get("fave_artist")).toBeGreaterThan(0);
+    const off = computeWeights(profile(), GLOBAL, N_SITE, { pinned: [], muted: [], noArtists: true });
+    expect(off.has("fave_artist")).toBe(false);
+    expect(off.get("niche_kink")).toBe(w.get("niche_kink"));
+    const pinned = computeWeights(profile(), GLOBAL, N_SITE, { pinned: ["fave_artist"], muted: [], noArtists: true });
+    expect(pinned.has("fave_artist")).toBe(true);
+  });
+
   it("skips tags with no global count", () => {
     expect(computeWeights(profile(), {}, N_SITE).size).toBe(0);
   });

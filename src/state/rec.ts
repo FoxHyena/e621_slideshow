@@ -51,6 +51,8 @@ export interface Rec {
   rebuild(): void;
   togglePin(tag: string): void;
   toggleMute(tag: string): void;
+  /** Tune's "Leave out artists" */
+  setNoArtists(on: boolean): void;
 }
 
 function recApi(userId: number, creds: Credentials): RecApi {
@@ -77,7 +79,8 @@ export function weightsOf(s: RecState): Map<string, number> {
 
 /** The learned weights with pins and mutes applied, when the fit matches this exact profile. */
 export function learnedOf(s: RecState): Map<string, number> | null {
-  return s.profile && s.fit?.favKey === favKey(s.profile) ? withOverrides(s.fit, s.overrides) : null;
+  const p = s.profile;
+  return p && s.fit?.favKey === favKey(p) ? withOverrides(s.fit, s.overrides, (t) => p.tags[t]?.cat === "artist") : null;
 }
 
 /** Changes whenever ranking inputs do, so a ranked list knows it's stale. */
@@ -201,6 +204,7 @@ export function createRec(warn: (msg: string) => void, now: () => number = Date.
     togglePin(tag) {
       const o = store.get().overrides;
       setOverrides({
+        ...o,
         pinned: o.pinned.includes(tag) ? without(o.pinned, tag) : [...o.pinned, tag],
         muted: without(o.muted, tag),
       });
@@ -208,9 +212,15 @@ export function createRec(warn: (msg: string) => void, now: () => number = Date.
     toggleMute(tag) {
       const o = store.get().overrides;
       setOverrides({
+        ...o,
         pinned: without(o.pinned, tag),
         muted: o.muted.includes(tag) ? without(o.muted, tag) : [...o.muted, tag],
       });
+    },
+    setNoArtists(on) {
+      const o = store.get().overrides;
+      if (!!o.noArtists === on) return;
+      setOverrides({ ...o, noArtists: on || undefined });
     },
   };
 }

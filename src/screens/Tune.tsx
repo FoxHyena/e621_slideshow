@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Tune (`/for-you/tune`, UX §5): For You's profile. Sync status and Rebuild, Breadth, and every
- * profile tag with Pin and Mute. Nothing re-ranks from here: For You offers Update ranking on return.
+ * Tune (`/for-you/tune`, UX §5): For You's profile. Sync status and Rebuild, Breadth, Leave out
+ * artists, and every profile tag with Pin and Mute. Nothing re-ranks from here: For You offers Update ranking on return.
  */
 import { ChevronLeft, Pin, RefreshCw, Search, VolumeX } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
@@ -177,6 +177,24 @@ export function TuneScreen() {
               e621&rsquo;s search-tag slots.
             </p>
           </section>
+
+          {/* the owner's ask (2026-11-26): taste without who drew it; a pinned artist still counts */}
+          <div className="list-group tune-artists">
+            <label className="list-row">
+              <span className="row-text">
+                <b>Leave out artists</b>
+                <small>Rank by what&rsquo;s drawn, not who</small>
+              </span>
+              <input
+                type="checkbox"
+                role="switch"
+                className="switch"
+                checked={!!overrides.noArtists}
+                onChange={(e) => rec.setNoArtists(e.target.checked)}
+                data-testid="rec-no-artists"
+              />
+            </label>
+          </div>
 
           {tags.length > 0 ? (
             <section className="tune-tags" aria-labelledby="tune-profile">

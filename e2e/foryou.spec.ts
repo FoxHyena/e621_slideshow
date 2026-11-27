@@ -243,3 +243,32 @@ test("signing out while For You is still ranking (hidden behind Settings) stops 
   await page.waitForTimeout(4000);
   expect(mock.searches.filter((s) => s.auth && rankPage(s.tags)).length).toBe(asked);
 });
+
+test("Tune's Leave out artists takes artist tags out of your taste and the search; it's kept, and offers Update ranking", async ({ page }) => {
+  const mock = await withFavorites(page);
+  // the favorites' artist is rare on e621, so it weighs in like any distinctive tag
+  mock.tagCounts = { ...mock.tagCounts, mock_artist: 5 };
+  const rankSearches = () => mock.searches.filter((s) => / order:score$/.test(s.tags) && s.tags.startsWith("~")).map((s) => s.tags);
+  await page.goto("/for-you");
+  await firstRanked(page);
+  expect(rankSearches().at(-1)).toContain("~mock_artist");
+
+  await page.getByTestId("open-tune").click();
+  const sw = page.getByTestId("rec-no-artists");
+  await expect(sw).not.toBeChecked();
+  await expect(page.getByTestId("rec-tags")).toContainText("mock artist");
+  await sw.check();
+  await expect(page.getByTestId("rec-tags")).not.toContainText("mock artist");
+  await expect(page.getByTestId("rec-tags")).toContainText("pawpads");
+  await shot(page, "tune-no-artists");
+  // kept for this account
+  await page.reload();
+  await expect(page.getByTestId("rec-no-artists")).toBeChecked();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/for-you$/);
+  await page.getByTestId("update-ranking").click();
+  await expect.poll(() => rankSearches().length).toBeGreaterThan(1);
+  expect(rankSearches().at(-1)).not.toContain("mock_artist");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+});
