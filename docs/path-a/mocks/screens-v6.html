@@ -145,6 +145,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* Material 2, the post panel: lit navy, one 8 edge, radii that nest (24 > 16) */
 .post6 { margin: 0 var(--inset) 16px; padding: var(--edge); border-radius: var(--r-panel); background: linear-gradient(var(--panel-a), var(--panel-b) 220px); box-shadow: var(--lit), var(--lit-b); position: relative; }
+/* Two 36 discs sit 8 inside the panel's top corners: the artist mark on the left and the ⋯ button's wash on the right. So both top corners are 18 + 8 = 26 and the gap is 8 all the way round each disc. The bottom corners stay 24. */
+.post6 { border-top-left-radius: 26px; border-top-right-radius: 26px; }
 .ph { display: flex; align-items: center; gap: 12px; height: 36px; margin-bottom: var(--edge); }
 .ph .who { display: block; border-radius: 999px; flex: none; }
 .ph .who::before { content: ""; position: absolute; inset: -4px; }
@@ -158,6 +160,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ph .when b { color: var(--gold); font: var(--t-foot-r); line-height: 16px; }
 .more6 { width: 36px; height: 36px; margin-right: -6px; display: grid; place-items: center; color: var(--muted); flex: none; border-radius: 999px; position: relative; }
 .more6::before { content: ""; position: absolute; inset: -4px; }
+/* In a panel's header the ⋯ stays inside the 8 padding, so its wash never crowds the panel's edge. */
+.ph .more6 { margin-right: 0; }
 .more6:active { background: var(--well); color: var(--text); }
 .follow6 { height: var(--h-c); display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 10px; border-radius: 999px; font: var(--t-foot-r); flex: none; --lip: 2px;
   background: linear-gradient(var(--raised-a), var(--raised-b)); position: relative; }
@@ -1069,6 +1073,89 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile6.skt6 > .sk.pic { aspect-ratio: 1; border-radius: var(--r-art); }
 .tile6.skt6 .nums { height: 18px; align-items: center; }
 .tile6.skt6 .nums .sk { height: 10px; }
+
+/* ============ A post on its own: the picture viewer, the post page, comics (owner-approved 2026-11-27) ============ */
+/* The viewer is the player's room (black, glass) with no slideshow in it. */
+.view6 .vstage { position: absolute; inset: 0; overflow: hidden; cursor: zoom-in; touch-action: none; user-select: none; -webkit-user-select: none; }
+.view6 .vtrack { position: absolute; inset: 0; display: flex; transition: transform .32s cubic-bezier(.2,.8,.2,1); }
+.view6 .vpage { flex: none; width: 100%; height: 100%; display: grid; place-items: center; }
+.view6 .vpic { width: 100%; transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+.view6 .vpic > i { display: block; width: 100%; aspect-ratio: var(--ar, 4 / 5); background: var(--art); }
+.view6.zoomed .vstage { cursor: zoom-out; }
+.view6 .ts, .view6 .bs { pointer-events: none; }
+.view6 .bs { height: 250px; }
+.view6 :is(.ts, .bs, .ptop6, .pbot6) { transition: opacity .2s ease-out; }
+.view6[data-chrome="0"] :is(.ts, .bs, .ptop6, .pbot6) { opacity: 0; pointer-events: none; }
+.view6 .ptop6 { min-height: var(--h); }
+button.pwho6 { text-align: left; width: 100%; }
+button.pwho6 b { display: flex; align-items: center; gap: 2px; }
+button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
+/* The comic bar: the player's glass, as one capsule. It names the comic and opens its pages. */
+.vcomic6 { display: flex; align-items: center; gap: 10px; width: 100%; height: var(--h); padding: 0 12px 0 14px; border-radius: 999px; background: rgba(2,15,35,.55); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); color: #fff; text-align: left; transition: transform .1s ease-out; }
+.vcomic6:active { transform: scale(.98); }
+.vcomic6 b { flex: 1; min-width: 0; font: var(--t-count); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vcomic6 small { flex: none; font: var(--t-foot-r); color: rgba(255,255,255,.74); font-variant-numeric: tabular-nums; }
+.vcomic6 .ic { flex: none; }
+.vcomic6 .chev { transform: rotate(-90deg); color: rgba(255,255,255,.6); }
+/* A stand-in comic page: paper and three panels. Not real art. */
+.cpg6 { --g: 8px; display: grid; gap: var(--g); padding: calc(var(--g) * 1.25); width: 100%; aspect-ratio: 5 / 7; background: #EFEAE0; }
+.cpg6 i { display: block; min-height: 0; border-radius: 2px; background: var(--art); }
+.cpg6.a { grid-template: 5fr 4fr / 1fr 1fr; } .cpg6.a i:first-child { grid-column: 1 / -1; }
+.cpg6.b { grid-template: 1fr 1fr 1fr / 1fr; }
+.cpg6.c { grid-template: 4fr 5fr / 3fr 2fr; } .cpg6.c i:last-child { grid-column: 1 / -1; }
+/* The Pages sheet: every page as a thumb, the current one ringed like a chosen slideshow style. */
+.pages6 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 8px; margin-top: 12px; }
+.pages6 button { display: flex; flex-direction: column; align-items: center; gap: 4px; font: var(--t-foot-r); color: var(--muted); font-variant-numeric: tabular-nums; }
+.pages6 .pg { display: block; width: 100%; border-radius: 8px; overflow: hidden; box-shadow: var(--sunk-art); }
+.pages6 .cpg6, .cstrip6 .cpg6 { --g: 2px; }
+.pages6 button[aria-current] { color: var(--text); }
+.pages6 button[aria-current] .pg { box-shadow: 0 0 0 2px var(--panel-a), 0 0 0 3.5px var(--gold); }
+/* On a feed card: a well at the left of the footer, where nothing stood. */
+.cpill6 { margin-right: auto; height: var(--h-w); display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 8px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); color: var(--link); font: var(--t-foot-r); font-variant-numeric: tabular-nums; position: relative; }
+.cpill6::before { content: ""; position: absolute; inset: -8px 0; }
+/* The post page */
+.post6 .art6 > .cpg6 { border-radius: 0; }
+.comic6 .cstrip6 { display: flex; gap: 8px; margin: 0 8px 8px; padding: 8px; border-radius: var(--r-art); background: var(--well); box-shadow: var(--sunk); overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.comic6 .cstrip6::-webkit-scrollbar { display: none; }
+.cstrip6 button { flex: none; width: 56px; border-radius: 8px; overflow: hidden; scroll-snap-align: center; position: relative; }
+.cstrip6 button::before { content: ""; position: absolute; inset: -8px -4px; }
+.cstrip6 button[aria-current] { box-shadow: 0 0 0 2px var(--well), 0 0 0 3.5px var(--gold); }
+.pinfo6 { margin: 0 var(--inset) 16px; padding: 16px; border-radius: var(--r-panel); background: var(--panel-a); box-shadow: var(--lit), var(--lit-b); }
+.pinfo6 > .tlabel6:first-child { margin-top: 0; }
+.tag6.a { color: #F2AC08; }
+.pinfo6 .desc6 { margin: 0; font: var(--t-body); color: var(--text); text-wrap: pretty; }
+.pinfo6 .ifoot6 { margin: 16px 0 0; }
+.shead6 .link6 { height: 25px; position: relative; }
+.shead6 .link6::before { content: ""; position: absolute; inset: -10px 0; }
+/* A link in a chat. Page chrome: this is somebody else's app, so it is not drawn in ours. */
+.chat6 { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 24px; background: #17171A; }
+.chat6 .msg { margin: 0; font: 400 14px/20px var(--f-page); color: #DCDBD6; overflow-wrap: anywhere; }
+.chat6 .msg u { color: #8FB8F0; text-underline-offset: 2px; }
+.chat6 .emb { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 12px; background: #232327; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.chat6 .emb > small { font: 500 12px/16px var(--f-page); color: #A9A7A1; }
+.chat6 .emb > b { font: 650 15px/20px var(--f-page); color: #8FB8F0; }
+.chat6 .emb > span { font: 400 13px/18px var(--f-page); color: #C9C7C1; }
+.chat6 .im { margin-top: 10px; border-radius: 8px; overflow: hidden; }
+.chat6 .im.pic { width: 220px; max-width: 100%; }
+.ogc6.p6 { aspect-ratio: 1200 / 630; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: linear-gradient(#17335C, #0E2445); position: relative; }
+.ogc6 .av6 { width: 64px; height: 64px; }
+.ogc6 .idn { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ogc6 .idn b { font: var(--w-d) 22px/26px var(--f-r); letter-spacing: var(--ls-d); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ogc6 .idn small { font: var(--t-foot); color: var(--muted); font-variant-numeric: tabular-nums; }
+.ogc6 .wm6 { position: absolute; right: 16px; bottom: 12px; font-size: 15px; line-height: 20px; }
+/* On a computer: the viewer is the player's window without the transport; pages turn with two glass buttons. */
+.dview6 .stage { cursor: zoom-in; }
+.dview6 .stage .cpg6 { --g: 12px; width: auto; height: 100%; }
+.dview6 .stage .cpg6 i { height: auto; aspect-ratio: auto; }
+.dview6 .dvnav6 { position: absolute; z-index: 3; top: 50%; margin-top: -22px; }
+.dview6 .dvnav6.l { left: 16px; } .dview6 .dvnav6.r { right: 392px; }
+.dview6 .vcomic6 { width: 300px; }
+.dpost6 { display: flex; gap: 24px; justify-content: center; align-items: flex-start; }
+.dpost6 > .l { width: 600px; flex: none; } .dpost6 > .r { width: 344px; flex: none; padding-top: 70px; }
+.dpost6 .post6, .dpost6 .group6, .dpost6 .pinfo6 { margin-left: 0; margin-right: 0; }
+.dpost6 .head6 { padding-left: 0; padding-right: 0; margin-bottom: 12px; }
+.dpost6 .grid6 { padding: 0; grid-template-columns: repeat(3, 1fr); }
+.dpost6 .shead6 { padding: 4px 16px 12px; }
 </style>
 
 <div class="wrap" id="root">
@@ -1085,6 +1172,62 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <feColorMatrix mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/>
     </filter>
   </defs></svg>
+
+  <section id="single" aria-label="A post on its own">
+    <h2 class="pg-h2" style="margin-top:40px">A post on its own: the picture viewer, the post page and comics</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Approved by you</span>Three things you asked for, built from the parts the app already has. Tap a picture and it opens alone on black, where you can zoom and save it, with no slideshow. Every post gets a page of its own with a link you can share. A post that belongs to a comic can be read page by page from either place. Both choices are picked by you: a double tap zooms, and a link shows the picture whatever the rating. The pictures are stand-ins.</p>
+    <div class="cols">
+      <section class="col" aria-label="The picture viewer">
+        <div class="col-head"><h2 class="pg-h3">1. The picture viewer</h2><p>Tap a picture in a feed. It opens alone, at the width of the screen. Tap once to hide the buttons, double tap to zoom in where you tapped and again to zoom out. Drag down to close.</p></div>
+        <div class="phone-holder" id="s-view"></div>
+        <div class="under" id="u-view"></div>
+      </section>
+      <section class="col" aria-label="A comic page in the viewer">
+        <div class="col-head"><h2 class="pg-h3">2. A comic page in the viewer</h2><p>The same viewer with one more capsule: the comic's name and the page you are on. Drag sideways to turn the page. The count at the top follows.</p></div>
+        <div class="phone-holder" id="s-vcomic"></div>
+        <div class="under" id="u-vcomic"></div>
+      </section>
+      <section class="col" aria-label="The pages of a comic">
+        <div class="col-head"><h2 class="pg-h3">3. All the pages</h2><p>The capsule opens the app's sheet with every page as a thumb. The page you are on wears the gold ring. "Open as a feed" shows the comic as posts, in page order.</p></div>
+        <div class="phone-holder" id="s-pages"></div>
+      </section>
+    </div>
+    <div class="cols" style="margin-top:48px">
+      <section class="col" aria-label="The post page">
+        <div class="col-head"><h2 class="pg-h3">4. The post page</h2><p>Where a shared link lands. The post as it is in a feed, then its comic, its description and every tag, where it came from, and more from the artist. It scrolls.</p></div>
+        <div class="phone-holder" id="s-post"></div>
+        <div class="under" id="u-post"></div>
+      </section>
+      <section class="col" aria-label="Sharing a post">
+        <div class="col-head"><h2 class="pg-h3">5. Sharing a post</h2><p>A post's ⋯ gets one new row, "Open post". "Share post" now sends a link to the post page in this app, from every feed.</p></div>
+        <div class="phone-holder" id="s-pshare"></div>
+        <div class="under" id="u-pshare"></div>
+      </section>
+    </div>
+    <div class="dframes6" style="margin-top:48px">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">6. The viewer on a computer</h2><p>The player's window without the transport. Post info stands beside the picture. In a comic two glass buttons turn the page, and so do the arrow keys. The wheel zooms and a drag moves the picture.</p></figcaption><div class="desk-holder" id="d-view"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">7. The post page on a computer</h2><p>Two columns: the post in the 600 column, and what is under it on a phone stands beside it.</p></figcaption><div class="desk-holder" id="d-post"></div></figure>
+    </div>
+    <h2 class="pg-h2">What I decided in this pass</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Decision</th><th>Today</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>Tapping a picture</th><td>Opens the player, paused, on that post</td><td>Opens the viewer: that one picture on black. The slideshow is not in it. The player opens from Play and from ⋯ › "Play from here" only. A grid tile opens the viewer too.</td><td>You asked for a picture you can look at without being pulled into the slideshow. Other option: keep the paused player and add zoom to it.</td></tr>
+        <tr><th>What the viewer holds</th><td></td><td>✕ at the top left. At the bottom the artist's row (it opens the artist) and four glass buttons: Favorite, Post info, Share, Save. All of it is the player's glass.</td><td>It looks like the player's sibling, so nothing new has to be learned. Post info is the player's sheet, unchanged.</td></tr>
+        <tr><th>Hands</th><td></td><td>One tap hides or shows the buttons. Pinch zooms from 1 to 5 times and a drag moves the picture. Dragging down closes it, and the picture follows the finger. Holding the picture brings the phone's own menu (Save to Photos, Copy), which the feed turns off.</td><td>These are what X, Bluesky and Photos do.</td></tr>
+        <tr><th>Double tap</th><td>Favorites, in feeds and in the player</td><td><b>Picked by you: Zoom.</b> To 2.5 times where you tapped, and back. The heart button is how you favorite here. In feeds and in the player a double tap still favorites.</td><td>It is what the apps you named do. The other option, Favorite, is gone.</td></tr>
+        <tr><th>Save</th><td>Not in the app</td><td>One glass button. On an iPhone it opens the phone's share sheet with the picture in it, where "Save Image" is. On a computer it downloads the file.</td><td>A web page cannot write to Photos itself. Not tried in a build yet.</td></tr>
+        <tr><th>Videos</th><td>A tap plays or pauses in place</td><td>Unchanged. Videos do not open the viewer in this pass.</td><td>Zoom and Save are for pictures. Other option: a full-screen video, later.</td></tr>
+        <tr><th>The post page</th><td>None</td><td>A pushed screen at <code>/post/&lt;number&gt;</code>: Back and the tools (Share, ⋯), the post panel without its tag strip, the comic, a panel with the description and every tag by kind, Source and "Open on e621", then six more posts from the artist.</td><td>It is what a link needs to land on, and it is the only place every tag shows without opening a sheet.</td></tr>
+        <tr><th>Getting to it</th><td></td><td>From a link; from a post's ⋯ › "Open post"; from a comic's thumbs.</td><td>The header already opens the artist and the picture opens the viewer, so there is no third thing left to tap on a card. Other option: make the time and number line a link (small on a phone).</td></tr>
+        <tr><th>Share post</th><td>Following and For You share the e621 link</td><td>Every feed shares <code>/post/&lt;number&gt;</code> through the phone's share sheet. With no share sheet it copies the link and a toast says "Link copied".</td><td>You asked for links that come back to this app.</td></tr>
+        <tr><th>The link's preview</th><td>None</td><td>The site's name, "mossy otter on eLicks21", one line of numbers, and the picture. <b>Picked by you: Picture</b>, whatever the rating. A post e621 hides from signed-out visitors gets a drawn card with the artist's mark and name and no art, because its picture cannot be fetched.</td><td>A chat shows the preview to everyone in it, without a tap; the person sharing chooses where. The other option, covering Questionable and Explicit posts, is gone.</td></tr>
+        <tr><th>A comic</th><td>None</td><td>A comic is an e621 pool. On a card: a well at the left of the footer, "3 / 12". In the viewer: a capsule with its name, and sideways drags turn pages. On the post page: its name and a strip of page thumbs. "Open as a feed" is Results for that pool in page order.</td><td>Each page is a post with its own favorites, so reading page by page keeps the heart and Save per page. Other option: one long strip you scroll; the feed already is that.</td></tr>
+        <tr><th>When a link cannot show the post</th><td></td><td>Hidden by e621: the gate the feed already has. Deleted or wrong number: Goo looking, "No post #… on e621". On your blacklist: the same gate shape, saying which tag, with "Show it".</td><td>All three are shapes the app has.</td></tr>
+        <tr><th>For the builder</th><td>The app runs in the browser only</td><td>A preview needs each post page to answer with its title and picture before any script runs. A pool's name and pages need one more call to e621.</td><td>This is the part that costs the most to build. I have not checked what e621 allows a server to fetch.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
   <section id="states" aria-label="Landing, empty and error states">
     <h2 class="pg-h2" style="margin-top:40px">Landing, empty and error states</h2>
@@ -3088,6 +3231,96 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       if (pp) { pp.classList.toggle('hide', y > last && y > 8); clearTimeout(t); t = setTimeout(() => pp.classList.remove('hide'), 1000); } last = y;
     }, { passive: true });
   });
+  /* ---------- a post on its own: the picture viewer, the post page, comics ---------- */
+  Object.assign(P, { down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>' });
+  // Nine stand-in panels, shared by every drawn comic page, so the page does not carry the same picture dozens of times.
+  document.head.insertAdjacentHTML('beforeend', `<style>${Array.from({ length: 9 }, (_, k) => `.ca${k}{--art:${art('mossy otter', k + 4)}}`).join('')}</style>`);
+  const cpage = n => `<span class="cpg6 ${'abc'[n % 3]}">${[0, 1, 2].map(k => `<i class="ca${(n * 3 + k) % 9}"></i>`).join('')}</span>`;
+  const COMIC = { name: 'Riverbank', n: 12, at: 3 };
+  const vcomic = `<button class="vcomic6" type="button" aria-label="${COMIC.name}. Show all pages">${ic('frames', 18, 2.2)}<b>${COMIC.name}</b><small data-vpg>Page ${COMIC.at} of ${COMIC.n}</small>${ic('right', 16, 2.4, 'chev')}</button>`;
+  const vacts = (info = false) => `<button class="gl6 pfav" type="button" aria-pressed="false" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6 ${info ? 'ring' : ''}" type="button" ${info ? 'aria-pressed="true"' : ''} aria-label="Post info">${ic('info', 22, 2.2)}</button><button class="gl6" type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button class="gl6" type="button" aria-label="Save picture">${ic('down', 20, 2.2)}</button>`;
+  const vwho = (a, sub) => `<button class="pwho6" type="button" aria-label="More from ${a}">${avatar(a)}<span class="idn"><b>${a}${ic('right', 16, 2.4)}</b><small>${sub}</small></span></button>`;
+  const vbot = (a, sub, comic = '') => `<div class="pbot6">${comic}${vwho(a, sub)}<div class="prow6">${vacts()}</div></div>`;
+  const vpage = html => `<div class="vpage"><div class="vpic">${html}</div></div>`;
+  const viewer = (pages, top, bot, attrs = '', over = '') => `<div class="phone6 p6 player6 view6" data-chrome="1" ${attrs}><div class="status6"><span>9:41</span><span class="batt"></span></div>
+    <div class="vstage"><div class="vtrack">${pages}</div></div><div class="ts"></div><div class="bs"></div>
+    <div class="ptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button>${top}</div>${bot}${over}<span class="home6"></span></div>`;
+  const vcount = `<span class="pcount6" data-vcount>${COMIC.at} / ${COMIC.n}</span>`;
+
+  // 1. The viewer
+  $('s-view').innerHTML = viewer(vpage(`<i style="--art:${art('pastelbat', 0)}"></i>`), '', vbot('pastelbat', '5h ago · #4511902'));
+  $('u-view').innerHTML = strip('Zoomed in', 'The buttons leave and the picture fills the screen. Drag to move it. Pinch back, or double tap, to fit it again.', `<div class="strip" style="height:230px;background:#000"><i style="display:block;width:250%;margin:-150% 0 0 -30%;aspect-ratio:4/5;background:${art('pastelbat', 0)}"></i></div>`);
+
+  // 2. A comic page in the viewer, 3. all the pages
+  const CP = { ...P2, isNew: false, faved: false };
+  const comicArt = h => h.replace(/<div class="art6"[^>]*><\/div>/, `<div class="art6">${cpage(COMIC.at)}</div>`);
+  const comicCard = comicArt(post(CP)).replace('<footer class="pf">', `<footer class="pf"><button class="cpill6" type="button" aria-label="${COMIC.name}, page ${COMIC.at} of ${COMIC.n}">${ic('frames', 16, 2.2)}${COMIC.at} / ${COMIC.n}</button>`);
+  $('s-vcomic').innerHTML = viewer(Array.from({ length: COMIC.n }, (_, k) => vpage(cpage(k + 1))).join(''), vcount, vbot('mossy otter', '3h ago · #4512290', vcomic), `data-page="${COMIC.at}"`);
+  $('u-vcomic').innerHTML = strip('On a feed card', 'A post that is a comic page says so with a well at the left of the footer, where nothing stood: the pages glyph and "3 / 12". It opens the viewer on that page. Nothing sits on the picture.', `<div class="strip p6 pad">${comicCard}</div>`);
+  const thumbs = () => Array.from({ length: COMIC.n }, (_, k) => k + 1);
+  $('s-pages').innerHTML = viewer(vpage(cpage(COMIC.at)), vcount, vbot('mossy otter', '3h ago · #4512290', vcomic), '', `<div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Pages of ${COMIC.name}">${shtop(COMIC.name)}<p class="sub6">A comic by mossy otter · ${COMIC.n} pages</p>
+      <div class="pages6">${thumbs().map(k => `<button type="button" ${k === COMIC.at ? 'aria-current="page"' : ''} aria-label="Page ${k}"><span class="pg">${cpage(k)}</span>${k}</button>`).join('')}</div>
+      <div class="ifoot6"><small style="font:var(--t-foot)">Last page 3h ago</small><button class="link6" type="button">Open as a feed${chev()}</button></div>
+    </div>`);
+
+  // 4. The post page
+  const ptools = `<div class="tools6"><button type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
+  const phead = `<div class="head6"><div class="titlerow">${back()}${ptools}</div></div>`;
+  const pagePost = comicArt(post({ ...CP, follow: false })).replace(/<div class="tags6">[\s\S]*?<\/div>/, '');
+  const comicGroup = `<div class="group6 comic6"><button class="srow6" type="button" aria-label="${COMIC.name}, page ${COMIC.at} of ${COMIC.n}. Open as a feed"><span class="ico">${ic('frames', 20, 2)}</span><span class="lbl"><b>${COMIC.name}</b><small>Page ${COMIC.at} of ${COMIC.n}</small></span>${chev()}</button>
+    <div class="cstrip6">${thumbs().map(k => `<button type="button" ${k === COMIC.at ? 'aria-current="page"' : ''} aria-label="Page ${k}">${cpage(k)}</button>`).join('')}</div></div>`;
+  const pinfo = `<div class="pinfo6"><div class="tlabel6">Description</div><p class="desc6">Page three. Reed finally reaches the river. The next page comes on Friday.</p>
+    ${tgroup('Artists', 'a', ['mossy otter'])}${tgroup('Characters', 'c', ['reed (mossy)'])}${tgroup('Species', 's', ['otter', 'mustelid', 'mammal'])}
+    ${tgroup('General', '', ['river', 'cozy', 'smile', 'sitting', 'scarf', 'autumn', 'leaves', 'outside', 'comic', 'detailed background'])}${tgroup('Meta', 'm', ['hi res', 'digital media (artwork)'])}
+    <div class="ifoot6"><small>1536 × 2048 · PNG · 2.1 MB</small></div></div>`;
+  const plinks = `<div class="group6">${srow('link', 'Source', 'bsky.app')}${srow('ext', 'Open on e621', 'Post #4512290')}</div>`;
+  const pmore = n => `<div class="shead6"><b>More from mossy otter</b><button class="link6" type="button">See all${chev()}</button></div><div class="grid6">${tiles('mossy otter', n, 4, 0)}</div>`;
+  $('s-post').innerHTML = phone(`<div class="scroll6">${phead}${pagePost}${comicGroup}${pinfo}${plinks}${pmore(6)}</div>` + bottom('Following'));
+  const blocked = post({ ...P1, isNew: false, gate: true }).replace(ic('lock', 28, 2), ic('ban', 28, 2)).replace('Sign in to see this post', 'On your blacklist').replace('e621 hides it from signed-out visitors.', 'It matches "spider" in your blacklist.').replace('>Sign in</button>', '>Show it</button>');
+  $('u-post').innerHTML = strip('When a link cannot show the post', 'On your blacklist: the feed\'s gate, saying which line matched, with a way to see it once. Deleted, or a wrong number: Goo looking. A post e621 hides from signed-out visitors shows the gate the feed already has.',
+    `<div class="strip p6 pad">${blocked}<div style="padding:24px 0 4px">${state('look', 'No post #4512291 on e621', 'It was deleted, or the link is wrong.', act('Search', 'lip6', 'search'))}</div></div>`);
+
+  // 5. Sharing a post
+  $('s-pshare').innerHTML = phone(`<div class="scroll6" style="overflow:hidden">${head()}${comicCard}</div><div class="scrim6"></div>${tabbar('Following', '', 343, 'live')}<div class="dim6"></div>
+    <div class="sheet6 in" role="dialog" aria-label="Post by mossy otter">${ctx('mossy otter', '#4512290 · 3h ago')}${rows6c(['image', 'Open post'], ['play', 'Play from here'], ['share', 'Share post'], ['ext', 'Open on e621', 'e621.net'], ['ban', 'Blacklist this artist', '', 'danger'])}</div><span class="home6"></span>`);
+  const emb = im => `<div class="chat6"><p class="msg">look at this one <u>elicks21.example/post/4512290</u></p><div class="emb"><small>eLicks21</small><b>mossy otter on eLicks21</b><span>Post #4512290 on e621 · 112 score · 486 favorites</span>${im}</div></div>`;
+  $('u-pshare').innerHTML = [
+    strip('The link in a chat', 'How a chat app shows the link. The chat is somebody else\'s app, so only what is inside the card is ours: the site\'s name, a title, one line of numbers and the picture. Picked by you: the picture shows whatever the post\'s rating.', emb(`<div class="im pic">${cpage(COMIC.at)}</div>`)),
+    strip('A post e621 hides from signed-out visitors', 'The app cannot fetch its picture for the preview, so the card is drawn: the artist\'s mark and name, the number and the rating, and the wordmark. No art.', emb(`<div class="im"><div class="ogc6 p6">${avatar('mossy otter')}<span class="idn"><b>mossy otter</b><small>#4512290 · Explicit</small></span>${wm()}</div></div>`)),
+  ].join('');
+
+  // 6 and 7. On a computer
+  $('d-view').innerHTML = desk(`<div class="stage">${cpage(COMIC.at)}</div><div class="ts"></div><div class="bs"></div>
+    <div class="dptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="r">${vcount}<button class="gl6" type="button" aria-label="Full screen">${ic('full', 20, 2.2)}</button></span></div>
+    <button class="gl6 dvnav6 l" type="button" aria-label="Previous page">${ic('left', 22, 2.4)}</button><button class="gl6 dvnav6 r" type="button" aria-label="Next page">${ic('right', 22, 2.4)}</button>
+    <div class="dpbot6"><div class="dpctl6">${vwho('mossy otter', '3h ago · #4512290')}${vcomic}<div class="acts">${vacts(true)}</div></div></div>
+    <aside class="sheet6 ipanel6" aria-label="Post info">${sinfo.replace(/<p class="why6">[\s\S]*?<\/p>/, '')}</aside>`, 'dplayer6 dview6');
+  $('d-post').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpost6"><div class="l">${phead}${pagePost}</div><div class="r">${comicGroup}${pinfo}${plinks}${pmore(3)}</div></div></div>`);
+  dfit();
+
+  // The viewer's hands, enough to try them: one tap hides the buttons, a double tap zooms, a sideways drag turns a comic's page.
+  document.querySelectorAll('.view6').forEach(v => {
+    const stage = v.querySelector('.vstage'), track = v.querySelector('.vtrack'), n = track.children.length;
+    let page = +(v.dataset.page || 1), timer = 0, last = 0, down = null;
+    const go = p => { page = clamp(p, 1, n); track.style.transform = `translateX(${-(page - 1) * 100}%)`;
+      const c = v.querySelector('[data-vcount]'), g = v.querySelector('[data-vpg]'); if (c) c.textContent = `${page} / ${n}`; if (g) g.textContent = `Page ${page} of ${n}`; };
+    if (n > 1) { track.style.transition = 'none'; go(page); requestAnimationFrame(() => track.style.transition = ''); }
+    stage.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+    stage.addEventListener('pointerup', e => {
+      if (!down) return; const dx = e.clientX - down.x, dy = e.clientY - down.y; down = null;
+      const zoomed = v.classList.contains('zoomed');
+      if (n > 1 && !zoomed && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { clearTimeout(timer); last = 0; return go(page + (dx < 0 ? 1 : -1)); }
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) return;
+      const now = performance.now(), pic = track.children[page - 1].querySelector('.vpic');
+      if (now - last < 300) { clearTimeout(timer); last = 0;
+        if (zoomed) { v.classList.remove('zoomed'); pic.style.transform = ''; v.dataset.chrome = '1'; }
+        else { const r = pic.getBoundingClientRect(); pic.style.transformOrigin = `${clamp((e.clientX - r.left) / r.width * 100, 0, 100)}% ${clamp((e.clientY - r.top) / r.height * 100, 0, 100)}%`; pic.style.transform = 'scale(2.5)'; v.classList.add('zoomed'); v.dataset.chrome = '0'; }
+        return; }
+      last = now; timer = setTimeout(() => { if (!v.classList.contains('zoomed')) v.dataset.chrome = v.dataset.chrome === '0' ? '1' : '0'; }, 300);
+    });
+  });
+
   const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
     const w = h.parentElement.clientWidth, z = Math.min(1, w / 375), el = h.firstElementChild; h.style.height = (812 * z) + 'px'; if (el) el.style.zoom = z;
   });

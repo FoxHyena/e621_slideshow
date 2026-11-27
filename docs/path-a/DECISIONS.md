@@ -1498,3 +1498,40 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   tag is dominant_male, 1.1% of e621). 5 rounds found no more. One account and 22 favorites; the 7-day
   window had 1 hidden favorite, too few to test.
 - **Cost:** up to 25 tag pages instead of 4, so a ranking takes longer and makes more e621 requests.
+
+## 2026-11-27 — The post panel's top corners are 26; the ⋯ stays inside the padding
+- Owner, asked "Fix the artist mark's loose corner in the mock next?": "Yes, fix it". This replaces "left
+  as it is" from the 2026-11-25 pass. Then, with two pictures of the ⋯ button crowding the corner: "Also
+  need to fix spacing around the triple dot as well if this didn't cover it".
+- How, decided by the designer: both top corners of the post panel are 26, the bottom two stay 24. A 36
+  disc (18 radius) 8 inside a corner wants 18 + 8 = 26; at 24 the gap was 8.8 on the diagonal and 8 at the
+  sides. This is the spec's own rule (outer radius = inner radius + gap).
+- The ⋯ was pulled 6 into the panel's edge so its dots lined up with the picture, which left its 36 wash 2
+  from the edge. It now stays inside the 8 padding: the wash is 8 from the top and the right. The cost:
+  at rest the dots are 15 from the panel's edge, not 9. The Follow pill moves 6 to the left with it. The
+  ⋯ in an artist card's header moves the same way. A list row's ⋯ is not changed.
+- Not chosen for the mark: a 32 mark (a smaller mark, 2 above the text's centre) and moving the 36 mark
+  2 up and left (it leaves the picture's left edge). Both were drawn and measured.
+- Only `screens-v6.html` changes. `feed-v6.html` stays as approved.
+- For the build: `border-top-left-radius` and `border-top-right-radius` 26 on the post panel and its
+  loading skeleton; no negative right margin on the ⋯ in a panel's header.
+
+## 2026-11-27 — The picture viewer, the post page, comics: owner-approved
+- Owner: "Single-post view, so we can share a post out specifically from our app and have it link back
+  with an image preview", "Might also want to build comic view into this so when we click into a post
+  that's a part of a set we can look through it", and "single-image viewing, where when we tap into a
+  picture it pulls it up fullscreen and allows us to zoom and save and stuff without pulling us into the
+  slideshow view, kinda like if we were on X or bluesky".
+- Drawn in `screens-v6.html`, section "A post on its own", and written in DESIGN.md under the same name.
+- Decided by the designer, for the owner to react to: tapping a picture opens the viewer, not the paused
+  player; the viewer is the player's glass with Favorite, Post info, Share and Save; a comic is an e621
+  pool, read page by page in the viewer; the post page is `/post/<number>`; "Share post" shares that
+  link from every feed; a post's ⋯ gets "Open post".
+- Owner, asked "Double tap in the picture viewer: zoom or favorite?": "Zoom". The switch is gone. In
+  feeds and in the player a double tap still favorites.
+- Owner, asked "Link preview of a Questionable or Explicit post: picture or covered?": "Picture". The
+  switch is gone. The drawn card with no art stays for one case only: a post e621 hides from signed-out
+  visitors, whose picture cannot be fetched.
+- Owner, asked "Approve the viewer, post page and comic screens as drawn?": "Approve".
+- Still open, for the builder: how a link gets its preview (see "Not checked" below).
+- Not checked: whether a server may fetch a post from e621 for the preview, and Save on a real iPhone.

@@ -42,6 +42,8 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 └── sign-in · player quick settings · post info · follow-from-favorites · filter menus · ⋯ menus
 ```
 
+- **Added 2026-11-27 (owner-approved; DESIGN.md "A post on its own"):** a pushed screen `/post/<id>`
+  (one post on its own page; works signed out) and an overlay `…?view=<postId>` (the picture viewer).
 - `/` redirects to `/following`.
 - **Search button** in every tab header. `/` key opens it on desktop.
 - **Grid/feed toggle** in every feed screen's header.
@@ -176,6 +178,9 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 - **Media taps** (media has `touch-action: manipulation`, no selection, no callout):
   - **Single tap** (after a 200 ms double-tap guard, media only): images open the player **paused** on
     that post (a full-screen viewer that can start the slideshow); videos play/pause in place.
+  - **Changed 2026-11-27 (owner-approved; DESIGN.md "A post on its own"):** a single tap on an image
+    or a grid tile opens the **picture viewer**, not the paused player. The player opens from Play and
+    from ⋯ › Play from here. In the viewer a double tap zooms; it does not favorite there.
   - **Double tap** favorites (never unfavorites) with one big heart over the picture.
   - Videos: one live `<video>` at a time (the card nearest the middle, muted, `playsinline`); others are
     posters with a ▶ glyph. A mute button sits bottom-right. If autoplay is blocked (Low Power Mode) the
@@ -184,6 +189,8 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 - **Signed out:** ♥, double tap and [+ Follow] open the sign-in sheet; after sign-in the action you
   tapped is carried out.
 - **⋯ menu:** Play from this post · Share post · Open on e621 ↗ · Blacklist this artist.
+  As approved 2026-11-27: **Open post** is a new first row, and Share post shares `/post/<id>` from
+  every feed. A post in an e621 pool shows a "3 / 12" well in the card's footer (the comic).
 - **Hold a tag** (450 ms; moving more than 10 px first cancels, so the strip still scrolls): two targets
   pop up **above the finger** — **Search** (Results: narrows; elsewhere: opens `/search?tags=<tag>`;
   For You: **Pin**) and **Blacklist** (adds the tag to this browser's blacklist, hides matching posts in
