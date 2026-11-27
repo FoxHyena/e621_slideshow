@@ -1543,3 +1543,15 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   artist card's ⋯ likewise sits inside the card's 8 padding (the head lost its 4 right padding and the
   ⋯ its −10 pull). A list row's ⋯ keeps its pull.
 - New e2e test `post-panel.spec.ts` measures the corners and the 8s.
+
+## 2026-11-27 — On a computer: Ground behind the sidebar; the shrunk top bar's hover follows its end
+- Owner, with screenshots: "this strange background behind the left bar on desktop, is that to spec?"
+  and "these hover states in the for you bar look off".
+- **Behind the sidebar:** the page was black and the screen's Ground began right of the sidebar, so
+  the sidebar sat on a black strip. DESIGN.md has the sidebar float on the window and only the
+  player's window black. At 900 and wider the page is Ground; the player still paints its own black.
+- **The shrunk top bar's hover:** its tools wore the tools capsule's 40 by 36 wash, which is 4 inside
+  that 44 capsule but 8 from the top and bottom of the 52 top bar and 4 from its end, so it did not run
+  parallel to the 26 end. **Mine, by the hover rule** ("radius = the container's less the gap"): in the
+  52 bar the tools are 44 wide and the wash is a 44 circle, 4 inside on every side. Same on a phone,
+  where there is no hover; the tools are 4 wider each there too.
