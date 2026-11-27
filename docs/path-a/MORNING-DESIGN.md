@@ -8,6 +8,16 @@ https://claude.ai/artifact/WpoUngWRfjhDHcdGScuup1 (Version 53).
 `3d28a4b` (pull request 24) and is live. The batches below are kept as the record of what was asked;
 your answers are in the next section and they win over anything further down.
 
+## Open now (2026-11-27, later)
+
+New drawings, in the mock's first section, "A post on its own". **Approved by you ("Approve").**
+
+1. ~~Double tap in the viewer: Zoom or Favorite.~~ **Picked by you: "Zoom".**
+2. ~~Link preview of a Questionable or Explicit post: Picture or Covered.~~ **Picked by you: "Picture".**
+3. ~~The rest of the section as drawn.~~ **Approved by you: "Approve".** The viewer, the comic well
+   and pages, the post page, "Open post" in a post's ⋯, "Share post" sharing this app's link.
+4. **For the builder before any of it is built:** a link preview needs a server to answer for each post.
+
 ## Answered on the check list, 2026-11-27
 
 - **Agreed with my pick, 47 items:** every choice in batches 1 to 5 as drawn, the sidebar with names,
@@ -188,5 +198,7 @@ treat that message as your approval of any design.
 - "Popular today" under For You's signed-out block (built; from the builder's list).
 - From the builder's list to show you: Post info's Artists group; "Open" as an artist tag's first
   target; the tag target's shadow; Goo being pointer-only.
-- The artist mark's corner is 0.8 px loose against its disc in the mock.
+- ~~The artist mark's corner is 0.8 px loose against its disc in the mock.~~ **Fixed on your say** ("Yes, fix
+  it", 2026-11-27): the post panel's top corners are 26, so the gap is 8 all the way round. The mark
+  did not change size or move. The ⋯ now stays 8 inside the panel too (you asked the same day).
 - Pushing this branch. It is local only.

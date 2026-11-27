@@ -1521,7 +1521,8 @@ html {
   display: flex;
   flex-direction: column;
   padding: 8px;
-  border-radius: var(--radius-panel);
+  /* top corners 26: the mark's 36 disc and the ⋯'s 36 wash sit 8 inside them, 18 + 8 (DESIGN.md "Shapes") */
+  border-radius: calc(var(--radius-panel) + 2px) calc(var(--radius-panel) + 2px) var(--radius-panel) var(--radius-panel);
   background: var(--color-panel);
   box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
   contain: layout style;
@@ -1613,7 +1614,7 @@ html {
   place-items: center;
   width: 36px;
   height: 36px;
-  margin-right: -6px;
+  /* inside the panel's 8 padding: the wash is 8 from the top and the right, as the mark is on the left */
   flex: none;
   border-radius: 999px;
   color: var(--color-muted);
@@ -5236,7 +5237,11 @@ li[data-state="done"] .first-step-n svg,
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 4px 0 0;
+  padding: 8px 0 0 0;
+}
+/* an artist card's ⋯ stays inside the card's 8 padding, as a post's does (a list row's keeps its pull) */
+.sugg-head .row-more {
+  margin-right: 0;
 }
 .sugg-who {
   display: flex;
