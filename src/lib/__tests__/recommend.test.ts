@@ -74,6 +74,16 @@ describe("computeWeights", () => {
     expect(pinned.has("fave_artist")).toBe(true);
   });
 
+  it("gives e621's do-not-post marks and no-one placeholders no weight", () => {
+    const favs = Array.from({ length: 10 }, (_, i) =>
+      makePost({ id: 7000 + i, tags: { general: ["niche_kink"], artist: ["avoid_posting", "conditional_dnp", "unknown_artist", "fave_artist"] } }),
+    );
+    const p = addFavorites(emptyProfile("pup"), favs, NOW);
+    const counts = { niche_kink: 2_000, avoid_posting: 900, conditional_dnp: 900, unknown_artist: 900, fave_artist: 500 };
+    expect([...computeWeights(p, counts, N_SITE).keys()].sort()).toEqual(["fave_artist", "niche_kink"]);
+    expect(tagsToLookUp(p).sort()).toEqual(["fave_artist", "niche_kink"]);
+  });
+
   it("skips tags with no global count", () => {
     expect(computeWeights(profile(), {}, N_SITE).size).toBe(0);
   });
@@ -237,6 +247,33 @@ describe("searchPlan", () => {
 
   it("puts pins first and counts them against breadth", () => {
     expect(plan(2, { pinned: ["anthro"], muted: [] })).toEqual(["pinned:anthro", "signature:rare_artist"]);
+  });
+  it("keeps artists to a third of the searched tags while other tags are left, in weight order", () => {
+    // a heavy favoriter: ten artists at the lift cap above every other tag
+    const heavy = new Map<string, number>([
+      ...Array.from({ length: 10 }, (_, i) => [`artist_${i}`, 3.9 - i * 0.01] as [string, number]),
+      ["kink_a", 3.0],
+      ["kink_b", 2.9],
+      ["species_c", 2.5],
+      ["kink_d", 2.0],
+    ]);
+    const isArtist = (t: string) => t.startsWith("artist_");
+    const tags = searchPlan(heavy, NO_OVERRIDES, 6, isArtist).map((s) => s.tag);
+    expect(tags).toEqual(["artist_0", "artist_1", "kink_a", "kink_b", "species_c", "kink_d"]);
+    // other tags run out: artists fill the rest
+    expect(searchPlan(heavy, NO_OVERRIDES, 9, isArtist).map((s) => s.tag)).toEqual([
+      "artist_0",
+      "artist_1",
+      "artist_2",
+      "artist_3",
+      "artist_4",
+      "kink_a",
+      "kink_b",
+      "species_c",
+      "kink_d",
+    ]);
+    // a pinned artist doesn't use the share
+    expect(searchPlan(heavy, { pinned: ["artist_9"], muted: [] }, 4, isArtist).map((s) => s.tag)).toEqual(["artist_9", "artist_0", "kink_a", "kink_b"]);
   });
 });
 

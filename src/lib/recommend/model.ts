@@ -2,7 +2,7 @@ import type { Post } from "../e621/types";
 import { features, learnWeightsAsync } from "./learn";
 import type { Profile } from "./profile";
 import type { Progress } from "./sync";
-import type { Overrides } from "./weights";
+import { notTaste, type Overrides } from "./weights";
 
 /**
  * The learned ranking's inputs and output, kept in IndexedDB next to the
@@ -143,6 +143,7 @@ export async function fitLearned(
  */
 export function withOverrides(learned: Learned, overrides: Overrides, isArtist: (tag: string) => boolean = () => false): Map<string, number> {
   const w = new Map(learned.weights);
+  for (const tag of [...w.keys()]) if (notTaste(tag)) w.delete(tag);
   // "Filter artists": the favorites' artists weigh nothing (pins, below, still do)
   if (overrides.noArtists) for (const tag of [...w.keys()]) if (isArtist(tag)) w.delete(tag);
   const max = Math.max(0, ...w.values());

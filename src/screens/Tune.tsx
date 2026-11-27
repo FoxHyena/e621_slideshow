@@ -40,7 +40,7 @@ export function TuneScreen() {
   const tags = useMemo(() => topTags(weights, weights.size), [weights]);
   // What For You actually searches: the plan, cut to what e621's tag limit leaves room for.
   const { searched, capped } = useMemo(() => {
-    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth) : [];
+    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth, (t) => r.profile?.tags[t]?.cat === "artist") : [];
     const s = { ...DEFAULT_SEARCH, ratings: search.ratings, media: forYou.media, date: forYou.date, minScore: forYou.minScore, breadth: search.breadth };
     const rq = buildRecommendedQuery(s, plan.map((p) => p.tag), session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT);
     const inQuery = new Set(rq.candidates);

@@ -2,6 +2,8 @@ import type { Post, TagCategoryName } from "../e621/types";
 
 /** Artist tags that aren't a person. */
 export const NOT_ARTISTS = new Set(["conditional_dnp", "sound_warning", "epilepsy_warning", "avoid_posting", "third-party_edit"]);
+/** Artist tags that name no one (e621's placeholders), never suggested. */
+export const NOBODY = new Set(["unknown_artist", "anonymous_artist", "unknown_artist_signature", "third-party_edit", "sketch_artist", "artist_request"]);
 /** The order tags show in on a card (the artist tag is in the artist line, not here). */
 export const TAG_ORDER: TagCategoryName[] = ["copyright", "character", "species", "general", "lore", "meta"];
 

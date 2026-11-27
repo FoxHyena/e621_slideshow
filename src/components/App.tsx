@@ -196,7 +196,7 @@ export default function App({
   const recTags = useMemo(() => topTags(rec.weights, rec.weights.size), [rec.weights]);
   /** the tags that get their own candidate search: pins, then the highest weights */
   const recCandidates = useMemo(
-    () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth) : []),
+    () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth, (t) => rec.profile?.tags[t]?.cat === "artist") : []),
     [rec.weights, rec.profile, rec.overrides, search.breadth],
   );
   const isRec = (s: SearchSettings) => s.source === "recommended";

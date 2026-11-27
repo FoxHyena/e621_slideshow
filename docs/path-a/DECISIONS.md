@@ -1356,3 +1356,19 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   and "Surprise me", since many tags can weigh about the same and Breadth is how many are searched.
   The note under it says just that.
 
+## 2026-11-26 — For You: artists take at most a third of the search; do-not-post marks don't count
+
+- Owner's report: a friend with many favorites got only artist tags in For You, and the owner's own
+  Tune showed `avoid_posting` as the strongest tag, then artists only.
+- **Bug:** e621's do-not-post and warning marks (`avoid_posting`, `conditional_dnp`, `sound_warning`,
+  `epilepsy_warning`, `third-party_edit`) and its no-one placeholders (`unknown_artist`, …) are artist
+  tags on e621. The artist lists already skipped them; For You's taste didn't. Now they get no weight,
+  learned or lift, and their counts aren't fetched.
+- **Why only artists:** lift is capped at 50×. Artists are rare on e621, so any artist favorited a few
+  dozen times hits the cap, while content tags, common on e621, almost never do. With a few thousand
+  favorites, all 15 searched slots went to artists, and the candidates were their posts.
+- **Fix:** at most a third of the searched tags (rounded up: 5 of 15) are artists while other tags
+  are left; artists past that fill in only if other tags run out. Pins don't use the share. Every
+  tag still counts when ranking; Tune lists the artists past the share under "Not searched".
+- Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
+

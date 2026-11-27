@@ -140,7 +140,7 @@ export function ForYouScreen() {
   const ready = session.ready && r.loaded && r.name === name;
 
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
-  const plan = useMemo(() => (r.profile ? searchPlan(weights, r.overrides, breadth) : []), [weights, r.profile, r.overrides, breadth]);
+  const plan = useMemo(() => (r.profile ? searchPlan(weights, r.overrides, breadth, (t) => r.profile?.tags[t]?.cat === "artist") : []), [weights, r.profile, r.overrides, breadth]);
   const filterKey = JSON.stringify([name, applied.media, applied.date, applied.minScore, ratings]);
   const inputs = JSON.stringify([signatureOf(r), breadth]);
   const canRank = ready && !!name && plan.length > 0;
