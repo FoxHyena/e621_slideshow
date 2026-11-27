@@ -33,7 +33,7 @@ import {
   type BuiltQuery,
 } from "@/lib/query/build";
 import { RecommendedQueue, REC_PAGE_BUDGET, REC_POPULAR_PAGES } from "@/lib/recommend/stream";
-import { searchPlan, topTags } from "@/lib/recommend/weights";
+import { isName, searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
 import { encodeShare, encodeShareCreds } from "@/lib/share";
 import { displayUrl, Preloader } from "@/lib/slideshow/media";
@@ -196,7 +196,7 @@ export default function App({
   const recTags = useMemo(() => topTags(rec.weights, rec.weights.size), [rec.weights]);
   /** the tags that get their own candidate search: pins, then the highest weights */
   const recCandidates = useMemo(
-    () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth) : []),
+    () => (rec.profile ? searchPlan(rec.weights, rec.overrides, search.breadth, (t) => isName(rec.profile?.tags[t]?.cat)) : []),
     [rec.weights, rec.profile, rec.overrides, search.breadth],
   );
   const isRec = (s: SearchSettings) => s.source === "recommended";

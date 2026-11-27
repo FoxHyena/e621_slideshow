@@ -11,7 +11,7 @@
  * ones' newest posts, rank once more with recency, then show.
  */
 import type { Post } from "../e621/types";
-import { NOT_ARTISTS } from "../feed/format";
+import { NOBODY, NOT_ARTISTS } from "../feed/format";
 import type { Profile } from "./profile";
 
 /** Favorites an artist needs before they're suggested. */
@@ -24,8 +24,7 @@ export const TILE_BATCH = 8;
 export const LIST_TOP = 30;
 export const PICKED = 10;
 
-/** Artist tags that name no one (e621's placeholders), never suggested. */
-export const NOBODY = new Set(["unknown_artist", "anonymous_artist", "unknown_artist_signature", "third-party_edit", "sketch_artist", "artist_request"]);
+export { NOBODY };
 
 export interface ArtistCandidate {
   name: string;

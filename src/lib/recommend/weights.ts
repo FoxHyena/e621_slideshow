@@ -1,4 +1,5 @@
 import type { TagCategoryName } from "../e621/types";
+import { NOBODY, NOT_ARTISTS } from "../feed/format";
 import type { Profile } from "./profile";
 
 /** A tag must be on at least this many favorites to count. One odd favorite is not a taste. */
@@ -17,10 +18,13 @@ export const MAX_LIFT = Math.log(50);
 /**
  * Meta tags (hi_res, 2024, ...) say nothing about taste. Artists get no bonus:
  * they're already rare on the site, which the lift rewards on its own.
+ * Characters count half (owner: "characters weighted less"): as rare as
+ * artists, they hit the lift cap after a few dozen favorites and topped every
+ * list, though a character says less about a picture than what is in it.
  */
 export const CAT_MULT: Record<TagCategoryName, number> = {
   artist: 1,
-  character: 1,
+  character: 0.5,
   species: 1,
   general: 1,
   copyright: 0.5,
@@ -29,6 +33,23 @@ export const CAT_MULT: Record<TagCategoryName, number> = {
   meta: 0,
   invalid: 0,
 };
+
+/**
+ * Artist-category tags that say nothing about taste: e621's do-not-post and content-warning marks
+ * (`avoid_posting` was a heavy favoriter's strongest tag) and its placeholders for no one.
+ */
+export const notTaste = (tag: string) => NOT_ARTISTS.has(tag) || NOBODY.has(tag);
+
+/**
+ * At most this share of the searched tags are names, artists and characters together (pins
+ * aside), when there are other tags to search. Names are rare on e621, so lift tops out for any
+ * artist or character favorited a few dozen times, and for someone with many favorites every
+ * searched slot went to one. The rest still count when ranking.
+ */
+export const NAME_SHARE = 1 / 3;
+
+/** Whether a tag category names someone: an artist or a character. */
+export const isName = (cat: TagCategoryName | undefined) => cat === "artist" || cat === "character";
 
 export interface Overrides {
   pinned: string[];
@@ -58,7 +79,7 @@ export function computeWeights(
   if (nFav > 0 && nSite > 0) {
     for (const [tag, { n, cat }] of Object.entries(profile.tags)) {
       const count = globalCounts[tag];
-      if (n < MIN_SUPPORT || !count || (overrides.noArtists && cat === "artist")) continue;
+      if (n < MIN_SUPPORT || !count || notTaste(tag) || (overrides.noArtists && cat === "artist")) continue;
       const lift = Math.min(MAX_LIFT, Math.log(n / nFav / (count / nSite)));
       const w = Math.max(0, lift) * (n / (n + SHRINK)) * CAT_MULT[cat];
       if (w > 0) weights.set(tag, w);
@@ -87,7 +108,8 @@ export interface PlannedSearch {
 
 /**
  * Which profile tags the candidate search uses, strongest first: pins, then
- * the highest-weight ("signature") tags up to `breadth`.
+ * the highest-weight ("signature") tags up to `breadth`, with no more than
+ * NAME_SHARE of them names (`isName`: artists, characters) while other tags are left.
  *
  * Searching by cover (weight × favorites) as well kept the pool larger, but
  * with generic tags like `canine` and `sex` that the weighting exists to
@@ -97,15 +119,30 @@ export function searchPlan(
   weights: Map<string, number>,
   overrides: Overrides,
   breadth: number,
+  isName: (tag: string) => boolean = () => false,
 ): PlannedSearch[] {
   const pinned = overrides.pinned
     .filter((t) => weights.has(t))
     .slice(0, breadth)
     .map((tag): PlannedSearch => ({ tag, kind: "pinned" }));
   const taken = new Set(pinned.map((p) => p.tag));
-  const signature = topTags(weights, weights.size)
-    .filter((t) => !taken.has(t))
-    .slice(0, breadth - pinned.length)
-    .map((tag): PlannedSearch => ({ tag, kind: "signature" }));
+  const slots = Math.max(0, breadth - pinned.length);
+  const ranked = topTags(weights, weights.size).filter((t) => !taken.has(t));
+  // names up to their share; past it they wait, and fill in only if other tags run out
+  let namesLeft = Math.ceil(slots * NAME_SHARE);
+  const picked = new Set<string>();
+  for (const t of ranked) {
+    if (picked.size >= slots) break;
+    if (!isName(t)) picked.add(t);
+    else if (namesLeft > 0) {
+      picked.add(t);
+      namesLeft--;
+    }
+  }
+  for (const t of ranked) {
+    if (picked.size >= slots) break;
+    picked.add(t);
+  }
+  const signature = ranked.filter((t) => picked.has(t)).map((tag): PlannedSearch => ({ tag, kind: "signature" }));
   return [...pinned, ...signature];
 }

@@ -125,4 +125,9 @@ describe("withOverrides", () => {
     // off (or an older save without the field): artists stay
     expect(withOverrides(l, { pinned: [], muted: [] }, isArtist).has("artist_one")).toBe(true);
   });
+
+  it("drops e621's do-not-post marks, which the fit may have learned", () => {
+    const l: Learned = { favKey: "k", negAt: 0, weights: [["a", 1], ["avoid_posting", 4], ["unknown_artist", 2]] };
+    expect([...withOverrides(l, { pinned: [], muted: [] }).keys()]).toEqual(["a"]);
+  });
 });

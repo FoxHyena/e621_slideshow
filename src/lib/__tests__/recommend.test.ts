@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
 import { cohortQuality, percentiles, rankAll, scorePost, type Ranked } from "../recommend/rank";
 import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
-import { CAT_MULT, computeWeights, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
+import { CAT_MULT, computeWeights, isName, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
 import { makePost } from "./fixtures";
 
 const NOW = 1_700_000_000_000;
@@ -74,6 +74,16 @@ describe("computeWeights", () => {
     expect(pinned.has("fave_artist")).toBe(true);
   });
 
+  it("gives e621's do-not-post marks and no-one placeholders no weight", () => {
+    const favs = Array.from({ length: 10 }, (_, i) =>
+      makePost({ id: 7000 + i, tags: { general: ["niche_kink"], artist: ["avoid_posting", "conditional_dnp", "unknown_artist", "fave_artist"] } }),
+    );
+    const p = addFavorites(emptyProfile("pup"), favs, NOW);
+    const counts = { niche_kink: 2_000, avoid_posting: 900, conditional_dnp: 900, unknown_artist: 900, fave_artist: 500 };
+    expect([...computeWeights(p, counts, N_SITE).keys()].sort()).toEqual(["fave_artist", "niche_kink"]);
+    expect(tagsToLookUp(p).sort()).toEqual(["fave_artist", "niche_kink"]);
+  });
+
   it("skips tags with no global count", () => {
     expect(computeWeights(profile(), {}, N_SITE).size).toBe(0);
   });
@@ -89,6 +99,14 @@ describe("computeWeights", () => {
 
   it("gives artists no bonus over other tags", () => {
     expect(CAT_MULT.artist).toBe(CAT_MULT.general);
+  });
+
+  it("weighs a character half as much as a content tag on as many favorites", () => {
+    const p = profile();
+    p.tags.fave_character = { n: 20, cat: "character" };
+    const half = computeWeights(p, { ...GLOBAL, fave_character: 2_000 }, N_SITE);
+    expect(CAT_MULT.character).toBe(CAT_MULT.general / 2);
+    expect(half.get("fave_character")!).toBeCloseTo(half.get("niche_kink")! / 2, 5);
   });
 
   it("pins to the top weight and mutes to zero", () => {
@@ -237,6 +255,36 @@ describe("searchPlan", () => {
 
   it("puts pins first and counts them against breadth", () => {
     expect(plan(2, { pinned: ["anthro"], muted: [] })).toEqual(["pinned:anthro", "signature:rare_artist"]);
+  });
+  it("keeps names (artists and characters together) to a third of the searched tags while other tags are left, in weight order", () => {
+    // a heavy favoriter: ten names at the lift cap above every other tag, characters among the artists
+    const names = ["artist_0", "char_0", "artist_1", "char_1", "artist_2", "artist_3", "char_2", "artist_4", "artist_5", "char_3"];
+    const heavy = new Map<string, number>([
+      ...names.map((t, i) => [t, 3.9 - i * 0.01] as [string, number]),
+      ["kink_a", 3.0],
+      ["kink_b", 2.9],
+      ["species_c", 2.5],
+      ["kink_d", 2.0],
+    ]);
+    const name = (t: string) => isName(t.startsWith("artist_") ? "artist" : t.startsWith("char_") ? "character" : "general");
+    const tags = searchPlan(heavy, NO_OVERRIDES, 6, name).map((s) => s.tag);
+    expect(tags).toEqual(["artist_0", "char_0", "kink_a", "kink_b", "species_c", "kink_d"]);
+    // other tags run out: names fill the rest
+    expect(searchPlan(heavy, NO_OVERRIDES, 9, name).map((s) => s.tag)).toEqual([
+      "artist_0",
+      "char_0",
+      "artist_1",
+      "char_1",
+      "artist_2",
+      "kink_a",
+      "kink_b",
+      "species_c",
+      "kink_d",
+    ]);
+    // a pinned name doesn't use the share
+    expect(searchPlan(heavy, { pinned: ["char_3"], muted: [] }, 4, name).map((s) => s.tag)).toEqual(["char_3", "artist_0", "kink_a", "kink_b"]);
+    // species, copyrights and the rest aren't names
+    expect([isName("species"), isName("copyright"), isName(undefined)]).toEqual([false, false, false]);
   });
 });
 
