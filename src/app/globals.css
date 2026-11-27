@@ -1320,6 +1320,12 @@ html {
 }
 
 @media (min-width: 900px) {
+  /* the sidebar floats on the window, which is Ground like the screens (DESIGN.md "On a computer");
+     only the player's window is black, and the player paints its own */
+  html,
+  body {
+    background: var(--color-ground);
+  }
   .screen {
     margin-left: var(--spacing-rail);
   }
@@ -5476,6 +5482,12 @@ li[data-state="done"] .first-step-n svg,
   background: none;
   box-shadow: none;
 }
+/* In the 52 capsule the tools are 44 wide, so the hover wash below is a 44 circle 4 inside the capsule
+   on every side: it runs parallel to the capsule's 26 end (DESIGN.md "A row": radius = the container's
+   less the gap). The tools capsule's 40 by 36 wash only fits its own 44 height. */
+.topbar[data-at] .tools .toolbar-circle {
+  width: 44px;
+}
 .topbar[data-at="in"] {
   animation: top-fade 150ms ease-out;
 }
@@ -6226,6 +6238,9 @@ li[data-state="done"] .first-step-n svg,
     padding-block: 4px;
     background: rgba(255, 255, 255, 0.06) content-box;
     color: var(--color-fg);
+  }
+  .topbar[data-at] .tools .toolbar-circle:not([aria-pressed="true"]):hover {
+    padding-block: 0;
   }
   .post-menu:not(:active):hover,
   .compact-back:not(:active):hover,

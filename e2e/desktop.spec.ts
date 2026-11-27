@@ -343,3 +343,24 @@ test("the player: Post info is a panel at the right and the picture moves over",
   await expect(panel.getByRole("dialog")).not.toHaveAttribute("aria-modal", "true");
   await shot(page, "desktop-player-info");
 });
+
+test("the sidebar floats on Ground, not black; the shrunk top bar's tools wash a 44 circle 4 inside it", async ({ page }) => {
+  await following(page);
+  await page.goto("/following");
+  await expect(side(page)).toBeVisible();
+  // behind the sidebar is the window, which is Ground like the screen beside it
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(2, 15, 35)");
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(1600);
+  await page.evaluate(() => window.scrollTo(0, 600));
+  const cap = page.locator(".topbar[data-at] .topcap");
+  await settled(cap);
+  const last = page.locator(".topbar[data-at] .tools .toolbar-circle").last();
+  await last.hover();
+  const [c, b] = [(await cap.boundingBox())!, (await last.boundingBox())!];
+  expect(b.width).toBe(44);
+  expect(await last.evaluate((n) => getComputedStyle(n).paddingTop)).toBe("0px");
+  // 4 from the capsule's top, bottom and right end
+  expect(b.y - c.y).toBeCloseTo(4, 0);
+  expect(c.y + c.height - (b.y + b.height)).toBeCloseTo(4, 0);
+  expect(c.x + c.width - (b.x + b.width)).toBeCloseTo(4, 0);
+});
