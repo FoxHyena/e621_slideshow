@@ -208,6 +208,7 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
     <Sheet
       title={`Post ${post.id}${name ? ` by ${name}` : ""}`}
       testId="sheet-post"
+      pop
       head={
         <div className="sheet-ctx">
           <Avatar seed={artist ?? `post:${post.id}`} className="post-avatar" />

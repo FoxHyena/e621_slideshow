@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { mockE621, type MockPostSpec } from "./mock";
 
 /**
@@ -33,6 +33,13 @@ async function following(page: Page) {
 }
 
 const side = (page: Page) => page.getByTestId("sidebar");
+
+/** A box once its opening animation has finished. */
+async function settled(el: Locator) {
+  await expect(el).toBeVisible();
+  await el.evaluate((n) => Promise.all(n.getAnimations().map((a) => a.finished)));
+  return (await el.boundingBox())!;
+}
 
 test("the sidebar: brand, tabs with names, the capsule on the current one, Search with /, the account", async ({ page }) => {
   await following(page);
@@ -91,7 +98,7 @@ test("under 900 it is the phone layout", async ({ page }) => {
   await expect(page.locator(".tube")).toBeVisible();
 });
 
-test("a grid uses the full width; a titled sheet is a 420 dialog", async ({ page }) => {
+test("a grid uses the full width; a tile's right-click menu is a popover at the pointer", async ({ page }) => {
   await following(page);
   await page.goto("/following");
   await page.getByTestId("grid-toggle").click();
@@ -102,18 +109,73 @@ test("a grid uses the full width; a titled sheet is a 420 dialog", async ({ page
   expect(first.width).toBeGreaterThanOrEqual(176);
   await shot(page, "desktop-grid");
   // a tile's menu is right-click: Favorite, Open artist, Play from here, Open on e621
-  await tiles.first().click({ button: "right" });
+  await tiles.first().click({ button: "right", position: { x: 40, y: 30 } });
   const menu = page.getByTestId("sheet-post");
   await expect(menu).toBeVisible();
   await expect(menu).toContainText("Play from here");
   await expect(menu).toContainText("Open artist");
-  // a titled sheet is a 420 dialog in the middle
-  const dialog = (await menu.getByRole("dialog").boundingBox())!;
-  expect(dialog.width).toBe(420);
+  // a popover at the pointer: 300 wide, its top left corner where the click was, no ✕, no dim
+  const pop = await settled(menu.getByRole("dialog"));
+  expect(pop.width).toBe(300);
+  expect(Math.abs(pop.x - (first.x + 40))).toBeLessThanOrEqual(1);
+  expect(Math.abs(pop.y - (first.y + 30))).toBeLessThanOrEqual(1);
+  await expect(menu.getByTestId("sheet-close")).toBeHidden();
+  await expect(menu.locator(".sheet-dim")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await shot(page, "desktop-tile-menu");
   await page.getByTestId("tile-fav").click();
   await expect(menu).toHaveCount(0);
   await expect(tiles.first()).toHaveAccessibleName(/favorited/);
+});
+
+test("a ⋯ opens its menu as a popover under it; a click away or Esc closes it; a titled sheet with its own job is a dialog", async ({ page }) => {
+  await following(page);
+  await page.goto("/following");
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  const more = page.getByTestId("following-more");
+  const at = (await more.boundingBox())!;
+  await more.click();
+  const menu = page.getByTestId("sheet-following-menu");
+  const pop = await settled(menu.getByRole("dialog"));
+  // 300 wide, 8 below the ⋯; left edges lined up, or right edges when it would leave the window
+  expect(pop.width).toBe(300);
+  expect(Math.abs(pop.y - (at.y + at.height + 8))).toBeLessThanOrEqual(1);
+  if (at.x + 300 > 1280 - 8) expect(Math.abs(pop.x + 300 - (at.x + at.width))).toBeLessThanOrEqual(1);
+  else expect(Math.abs(pop.x - at.x)).toBeLessThanOrEqual(1);
+  await expect(menu.getByRole("heading", { name: "Following" })).toBeVisible();
+  await expect(menu.getByTestId("sheet-close")).toBeHidden();
+  await shot(page, "desktop-popover");
+  // a click away closes it
+  await page.mouse.click(400, 700);
+  await expect(menu).toHaveCount(0);
+  // Esc too
+  await more.click();
+  await expect(menu).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(menu).toHaveCount(0);
+  // opened by its row, Keyboard shortcuts is a 420 dialog in the middle with its ✕
+  await page.goto("/settings");
+  await page.getByTestId("app-keys").click();
+  const keys = page.getByTestId("sheet-keys");
+  const box = (await keys.getByRole("dialog").boundingBox())!;
+  expect(box.width).toBe(420);
+  expect(Math.abs(box.x + box.width / 2 - 640)).toBeLessThanOrEqual(1);
+  await expect(keys.getByTestId("sheet-close")).toBeVisible();
+});
+
+test("an artist's ⋯ near the window's right edge lines the popover up by right edges", async ({ page }) => {
+  await following(page);
+  await page.goto("/artist/fox_artist");
+  const more = page.getByTestId("artist-menu");
+  await expect(more).toBeVisible();
+  await page.setViewportSize({ width: 1000, height: 800 });
+  const at = (await more.boundingBox())!;
+  await more.click();
+  const menu = page.getByTestId("sheet-artist-menu");
+  const pop = await settled(menu.getByRole("dialog"));
+  expect(pop.width).toBe(300);
+  expect(at.x + 300).toBeGreaterThan(1000 - 8);
+  expect(Math.abs(pop.x + pop.width - (at.x + at.width))).toBeLessThanOrEqual(1);
+  expect(Math.abs(pop.y - (at.y + at.height + 8))).toBeLessThanOrEqual(1);
 });
 
 test("grid loading on a computer: three full rows of skeleton tiles across the wide grid", async ({ page }) => {

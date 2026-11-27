@@ -352,6 +352,7 @@ function ArtistMenu({ name }: { name: string }) {
     <Sheet
       title={label(name)}
       testId="sheet-artist-menu"
+      pop
       head={
         <div className="sheet-ctx">
           <Avatar seed={name} className="post-avatar" />

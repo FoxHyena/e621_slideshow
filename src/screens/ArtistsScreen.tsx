@@ -298,6 +298,7 @@ function ArtistSheet({ name, followed }: { name: string; followed: boolean }) {
     <Sheet
       title={label(name)}
       testId="sheet-artist"
+      pop
       head={
         <div className="sheet-ctx">
           <Avatar seed={name} className="post-avatar" />

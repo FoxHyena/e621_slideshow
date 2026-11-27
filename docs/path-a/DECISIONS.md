@@ -1356,6 +1356,47 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   and "Surprise me", since many tags can weigh about the same and Breadth is how many are searched.
   The note under it says just that.
 
+## 2026-11-27 — The check list: the overnight batches are owner-approved
+
+- The 49 things still open were put on one page (https://claude.ai/artifact/43ibNeuA4gHKncdwxkW3XM), each
+  with where to look, the other option and my pick. The owner answered 48 by tapping; no notes. I read
+  the answers from the page's store.
+- 47 times "Agree" (or "Looks right"): every listed choice in the five overnight batches, the sidebar
+  with names, Play as a disc on a computer, the leftovers. DESIGN.md's five "Proposed, not
+  owner-approved" headings now read "Owner-approved 2026-11-27 on the check list". What was approved
+  is the listed choices; the measurements are mine.
+- "Agree" also meant "drop" for three things I had added: "What's new" (never built), the "Updated to
+  2.1" toast (built, to be removed), the one-time "Install the app" row on Settings (never built).
+  They are out of the mock and DESIGN.md.
+- Safari: the owner sees Share under "•••". The hint in the install steps stays.
+- Not answered: whether Search, Artists and the artist page on a computer need their own drawing.
+- Fixed in passing: two places in DESIGN.md still said "Slideshow" where the app names itself (the
+  install sheet's lead and the e621 button's line).
+- Pull request 24 was merged to main as `3d28a4b` on the owner's say ("It's ready, let's mark ready and
+  merge for now").
+
+
+## 2026-11-27 — Built: popovers on a computer; the "Updated to" toast is gone
+
+- Built from the check list (owner: "Agree" to g1 and b7; I read the answers from the page's store
+  myself before building).
+- **The "Updated to 2.1" toast is gone.** After a Reload into a new build nothing is said.
+- **Popovers on a computer** (DESIGN.md "On a computer", "Popover"). A sheet opened from something on
+  screen hangs from it: 300 wide, 8 below it with left edges lined up (right edges when it would leave
+  the window), no grabber, no ✕, no dim; a click away or Esc closes it. These are the menus of
+  Following, For You and Results (⋯), an artist page's ⋯, an artist row's ⋯ in Artists (followed and
+  suggested), a post's ⋯, and a grid tile's right-click menu, which opens at the pointer.
+- **How a popover finds its opener:** every press (click, key, right-click) is noted as it happens
+  (`src/shell/opener.ts`); a sheet marked `pop` that mounts within 1.5 s of one hangs from that
+  control. A sheet opened any other way (a keyboard shortcut) is the centred dialog.
+- **Mine, not in the spec:** when there is no room below the opener and more above it, the popover
+  opens 8 above it instead. Slideshow's choices in Settings (Transition, Quality, Longest video, Load
+  ahead) are popovers at their row: they are opened from a row and only pick one of a list, like the
+  sort and date menus. Undo either by taking `pop` off the sheet.
+- **Still dialogs in the middle:** Quick settings, Keyboard shortcuts, sign-in, the install steps,
+  Follow from favorites, Mark all as seen (a confirm with its own job), the search editor, Quality in
+  the player's Quick settings.
+
 ## 2026-11-26 — For You: artists and characters take at most a third of the search; do-not-post marks don't count
 
 - Owner's report: a friend with many favorites got only artist tags in For You, and the owner's own

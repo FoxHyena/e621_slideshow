@@ -364,7 +364,7 @@ export function ForYouScreen() {
             dateAny={DATE_ANY}
           />
           {sheet === "menu" && (
-            <Sheet title="For You" testId="sheet-for-you-menu">
+            <Sheet title="For You" testId="sheet-for-you-menu" pop>
               <div className="sheet-rows" data-wells>
                 <SheetAction icon={RotateCw} label="Refresh" onClick={() => void doRefresh()} disabled={!choice || busy} data-testid="for-you-refresh" />
               </div>

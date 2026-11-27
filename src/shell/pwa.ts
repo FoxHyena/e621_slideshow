@@ -41,9 +41,9 @@ let deferred: BeforeInstallPromptEvent | null = null;
 let registration: ServiceWorkerRegistration | null = null;
 let started = false;
 
-const UPDATED = "e6ss:updated-from";
 /** This build (the worker's cache names carry it). */
 const BUILD = process.env.NEXT_PUBLIC_BUILD_ID ?? "dev";
+
 
 /** The way to install here, from the browser alone (before any prompt event). */
 export function installWayOf(nav: { userAgent: string; maxTouchPoints?: number; standalone?: boolean }, standalone: boolean): InstallWay {
@@ -76,12 +76,8 @@ export async function promptInstall(): Promise<void> {
 
 /** Take the waiting version: the worker takes over, then the page reloads on it. */
 export function reloadToUpdate(): void {
+  // (nothing is said after the reload: the Reload just tapped already told; owner-approved 2026-11-27)
   const waiting = registration?.waiting;
-  try {
-    sessionStorage.setItem(UPDATED, BUILD);
-  } catch {
-    /* the "Updated" toast is a nicety */
-  }
   if (!waiting) {
     location.reload();
     return;
@@ -144,16 +140,6 @@ export function startPwa(): void {
   if (early) offered(early);
   window.addEventListener("beforeinstallprompt", offered);
   window.addEventListener("appinstalled", () => pwa.set((s) => ({ ...s, install: "installed" })));
-
-  try {
-    const from = sessionStorage.getItem(UPDATED);
-    if (from !== null) {
-      sessionStorage.removeItem(UPDATED);
-      if (from !== BUILD) toast.success(`Updated to ${process.env.APP_VERSION}`, { id: "updated", duration: 4000 });
-    }
-  } catch {
-    /* private mode */
-  }
 
   // Development serves changing chunks under one name: no worker there.
   if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) return;

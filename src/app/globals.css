@@ -2949,6 +2949,24 @@ html {
   .sheet[data-full] {
     height: min(720px, calc(100dvh - 48px));
   }
+  /* a sheet opened from something on screen hangs from it as a 300 popover (Sheet places it): no dim,
+     no ✕; a click away closes it, on the clear layer under it */
+  .sheet-layer[data-pop] {
+    display: block;
+  }
+  .sheet-layer[data-pop] .sheet-dim {
+    background: none;
+    animation: none;
+  }
+  .sheet-layer[data-pop] .sheet {
+    position: fixed;
+    width: 300px;
+    max-height: none;
+    animation: drop-in 150ms ease-out;
+  }
+  .sheet-layer[data-pop] .sheet-x {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
