@@ -51,7 +51,7 @@ export interface Rec {
   rebuild(): void;
   togglePin(tag: string): void;
   toggleMute(tag: string): void;
-  /** Tune's "Leave out artists" */
+  /** Tune's "Filter artists" */
   setNoArtists(on: boolean): void;
 }
 

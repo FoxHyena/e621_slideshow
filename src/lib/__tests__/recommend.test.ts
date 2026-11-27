@@ -65,7 +65,7 @@ describe("computeWeights", () => {
     expect(w.has("hi_res")).toBe(false);
   });
 
-  it("with Leave out artists, gives artist tags no weight unless pinned", () => {
+  it("with Filter artists, gives artist tags no weight unless pinned", () => {
     expect(w.get("fave_artist")).toBeGreaterThan(0);
     const off = computeWeights(profile(), GLOBAL, N_SITE, { pinned: [], muted: [], noArtists: true });
     expect(off.has("fave_artist")).toBe(false);

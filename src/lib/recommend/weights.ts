@@ -34,7 +34,7 @@ export interface Overrides {
   pinned: string[];
   muted: string[];
   /**
-   * Tune's "Leave out artists": For You's taste ignores artist tags (a pinned one still counts),
+   * Tune's "Filter artists": For You's taste ignores artist tags (a pinned one still counts),
    * so it ranks by what is in a picture, not who drew it. Off when missing (older saves).
    */
   noArtists?: boolean;

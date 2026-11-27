@@ -143,7 +143,7 @@ export async function fitLearned(
  */
 export function withOverrides(learned: Learned, overrides: Overrides, isArtist: (tag: string) => boolean = () => false): Map<string, number> {
   const w = new Map(learned.weights);
-  // "Leave out artists": the favorites' artists weigh nothing (pins, below, still do)
+  // "Filter artists": the favorites' artists weigh nothing (pins, below, still do)
   if (overrides.noArtists) for (const tag of [...w.keys()]) if (isArtist(tag)) w.delete(tag);
   const max = Math.max(0, ...w.values());
   for (const tag of overrides.pinned) w.set(tag, Math.max(max, w.get(tag) ?? 0));

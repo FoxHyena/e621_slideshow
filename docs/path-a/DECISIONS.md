@@ -1337,10 +1337,11 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   "adds again" line. Not owner-approved either way; the question is on the morning list.- Owner, asked one drop per post or a new drop every time: "One per post". Locked, as built. The
   build's memory lasts for the page session only; the owner was told and did not ask for more.
 
-## 2026-11-26 — Tune: Leave out artists (owner's ask)
+## 2026-11-26 — Tune: Filter artists (owner's ask)
 
 - Owner: "add a toggle to the for you tune settings to filter out artists from the taste building
-  process". A switch row in Tune under Breadth: "Leave out artists", "Rank by what's drawn, not who".
+  process". A switch row in Tune under Breadth: "Filter artists", "Ranks without artist tags"
+  (owner: "just say 'filter artists' with a brief description … shouldn't be too prescriptive").
   Placement and copy are mine; not drawn by the design session.
 - Kept with the pins and mutes (`overrides:<user>`, `noArtists`), so per account and on this device.
 - When on, For You's taste has no artist tags: the lift weights skip them, the learned weights drop
@@ -1351,4 +1352,7 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The learned fit itself is not redone without artists: it still shares credit between an artist
   and their usual tags, then the artists are dropped. A refit would also need a second fit for
   Artists › Suggested, which keeps the artists' taste whatever the switch says.
+- **Breadth's ends are numbers** (owner, same day): "2" and "30" in place of "Close to my favorites"
+  and "Surprise me", since many tags can weigh about the same and Breadth is how many are searched.
+  The note under it says just that.
 

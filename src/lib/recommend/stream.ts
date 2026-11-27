@@ -75,7 +75,7 @@ export class RecommendedQueue implements SlideQueue {
      */
     private learned: Map<string, number> | null = null,
     /**
-     * Tune's "Leave out artists": when set, a post is scored without its artist tags, except
+     * Tune's "Filter artists": when set, a post is scored without its artist tags, except
      * these (pinned ones). The learned weights still hold artists the favorites never had.
      */
     private keepArtists: ReadonlySet<string> | null = null,
@@ -198,7 +198,7 @@ export class RecommendedQueue implements SlideQueue {
     }
   }
 
-  /** What a post's taste is scored on: all of it, or (Leave out artists) all but who drew it. */
+  /** What a post's taste is scored on: all of it, or (Filter artists) all but who drew it. */
   private taste(post: Post): Post {
     const keep = this.keepArtists;
     if (!keep || !post.tags.artist?.length) return post;

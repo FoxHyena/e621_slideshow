@@ -244,7 +244,7 @@ test("signing out while For You is still ranking (hidden behind Settings) stops 
   expect(mock.searches.filter((s) => s.auth && rankPage(s.tags)).length).toBe(asked);
 });
 
-test("Tune's Leave out artists takes artist tags out of your taste and the search; it's kept, and offers Update ranking", async ({ page }) => {
+test("Tune's Filter artists takes artist tags out of your taste and the search; it's kept, and offers Update ranking", async ({ page }) => {
   const mock = await withFavorites(page);
   // the favorites' artist is rare on e621, so it weighs in like any distinctive tag
   mock.tagCounts = { ...mock.tagCounts, mock_artist: 5 };
@@ -254,8 +254,12 @@ test("Tune's Leave out artists takes artist tags out of your taste and the searc
   expect(rankSearches().at(-1)).toContain("~mock_artist");
 
   await page.getByTestId("open-tune").click();
+  // Breadth's ends are how many tags, not a promise (owner)
+  await expect(page.locator(".slider-ends")).toHaveText("230");
+  await expect(page.getByTestId("tune")).not.toContainText("Surprise me");
   const sw = page.getByTestId("rec-no-artists");
   await expect(sw).not.toBeChecked();
+  await expect(page.getByRole("switch", { name: /Filter artists/ })).toBeVisible();
   await expect(page.getByTestId("rec-tags")).toContainText("mock artist");
   await sw.check();
   await expect(page.getByTestId("rec-tags")).not.toContainText("mock artist");

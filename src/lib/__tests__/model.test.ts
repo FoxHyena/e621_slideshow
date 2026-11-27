@@ -116,7 +116,7 @@ describe("withOverrides", () => {
     expect(w.has("c")).toBe(false);
   });
 
-  it("with Leave out artists, drops the favorites' artists unless pinned", () => {
+  it("with Filter artists, drops the favorites' artists unless pinned", () => {
     const l: Learned = { favKey: "k", negAt: 0, weights: [["a", 2], ["artist_one", 3], ["artist_two", 1]] };
     const isArtist = (t: string) => t.startsWith("artist_");
     const w = withOverrides(l, { pinned: ["artist_two"], muted: [], noArtists: true }, isArtist);

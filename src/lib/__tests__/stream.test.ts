@@ -69,7 +69,7 @@ describe("RecommendedQueue", () => {
     expect(q.matchFor(best.id)?.reasons).toEqual(["best"]);
   });
 
-  it("with Leave out artists, scores a post without its artist tags, but keeps a pinned artist", async () => {
+  it("with Filter artists, scores a post without its artist tags, but keeps a pinned artist", async () => {
     const api = controlled();
     const w = new Map([
       ["a", 1],
