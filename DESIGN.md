@@ -509,7 +509,7 @@ components:
 
 Source of truth: two owner-approved mocks. `docs/path-a/mocks/feed-v6.html` is the feed (its `.p6` custom properties and the classes ending in `6`; the page also carries a copy of v5.3 for comparison, which is not part of the system). `docs/path-a/mocks/screens-v6.html` is the rest of the app, built from the same parts: artist page, grid view, Artists, Search, Tune, Settings, Settings › Slideshow, the sign-in sheet, the player and its two sheets, the filter menus, the tag targets, the signed-out landing, the empty, error and offline states, Goo the mascot, and the first run after sign-in. v6 redrew the Following feed and the app's shared chrome: header, chips, post panel, artist card, burst row, caught-up, the ⋯ sheet, Play and the tab bar. It also replaced the materials, sizes, voice face and avatars that every screen uses.
 
-Every surface has a drawing now. The sections drawn overnight on 2026-11-26 were owner-approved on 2026-11-27, choice by choice, on a check list; the record is in `docs/path-a/MORNING-DESIGN.md` and `docs/path-a/DECISIONS.md`. One thing is still open: Search, Artists and the artist page on a computer have no drawing of their own and the owner has not said whether they need one. Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
+Every surface has a drawing now. The sections drawn overnight on 2026-11-26 were owner-approved on 2026-11-27, choice by choice, on a check list; the record is in `docs/path-a/MORNING-DESIGN.md` and `docs/path-a/DECISIONS.md`. Search, Artists and the artist page on a computer have no drawing of their own, and need none: the owner looked at them as built and said "Fine as built" (2026-11-27). Values marked **spec (not in mock)** come from `docs/path-a/UX.md`. The machine-readable extensions (ramps, shadows, motion, component snippets) are in `.impeccable/design.json`.
 
 ## Overview
 
@@ -1047,7 +1047,7 @@ What Following shows the first time you sign in, before you follow anyone. Three
 - **"From a link":** the same Panel dropdown, 343 wide, holding the line, the six rows, the note and the tonal "Use my settings".
 
 ### Not drawn yet
-Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. Build them from UX.md with the parts above, and show the owner before they ship.
+Search, Artists and the artist page on a computer have no drawing of their own; they follow "On a computer": the 600 column, and the full width for a grid. They are built from UX.md with the parts above; the owner looked at them as built and said "Fine as built" (2026-11-27), so they need no drawing.
 
 ### Motion
 | Motion | Duration · curve | What animates | Source |

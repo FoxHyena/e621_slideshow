@@ -1421,3 +1421,6 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   The learned model fits its own weights and is unchanged. The shared third stays as a backstop.
 - Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
 
+## 2026-11-27 — Search, Artists and the artist page on a computer: fine as built
+- Owner, after the check list, asked whether Search, Artists and the artist page on a computer need
+  their own drawing: "Fine as built". The check list is fully answered (49 of 49). Nothing to build.
