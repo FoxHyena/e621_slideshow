@@ -9,7 +9,7 @@ import { Fragment, useMemo, useState } from "react";
 import { InlineLoader, stepText } from "@/components/Loader";
 import { Field, Slider } from "@/components/v6";
 import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "@/lib/query/build";
-import { searchPlan, topTags, type SearchKind } from "@/lib/recommend/weights";
+import { isName, searchPlan, topTags, type SearchKind } from "@/lib/recommend/weights";
 import { BREADTH_MAX, BREADTH_MIN, DEFAULT_SEARCH } from "@/lib/settings";
 import { getNav } from "@/nav/history";
 import { getPrefs } from "@/state/prefs";
@@ -40,7 +40,7 @@ export function TuneScreen() {
   const tags = useMemo(() => topTags(weights, weights.size), [weights]);
   // What For You actually searches: the plan, cut to what e621's tag limit leaves room for.
   const { searched, capped } = useMemo(() => {
-    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth, (t) => r.profile?.tags[t]?.cat === "artist") : [];
+    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth, (t) => isName(r.profile?.tags[t]?.cat)) : [];
     const s = { ...DEFAULT_SEARCH, ratings: search.ratings, media: forYou.media, date: forYou.date, minScore: forYou.minScore, breadth: search.breadth };
     const rq = buildRecommendedQuery(s, plan.map((p) => p.tag), session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT);
     const inQuery = new Set(rq.candidates);

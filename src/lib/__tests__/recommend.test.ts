@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
 import { cohortQuality, percentiles, rankAll, scorePost, type Ranked } from "../recommend/rank";
 import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
-import { CAT_MULT, computeWeights, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
+import { CAT_MULT, computeWeights, isName, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
 import { makePost } from "./fixtures";
 
 const NOW = 1_700_000_000_000;
@@ -248,32 +248,35 @@ describe("searchPlan", () => {
   it("puts pins first and counts them against breadth", () => {
     expect(plan(2, { pinned: ["anthro"], muted: [] })).toEqual(["pinned:anthro", "signature:rare_artist"]);
   });
-  it("keeps artists to a third of the searched tags while other tags are left, in weight order", () => {
-    // a heavy favoriter: ten artists at the lift cap above every other tag
+  it("keeps names (artists and characters together) to a third of the searched tags while other tags are left, in weight order", () => {
+    // a heavy favoriter: ten names at the lift cap above every other tag, characters among the artists
+    const names = ["artist_0", "char_0", "artist_1", "char_1", "artist_2", "artist_3", "char_2", "artist_4", "artist_5", "char_3"];
     const heavy = new Map<string, number>([
-      ...Array.from({ length: 10 }, (_, i) => [`artist_${i}`, 3.9 - i * 0.01] as [string, number]),
+      ...names.map((t, i) => [t, 3.9 - i * 0.01] as [string, number]),
       ["kink_a", 3.0],
       ["kink_b", 2.9],
       ["species_c", 2.5],
       ["kink_d", 2.0],
     ]);
-    const isArtist = (t: string) => t.startsWith("artist_");
-    const tags = searchPlan(heavy, NO_OVERRIDES, 6, isArtist).map((s) => s.tag);
-    expect(tags).toEqual(["artist_0", "artist_1", "kink_a", "kink_b", "species_c", "kink_d"]);
-    // other tags run out: artists fill the rest
-    expect(searchPlan(heavy, NO_OVERRIDES, 9, isArtist).map((s) => s.tag)).toEqual([
+    const name = (t: string) => isName(t.startsWith("artist_") ? "artist" : t.startsWith("char_") ? "character" : "general");
+    const tags = searchPlan(heavy, NO_OVERRIDES, 6, name).map((s) => s.tag);
+    expect(tags).toEqual(["artist_0", "char_0", "kink_a", "kink_b", "species_c", "kink_d"]);
+    // other tags run out: names fill the rest
+    expect(searchPlan(heavy, NO_OVERRIDES, 9, name).map((s) => s.tag)).toEqual([
       "artist_0",
+      "char_0",
       "artist_1",
+      "char_1",
       "artist_2",
-      "artist_3",
-      "artist_4",
       "kink_a",
       "kink_b",
       "species_c",
       "kink_d",
     ]);
-    // a pinned artist doesn't use the share
-    expect(searchPlan(heavy, { pinned: ["artist_9"], muted: [] }, 4, isArtist).map((s) => s.tag)).toEqual(["artist_9", "artist_0", "kink_a", "kink_b"]);
+    // a pinned name doesn't use the share
+    expect(searchPlan(heavy, { pinned: ["char_3"], muted: [] }, 4, name).map((s) => s.tag)).toEqual(["char_3", "artist_0", "kink_a", "kink_b"]);
+    // species, copyrights and the rest aren't names
+    expect([isName("species"), isName("copyright"), isName(undefined)]).toEqual([false, false, false]);
   });
 });
 

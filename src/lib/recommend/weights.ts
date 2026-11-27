@@ -38,12 +38,15 @@ export const CAT_MULT: Record<TagCategoryName, number> = {
 export const notTaste = (tag: string) => NOT_ARTISTS.has(tag) || NOBODY.has(tag);
 
 /**
- * At most this share of the searched tags are artists (pins aside), when there are other tags to
- * search. Artists are rare on e621, so lift tops out for any artist favorited a few dozen times,
- * and for someone with many favorites every searched slot went to an artist. The rest still count
- * when ranking.
+ * At most this share of the searched tags are names, artists and characters together (pins
+ * aside), when there are other tags to search. Names are rare on e621, so lift tops out for any
+ * artist or character favorited a few dozen times, and for someone with many favorites every
+ * searched slot went to one. The rest still count when ranking.
  */
-export const ARTIST_SHARE = 1 / 3;
+export const NAME_SHARE = 1 / 3;
+
+/** Whether a tag category names someone: an artist or a character. */
+export const isName = (cat: TagCategoryName | undefined) => cat === "artist" || cat === "character";
 
 export interface Overrides {
   pinned: string[];
@@ -103,7 +106,7 @@ export interface PlannedSearch {
 /**
  * Which profile tags the candidate search uses, strongest first: pins, then
  * the highest-weight ("signature") tags up to `breadth`, with no more than
- * ARTIST_SHARE of them artists (`isArtist`) while other tags are left.
+ * NAME_SHARE of them names (`isName`: artists, characters) while other tags are left.
  *
  * Searching by cover (weight × favorites) as well kept the pool larger, but
  * with generic tags like `canine` and `sex` that the weighting exists to
@@ -113,7 +116,7 @@ export function searchPlan(
   weights: Map<string, number>,
   overrides: Overrides,
   breadth: number,
-  isArtist: (tag: string) => boolean = () => false,
+  isName: (tag: string) => boolean = () => false,
 ): PlannedSearch[] {
   const pinned = overrides.pinned
     .filter((t) => weights.has(t))
@@ -122,15 +125,15 @@ export function searchPlan(
   const taken = new Set(pinned.map((p) => p.tag));
   const slots = Math.max(0, breadth - pinned.length);
   const ranked = topTags(weights, weights.size).filter((t) => !taken.has(t));
-  // artists up to their share; past it they wait, and fill in only if other tags run out
-  let artistsLeft = Math.ceil(slots * ARTIST_SHARE);
+  // names up to their share; past it they wait, and fill in only if other tags run out
+  let namesLeft = Math.ceil(slots * NAME_SHARE);
   const picked = new Set<string>();
   for (const t of ranked) {
     if (picked.size >= slots) break;
-    if (!isArtist(t)) picked.add(t);
-    else if (artistsLeft > 0) {
+    if (!isName(t)) picked.add(t);
+    else if (namesLeft > 0) {
       picked.add(t);
-      artistsLeft--;
+      namesLeft--;
     }
   }
   for (const t of ranked) {
