@@ -16,6 +16,16 @@ export const SHRINK = 5;
  */
 export const SHARE_HALF = 0.02;
 /**
+ * Share of all e621 posts at which a tag's weight is halved: weight also scales by
+ * 1 / (1 + c / SITE_HALF), c = the tag's share of the site. Lift is a log, so it squashes how
+ * specific a tag is: male_penetrating_male (3.6% of e621, 9× in one profile) scored 2.2 and a
+ * muzzle (0.24%, 20×) 3.0, and with the share damping the broad tag tied the kink. Broad tags
+ * also make poor searches: they fill the window with posts anyone might like. The weighting
+ * exists to find what is unusually common in someone's favorites and not on e621 at large
+ * (owner), so a tag on 1% of the site keeps half its weight and one on 3.6% keeps 22%.
+ */
+export const SITE_HALF = 0.01;
+/**
  * Lift is capped at "50× more common in your favorites than on e621". Past
  * that, rarer isn't more telling: without the cap an artist with 500 posts and
  * 9 favorites (190×) outweighed a kink on 20% of the favorites (33×), and rare
@@ -84,6 +94,8 @@ export function computeWeights(
   overrides: Overrides = NO_OVERRIDES,
   /** SHARE_HALF; 0 turns the share damping off (the backtest compares) */
   shareHalf = SHARE_HALF,
+  /** SITE_HALF; 0 turns the site-breadth damping off (the backtest compares) */
+  siteHalf = SITE_HALF,
 ): Map<string, number> {
   const weights = new Map<string, number>();
   const nFav = profile.favIds.length;
@@ -91,9 +103,11 @@ export function computeWeights(
     for (const [tag, { n, cat }] of Object.entries(profile.tags)) {
       const count = globalCounts[tag];
       if (n < MIN_SUPPORT || !count || notTaste(tag) || (overrides.noArtists && cat === "artist")) continue;
-      const lift = Math.min(MAX_LIFT, Math.log(n / nFav / (count / nSite)));
       const share = n / nFav;
-      const w = Math.max(0, lift) * (n / (n + SHRINK)) * (share / (share + shareHalf)) * CAT_MULT[cat];
+      const site = count / nSite;
+      const lift = Math.min(MAX_LIFT, Math.log(share / site));
+      const breadth = siteHalf ? 1 / (1 + site / siteHalf) : 1;
+      const w = Math.max(0, lift) * (n / (n + SHRINK)) * (share / (share + shareHalf)) * breadth * CAT_MULT[cat];
       if (w > 0) weights.set(tag, w);
     }
   }

@@ -1450,3 +1450,30 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 ## 2026-11-27 — Search, Artists and the artist page on a computer: fine as built
 - Owner, after the check list, asked whether Search, Artists and the artist page on a computer need
   their own drawing: "Fine as built". The check list is fully answered (49 of 49). Nothing to build.
+
+## 2026-11-27 — For You: tags common on e621 damped too
+- Owner, on the share damping's results: "one of the original intents with the weight system was to
+  make it harder for broader things like male_penetrating_male, which is a very common tag on e621, to
+  show up as opposed to specific kink interests … trying to make the system good at finding the things
+  that aren't so broad." Picked the site-breadth damping ("Yes, add it").
+- **Why the share damping broke it:** lift is a log, so it squashes specificity. In the friend's
+  profile male_penetrating_male (3.6% of e621, 9×) scored 2.2 and muzzle_(object) (0.24%, 20×) 3.0;
+  the share damping then cut the muzzle (4.8% of the favorites) to 71% and left the broad tag (31%)
+  at 94%. 8 of the 15 searched tags were on over 1% of e621.
+- **Fix:** weight also scales by 1 / (1 + c / 1%), c = the tag's share of all e621 posts
+  (`SITE_HALF`). A tag on 1% of the site keeps half its weight, one on 3.6% keeps 22%. The share
+  damping stays: it is what keeps 0.2%-of-the-favorites gear tags out.
+- **Backtest, the friend's account** (last 30 days hidden, 22 favorites; app's plan with 3 popular
+  pages; learned model mix10, quality 0.5–1):
+
+  | Weighting | Names searched | Tags on >1% of e621 | Pages | Found | Learned top 200 |
+  |---|---|---|---|---|---|
+  | count only (before #28) | 5 | 0 | 4 + 3 | 10 | 5–7 |
+  | share only (#28 alone) | 2 | 8 | 25 + 3 | 20 | 9–11 |
+  | share + site breadth (now) | 5 | 0 | 4 + 3 | 14 | 8–9 |
+
+- Read: the broad tags bought the extra finds by pulling 4× the posts, the pool size the weighting
+  exists not to chase. Now beats the old weighting on every measure, with no broad tags. Names are back
+  at the shared third (5 of 15). The specific tags run dry in 4 pages of a 30-day window, so most of
+  the page budget goes unused; a later change could spend it on more tags.
+- The owner's own account is no longer used for tuning or testing the weights.

@@ -261,7 +261,8 @@ Bump `@version` whenever you change it, or installed copies won't update. The bu
 - **Recommended** ([`src/lib/recommend/`](src/lib/recommend)):
   - `sync.ts` reads favorites incrementally and looks up each tag's site-wide count.
   - `weights.ts` scores each tag by how much more common it is in your favorites than on e621
-    (capped, damped for small counts and for a small share of your favorites, meta tags ignored).
+    (capped, damped for small counts, for a small share of your favorites and for tags common
+    across e621, meta tags ignored).
   - `rank.ts` scores a post by its 5 strongest matching tags, so common tags can't swamp a rare favorite,
     then orders posts by taste percentile + quality percentile (favorites compared with posts uploaded
     around the same time).
