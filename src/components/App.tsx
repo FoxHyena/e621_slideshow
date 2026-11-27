@@ -238,6 +238,7 @@ export default function App({
         new Set(rec.overrides.muted),
         onChange,
         rec.learned,
+        rec.overrides.noArtists ? new Set(rec.overrides.pinned) : null,
       );
     } else {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);

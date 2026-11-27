@@ -141,8 +141,10 @@ export async function fitLearned(
  * does for lift: a pinned tag weighs as much as the strongest one, a muted one
  * nothing (muted posts are filtered out anyway).
  */
-export function withOverrides(learned: Learned, overrides: Overrides): Map<string, number> {
+export function withOverrides(learned: Learned, overrides: Overrides, isArtist: (tag: string) => boolean = () => false): Map<string, number> {
   const w = new Map(learned.weights);
+  // "Filter artists": the favorites' artists weigh nothing (pins, below, still do)
+  if (overrides.noArtists) for (const tag of [...w.keys()]) if (isArtist(tag)) w.delete(tag);
   const max = Math.max(0, ...w.values());
   for (const tag of overrides.pinned) w.set(tag, Math.max(max, w.get(tag) ?? 0));
   for (const tag of overrides.muted) w.delete(tag);

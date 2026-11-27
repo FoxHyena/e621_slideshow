@@ -204,6 +204,7 @@ export function ForYouScreen() {
             onChange();
           },
           learnedOf(r),
+          r.overrides.noArtists ? new Set(r.overrides.pinned) : null,
         );
         holder.q = q;
         return q;

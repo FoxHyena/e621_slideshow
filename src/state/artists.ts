@@ -143,7 +143,8 @@ function create(): ArtistsApi {
     const p = r.profile;
     if (!p) return r.error && !r.syncing ? "error" : "wait";
     const counts = countsOf(r.cache);
-    const cands = rankCandidates(p, counts, learnedOf(r), new Set());
+    // (suggestions are about artists, so they keep the artists' taste whatever Tune leaves out of For You)
+    const cands = rankCandidates(p, counts, learnedOf({ ...r, overrides: { ...r.overrides, noArtists: false } }), new Set());
     // The post counts are still coming (a first read: the profile lands before the counts are
     // asked for). Ranking now would favour the unknown, and the order is kept for the hour.
     const counting = r.step?.phase === "favorites" || r.step?.phase === "tags";

@@ -69,6 +69,30 @@ describe("RecommendedQueue", () => {
     expect(q.matchFor(best.id)?.reasons).toEqual(["best"]);
   });
 
+  it("with Filter artists, scores a post without its artist tags, but keeps a pinned artist", async () => {
+    const api = controlled();
+    const w = new Map([
+      ["a", 1],
+      ["drawn_by", 9],
+      ["pinned_artist", 9],
+    ]);
+    const learned = new Map([
+      ["a", 1],
+      ["stranger", -5], // an artist only the sample had: no say either
+    ]);
+    const q = new RecommendedQueue([tq("or")], api.fetch, w, filter, none, undefined, learned, new Set(["pinned_artist"]));
+    const byArtist = makePost({ tags: { artist: ["drawn_by"] } }); // only the artist matched: out
+    const plain = makePost({ tags: { general: ["a"], artist: ["stranger"] } });
+    const pinned = makePost({ tags: { general: ["a"], artist: ["pinned_artist"] } });
+    await flush();
+    api.calls[0].resolve([byArtist, plain, pinned]);
+    await q.ensure();
+    expect(ids(q)).toEqual([pinned.id, plain.id]);
+    expect(q.matchFor(plain.id)?.reasons).toEqual(["a"]);
+    // the post itself is untouched: its artist still shows
+    expect(q.posts[1].tags.artist).toEqual(["stranger"]);
+  });
+
   it("fetches several queries round by round, each until a short page or its budget", async () => {
     const api = controlled();
     new RecommendedQueue([tq("a", 3), tq("b", 2), tq("c", 1)], api.fetch, weights, filter, none);

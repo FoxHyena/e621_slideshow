@@ -74,6 +74,11 @@ export class RecommendedQueue implements SlideQueue {
      * still decides which posts match at all and the "Recommended because" tags.
      */
     private learned: Map<string, number> | null = null,
+    /**
+     * Tune's "Filter artists": when set, a post is scored without its artist tags, except
+     * these (pinned ones). The learned weights still hold artists the favorites never had.
+     */
+    private keepArtists: ReadonlySet<string> | null = null,
   ) {
     this.filter = { ...filter, seen: new Set(), stats: this.stats };
     void this.run();
@@ -174,7 +179,7 @@ export class RecommendedQueue implements SlideQueue {
       this.loading = false;
       if (!this.disposed) {
         const learned = this.learned;
-        this.ranked = rankAll(this.ranked, QUALITY_WEIGHT, learned ? (r) => learnedScore(r.post, learned) : undefined);
+        this.ranked = rankAll(this.ranked, QUALITY_WEIGHT, learned ? (r) => learnedScore(this.taste(r.post), learned) : undefined);
         this.changed();
       }
     }
@@ -186,11 +191,18 @@ export class RecommendedQueue implements SlideQueue {
       // Already a favorite: seen, and it's part of the profile that ranks everything else.
       if (post.stats.is_favorited) continue;
       if (this.muted.size && allTags(post).some((t) => this.muted.has(t))) continue;
-      const r = scorePost(post, this.weights);
+      const r = scorePost(this.taste(post), this.weights);
       if (r.score <= 0) continue;
       this.ranked.push({ post, ...r });
       this.matches.set(post.id, r);
     }
+  }
+
+  /** What a post's taste is scored on: all of it, or (Filter artists) all but who drew it. */
+  private taste(post: Post): Post {
+    const keep = this.keepArtists;
+    if (!keep || !post.tags.artist?.length) return post;
+    return { ...post, tags: { ...post.tags, artist: post.tags.artist.filter((t) => keep.has(t)) } };
   }
 
   /** Publish posts, but only once the search is over (or failed, so what was found still plays). */

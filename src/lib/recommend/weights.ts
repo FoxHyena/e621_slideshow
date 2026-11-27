@@ -33,6 +33,11 @@ export const CAT_MULT: Record<TagCategoryName, number> = {
 export interface Overrides {
   pinned: string[];
   muted: string[];
+  /**
+   * Tune's "Filter artists": For You's taste ignores artist tags (a pinned one still counts),
+   * so it ranks by what is in a picture, not who drew it. Off when missing (older saves).
+   */
+  noArtists?: boolean;
 }
 
 export const NO_OVERRIDES: Overrides = { pinned: [], muted: [] };
@@ -53,7 +58,7 @@ export function computeWeights(
   if (nFav > 0 && nSite > 0) {
     for (const [tag, { n, cat }] of Object.entries(profile.tags)) {
       const count = globalCounts[tag];
-      if (n < MIN_SUPPORT || !count) continue;
+      if (n < MIN_SUPPORT || !count || (overrides.noArtists && cat === "artist")) continue;
       const lift = Math.min(MAX_LIFT, Math.log(n / nFav / (count / nSite)));
       const w = Math.max(0, lift) * (n / (n + SHRINK)) * CAT_MULT[cat];
       if (w > 0) weights.set(tag, w);
