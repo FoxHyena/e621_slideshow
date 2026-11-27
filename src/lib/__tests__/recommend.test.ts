@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addFavorites, emptyProfile, type Profile } from "../recommend/profile";
 import { cohortQuality, percentiles, rankAll, scorePost, type Ranked } from "../recommend/rank";
 import { FAV_PAGE, TAG_BATCH, refreshTagCache, syncProfile, tagsToLookUp, type RecApi, type TagCache } from "../recommend/sync";
-import { CAT_MULT, computeWeights, isName, NO_OVERRIDES, searchPlan, topTags } from "../recommend/weights";
+import { CAT_MULT, computeWeights, isName, NO_OVERRIDES, searchPlan, SHARE_HALF, topTags } from "../recommend/weights";
 import { makePost } from "./fixtures";
 
 const NOW = 1_700_000_000_000;
@@ -93,8 +93,22 @@ describe("computeWeights", () => {
     // niche_kink: 20% of favorites, 0.2% of the site (100×, also capped)
     const capped = computeWeights(profile(), GLOBAL, N_SITE);
     expect(capped.get("niche_kink")!).toBeGreaterThan(capped.get("fave_artist")!);
-    // with the same lift, the tag on more favorites wins through n / (n + SHRINK)
-    expect(capped.get("niche_kink")! / capped.get("fave_artist")!).toBeCloseTo((20 / 25) / (10 / 15), 5);
+    // with the same lift, the tag on more favorites wins through n / (n + SHRINK) and its share
+    const share = (s: number) => s / (s + SHARE_HALF);
+    expect(capped.get("niche_kink")! / capped.get("fave_artist")!).toBeCloseTo(((20 / 25) * share(0.2)) / ((10 / 15) * share(0.1)), 5);
+  });
+
+  it("damps by share of the favorites, so a heavy favoriter's rare names don't outweigh what's in the pictures", () => {
+    // 5,000 favorites: an artist on 50 (1%, at the lift cap) and a kink on 1,000 (20%, 10× the site)
+    const p = emptyProfile("heavy");
+    p.favIds = Array.from({ length: 5000 }, (_, i) => i + 1);
+    p.tags = { big_artist: { n: 50, cat: "artist" }, big_kink: { n: 1000, cat: "general" } };
+    const counts = { big_artist: 100, big_kink: 20_000 };
+    const now = computeWeights(p, counts, N_SITE);
+    expect(now.get("big_kink")!).toBeGreaterThan(now.get("big_artist")!);
+    // counting favorites alone (the old damping), the artist won
+    const old = computeWeights(p, counts, N_SITE, NO_OVERRIDES, 0);
+    expect(old.get("big_artist")!).toBeGreaterThan(old.get("big_kink")!);
   });
 
   it("gives artists no bonus over other tags", () => {

@@ -1380,3 +1380,22 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   The learned model fits its own weights and is unchanged. The shared third stays as a backstop.
 - Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
 
+
+## 2026-11-27 — For You: tag weights damped by share of the favorites
+
+- Owner, after the shared third and the half weight for characters: "Would love to think about the best
+  approach holistically here", then picked the fix at the root ("do #1").
+- **Root cause:** a tag's weight was damped by n / (n + 5), a count. With thousands of favorites, every
+  tag on 50 or more of them got full weight, so any artist or character favorited a few dozen times hit
+  the lift cap. Content tags, common on e621, rarely do. The shared third and the half weight only
+  covered this up.
+- **Fix:** the weight also scales by s / (s + 2%), s = the tag's share of the favorites
+  (`SHARE_HALF`). A tag on 10% of the favorites keeps 83% of its weight, one on 1% keeps 33%, at any
+  profile size. A small profile hardly changes (3 of 100 favorites is already 3%). The count damping
+  stays for tiny counts. One rule for every category: no artist or character case.
+- The shared third and the half weight for characters stay as backstops; with this they rarely bite.
+- Changes Tune's order, the searched tags and the ranking before a model is learned. The learned model
+  fits its own weights and is unchanged.
+- **Not measured yet.** `scripts/rec-backtest.ts` gains `mix-3-count` (the old damping) beside the
+  app's plan, and logs how many names each plan searches. Running it needs a list of public accounts
+  and a few thousand read-only e621 requests, which wait for the owner's go-ahead.

@@ -41,6 +41,8 @@
 //   popular-same+N no tags, for as many pages as mix-N costs
 //   mix-3-lr       mix-3 with search tags picked by the first model's weights, and posts kept when
 //                  either lift or that model scores them above 0
+//   mix-3-count    mix-3 with weights damped by count of favorites only, as before SHARE_HALF
+//                  (the log line "names searched" says how many artists and characters each plan searches)
 //
 // Caveat: people can only favorite what they saw, and popular posts are seen more, so the
 // rankings lean toward rewarding popularity.
@@ -65,7 +67,7 @@ import { addFavorites, emptyProfile } from "../src/lib/recommend/profile";
 import { byRank, rankAll, scorePost, type Ranked } from "../src/lib/recommend/rank";
 import { REC_PAGE_BUDGET, REC_PAGE_SIZE } from "../src/lib/recommend/stream";
 import { countsOf, EMPTY_TAG_CACHE, FAV_PAGE, refreshTagCache, tagsToLookUp, type RecApi, type TagCache } from "../src/lib/recommend/sync";
-import { CAT_MULT, computeWeights, searchPlan, NO_OVERRIDES } from "../src/lib/recommend/weights";
+import { CAT_MULT, computeWeights, isName, searchPlan, NO_OVERRIDES } from "../src/lib/recommend/weights";
 import { DEFAULT_SEARCH } from "../src/lib/settings";
 import { acceptPost } from "../src/lib/slideshow/queue";
 
@@ -98,6 +100,7 @@ const PLANS = [
   "popular-max",
   "cover-max",
   "mix-3-lr",
+  "mix-3-count",
 ] as const;
 type Plan = (typeof PLANS)[number];
 const DEFAULT_PLANS = PLANS.filter((p) => p !== "cover-max"); // cover-max: 25 uncacheable pages per account
@@ -259,7 +262,15 @@ async function runUser(name: string, share: number): Promise<Row[]> {
   const cover = (pages: number) =>
     coverTags(weights, favTags, [], k, { posts: (t) => (counts[t] ?? 0) * share, budget: pages * REC_PAGE_SIZE });
   const query = (tags: string[]) => buildRecommendedQuery(settings, tags, user.tagLimit);
-  const signature = query(searchPlan(weights, NO_OVERRIDES, breadth).map((p) => p.tag));
+  // the app's plan: names (artists, characters) take at most a third
+  const named = (t: string) => isName(profile.tags[t]?.cat);
+  const sigTags = searchPlan(weights, NO_OVERRIDES, breadth, named).map((p) => p.tag);
+  const signature = query(sigTags);
+  // the same with the old damping, by count of favorites only (no share)
+  const countTags = searchPlan(computeWeights(profile, counts, tagCache.site?.n ?? 0, NO_OVERRIDES, 0), NO_OVERRIDES, breadth, named).map((p) => p.tag);
+  const countSignature = query(countTags);
+  const names = (tags: string[]) => tags.filter(named).length;
+  log(`  names searched: ${names(sigTags)} of ${sigTags.length} by share, ${names(countTags)} of ${countTags.length} by count`);
   // The first model's strongest tags that lift could also search (no meta, no rating).
   const lrTags = main
     ? [...main.entries()]
@@ -285,6 +296,7 @@ async function runUser(name: string, share: number): Promise<Row[]> {
     "popular-max": () => [{ query: popular.query, pages: REC_PAGE_BUDGET }],
     "cover-max": () => [{ query: query(cover(REC_PAGE_BUDGET)).query, pages: REC_PAGE_BUDGET }],
     "mix-3-lr": () => [{ query: lrSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
+    "mix-3-count": () => [{ query: countSignature.query, pages: REC_PAGE_BUDGET }, { query: popular.query, pages: 3 }],
   };
 
   const rows: Row[] = [];
