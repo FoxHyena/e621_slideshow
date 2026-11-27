@@ -20,8 +20,8 @@ your answers are in the next section and they win over anything further down.
 - **Dropped, of the rows I added:** "What's new" (never built), the "Updated to 2.1" toast (built; the
   builder removes it), the one-time "Install the app" row on Settings (never built).
 - **Safari:** in your Safari, Share is under "•••". The install steps' hint stays as written.
-- **Not answered, still open:** Search, Artists and the artist page on a computer. They have no
-  drawing of their own; do they need one?
+- **Answered in chat afterwards ("Fine as built"):** Search, Artists and the artist page on a computer
+  need no drawing of their own. Nothing on the check list is open now.
 
 How this night started: a message from the session "App architecture and feature roadmap" said you had
 gone to bed and wanted the remaining surfaces drawn without waiting, marked proposed, committed to

@@ -1440,3 +1440,7 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Not measured yet.** `scripts/rec-backtest.ts` gains `mix-3-count` (the old damping) beside the
   app's plan, and logs how many names each plan searches. Running it needs a list of public accounts
   and a few thousand read-only e621 requests, which wait for the owner's go-ahead.
+
+## 2026-11-27 — Search, Artists and the artist page on a computer: fine as built
+- Owner, after the check list, asked whether Search, Artists and the artist page on a computer need
+  their own drawing: "Fine as built". The check list is fully answered (49 of 49). Nothing to build.
