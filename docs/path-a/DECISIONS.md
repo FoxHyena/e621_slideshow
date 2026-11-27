@@ -1396,3 +1396,28 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Still dialogs in the middle:** Quick settings, Keyboard shortcuts, sign-in, the install steps,
   Follow from favorites, Mark all as seen (a confirm with its own job), the search editor, Quality in
   the player's Quick settings.
+
+## 2026-11-26 — For You: artists and characters take at most a third of the search; do-not-post marks don't count
+
+- Owner's report: a friend with many favorites got only artist tags in For You, and the owner's own
+  Tune showed `avoid_posting` as the strongest tag, then artists only.
+- **Bug:** e621's do-not-post and warning marks (`avoid_posting`, `conditional_dnp`, `sound_warning`,
+  `epilepsy_warning`, `third-party_edit`) and its no-one placeholders (`unknown_artist`, …) are artist
+  tags on e621. The artist lists already skipped them; For You's taste didn't. Now they get no weight,
+  learned or lift, and their counts aren't fetched.
+- **Why only artists:** lift is capped at 50×. Artists are rare on e621, so any artist favorited a few
+  dozen times hits the cap, while content tags, common on e621, almost never do. With a few thousand
+  favorites, all 15 searched slots went to artists, and the candidates were their posts.
+- **Fix:** at most a third of the searched tags (rounded up: 5 of 15) are artists while other tags
+  are left; artists past that fill in only if other tags run out. Pins don't use the share. Every
+  tag still counts when ranking; Tune lists the artists past the share under "Not searched".
+- **Characters share the third** (owner: "Share a third"). The owner's own Tune was all characters, for
+  the same reason: characters are as rare on e621 as artists. Artists and characters together take at
+  most a third, not a third each, so content tags keep two thirds of the search. "Filter artists" still
+  takes out artists only.
+- **Characters weigh half** (owner: "would love to have characters weighted less"). Their category
+  multiplier is 0.5, like copyrights, so a character at the lift cap weighs about as much as a content
+  tag at 7× lift. It changes Tune's order, the searched tags and the ranking before a model is learned.
+  The learned model fits its own weights and is unchanged. The shared third stays as a backstop.
+- Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
+

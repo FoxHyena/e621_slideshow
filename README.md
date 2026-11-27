@@ -124,8 +124,11 @@ well liked they are for their age. Posts you've already favorited are left out.
   and the sample is retaken once a month.
 - Candidates come from two searches in the window: your top tags, plus its most popular posts (3 pages),
   so a well-liked post with only some of your tags still gets ranked.
-- **Tune** (the sliders on For You) holds the rest. **Breadth** sets how many of your top tags are searched together: lower stays close to your strongest
-  interests, higher brings more variety.
+- **Tune** (the sliders on For You) holds the rest. **Breadth** sets how many of your top tags are searched together.
+  At most a third of them are names (artists and characters together) while other tags are left, since names
+  are rare on e621 and would otherwise take every slot for someone with many favorites. Characters also weigh
+  half as much as other tags. **Filter artists** leaves artist tags out of
+  your taste altogether. e621's do-not-post marks (`avoid_posting`, `conditional_dnp`, …) never count.
 - **Pin** a profile tag to always search it. **Mute** a tag to hide posts carrying it.
 - The window defaults to the last 7 days; change it with the date chip.
 - Only new favorites are read on each visit. Nothing re-ranks on its own: **Update ranking** appears when

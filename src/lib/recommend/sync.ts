@@ -2,7 +2,7 @@ import type { Post } from "../e621/types";
 import type { ProgressFn } from "../progress";
 import { MAX_PAGE } from "../query/build";
 import { addFavorites, emptyProfile, type Profile } from "./profile";
-import { CAT_MULT, MIN_SUPPORT } from "./weights";
+import { CAT_MULT, MIN_SUPPORT, notTaste } from "./weights";
 
 /** The network calls sync needs, injected so tests never touch e621. */
 export interface RecApi {
@@ -94,7 +94,7 @@ export const EMPTY_TAG_CACHE: TagCache = { counts: {}, site: null };
 /** Tags whose global count matters: enough support, and a category that carries weight. */
 export function tagsToLookUp(profile: Profile): string[] {
   return Object.entries(profile.tags)
-    .filter(([, t]) => t.n >= MIN_SUPPORT && CAT_MULT[t.cat] > 0)
+    .filter(([name, t]) => t.n >= MIN_SUPPORT && CAT_MULT[t.cat] > 0 && !notTaste(name))
     .map(([name]) => name);
 }
 
