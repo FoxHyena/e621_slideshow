@@ -448,7 +448,7 @@ function Slideshow() {
         Reset to defaults
       </button>
       {picking && (
-        <Sheet title={TITLES[picking]} testId={`sheet-${picking}`}>
+        <Sheet title={TITLES[picking]} testId={`sheet-${picking}`} pop>
           <Menu label={TITLES[picking]}>
             {(CHOICES[picking] as { value: PlaybackSettings[ChoiceKey]; label: string }[]).map((c) => (
               <MenuRow

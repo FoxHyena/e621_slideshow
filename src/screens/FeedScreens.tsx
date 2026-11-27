@@ -255,7 +255,7 @@ function ResultsMenu() {
     void getNav().back();
   };
   return (
-    <Sheet title="Results" testId="sheet-results-menu">
+    <Sheet title="Results" testId="sheet-results-menu" pop>
       <div className="sheet-rows" data-wells>
         <SheetAction icon={Link2} label={url?.withSignIn ? "Copy share link (with your sign-in)" : "Copy share link"} onClick={copy} data-testid="copy-share-link" />
       </div>

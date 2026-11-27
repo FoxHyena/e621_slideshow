@@ -1375,3 +1375,24 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Pull request 24 was merged to main as `3d28a4b` on the owner's say ("It's ready, let's mark ready and
   merge for now").
 
+
+## 2026-11-27 — Built: popovers on a computer; the "Updated to" toast is gone
+
+- Built from the check list (owner: "Agree" to g1 and b7; I read the answers from the page's store
+  myself before building).
+- **The "Updated to 2.1" toast is gone.** After a Reload into a new build nothing is said.
+- **Popovers on a computer** (DESIGN.md "On a computer", "Popover"). A sheet opened from something on
+  screen hangs from it: 300 wide, 8 below it with left edges lined up (right edges when it would leave
+  the window), no grabber, no ✕, no dim; a click away or Esc closes it. These are the menus of
+  Following, For You and Results (⋯), an artist page's ⋯, an artist row's ⋯ in Artists (followed and
+  suggested), a post's ⋯, and a grid tile's right-click menu, which opens at the pointer.
+- **How a popover finds its opener:** every press (click, key, right-click) is noted as it happens
+  (`src/shell/opener.ts`); a sheet marked `pop` that mounts within 1.5 s of one hangs from that
+  control. A sheet opened any other way (a keyboard shortcut) is the centred dialog.
+- **Mine, not in the spec:** when there is no room below the opener and more above it, the popover
+  opens 8 above it instead. Slideshow's choices in Settings (Transition, Quality, Longest video, Load
+  ahead) are popovers at their row: they are opened from a row and only pick one of a list, like the
+  sort and date menus. Undo either by taking `pop` off the sheet.
+- **Still dialogs in the middle:** Quick settings, Keyboard shortcuts, sign-in, the install steps,
+  Follow from favorites, Mark all as seen (a confirm with its own job), the search editor, Quality in
+  the player's Quick settings.

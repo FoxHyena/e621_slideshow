@@ -21,7 +21,7 @@ export default function FollowingSheets({
 }) {
   if (sheet === "menu")
     return (
-      <Sheet title="Following" testId="sheet-following-menu">
+      <Sheet title="Following" testId="sheet-following-menu" pop>
         <div className="sheet-rows" data-wells>
           <SheetAction
             icon={RotateCw}
