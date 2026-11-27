@@ -1535,3 +1535,11 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Owner, asked "Approve the viewer, post page and comic screens as drawn?": "Approve".
 - Still open, for the builder: how a link gets its preview (see "Not checked" below).
 - Not checked: whether a server may fetch a post from e621 for the preview, and Save on a real iPhone.
+
+## 2026-11-27 — Built: the post panel's 26 top corners; the ⋯ inside the padding
+- From the design commit 2ce8910 (owner: "Yes, fix it", then "need to fix spacing around the triple
+  dot as well"). A post panel's top corners are 26 (the skeleton's too), the bottom two 24. Its ⋯ has
+  no negative margin: the 36 wash is 8 from the top and the right, as the mark is on the left. An
+  artist card's ⋯ likewise sits inside the card's 8 padding (the head lost its 4 right padding and the
+  ⋯ its −10 pull). A list row's ⋯ keeps its pull.
+- New e2e test `post-panel.spec.ts` measures the corners and the 8s.
