@@ -101,6 +101,14 @@ describe("computeWeights", () => {
     expect(CAT_MULT.artist).toBe(CAT_MULT.general);
   });
 
+  it("weighs a character half as much as a content tag on as many favorites", () => {
+    const p = profile();
+    p.tags.fave_character = { n: 20, cat: "character" };
+    const half = computeWeights(p, { ...GLOBAL, fave_character: 2_000 }, N_SITE);
+    expect(CAT_MULT.character).toBe(CAT_MULT.general / 2);
+    expect(half.get("fave_character")!).toBeCloseTo(half.get("niche_kink")! / 2, 5);
+  });
+
   it("pins to the top weight and mutes to zero", () => {
     const o = computeWeights(profile(), GLOBAL, N_SITE, { pinned: ["anthro"], muted: ["niche_kink"] });
     expect(o.has("niche_kink")).toBe(false);

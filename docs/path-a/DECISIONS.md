@@ -1374,5 +1374,9 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the same reason: characters are as rare on e621 as artists. Artists and characters together take at
   most a third, not a third each, so content tags keep two thirds of the search. "Filter artists" still
   takes out artists only.
+- **Characters weigh half** (owner: "would love to have characters weighted less"). Their category
+  multiplier is 0.5, like copyrights, so a character at the lift cap weighs about as much as a content
+  tag at 7× lift. It changes Tune's order, the searched tags and the ranking before a model is learned.
+  The learned model fits its own weights and is unchanged. The shared third stays as a backstop.
 - Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
 

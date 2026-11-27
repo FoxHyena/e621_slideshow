@@ -18,10 +18,13 @@ export const MAX_LIFT = Math.log(50);
 /**
  * Meta tags (hi_res, 2024, ...) say nothing about taste. Artists get no bonus:
  * they're already rare on the site, which the lift rewards on its own.
+ * Characters count half (owner: "characters weighted less"): as rare as
+ * artists, they hit the lift cap after a few dozen favorites and topped every
+ * list, though a character says less about a picture than what is in it.
  */
 export const CAT_MULT: Record<TagCategoryName, number> = {
   artist: 1,
-  character: 1,
+  character: 0.5,
   species: 1,
   general: 1,
   copyright: 0.5,

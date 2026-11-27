@@ -126,7 +126,8 @@ well liked they are for their age. Posts you've already favorited are left out.
   so a well-liked post with only some of your tags still gets ranked.
 - **Tune** (the sliders on For You) holds the rest. **Breadth** sets how many of your top tags are searched together.
   At most a third of them are names (artists and characters together) while other tags are left, since names
-  are rare on e621 and would otherwise take every slot for someone with many favorites. **Filter artists** leaves artist tags out of
+  are rare on e621 and would otherwise take every slot for someone with many favorites. Characters also weigh
+  half as much as other tags. **Filter artists** leaves artist tags out of
   your taste altogether. e621's do-not-post marks (`avoid_posting`, `conditional_dnp`, …) never count.
 - **Pin** a profile tag to always search it. **Mute** a tag to hide posts carrying it.
 - The window defaults to the last 7 days; change it with the date chip.
