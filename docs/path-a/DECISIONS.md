@@ -1437,9 +1437,15 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The shared third and the half weight for characters stay as backstops; with this they rarely bite.
 - Changes Tune's order, the searched tags and the ranking before a model is learned. The learned model
   fits its own weights and is unchanged.
-- **Not measured yet.** `scripts/rec-backtest.ts` gains `mix-3-count` (the old damping) beside the
-  app's plan, and logs how many names each plan searches. Running it needs a list of public accounts
-  and a few thousand read-only e621 requests, which wait for the owner's go-ahead.
+- **Backtest** (owner's go-ahead, 2026-11-27; `scripts/rec-backtest.ts` gains `mix-3-count`, the old
+  damping, and logs how many names each plan searches). Last 30 days hidden, breadth 15, app's plan
+  (mix-3), learned model mix10:
+  - The friend whose For You was all artists (10,921 favorites, 22 hidden): names searched 5 of 15
+    before, 2 of 15 now. Hidden favorites found 10 → 20; in the learned top 200, 5–7 → 10–12.
+  - The owner (2,002 favorites, 18 hidden): no names searched either way. Found 7 → 11; in the learned
+    top 200, 5–6 → 7–8.
+  - Cost: the old plan's narrow tags ran dry in 4–6 pages; the new one uses the full 25-page budget
+    plus 3 popular pages, as designed. Two accounts and 40 hidden favorites: a direction, not a proof.
 
 ## 2026-11-27 — Search, Artists and the artist page on a computer: fine as built
 - Owner, after the check list, asked whether Search, Artists and the artist page on a computer need
