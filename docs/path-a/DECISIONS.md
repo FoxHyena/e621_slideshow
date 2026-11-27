@@ -1421,3 +1421,59 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   The learned model fits its own weights and is unchanged. The shared third stays as a backstop.
 - Not backtested live (needs `.env.backtest`); `scripts/rec-backtest.ts` still plans without the share.
 
+
+## 2026-11-27 — For You: tag weights damped by share of the favorites
+
+- Owner, after the shared third and the half weight for characters: "Would love to think about the best
+  approach holistically here", then picked the fix at the root ("do #1").
+- **Root cause:** a tag's weight was damped by n / (n + 5), a count. With thousands of favorites, every
+  tag on 50 or more of them got full weight, so any artist or character favorited a few dozen times hit
+  the lift cap. Content tags, common on e621, rarely do. The shared third and the half weight only
+  covered this up.
+- **Fix:** the weight also scales by s / (s + 2%), s = the tag's share of the favorites
+  (`SHARE_HALF`). A tag on 10% of the favorites keeps 83% of its weight, one on 1% keeps 33%, at any
+  profile size. A small profile hardly changes (3 of 100 favorites is already 3%). The count damping
+  stays for tiny counts. One rule for every category: no artist or character case.
+- The shared third and the half weight for characters stay as backstops; with this they rarely bite.
+- Changes Tune's order, the searched tags and the ranking before a model is learned. The learned model
+  fits its own weights and is unchanged.
+- **Backtest** (owner's go-ahead, 2026-11-27; `scripts/rec-backtest.ts` gains `mix-3-count`, the old
+  damping, and logs how many names each plan searches). Last 30 days hidden, breadth 15, app's plan
+  (mix-3), learned model mix10:
+  - The friend whose For You was all artists (10,921 favorites, 22 hidden): names searched 5 of 15
+    before, 2 of 15 now. Hidden favorites found 10 → 20; in the learned top 200, 5–7 → 10–12.
+  - The owner (2,002 favorites, 18 hidden): no names searched either way. Found 7 → 11; in the learned
+    top 200, 5–6 → 7–8.
+  - Cost: the old plan's narrow tags ran dry in 4–6 pages; the new one uses the full 25-page budget
+    plus 3 popular pages, as designed. Two accounts and 40 hidden favorites: a direction, not a proof.
+
+## 2026-11-27 — Search, Artists and the artist page on a computer: fine as built
+- Owner, after the check list, asked whether Search, Artists and the artist page on a computer need
+  their own drawing: "Fine as built". The check list is fully answered (49 of 49). Nothing to build.
+
+## 2026-11-27 — For You: tags common on e621 damped too
+- Owner, on the share damping's results: "one of the original intents with the weight system was to
+  make it harder for broader things like male_penetrating_male, which is a very common tag on e621, to
+  show up as opposed to specific kink interests … trying to make the system good at finding the things
+  that aren't so broad." Picked the site-breadth damping ("Yes, add it").
+- **Why the share damping broke it:** lift is a log, so it squashes specificity. In the friend's
+  profile male_penetrating_male (3.6% of e621, 9×) scored 2.2 and muzzle_(object) (0.24%, 20×) 3.0;
+  the share damping then cut the muzzle (4.8% of the favorites) to 71% and left the broad tag (31%)
+  at 94%. 8 of the 15 searched tags were on over 1% of e621.
+- **Fix:** weight also scales by 1 / (1 + c / 1%), c = the tag's share of all e621 posts
+  (`SITE_HALF`). A tag on 1% of the site keeps half its weight, one on 3.6% keeps 22%. The share
+  damping stays: it is what keeps 0.2%-of-the-favorites gear tags out.
+- **Backtest, the friend's account** (last 30 days hidden, 22 favorites; app's plan with 3 popular
+  pages; learned model mix10, quality 0.5–1):
+
+  | Weighting | Names searched | Tags on >1% of e621 | Pages | Found | Learned top 200 |
+  |---|---|---|---|---|---|
+  | count only (before #28) | 5 | 0 | 4 + 3 | 10 | 5–7 |
+  | share only (#28 alone) | 2 | 8 | 25 + 3 | 20 | 9–11 |
+  | share + site breadth (now) | 5 | 0 | 4 + 3 | 14 | 8–9 |
+
+- Read: the broad tags bought the extra finds by pulling 4× the posts, the pool size the weighting
+  exists not to chase. Now beats the old weighting on every measure, with no broad tags. Names are back
+  at the shared third (5 of 15). The specific tags run dry in 4 pages of a 30-day window, so most of
+  the page budget goes unused; a later change could spend it on more tags.
+- The owner's own account is no longer used for tuning or testing the weights.
