@@ -1985,3 +1985,17 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - It opens above only when there's real room there (at least its height, or 160).
   - The ⌄ keeps still under reduced motion.
   - The flip test now sets the row at the window's foot and checks that the menu opened above.
+## 2026-11-27 — Switching between the feed and the grid keeps the post you were looking at
+- Owner: "When I switch from feed to grid in for you, scroll is out of place in grid."
+- **Cause:** the switch kept the page's offset. The grid is far shorter than the feed, so the same
+  offset landed far below the post (or at the grid's end). For You and Following show the switch in
+  the floating title capsule, so it can be pressed mid-scroll; on Results, Favorites and an artist's
+  page it scrolls away with the header, but they share the same list (`FeedView.tsx`), and the fix.
+- **Mine:** feed → grid centres the tile of the post in the middle of the view. Grid → feed (the
+  switch, not a tile) opens the feed at the middle tile's post (the tile in the middle column of the
+  row at the middle of the view), the same way a tapped tile does. At the top of the list nothing
+  moves. On a computer it waits for the grid's wider width before placing the tile.
+- **Mine:** `e2e/grid-switch.spec.ts`: For You on a computer and a phone, Following, both ways, and
+  the top case.
+- **Left as it was:** a card the grid opens the feed at (tap or switch) sits 12 below the top of the
+  view, so on For You and Following its head is under the floating capsule.

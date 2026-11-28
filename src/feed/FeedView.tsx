@@ -322,8 +322,54 @@ export function FeedView({
     keep.current = i >= 0 && !grid ? { id: posts[i].id, top: topOf(i) } : null;
   });
 
-  // A tile tapped: the feed opens with that post at the top (under the screen's own top inset).
+  // The grid switched on or off: the page's offset alone would land somewhere else (the grid is far
+  // shorter than the feed), so the post you were looking at stays in view. The feed turning into the
+  // grid centres that post's tile; the grid turning back opens the feed at the middle tile's post, as
+  // a tap on it would. At the top of the list nothing moves.
   const revealing = useRef<{ id: number; unfolded: boolean } | null>(null);
+  /** the post in the middle of the view, from the last render that was in the mode it showed */
+  const looking = useRef<number | null>(null);
+  const wasGrid = useRef(grid);
+  const gridding = useRef<number | null>(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- every render: it reads this render's layout, like the effects below
+  useLayoutEffect(() => {
+    const switched = wasGrid.current !== grid;
+    wasGrid.current = grid;
+    if (switched) {
+      gridding.current = null;
+      if (looking.current !== null) {
+        if (grid) gridding.current = looking.current;
+        else revealing.current ??= { id: looking.current, unfolded: false };
+      }
+      // this render's view is still the other mode's: read it again once the page has scrolled
+      looking.current = null;
+    } else if (gridding.current === null && revealing.current === null) {
+      const y = view.top + view.height / 2;
+      let i = -1;
+      if (view.top <= 0 || posts.length === 0) i = -1;
+      else if (!grid) i = postAt(Math.min(indexAt(layout, y), rows.length - 1));
+      else if (tiles.pitch > 0) i = Math.min(posts.length - 1, Math.floor(y / tiles.pitch) * tiles.cols + Math.floor(tiles.cols / 2));
+      looking.current = i >= 0 ? posts[i].id : null;
+    }
+
+    const id = gridding.current;
+    const el = list.current;
+    if (id === null) return;
+    // (under a sheet or the player the page is held: a later render mustn't move it on its own)
+    if (!grid || !el || isLocked()) return void (gridding.current = null);
+    // On a computer the grid is wider than the feed's column: wait for its width, as below.
+    if (width === 0 || el.clientWidth !== width) return;
+    gridding.current = null;
+    const i = posts.findIndex((p) => p.id === id);
+    if (i < 0) return;
+    const listTop = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, Math.max(0, listTop + tileAt(tiles, i).top + tiles.cell / 2 - window.innerHeight / 2));
+    // window the tiles from the new place now, not a frame later (once: `gridding` is cleared above)
+    const m = measure();
+    if (m) setView(m); // eslint-disable-line react-hooks/set-state-in-effect -- the page just scrolled under it
+  });
+
+  // A tile tapped: the feed opens with that post at the top (under the screen's own top inset).
   useLayoutEffect(() => {
     const r = revealing.current;
     const el = list.current;
