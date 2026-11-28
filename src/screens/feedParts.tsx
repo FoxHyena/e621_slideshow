@@ -6,29 +6,24 @@
  * apart from Results, Favorites and the artist page (FeedScreens.tsx), so those stay out of the first
  * load while Following, which uses these, is in it.
  */
-import { ChevronLeft, ExternalLink, Heart, LayoutGrid, Play, Rows3, Share, User, UserX } from "lucide-react";
-import Avatar from "@/components/Avatar";
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
-import { postPageUrl } from "@/lib/e621/client";
+import { ChevronLeft, LayoutGrid, Play, Rows3 } from "lucide-react";
+import { createContext, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { Post } from "@/lib/e621/types";
 import { OfflineBanner, QuietButton, StateBlock } from "@/components/State";
-import { artists } from "@/lib/feed/format";
 import { type SearchSettings } from "@/lib/settings";
 import type { TagAction } from "@/components/TagActions";
 import { FeedView, type FeedViewProps } from "@/feed/FeedView";
 import { getNav } from "@/nav/history";
 import type { Route } from "@/nav/routes";
 import { useScreen } from "@/shell/context";
-import { Sheet } from "@/shell/Sheet";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
-import { favedOf, getFavs } from "@/state/favs";
-import { getGoo } from "@/state/goo";
-import { blacklistLine, openArtist, openSignIn, sharePost } from "./actions";
+import { openSignIn } from "./actions";
 import { openPaused } from "@/player/intent";
 import { scrollY } from "@/nav/scroll";
+import { PostMenuSheet } from "@/shell/lazy";
 
 export const ALL_RATINGS = { s: true, q: true, e: true };
 
@@ -194,118 +189,12 @@ export function PlayFab({ feed, route, count = 0, gate }: { feed: Feed | null; r
   );
 }
 
-export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
-  const post = feed?.queue.posts.find((p) => p.id === id);
-  const { entry, sheet } = useScreen();
-  const faved = useStore(getFavs().store, (s) => (post ? favedOf(s, post) : false));
-  if (!post) return null;
-  // a held or right-clicked grid tile: Favorite, Open artist, Play from here, Open on e621
-  const tile = sheet?.startsWith("tile:") ?? false;
-  const artist = artists(post)[0];
-  const close = () => getNav().back();
-  const name = artist?.replaceAll("_", " ");
+/** A post's ⋯ sheet; its code loads with the filter sheets' chunk, after the first load (src/feed/PostMenu.tsx). */
+export function PostMenu(props: { feed: Feed | null; id: number }) {
   return (
-    <Sheet
-      title={`Post ${post.id}${name ? ` by ${name}` : ""}`}
-      testId="sheet-post"
-      pop
-      head={
-        <div className="sheet-ctx">
-          <Avatar seed={artist ?? `post:${post.id}`} className="post-avatar" />
-          <span className="row-text">
-            <b>{name ?? "unknown artist"}</b>
-            <small>#{post.id}</small>
-          </span>
-        </div>
-      }
-    >
-      {tile ? (
-        <div className="well-group">
-          <button
-            type="button"
-            className="well-row"
-            data-on={faved || undefined}
-            onClick={async () => {
-              await close();
-              if (!faved && getSession().store.get().creds) getGoo().addFav(post.id);
-              getFavs().toggle(post);
-            }}
-            data-testid="tile-fav"
-          >
-            <Heart aria-hidden />
-            <span>{faved ? "Unfavorite" : "Favorite"}</span>
-          </button>
-          {artist && (
-            <button
-              type="button"
-              className="well-row"
-              onClick={async () => {
-                await close();
-                openArtist(artist);
-              }}
-            >
-              <User aria-hidden />
-              <span>Open artist</span>
-            </button>
-          )}
-          <button
-            type="button"
-            className="well-row"
-            onClick={async () => {
-              await close();
-              openPaused(false);
-              getNav().push({ screen: entry.route.screen, play: String(post.id) });
-            }}
-          >
-            <Play aria-hidden />
-            <span>Play from here</span>
-          </button>
-          <a className="well-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
-            <ExternalLink aria-hidden />
-            <span>Open on e621</span>
-            <small>e621.net</small>
-          </a>
-        </div>
-      ) : (
-      <div className="well-group">
-        <button
-          type="button"
-          className="well-row"
-          onClick={async () => {
-            await close();
-            openPaused(false);
-            getNav().push({ screen: entry.route.screen, play: String(post.id) });
-          }}
-        >
-          <Play aria-hidden />
-          <span>Play from this post</span>
-        </button>
-        <button type="button" className="well-row" onClick={() => void sharePost(post)}>
-          <Share aria-hidden />
-          <span>Share post</span>
-        </button>
-        <a className="well-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
-          <ExternalLink aria-hidden />
-          <span>Open on e621</span>
-          <small>e621.net</small>
-        </a>
-        {artist && (
-          <button
-            type="button"
-            className="well-row"
-            data-danger
-            onClick={async () => {
-              await close();
-              blacklistLine(artist);
-            }}
-          >
-            <UserX aria-hidden />
-            <span>Blacklist this artist</span>
-          </button>
-        )}
-      </div>
-      )}
-    </Sheet>
+    <Suspense fallback={null}>
+      <PostMenuSheet {...props} />
+    </Suspense>
   );
 }
 
@@ -344,9 +233,8 @@ export function FeedBody({
       entryKey={entry.key}
       empty={empty}
       onOpen={(p: Post) => {
-        // A tap on a picture or a tile opens the viewer paused; ▶ there starts the show.
-        openPaused(true);
-        getNav().push({ screen: route.screen, play: String(p.id) });
+        // A picture opens on its own (DESIGN.md "A post on its own"); the viewer hands a video tile to the player.
+        getNav().push({ screen: route.screen, play: null, view: String(p.id) });
       }}
       onMenu={(p: Post, tile?: boolean) => getNav().openSheet(`${tile ? "tile" : "post"}:${p.id}`)}
       onList={setGrid ? () => setGrid(false) : undefined}

@@ -22,7 +22,7 @@ import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { watchPresses } from "./opener";
 import { ScreenContext } from "./context";
 import { TabBar, useRail } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -200,7 +200,7 @@ export default function Shell() {
       // An overlay closed (a sheet over the player included): focus goes back to what opened it.
       const now = shown.stack[shown.index];
       if (isOverlay(left) && left.key !== now.key && (shown.cause === "back" || shown.cause === "pop")) {
-        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=player]") : screenOf(to);
+        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=player], [data-testid=viewer]") : screenOf(to);
         restoreFocus(left.key, box);
       }
       return;
@@ -240,7 +240,7 @@ export default function Shell() {
   }, [held]);
 
   const rail = useRail();
-  const barHidden = (immersive && onAccount) || overlay?.route.play != null;
+  const barHidden = (immersive && onAccount) || overlay?.route.play != null || !!overlay?.route.view;
   const ctx = (e: Entry, visible: boolean) => ({
     entry: e,
     visible,
@@ -319,6 +319,11 @@ export default function Shell() {
       {overlay?.route.play != null && (
         <Suspense fallback={null}>
           <Player key={cur.key} base={cur} top={overlay} />
+        </Suspense>
+      )}
+      {overlay?.route.view && overlay.route.play == null && (
+        <Suspense fallback={null}>
+          <Viewer key={`${cur.key}:${overlay.route.view}`} base={cur} top={overlay} />
         </Suspense>
       )}
       {/* DESIGN.md "Toast": one at a time, a mark, the words, at most one way back; 4 s, 6 s with an action */}

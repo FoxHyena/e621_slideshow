@@ -1555,3 +1555,39 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   parallel to the 26 end. **Mine, by the hover rule** ("radius = the container's less the gap"): in the
   52 bar the tools are 44 wide and the wash is a 44 circle, 4 inside on every side. Same on a phone,
   where there is no hover; the tools are 4 wider each there too.
+
+## 2026-11-27 — Built: the picture viewer (part one of "A post on its own")
+- From the design commit 2ce8910 (owner: "Approve"; "Zoom" for the double tap), on "Merge both,
+  start viewer". `?view=<post number>` over the screen; Back, ✕ and Esc close it and land the feed on
+  that post, as the player does. Code: `src/player/Viewer.tsx` (its own chunk, fetched when idle).
+- **A tap on a picture opens the viewer** (a card's picture, and a grid tile where a tile opens a post).
+  The player opens from Play, ⋯ › "Play from this post" and Play from here. A video still plays or
+  pauses in place on a card; **a video tile still opens the player paused** (DESIGN.md: no videos in
+  the viewer this pass). On Results, a grid tile still turns the feed to a list at that post (owner,
+  2026-11-26); DESIGN.md now says a tile opens the viewer. **Asked the owner which wins; tiles are
+  unchanged until then.**
+- Hands as drawn: one tap hides or shows the buttons (after 250 ms, so a double tap can cancel it);
+  a double tap zooms to 2.5 at the point in 280 ms and back to fit, never favorites; pinch 1 to 5;
+  a drag moves a zoomed picture; a drag down on an unzoomed one closes past 120 px, the picture
+  following and the room fading so the feed shows through. On a computer the wheel zooms at the
+  pointer, a drag moves a zoomed picture, a mouse drag never closes it; **mine:** keys L (favorite),
+  I (Post info), + − 0 (zoom in, out, fit), like the player's keys.
+- **Mine:** the sample file shows first; once zoomed past fit the original file loads over it and
+  fades in (200 ms), so zooming in gets the full picture without every open paying for it.
+- **Save:** e621's file host lets only e621.net read its files (CORS), and our page may not fetch
+  from it, so the app cannot put the file in a share sheet or start a download. For now Save opens
+  the original in a new tab, and holding the picture brings the phone's own menu (the viewer allows
+  it; the feed turns it off). A server route that passes the file through would allow the drawn Save;
+  **asked the owner.**
+- A reload or a link with `?view=` finds the post in the screen's feed, else asks e621 for `id:<n>`;
+  none: "No post #… on e621".
+- **A video** (a grid tile, or a link with `?view=` to one) hands itself to the player, paused, in the
+  viewer's place (a replace, so Back still goes to the feed).
+- **JS budget:** the viewer rides in the player's chunk (a chunk of its own put its file list in the
+  first load: 200.6 KB, over the 200 limit). The route and shell parts still came to 200.2, so the
+  post ⋯ sheet (`src/feed/PostMenu.tsx`) moved out of the first load into the filter sheets' chunk;
+  it shows only after a tap and that chunk is fetched when idle. First load now 198.0 KB.
+- Not built in this part: comics, the post page, "Open post", link previews.
+- Tests: `e2e/viewer.spec.ts` (opens from a tap, not the player; tap hides, double tap zooms and does
+  not favorite; the heart favorites; ✕, Back and Esc; reload; the wheel; Post info beside it on a
+  computer). Four older tests that opened the player with a tap now open it from ⋯.
