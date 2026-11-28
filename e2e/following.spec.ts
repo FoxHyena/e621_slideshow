@@ -259,7 +259,8 @@ test("opening an old post straight away isn't playing past the new ones", async 
   await page.goto("/following");
   await expect(status(page)).toHaveText("2 new since your last visit");
   // The first old post, opened without scrolling (scrolling past the divider would mark by rule 1).
-  await page.locator('[data-post-id="1148"] [data-testid=card-media]').dispatchEvent("click");
+  await page.locator('[data-post-id="1148"] [data-testid=card-menu]').dispatchEvent("click");
+  await page.getByTestId("sheet-post").getByRole("button", { name: "Play from this post" }).dispatchEvent("click");
   await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1148");
   await page.keyboard.press("ArrowRight");
   await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1147");

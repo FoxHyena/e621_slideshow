@@ -23,11 +23,18 @@ export interface MockPostSpec {
   artist?: string;
   /** more than one artist tag (overrides `artist`) */
   artists?: string[];
+  /** give the original e621's real file shape (`/data/ab/cd/<md5>.ext`), as Save's pass-through needs */
+  realPath?: boolean;
 }
 
 export function mockPost(spec: MockPostSpec) {
   const ext = spec.ext ?? "png";
-  const url = spec.hidden ? null : `https://static1.e621.net/data/mock/${spec.id}.${ext}`;
+  const md5 = String(spec.id).padStart(32, "0");
+  const url = spec.hidden
+    ? null
+    : spec.realPath
+      ? `https://static1.e621.net/data/${md5.slice(0, 2)}/${md5.slice(2, 4)}/${md5}.${ext}`
+      : `https://static1.e621.net/data/mock/${spec.id}.${ext}`;
   const sample = spec.hidden ? null : `https://static1.e621.net/data/sample/mock/${spec.id}.jpg`;
   // e621's posts format since 2026-11-18, `mode=extended` (tags grouped by category)
   return {
@@ -358,6 +365,11 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     return json(route, { success: false, reason: "not mocked" }, 404);
   });
 
+  // Save's same-origin pass-through (next.config.ts rewrites): never let a test reach the real e621
+  await page.route(/\/media\/[0-9a-f]{2}\/[0-9a-f]{2}\/[0-9a-f]{32}\.\w+$/, async (route) => {
+    state.media.push(route.request().url());
+    return route.fulfill({ body: IMG, contentType: "image/png" });
+  });
   await page.route("https://static1.e621.net/**", async (route) => {
     const url = route.request().url();
     state.media.push(url);

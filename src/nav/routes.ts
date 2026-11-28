@@ -32,18 +32,23 @@ export interface Route {
   screen: Screen;
   /** `?play=<postId>` (or `first` from a link), the player over the screen */
   play: string | null;
+  /** `?view=<postId>`, the picture viewer over the screen (DESIGN.md "A post on its own") */
+  view?: string | null;
 }
 
 /** Split a path + search into a route. `params` keep their order, minus `play`. */
 export function parseRoute(pathname: string, search: string): Route {
   const q = new URLSearchParams(search);
   const play = q.get("play");
+  const view = q.get("view");
   q.delete("play");
+  q.delete("view");
   const rest = q.toString();
   const path = pathname.replace(/\/+$/, "") || "/";
   const parts = path.split("/").filter(Boolean);
   const screen = parseScreen(path, parts, rest);
-  return { screen, play: play || null };
+  // the player wins if a URL somehow names both
+  return !play && view && /^\d+$/.test(view) ? { screen, play: null, view } : { screen, play: play || null };
 }
 
 function parseScreen(path: string, parts: string[], params: string): Screen {
@@ -109,8 +114,9 @@ export function screenPath(s: Screen): string {
 
 export function routeUrl(r: Route): string {
   const base = screenPath(r.screen);
-  if (!r.play) return base;
-  return `${base}${base.includes("?") ? "&" : "?"}play=${encodeURIComponent(r.play)}`;
+  const [k, v] = r.play ? ["play", r.play] : r.view ? ["view", r.view] : [null, null];
+  if (!k || !v) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}${k}=${encodeURIComponent(v)}`;
 }
 
 /** The tab a screen belongs to when it is that tab's root, else null (a pushed screen). */
@@ -130,7 +136,7 @@ export function activeTab(s: Screen, openedFrom: Tab | null): Tab {
  * Returns null at a tab root (nothing above it in the app).
  */
 export function parentOf(r: Route, openedFrom: Tab | null): Route | null {
-  if (r.play) return { screen: r.screen, play: null };
+  if (r.play || r.view) return { screen: r.screen, play: null };
   const s = r.screen;
   switch (s.kind) {
     case "tab":

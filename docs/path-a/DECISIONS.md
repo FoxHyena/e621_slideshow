@@ -1556,6 +1556,66 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   52 bar the tools are 44 wide and the wash is a 44 circle, 4 inside on every side. Same on a phone,
   where there is no hover; the tools are 4 wider each there too.
 
+## 2026-11-27 — Built: the picture viewer (part one of "A post on its own")
+- From the design commit 2ce8910 (owner: "Approve"; "Zoom" for the double tap), on "Merge both,
+  start viewer". `?view=<post number>` over the screen; Back, ✕ and Esc close it and land the feed on
+  that post, as the player does. Code: `src/player/Viewer.tsx` (its own chunk, fetched when idle).
+- **A tap on a card's picture opens the viewer.** The player opens from Play, ⋯ › "Play from this
+  post" and Play from here. A video still plays or pauses in place on a card (DESIGN.md: no videos in
+  the viewer this pass).
+- **Grid tiles keep turning the feed to a list at that post.** Owner, asked "Grid tiles on Results:
+  open the viewer, or keep turning the feed to a list?": "Keep list behavior" (2026-11-27). This
+  overrides DESIGN.md's "or a grid tile" in the viewer bullet; every grid (Following, For You,
+  Results, Favorites, an artist) already does it, so no tile opens the viewer.
+- Hands as drawn: one tap hides or shows the buttons (after 250 ms, so a double tap can cancel it);
+  a double tap zooms to 2.5 at the point in 280 ms and back to fit, never favorites; pinch 1 to 5;
+  a drag moves a zoomed picture; a drag down on an unzoomed one closes past 120 px, the picture
+  following and the room fading so the feed shows through. On a computer the wheel zooms at the
+  pointer, a drag moves a zoomed picture, a mouse drag never closes it; **mine:** keys L (favorite),
+  I (Post info), + − 0 (zoom in, out, fit), like the player's keys.
+- **Mine:** the sample file shows first; once zoomed past fit the original file loads over it and
+  fades in (200 ms), so zooming in gets the full picture without every open paying for it.
+- **Save, through our own pass-through.** e621's file host lets only e621.net read its files (CORS),
+  so the page can't hand a file to a share sheet or a download. Owner, told what a pass-through
+  means (Vercel's Acceptable Use Policy lists "proxy... or host media for hot-linking", and the
+  files would come from our domain): "Build pass-through" (2026-11-27). `next.config.ts` rewrites
+  `/media/ab/cd/<md5>.<png|jpg|jpeg|gif|webp>` to `static1.e621.net/data/...`, nothing else (any
+  other path is a 404). On Vercel that is an external rewrite: no function, so no 4.5 MB limit; a
+  2-minute timeout. Only Save uses it; pictures still load from e621 directly. Fetched with no
+  credentials (e621's files are public; the API key never goes near it).
+  - On a phone (coarse pointer) the share sheet gets the file, named `<artist>_e621_<id>.<ext>`;
+    on a computer it downloads. While the file comes, the glass breathes (aria-busy).
+  - **Mine:** a share sheet needs a fresh tap; if the fetch outlasted the tap's permission, the file
+    is kept and a toast says "The picture is ready: tap Save again".
+  - If the pass-through fails, the full picture opens in a new tab with a toast. Holding the picture
+    still brings the phone's own menu.
+  - Not checked: Save on a real iPhone, whether e621's Cloudflare lets Vercel's servers through, and
+    which Vercel transfer allowance this traffic counts against.
+- A reload or a link with `?view=` finds the post in the screen's feed, else asks e621 for `id:<n>`;
+  none: "No post #… on e621".
+- **A video** (a grid tile, or a link with `?view=` to one) hands itself to the player, paused, in the
+  viewer's place (a replace, so Back still goes to the feed).
+- **JS budget:** the viewer rides in the player's chunk (a chunk of its own put its file list in the
+  first load: 200.6 KB, over the 200 limit). The route and shell parts still came to 200.2, so the
+  post ⋯ sheet (`src/feed/PostMenu.tsx`) moved out of the first load into the filter sheets' chunk;
+  it shows only after a tap and that chunk is fetched when idle. First load now 198.0 KB.
+- Not built in this part: comics, the post page, "Open post", link previews.
+- Tests: `e2e/viewer.spec.ts` (opens from a tap, not the player; tap hides, double tap zooms and does
+  not favorite; the heart favorites; ✕, Back and Esc; reload; the wheel; Post info beside it on a
+  computer). Four older tests that opened the player with a tap now open it from ⋯.
+
+## 2026-11-27 — A grid tile does not open the viewer
+- The approved section said "Tapping a picture in a feed or a grid tile opens it". "or a grid tile" was
+  the designer's line. It went against the owner's idea of 2026-11-26 (a grid tile opens the feed at
+  that post), and the designer did not point that out when asking for approval.
+- Owner, asked by the builder "Grid tiles on Results: open the viewer, or keep turning the feed to a
+  list?": "Keep list behavior". The designer has this from the builder's message and from the
+  builder's entry on PR #32, not from the owner directly.
+- Now: only a picture in a feed opens the viewer. In every grid a tile turns the feed to a list at that
+  post, and the picture there opens the viewer. "Play from here" stays in the tile's menu.
+- Changed: DESIGN.md's viewer bullet, UX.md's Media taps note, the "Tapping a picture" row of the
+  table in `screens-v6.html`. No drawing changes.
+
 ## 2026-11-27 — Fixed: the sign-in sheet's spacing, back to the drawing
 - Owner, with a screenshot on a computer: "analyze the sign-in form for spacing issues". Measured
   against `screens-v6.html` (DESIGN.md "Sign-in sheet"); the same on a phone, so not a computer-only

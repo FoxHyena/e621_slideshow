@@ -122,7 +122,8 @@ test("at e621's 500 follows, Follow is off with a note, and a card says so witho
 test("the player offers Follow for the artist on screen", async ({ page }) => {
   const mock = await setup(page);
   await page.goto("/search?tags=wolf");
-  await card(page, 1149).getByTestId("card-media").click();
+  await card(page, 1149).getByTestId("card-menu").click();
+  await page.getByTestId("sheet-post").getByRole("button", { name: "Play from this post" }).click();
   const player = page.getByTestId("player");
   await expect(player).toHaveAttribute("data-post-id", "1149", { timeout: 10_000 });
   const p = player.getByTestId("follow-pill");
