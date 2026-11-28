@@ -7,7 +7,7 @@
  * does not favorite here); pinch zooms 1 to 5 times, a drag moves a zoomed picture, and a drag down
  * on an unzoomed one closes. On a computer the wheel zooms and Post info stands beside the picture.
  */
-import { ChevronRight, CircleAlert, Download, Heart, Info, Share, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, Download, Heart, Info, Share, X } from "lucide-react";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { turnMark } from "@/feed/motion";
@@ -33,6 +33,7 @@ import { openPaused } from "./intent";
 import { savePost } from "./save";
 import { actionLook } from "@/shell/toastLook";
 import { PlayerInfoSheet } from "./sheets";
+import { ComicBar, PagesSheet, useComic, usePages } from "@/feed/comics";
 
 /** A second tap this soon is a double tap. */
 const DOUBLE_TAP_MS = 250;
@@ -44,6 +45,13 @@ const ZOOM_MS = 280;
 const CLOSE_PX = 120;
 /** Swipes starting this close to the left edge belong to Back. */
 const EDGE_PX = 24;
+/** A comic's page turns in this long (DESIGN.md "A comic"), and past this much of a sideways drag. */
+const TURN_MS = 320;
+const TURN_PX = 60;
+
+/** Kept from page to page of a comic: whether the buttons show, and which side the new page comes in from. */
+let chromeShown = true;
+let enterFrom = 0;
 
 interface View {
   s: number;
@@ -79,13 +87,31 @@ function useViewedPost(base: Entry, id: string): { post: Post | null; missing: b
   return { post, missing: !inFeed && got !== null && got.post === null, inFeed: inFeed !== null };
 }
 
+/** One page at a time: a comic's next page is a fresh picture (its zoom, its file, its loader). */
 export function Viewer({ base, top }: { base: Entry; top: Entry }) {
+  // what a comic keeps from page to page ends with the viewer: the next one opens with its buttons
+  useEffect(
+    () => () => {
+      chromeShown = true;
+      enterFrom = 0;
+    },
+    [],
+  );
+  return <ViewerPage key={top.route.view ?? ""} base={base} top={top} />;
+}
+
+function ViewerPage({ base, top }: { base: Entry; top: Entry }) {
   const nav = getNav();
   const id = top.route.view ?? "";
   const sheet = top.sheet;
   const { post, missing, inFeed } = useViewedPost(base, id);
   const [now] = useState(() => Date.now());
-  const [controls, setControls] = useState(true);
+  const [controls, setControlsState] = useState(chromeShown);
+  const setControls = (f: (c: boolean) => boolean) =>
+    setControlsState((c) => {
+      chromeShown = f(c);
+      return chromeShown;
+    });
   const [zoomed, setZoomed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   /** the full file, once the picture is zoomed past fit and it has loaded */
@@ -93,14 +119,72 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
 
   const close = () => void nav.back();
 
+  // ---- a comic (src/feed/comics.tsx): its pages, and the ones either side of this one --------
+  const comic = useComic(post);
+  const list = usePages(comic);
+  const ids = comic?.pool.post_ids;
+  const at = ids && post ? ids.indexOf(post.id) : -1;
+  const blacklist = useStore(getPrefs().store, blacklistOf);
+  const username = useStore(getSession().store, (s) => s.user?.name);
+  const rules = parseBlacklist(blacklist);
+  /** A page a turn can land on: not one e621 didn't send, hides from you, or your blacklist hides (unless shown once). */
+  const turnable = (i: number) => {
+    // until the pages are known, a turn could land on one your blacklist hides: wait for them
+    if (!list) return false;
+    const p = list[i];
+    if (p === null) return false;
+    if (p === undefined) return true; // its ask failed: the page itself says what it is
+    return displayUrl(p, "sample") !== null && (revealed.has(p.id) || blacklistedBy(rules, p, { username }) === null);
+  };
+  /** The page a turn goes to (+1 on, -1 back), past the ones it can't land on; null at either end. */
+  const nearAt = (d: number) => {
+    if (!ids || at < 0) return -1;
+    for (let i = at + d; i >= 0 && i < ids.length; i += d) if (turnable(i)) return i;
+    return -1;
+  };
+  const near = (d: number) => {
+    const i = nearAt(d);
+    return i < 0 ? null : ids![i];
+  };
+  // the pages either side load before they're turned to (only ones a turn can land on)
+  const preload = [-1, 1].map((d) => {
+    const p = list?.[nearAt(d)];
+    return (p && displayUrl(p, "sample")) || "";
+  });
+  useEffect(() => {
+    for (const src of preload) if (src) new Image().src = src;
+  }, [preload[0], preload[1]]); // eslint-disable-line react-hooks/exhaustive-deps -- the two urls
+  const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /** Go to a page in this viewer's place (Back still closes the viewer). */
+  const goTo = (pid: number, from = 0) => {
+    enterFrom = from;
+    nav.replace({ ...top.route, view: String(pid) });
+  };
+  const turning = useRef(false);
+  const turnTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(turnTimer.current), []);
+  /** Turn one page on (+1) or back (-1): the picture slides off, the next comes in from the other side. */
+  const turn = (d: 1 | -1) => {
+    const pid = near(d);
+    if (pid === null || turning.current) return void paint(FIT, true);
+    const w = stage.current?.clientWidth ?? 0;
+    if (reducedMotion() || !w) return goTo(pid);
+    turning.current = true;
+    slide(-d * w);
+    turnTimer.current = setTimeout(() => {
+      // still this viewer's entry (not closed, no sheet opened over it meanwhile): turn
+      if (getNav().current().key === top.key) return goTo(pid, d * w);
+      turning.current = false;
+      slide(0);
+    }, TURN_MS);
+  };
+
   // Videos don't open the viewer in this pass (DESIGN.md): a video tile, or a link to one, opens the
   // player paused in this entry's place.
   const video = post !== null && mediaKind(post) === "video";
   // What the viewer can't show goes to the post's own page, which plays it or says why (a review,
   // 2026-11-27: these sat on a loader): a video with no feed for the player to find it in, a picture
   // e621 hides from you, a post on your blacklist you haven't chosen to see there.
-  const blacklist = useStore(getPrefs().store, blacklistOf);
-  const username = useStore(getSession().store, (s) => s.user?.name);
   const away =
     post !== null &&
     ((video && !inFeed) || displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
@@ -157,6 +241,34 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     setZoomed(z);
     if (z) setSharp(true);
   };
+  /** Move the unzoomed picture sideways to x, at a page turn's pace. */
+  const slide = (x: number) => {
+    view.current = FIT;
+    const el = pic.current;
+    if (!el) return;
+    el.style.transition = `transform ${TURN_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
+    el.style.transform = `translate(${x}px, 0px)`;
+  };
+  // a turned-to page comes in from the side it was turned from
+  const picShown = !!post && displayUrl(post, "sample") !== null;
+  // Held by this page until the slide starts: an effect that runs again (Strict Mode, or the picture
+  // arriving a render later) slides it in again rather than leaving it off to the side.
+  const entering = useRef(enterFrom);
+  useLayoutEffect(() => {
+    enterFrom = 0;
+    const from = entering.current;
+    const el = pic.current;
+    if (!from || !el) return;
+    el.style.transition = "none";
+    el.style.transform = `translate(${from}px, 0px)`;
+    let f = requestAnimationFrame(() => {
+      f = requestAnimationFrame(() => {
+        entering.current = 0;
+        slide(0);
+      });
+    });
+    return () => cancelAnimationFrame(f);
+  }, [picShown]);
   /** Zoom to `s` keeping the screen point (cx, cy), from the stage's centre, where it is. */
   const zoomAt = (s: number, cx: number, cy: number, animate: boolean) => {
     const v = view.current;
@@ -170,7 +282,7 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
   // ---- hands -------------------------------------------------------------------
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<
-    | { kind: "one"; x: number; y: number; v: View; moved: boolean; axis: "down" | "pan" | "none" | null; t: number }
+    | { kind: "one"; x: number; y: number; v: View; moved: boolean; axis: "down" | "pan" | "turn" | "none" | null; t: number }
     | { kind: "pinch"; d: number; mx: number; my: number; v: View }
     | null
   >(null);
@@ -183,6 +295,8 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     return { d: Math.hypot(a.x - b.x, a.y - b.y), mx, my };
   };
   const onPointerDown = (e: React.PointerEvent) => {
+    // a page on its way off answers nothing until the next one is in
+    if (turning.current) return;
     if (e.pointerType === "touch" && e.clientX < EDGE_PX && pointers.current.size === 0) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -208,9 +322,19 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     if (!g.moved && Math.hypot(dx, dy) < 8) return;
     g.moved = true;
     // a mouse never drags the viewer shut: Esc and ✕ do that on a computer
-    g.axis ??= g.v.s > 1.01 ? "pan" : e.pointerType !== "mouse" && dy > 0 && Math.abs(dy) > Math.abs(dx) ? "down" : "none";
+    // a comic's page turns with a sideways drag; a mouse turns it too
+    g.axis ??=
+      g.v.s > 1.01
+        ? "pan"
+        : comic && Math.abs(dx) > Math.abs(dy)
+          ? "turn"
+          : e.pointerType !== "mouse" && dy > 0 && Math.abs(dy) > Math.abs(dx)
+            ? "down"
+            : "none";
     if (g.axis === "pan") paint(clamp({ s: g.v.s, x: g.v.x + dx, y: g.v.y + dy }));
     else if (g.axis === "down") paint(FIT, false, Math.max(0, dy));
+    // no page that way: the picture holds back, a third of the finger's travel
+    else if (g.axis === "turn") paint({ s: 1, x: near(dx < 0 ? 1 : -1) === null ? dx / 3 : dx, y: 0 });
   };
   const onPointerUp = (e: React.PointerEvent) => {
     if (!pointers.current.delete(e.pointerId)) return;
@@ -230,6 +354,12 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
       else paint(FIT, true);
       return;
     }
+    if (g.axis === "turn") {
+      const dx = e.clientX - g.x;
+      if (Math.abs(dx) > TURN_PX) turn(dx < 0 ? 1 : -1);
+      else paint(FIT, true);
+      return;
+    }
     if (g.moved) return;
     // A tap shows or hides the buttons; a double tap zooms to 2.5 at the point, or back to fit.
     const t = performance.now();
@@ -245,7 +375,7 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
   };
   const onPointerCancel = (e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);
-    if (gesture.current?.kind === "one" && gesture.current.axis === "down") paint(FIT, true);
+    if (gesture.current?.kind === "one" && (gesture.current.axis === "down" || gesture.current.axis === "turn")) paint(FIT, true);
     gesture.current = null;
   };
   // the wheel zooms at the pointer (a computer); a native listener, so it can stop the page's scroll
@@ -317,6 +447,13 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
       case "0":
         paint(FIT, true);
         break;
+      // a comic's pages (on a computer, beside the two glass buttons)
+      case "ArrowRight":
+        if (comic && view.current.s <= 1.01) turn(1);
+        break;
+      case "ArrowLeft":
+        if (comic && view.current.s <= 1.01) turn(-1);
+        break;
     }
   });
   useEffect(() => {
@@ -348,6 +485,8 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
       data-testid="viewer"
       data-post-id={post?.id}
       data-zoomed={zoomed || undefined}
+      data-comic={comic ? "" : undefined}
+      data-pages={list ? "" : undefined}
     >
       <div
         ref={stage}
@@ -383,9 +522,25 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
           <button type="button" className="art-circle" aria-label="Close" onClick={close} data-testid="viewer-close">
             <X aria-hidden />
           </button>
+          {comic && (
+            <span className="count-pill" data-testid="viewer-count">
+              {comic.page} / {comic.total}
+            </span>
+          )}
         </div>
+        {comic && (
+          <>
+            <button type="button" className="art-circle viewer-turn" data-side="l" aria-label="Previous page" disabled={near(-1) === null} onClick={() => turn(-1)} data-testid="viewer-prev">
+              <ChevronLeft aria-hidden />
+            </button>
+            <button type="button" className="art-circle viewer-turn" data-side="r" aria-label="Next page" disabled={near(1) === null} onClick={() => turn(1)} data-testid="viewer-next">
+              <ChevronRight aria-hidden />
+            </button>
+          </>
+        )}
         {post && (
           <div className="player-bottom">
+            {comic && <ComicBar comic={comic} />}
             <button
               type="button"
               className="player-who viewer-who"
@@ -445,6 +600,17 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
       </div>
 
       {sheet === "player-info" && post && <PlayerInfoSheet post={post} base={base} />}
+      {sheet === "comic-pages" && post && comic && (
+        <PagesSheet
+          comic={comic}
+          post={post}
+          onPage={(pid) =>
+            void nav.back().then(() => {
+              if (pid !== post.id) goTo(pid);
+            })
+          }
+        />
+      )}
     </div>
   );
 }

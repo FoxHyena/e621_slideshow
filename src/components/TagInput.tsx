@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Avatar from "@/components/Avatar";
 import { autocompleteTags, type Credentials } from "@/lib/e621/client";
 import { TAG_CATEGORIES, TAG_CATEGORY_COLORS, type AutocompleteTag } from "@/lib/e621/types";
@@ -20,6 +20,13 @@ interface Props {
    * suggestions (DESIGN.md "Search"); the default is the legacy panel's box */
   variant?: "legacy" | "field";
   autoFocus?: boolean;
+  /** "field" only: what leads the capsule (the search icon unless given; null for none) */
+  icon?: ReactNode;
+  /** "field" only: the clear button's name (default "Clear search") */
+  clearLabel?: string;
+  /** "field" only: a search box (the default), or a plain text box (the blacklist's) */
+  kind?: "search" | "text";
+  enterKeyHint?: "search" | "done";
 }
 
 interface Token {
@@ -61,6 +68,10 @@ export default function TagInput({
   testId,
   variant = "legacy",
   autoFocus,
+  icon,
+  clearLabel = "Clear search",
+  kind = "search",
+  enterKeyHint = "search",
 }: Props) {
   const listId = useId();
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
@@ -123,6 +134,8 @@ export default function TagInput({
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // an IME confirming a word sends Enter too; that Enter is the IME's, not a pick
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (showList) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -160,6 +173,7 @@ export default function TagInput({
     "aria-autocomplete": "list" as const,
     "data-testid": testId,
     spellCheck: false,
+    autoComplete: "off",
     autoCapitalize: "off",
     autoCorrect: "off",
     onKeyDown,
@@ -179,13 +193,13 @@ export default function TagInput({
   if (variant === "field")
     return (
       <div className="field6" data-has={value ? "" : undefined}>
-        <Search aria-hidden />
-        <input type="search" enterKeyHint="search" role="combobox" aria-controls={listId} aria-expanded={showList} {...common} />
+        {icon === undefined ? <Search aria-hidden /> : icon}
+        <input type={kind} enterKeyHint={enterKeyHint} role="combobox" aria-controls={listId} aria-expanded={showList} {...common} />
         {value && (
           <button
             type="button"
             className="field-clear"
-            aria-label="Clear search"
+            aria-label={clearLabel}
             onClick={() => {
               onChange("");
               ref.current?.focus();

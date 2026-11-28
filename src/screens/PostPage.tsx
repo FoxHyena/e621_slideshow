@@ -35,6 +35,7 @@ import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { blacklistLine, openArtist, openResults, openSignIn, sharePost } from "./actions";
 import { PostMenu, Toolbar } from "./feedParts";
+import { ComicGroup } from "@/feed/comics";
 
 const MORE_SHOWN = 6;
 const label = (t: string) => t.replaceAll("_", " ");
@@ -227,6 +228,7 @@ function PostBody({ post }: { post: Post }) {
           ))}
       </div>
       <div className="post-page-side">
+        <ComicGroup post={post} />
         <TagsPanel post={post} hold={hold} />
         <Links post={post} />
         <MoreFrom post={post} />

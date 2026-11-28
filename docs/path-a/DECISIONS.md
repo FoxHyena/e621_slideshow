@@ -2207,3 +2207,73 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   weight per tag, `model.ts`), so "Taste is how well its tags match yours" holds for both, leaving out
   the rating; I kept the sentence. "Popular is its favorites for
   its age" holds: the quality percentile compares favorites against posts of the same age.
+
+## The blacklist box suggests e621's tags (owner, 2026-11-27)
+
+- Settings › Content's "Tags to hide" box is now the same `TagInput` as Search: after 250 ms it asks
+  e621's autocomplete (anonymously) for the word under the caret, with its `-`/`~` kept. Metatags
+  (`rating:e`) and words with `(` aren't asked about.
+- **Mine:** it keeps its own look: no search icon, `type="text"`, `enterKeyHint="done"`, clear button
+  "Clear Tags to hide". The list is Search's list, 8 below the box.
+- **Mine:** Enter with the list open picks the highlighted tag (as in Search); Enter with none open
+  adds the line. So typing `wolf` and pressing Enter twice adds the top suggestion, not `wolf`;
+  Escape first keeps what you typed.
+- From review: an IME's confirming Enter no longer picks a tag (Search too), and the box sets
+  `autoComplete="off"` so the browser's own list doesn't cover ours.
+
+## 2026-11-27 — Artists › Suggested loads more at the bottom, then says that's everyone
+- Owner: "When we scroll to the bottom it should load in more suggestions or say that it's out".
+- **Change:**
+  - Near the bottom of Suggested (800 before it), the next `RECENCY_TOP` (32) artists you favorite a
+    lot and neither follow nor hid are looked up and added below. It costs the same as the first look:
+    one search per 8 artists, plus up to 8 single looks.
+  - Each page is ranked with recency on its own and added after the last, so the cards you've passed
+    don't move. An artist who rejoins (an unfollow, Show) goes on the page their rank falls in.
+  - Nobody left: the feed's end moment, "That's everyone", with "You've seen every artist you favorite
+    a lot. Favorite more and check back." A list that holds everyone from the start shows it at once,
+    without a request.
+  - A failed look: the feed's last row, "Couldn't look up more artists" with Try again. The cards
+    stay.
+  - The pages are kept with the first look's hour; the next lookup starts again at page one.
+- **Mine:** the words of the end and the failed row; a spinner while it looks.
+- **Rejected:** a "Show more" button (the owner asked for the scroll); ranking every page together
+  (new cards would land among the ones you've read).
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - A More still running across Try again, a refresh or another sign-in blocked the next one without
+    a word. Now it is dropped with the lookup it was for, and the foot asks again on every re-cut.
+  - A More that landed during the hour's fresh lookup showed the old list for a moment.
+  - Every card gone (followed or hidden) with more to look up said "No one new to suggest". Now the
+    foot asks for the next ones.
+  - The tests: later artists now posted more recently, so ranking all pages together would fail the
+    "cards stay put" check; the failed More checks it isn't asked again until Try again.
+
+## 2026-11-27 — Built: comics (e621 pools)
+- Owner, asked about a post that is a comic's page: "Build it". Built from DESIGN.md "A post on its
+  own", "A comic", and the mock's comic screens.
+- **Built:**
+  - A feed card whose post is a comic's page has the well at the left of its footer, after Copy link:
+    the pages glyph and "3 / 5". It opens the viewer on that page. Cards that appear together share one
+    request for their pools, not one each.
+  - The viewer on a comic's page: "3 / 5" at the top, the comic bar above the artist row, a sideways
+    drag turns the page. The first and last pages hold back when dragged past. On a computer, two glass
+    buttons at the sides and the arrow keys turn it too. Back still closes the viewer, however many
+    pages were turned.
+  - The comic bar opens the Pages sheet: every page as a thumb, the current one ringed, "Last page
+    <when>", and "Open as a feed".
+  - The post page has the comic's group right after the post: its name and page, then a strip of
+    every page. The row opens the comic as a feed; a thumb opens that page's post.
+- **Picked by me:**
+  - Only e621's "series" pools are comics. A "collection" pool (somebody's set of favorites, say) gets
+    nothing.
+  - Up to 500 pages are fetched, 100 to a request; the first hundred go out as on-screen asks, the
+    rest wait behind them. A longer comic's strip and sheet stop at 500.
+  - "Open as a feed" is the pool's own page order. e621 can't sort a search by page, so the feed is
+    the pool's list of posts, fetched in order, with your ratings and your blacklist applied.
+  - A key press or tap while a page is turning (320 ms) is dropped, not queued.
+  - A turn goes past a page it can't show: deleted, hidden from you by e621, or on your blacklist (unless
+    you chose to see it once). Page numbers stay the pool's. A skipped page isn't fetched ahead.
+    Turning waits until the pages are known (a fraction of a second), so it never lands on one first.
+  - The comic as a feed has only the Media chip. Its order is the pages', so sort, date, score and
+    hide-favorites don't apply.
+  - A failed ask for a comic's pools or pages waits 30 s before it goes again.
+- Not built: a comic's own page (the e621 pool page), reading a comic in the slideshow.

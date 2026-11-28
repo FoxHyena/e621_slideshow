@@ -238,3 +238,44 @@ test("signed out on a phone, the e621 row has Sign in on it, which brings up the
   await expect(sheet(page)).toHaveCount(0);
   await shot(page, "settings-signed-out");
 });
+
+/** Owner, 2026-11-27: "the blacklist textbox has tag autocomplete like search". */
+test("Content: the blacklist box suggests e621's tags as you type, as Search does; Enter then adds the line", async ({ page }) => {
+  const mock = await mockE621(page);
+  await page.goto("/settings/content");
+  const field = page.getByTestId("blacklist-field");
+  await field.click();
+  await field.pressSequentially("gore -wol", { delay: 20 });
+  const list = page.getByTestId("autocomplete");
+  await expect(list.getByRole("option")).toHaveCount(3);
+  // the word being typed is asked about, its "-" kept out of the ask
+  expect(mock.autocompleteQueries.at(-1)).toBe("wol");
+  // the list hangs under the box, as Search's does
+  const f = (await field.locator("..").boundingBox())!;
+  const l = (await list.boundingBox())!;
+  expect(Math.round(l.y - (f.y + f.height))).toBe(8);
+  await shot(page, "settings-blacklist-suggest");
+  // Enter picks the highlighted one (the "-" stays); a second Enter adds the line
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(field).toHaveValue("gore -wol_artist ");
+  await expect(list).toHaveCount(0);
+  await expect(page.getByTestId("blacklist-line")).toHaveCount(0);
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("blacklist-line")).toHaveCount(1);
+  await expect(page.getByTestId("blacklist-line").first()).toContainText("gore · -wol artist");
+  await expect(field).toHaveValue("");
+  // a click on a suggestion picks it too; a metatag isn't asked about
+  const asked = mock.autocompleteQueries.length;
+  await field.pressSequentially("rating:e", { delay: 20 });
+  await page.waitForTimeout(400); // past the 250 ms wait before asking
+  expect(mock.autocompleteQueries.length).toBe(asked);
+  await expect(list).toHaveCount(0);
+  await field.fill("");
+  await field.pressSequentially("fox", { delay: 20 });
+  await list.getByRole("option").first().click();
+  await expect(field).toHaveValue("fox_species ");
+  // its clear button names the box
+  await page.getByRole("button", { name: "Clear Tags to hide" }).click();
+  await expect(field).toHaveValue("");
+});
