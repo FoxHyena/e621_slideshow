@@ -1749,3 +1749,14 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Smaller:** the viewer takes the focus when it opens; one post is asked of e621 once a visit,
   shared by the page and the viewer (`src/feed/postCache.ts`; the page asked 4 times); Try again
   shows the loader while it asks; a deleted post e621 still sends counts as no post.
+
+## 2026-11-27 — Post info shows the description; a card's bar opens the post
+- Owner: "hitting I on a post doesn't show its description". Post info (the player's and the
+  viewer's sheet) now has "Description" under the numbers and the "For you because" line, above the
+  tags, in the post page's DText look. "post #123" in it closes the sheet and the player or viewer,
+  then opens that post's page.
+- Owner: "Unless we tap artist's name, tapping the post's bar should open the post, not the artist
+  page now". The bar (the header's empty part and the time and number line) opens the post's page;
+  the artist's name opens the artist, and so does the artist's mark (the builder's call: the mark
+  is the artist's picture). On the post's own page the bar does nothing. This changes DESIGN.md's
+  "the header already opens the artist", which the designer has to update.

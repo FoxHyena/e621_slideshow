@@ -125,6 +125,40 @@ test.describe("on a phone", () => {
   });
 });
 
+test.describe("a card's bar, and Post info (owner, 2026-11-27)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("the bar opens the post's page; the artist's name and mark open the artist", async ({ page }) => {
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf");
+    const card = page.locator('[data-testid=post-card][data-post-id="1149"]');
+    const bar = card.getByTestId("card-open");
+    const box = (await bar.boundingBox())!;
+    await bar.click({ position: { x: box.width - 24, y: box.height / 2 } });
+    await expect(page).toHaveURL(/\/post\/1149$/);
+    // on the post's own page the bar does nothing
+    await postPage(page).getByTestId("card-open").click({ position: { x: box.width - 24, y: box.height / 2 } });
+    await expect(page).toHaveURL(/\/post\/1149$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/search\?tags=wolf$/);
+    await card.getByTestId("card-artist").click();
+    await expect(page).toHaveURL(/\/artist\/mock_artist$/);
+    await page.goBack();
+    await card.locator(".post-artist-mark").click();
+    await expect(page).toHaveURL(/\/artist\/mock_artist$/);
+  });
+
+  test("I opens Post info with the post's description", async ({ page }) => {
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf&view=1149");
+    await expect(page.getByTestId("viewer")).toHaveAttribute("data-post-id", "1149");
+    await page.keyboard.press("i");
+    const desc = page.getByTestId("sheet-info").getByTestId("info-desc");
+    await expect(desc.locator(".dtext-h")).toHaveText("Reed");
+    await expect(desc.getByRole("link", { name: "More" })).toHaveAttribute("href", "https://example.com/more");
+  });
+});
+
 test.describe("what the viewer can't show goes to the post's page (a review, 2026-11-27)", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 

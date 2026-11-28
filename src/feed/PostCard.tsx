@@ -191,6 +191,14 @@ function fadeTags(e: React.UIEvent<HTMLDivElement>) {
   r.style.setProperty("--fr", `${Math.min(28, Math.max(0, rest))}px`);
 }
 
+const openArtistPage = (name: string) => getNav().push({ screen: { kind: "artist", name }, play: null });
+/** The post's own page; nothing on that page itself (its panel is this post). */
+function openPostPage(id: number) {
+  const s = getNav().current().route.screen;
+  if (s.kind === "post" && s.id === id) return;
+  getNav().push({ screen: { kind: "post", id }, play: null });
+}
+
 function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, tagless, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
@@ -216,12 +224,33 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
     >
       <header className="post-head">
         <div ref={who} className="post-who">
-          <Avatar seed={seed} fresh={fresh} className="post-avatar" />
+          {/* The bar opens the post's page; the artist's mark and name open the artist (owner,
+              2026-11-27: "Unless we tap artist's name, tapping the post's bar should open the post") */}
+          <button type="button" className="post-by" aria-label={`Open post ${post.id}`} onClick={() => openPostPage(post.id)} data-testid="card-open" />
+          {by[0] ? (
+            <button type="button" className="post-artist-mark" tabIndex={-1} aria-hidden onClick={() => openArtistPage(by[0])}>
+              <Avatar seed={seed} fresh={fresh} className="post-avatar" />
+            </button>
+          ) : (
+            <Avatar seed={seed} fresh={fresh} className="post-avatar" />
+          )}
           <div className="post-idn">
-            <span className={`post-name${name ? "" : " post-name-none"}`}>
-              <span>{name ?? "unknown artist"}</span>
-              {by.length > 1 && <span className="post-also">+{by.length - 1}</span>}
-            </span>
+            {by[0] ? (
+              <button
+                type="button"
+                className="post-name post-artist"
+                aria-label={`More from ${name}${by.length > 1 ? ` and ${by.length - 1} more` : ""}`}
+                onClick={() => openArtistPage(by[0])}
+                data-testid="card-artist"
+              >
+                <span>{name}</span>
+                {by.length > 1 && <span className="post-also">+{by.length - 1}</span>}
+              </button>
+            ) : (
+              <span className="post-name post-name-none">
+                <span>unknown artist</span>
+              </span>
+            )}
             <span className="post-when">
               {fresh && (
                 <b className="post-new" data-testid="card-new">
@@ -236,15 +265,6 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
               <span className="post-id">#{post.id}</span>
             </span>
           </div>
-          {by[0] && (
-            <button
-              type="button"
-              className="post-by"
-              aria-label={`More from ${name}${by.length > 1 ? ` and ${by.length - 1} more` : ""}`}
-              onClick={() => getNav().push({ screen: { kind: "artist", name: by[0] }, play: null })}
-              data-testid="card-artist"
-            />
-          )}
         </div>
         {follow && by[0] && (
           <FollowPill

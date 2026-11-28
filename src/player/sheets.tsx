@@ -13,6 +13,7 @@ import { tagTargets, useTagHold, type TagAction } from "@/components/TagActions"
 import TagActionsOverlay from "@/components/TagTargets";
 import { Seg, Stepper } from "@/components/v6";
 import { postPageUrl } from "@/lib/e621/client";
+import { DText } from "@/lib/e621/dtext";
 import { TAG_CATEGORY_COLORS, type Post, type Rating, type TagCategoryName } from "@/lib/e621/types";
 import { decodeResults } from "@/lib/feed/filters";
 import { ago, artists, compact } from "@/lib/feed/format";
@@ -204,6 +205,12 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
     else openResults(tag);
   };
   const hold = useTagHold((t, a) => void act(t, a));
+  /** "post #123" in the description: close the sheet and the player or viewer, then its page */
+  const openPost = async (id: number) => {
+    await getNav().back();
+    await getNav().back();
+    getNav().push({ screen: { kind: "post", id }, play: null });
+  };
   const credited = artists(post);
   const multi = credited.length > 1;
   const [now] = useState(() => Date.now());
@@ -277,6 +284,16 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
             a lot.
           </span>
         </p>
+      )}
+      {/* the description, as on the post's page (owner, 2026-11-27: "hitting I on a post doesn't show
+          its description") */}
+      {post.description?.trim() && (
+        <section className="info-kind" aria-label="Description">
+          <h3 className="info-label">Description</h3>
+          <div className="post-desc" data-testid="info-desc">
+            <DText text={post.description} onPost={(id) => void openPost(id)} />
+          </div>
+        </section>
       )}
       {KINDS.map(([c, label]) => {
         const tags = c === "artist" ? (multi ? credited : []) : (post.tags[c] ?? []);

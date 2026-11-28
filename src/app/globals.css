@@ -1617,6 +1617,31 @@ html {
   border-radius: 16px;
   -webkit-tap-highlight-color: transparent;
 }
+/* the artist's mark and name, over the bar's own button: they open the artist */
+.post-artist-mark,
+.post-artist {
+  position: relative;
+  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.post-artist-mark {
+  display: block;
+  flex: none;
+  border-radius: 999px;
+}
+.post-artist {
+  max-width: 100%;
+  width: fit-content;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+.post-artist:focus-visible,
+.post-artist-mark:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
 .post-menu {
   position: relative;
   display: grid;
@@ -6547,7 +6572,7 @@ li[data-state="done"] .first-step-n svg,
     background: var(--color-raised-hi);
     color: var(--color-fg);
   }
-  .post-head:has(.post-by:hover) .post-avatar .mark svg {
+  .post-head:has(.post-artist:hover, .post-artist-mark:hover) .post-avatar .mark svg {
     background: var(--color-raised-hi);
   }
 
