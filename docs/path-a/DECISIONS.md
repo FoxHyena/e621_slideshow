@@ -2159,3 +2159,29 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     panel's edge. The mock has no rule for them; for the designer to say.
 - e2e "Rows: a row's end glyph's ink…" measures the drawn ink of each glyph, not its box. The Follow
   from favorites test checks its line still runs to the edge.
+
+## 2026-11-27 — Tune gets a picture of how For You picks (owner: "Lock it")
+- Owner: "I'd like to add a nice graphic to visually represent how the tuning and post weighing system
+  works to build the for you page that we could include in the tuning page as I've had some
+  questions. Would you be able to design a few approaches for me to pick from?"
+- Read first, on main (`src/lib/recommend/weights.ts`, `rank.ts`, `stream.ts`): a tag's weight is how
+  far its share of the favorites is above its share of e621, damped for small counts and for tags
+  that are broad on e621; For You searches the window for the top Breadth tags and adds three pages of
+  the window's best-scored posts; the order is the taste percentile plus the quality percentile
+  (favorites against posts of the same age).
+- Drawn (mine): A, the path from favorites to feed; B, one post with its two marks; C, two tags
+  against e621's share, with five dots on every tag row. My pick was C.
+- Owner: "A combined with C? Also keep in mind that we're making the comnination of popular vs taste
+  customizable".
+- Drawn (mine): one card. The path, with C's tag bars as its second stop, and C's dots on the rows.
+  The order stop reads the "Taste or popular" slider: Taste 1 part, Popular the slider's number.
+- Owner, asked 'Lock "A with C" as Tune's graphic and write it into the spec?': "Lock it".
+- **Mine:** every measurement and every sentence in the card; which two tags it shows; the dots' rule
+  (fifths of the strongest weight, rounded up; five when pinned); "Hide" and that the device
+  remembers it; that the card shows only once favorites are read.
+- **Read from the builder's uncommitted files, not from main:** the slider. "Taste or popular", 0 to
+  2 in steps of 0.25, 1 is "Even". If its name or range changes, the order stop changes with it.
+- **The cost:** 635 tall on a phone, more than one screen of Tune, until hidden.
+- **Left out of the picture on purpose:** the learned ranking (when it is fitted, it is the taste
+  mark), the damping rules, and that characters count half. The card says what holds for both.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
