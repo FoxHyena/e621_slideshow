@@ -168,3 +168,77 @@ test("Follow from favorites opens as a sheet and follows the picked ones in one 
   await page.getByRole("radio", { name: /Following/ }).click();
   await expect(rows(page)).toHaveCount(5);
 });
+
+test("Suggested still fills when you follow most of the artists you favorite; Show on a hidden one brings them back", async ({ page }) => {
+  // 40 artists you favorite alike (so they rank by name); you follow the first 30 and hid art_35
+  const names = Array.from({ length: 40 }, (_, i) => `art_${String(i).padStart(2, "0")}`);
+  const mock = await mockE621(
+    page,
+    names.flatMap((a, i) => [0, 1, 2].map((k) => ({ id: 3000 - i * 10 - k, artist: a }))),
+  );
+  mock.subscriptions = names.slice(0, 30);
+  let id = 5000;
+  mock.setFavorites(names.flatMap((a) => [0, 1, 2, 3].map(() => ({ id: id++, artist: a }))));
+  mock.tagCounts = Object.fromEntries(names.map((a) => [a, 140]));
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem("seeded")) return;
+    sessionStorage.setItem("seeded", "1");
+    localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "goodkey" }));
+    localStorage.setItem("e6ss:v1:hiddenArtists:tester", JSON.stringify(["art_35"]));
+  });
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const cards = page.getByTestId("sugg-card");
+  // the 9 you neither follow nor hid (picking the top 32 first, then cutting, left 2)
+  await expect(cards).toHaveCount(9, { timeout: 15_000 });
+  await expect(cards.first()).toHaveAttribute("data-artist", "art_30");
+  await expect(page.locator('[data-testid="sugg-card"][data-artist="art_35"]')).toHaveCount(0);
+  await expect(cards.first().locator(".sugg-tile img")).toHaveCount(3);
+  await expect(page.getByTestId("follow-favs")).toContainText("9 artists you favorite a lot");
+  // looked up the 9, not the followed: 2 batched searches and no single ones
+  const batched = () => mock.searches.filter((s) => s.tags.startsWith("~") && s.limit === 320);
+  const single = () => mock.searches.filter((s) => s.tags.startsWith("~") && s.limit === 3);
+  expect(batched()).toHaveLength(2);
+  expect(batched().some((s) => s.tags.includes("~art_00 "))).toBe(false);
+  expect(single()).toHaveLength(0);
+
+  // Show on the hidden one: one small search of their own, and they're back without a fresh lookup
+  await page.getByTestId("tab-settings").filter({ visible: true }).first().click();
+  // (a computer shows every section on one page; a phone opens For You's)
+  await expect(page.getByRole("heading", { name: "Settings", level: 1 })).toBeVisible();
+  const forYou = page.locator('a[href="/settings/for-you"]').filter({ visible: true });
+  if (await forYou.count()) await forYou.first().click();
+  await page.locator('[data-testid="hidden-artist"][data-artist="art_35"]').getByTestId("hidden-show").click();
+  await expect(page.getByTestId("hidden-none")).toBeVisible();
+  await expect.poll(() => single().length).toBe(1);
+  expect(single()[0].tags).toContain("~art_35");
+  await page.getByTestId("tab-artists").filter({ visible: true }).first().click();
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  await expect(cards).toHaveCount(10);
+  await expect(page.locator('[data-testid="sugg-card"][data-artist="art_35"]')).toHaveCount(1);
+  expect(batched()).toHaveLength(2);
+
+  // Unfollow one the lookup left out: the same, one small search, and they're back
+  await page.getByRole("radio", { name: /Following/ }).click();
+  await page.locator('[data-testid="artist-row"][data-artist="art_05"]').getByTestId("artist-more").click();
+  await page.getByTestId("artist-unfollow").click();
+  await expect(rows(page)).toHaveCount(29);
+  await expect.poll(() => single().length).toBe(2);
+  expect(single()[1].tags).toContain("~art_05");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  await expect(cards).toHaveCount(11);
+  await expect(cards.first()).toHaveAttribute("data-artist", "art_05");
+  expect(batched()).toHaveLength(2);
+});
+
+test("Suggested when you follow every artist you favorite a lot says so, not that you need more favorites", async ({ page }) => {
+  const mock = await setup(page);
+  mock.subscriptions = ["fox_artist", ...SUGGEST];
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const none = page.getByTestId("suggested-none");
+  await expect(none).toContainText("No one new to suggest", { timeout: 15_000 });
+  await expect(none).toContainText("You follow every artist you favorite a lot.");
+  // nobody to look up: no searches for tiles
+  expect(mock.searches.filter((s) => s.tags.startsWith("~"))).toHaveLength(0);
+});
