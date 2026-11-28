@@ -1217,6 +1217,13 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 /* A row whose value drops a menu: ⌄ in place of ›, and the menu hangs from the row's right end. */
 .srow6.open > .ic.chev { transform: rotate(180deg); color: var(--text); }
 .vmenu6 { display: flex; justify-content: flex-end; margin: 8px calc(var(--inset) + 16px) 0 0; }
+
+/* Rows (2026-11-27): a divider stops where the row's content stops; a glyph that ends a row is pulled by its own empty margin, so its ink ends 16 from the panel. */
+.p6 .group6 .srow6::before { right: 16px; }
+.p6 .group6 .qrows6 .srow6::before { right: 0; }
+.p6 .row6 + .row6::before { right: 14px; }
+.p6 .srow6 > .ic.chev.ext { margin: 0 -1px 0 0; }
+.p6 .srow6 > .ic.chev.dn { margin: 0 -3px 0 -2px; }
 </style>
 
 <div class="wrap" id="root">
@@ -2176,7 +2183,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   const sty = (name, on, inner) => `<button class="style6" type="button" aria-pressed="${on}"><i>${inner}</i>${name}</button>`;
   const A = v => `--art:${art('mossy otter', v)}`;
   P.cdown = '<path d="m6 9 6 6 6-6"/>'; // the chevron; P.down becomes Save's arrow further down
-  const vrow = (t, val, cls = '') => `<button class="srow6 ${cls}" type="button" aria-haspopup="menu"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${ic('cdown', 16, 2.4, 'chev')}</button>`;
+  const vrow = (t, val, cls = '') => `<button class="srow6 ${cls}" type="button" aria-haspopup="menu"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${ic('cdown', 16, 2.4, 'chev dn')}</button>`;
   const swrow = (t, s, on) => `<div class="srow6"><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
   const stylesHTML = `<div class="styles6" role="group" aria-label="Style">
         ${sty('Classic', true, `<u style="inset:22px 0;${A(0)}"></u>`)}
@@ -2718,10 +2725,10 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
       <p class="gnote6">Links you open will still go to Safari, not the installed app, and the two keep separate sign-ins.</p>
       <div class="group6">${srow('ext', 'e621 button', 'Adds an eLicks21 button to e621')}${srow('keys', 'Keyboard shortcuts', 'On a computer')}</div>
       ${glab('About')}
-      <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
+      <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev ext')}</button></div>
       <p class="gnote6">Not run by e621. It reads e621 with your own account and key.</p>
       ${glab('Made by')}
-      <div class="group6"><button class="srow6" type="button"><span class="ico">${ic('send', 20, 2)}</span><span class="lbl"><b>Oreo</b><small>@hyenafox on Telegram</small></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
+      <div class="group6"><button class="srow6" type="button"><span class="ico">${ic('send', 20, 2)}</span><span class="lbl"><b>Oreo</b><small>@hyenafox on Telegram</small></span>${ic('ext', 16, 2.2, 'chev ext')}</button></div>
       <p class="gnote6">Found a bug or want a feature? Send a message.</p>
     </div>` + bottom('Settings'));
   const kb1 = (k, t) => `<div class="srow6"><span class="lbl"><b>${t}</b></span>${k.split(' ').map(x => `<span class="kbd6">${x}</span>`).join('')}</div>`;
