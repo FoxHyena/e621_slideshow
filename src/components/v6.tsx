@@ -5,7 +5,7 @@
  * slider, toggle"). Styles live in globals.css ("v6 parts"); these only wire the bits CSS can't.
  */
 import { Minus, Plus, X } from "lucide-react";
-import { forwardRef, useRef, type CSSProperties, type InputHTMLAttributes, type ReactNode } from "react";
+import { forwardRef, useLayoutEffect, useRef, type CSSProperties, type InputHTMLAttributes, type ReactNode } from "react";
 
 /** A segmented control: a sunk track and a capsule that slides to the chosen segment. */
 export function Seg<T extends string>({
@@ -14,6 +14,7 @@ export function Seg<T extends string>({
   onChange,
   label,
   big,
+  hug,
   className,
   testId,
 }: {
@@ -22,17 +23,44 @@ export function Seg<T extends string>({
   onChange: (v: T) => void;
   label: string;
   big?: boolean;
+  /**
+   * Segments that hug their words (DESIGN.md "Segmented control", 2026-11-27): each is its word
+   * plus `hug` px at both sides, the spare width shared equally; the capsule takes the chosen one's
+   * place and width. Without it, segments are equal.
+   */
+  hug?: number;
   className?: string;
   testId?: string;
 }) {
   const i = Math.max(0, options.findIndex((o) => o.value === value));
+  const track = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = track.current;
+    if (!hug || !el) return;
+    const place = () => {
+      const b = el.querySelectorAll<HTMLButtonElement>(":scope > button")[i];
+      if (!b) return;
+      // (from the layout's own fractions: offsetLeft rounds, and the capsule stood 1 off)
+      const t = el.getBoundingClientRect();
+      const r = b.getBoundingClientRect();
+      el.style.setProperty("--thumb-x", `${r.left - t.left - el.clientLeft}px`);
+      el.style.setProperty("--thumb-w", `${r.width}px`);
+    };
+    place();
+    // the words' widths change once the font has loaded, and with the menu's width
+    const ro = new ResizeObserver(place);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [hug, i]);
   return (
     <div
+      ref={track}
       role="radiogroup"
       aria-label={label}
       className={`seg${className ? ` ${className}` : ""}`}
       data-big={big || undefined}
-      style={{ "--i": i, "--n": options.length } as CSSProperties}
+      data-hug={hug ? "" : undefined}
+      style={{ "--i": i, "--n": options.length, ...(hug && { "--hug": `${hug}px` }) } as CSSProperties}
       data-testid={testId}
       onKeyDown={(e) => {
         const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;

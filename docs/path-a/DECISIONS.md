@@ -1811,3 +1811,21 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Owner, asked "Commit and send the text spacing and both menu fixes?": "Commit and send".
 - **Mine.** It applies to every ⋯ sheet (a post, a grid tile, an artist row, a
   suggestion), on a phone too.
+
+## 2026-11-27 — Built: text spacing C, the date menu's Custom part, the ⋯ menu's labels
+- Owner: "Merge, then build" (the three fixes above).
+- **Text spacing (C), per face, where the faces are set (`globals.css`):** Fredoka rules get
+  word-spacing 0.08 em and letter-spacing normal; system and mono rules word-spacing normal; 13 px
+  system text (Footnote and Tag) letter-spacing −0.02 em, through `--ls-footnote` on `:root` so a
+  Fredoka rule at 13 px sets it back to normal. **Mine:** the declarations were added to the rules by
+  a script once, then checked by hand; nothing at run time tags elements.
+- **Mine:** `e2e/text-spacing.spec.ts` walks Following, results, the ⋯ and date menus, the post
+  page, the viewer with Post info, Settings, Artists and For You at 390 and 1280 wide, and fails on
+  any element whose spacing doesn't match its face. 0 found.
+- **The date menu:** a line 16 in from the menu's sides, 8 below the last row and 12 above the
+  segments; the number field 72 wide (was 88). Segments hug their words (`Seg hug`, 14 for the kinds,
+  8 for the units) and the capsule is measured to the chosen button, so it takes that one's width.
+  The spare width is shared, so the words stand 15 and 9 in at 390 wide.
+- **The ⋯ menu:** the rows' icons 14 in, labels at 64 like the name, dividers from 48; as a popover
+  the context line has 16 above, so the mark is 16 from the top. On a phone the grabber's space stays.
+- **Mine:** `e2e/menu-spacing.spec.ts` checks these numbers at 390 and 1280.
