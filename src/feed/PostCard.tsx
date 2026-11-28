@@ -9,7 +9,7 @@
 import { ArrowUp, Heart, MoreHorizontal, Play } from "lucide-react";
 import { TOAST_ICONS } from "@/shell/toastLook";
 import { toast } from "sonner";
-import { memo, useEffect, useRef, useState, type RefObject } from "react";
+import { memo, Suspense, useEffect, useRef, useState, type RefObject } from "react";
 import type { Post } from "@/lib/e621/types";
 import { mediaKind, TAG_CATEGORY_COLORS } from "@/lib/e621/types";
 import { ago, artists, cardTags, compact } from "@/lib/feed/format";
@@ -25,7 +25,7 @@ import Avatar from "@/components/Avatar";
 import type { TagHold } from "@/components/TagActions";
 import { FollowPill } from "./FollowPill";
 import { turnMark } from "./motion";
-import { motionFx } from "@/shell/lazy";
+import { ComicWell, motionFx } from "@/shell/lazy";
 
 /** A second tap this soon is a double tap. */
 const DOUBLE_TAP_MS = 200;
@@ -329,6 +329,12 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
       </div>}
       <footer className="post-foot">
         <CopyLink id={post.id} />
+        {/* a comic's page (src/feed/comics.tsx): its well comes in its own time, the card doesn't wait */}
+        {!!post.pools?.length && (
+          <Suspense>
+            <ComicWell post={post} onOpen={() => onOpen(post, index)} />
+          </Suspense>
+        )}
         <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>
           <ArrowUp aria-hidden />
           {compact(post.stats.score.total)}

@@ -33,6 +33,7 @@ import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { copyText, onFeedTag, shareArtist } from "./actions";
 export { PostScreen } from "./PostPage";
+export { ComicWell } from "@/feed/comics";
 import { FeedBody, GridSet, GridToggle, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
 
 const CHIPS: ChipId[] = ["media", "hideFaved", "sort", "date", "score"];

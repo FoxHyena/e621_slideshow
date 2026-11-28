@@ -99,6 +99,17 @@ export function rejoiners(
   return pool.filter((c, i) => i < last && !have.has(c.name) && !skip(c.name));
 }
 
+/**
+ * Which page of the looked-up ones `name` belongs on: the first whose ranks reach past theirs (else
+ * the last). `pool` is every candidate, best first.
+ */
+export function pageOf(pool: ArtistCandidate[], pages: ArtistCandidate[][], name: string): number {
+  const rank = new Map(pool.map((c, i) => [c.name, i]));
+  const at = rank.get(name) ?? Infinity;
+  const i = pages.findIndex((pg) => pg.some((c) => (rank.get(c.name) ?? -1) > at));
+  return i < 0 ? pages.length - 1 : i;
+}
+
 /** The second pass: recency from each artist's newest post, then the final order. */
 export function rankWithRecency(cands: ArtistCandidate[], lastPostAt: ReadonlyMap<string, number>, now: number): ArtistSuggestion[] {
   return cands

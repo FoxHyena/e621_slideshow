@@ -244,3 +244,106 @@ test("Suggested when you follow every artist you favorite a lot says so, not tha
   // nobody to look up: no searches for tiles
   expect(mock.searches.filter((s) => s.tags.startsWith("~"))).toHaveLength(0);
 });
+
+/**
+ * `n` artists you favorite alike (so they rank by name), three posts each. From the 33rd on they
+ * posted last week, the rest long ago: ranked all together, they would come first.
+ */
+async function many(page: Page, n: number) {
+  const names = Array.from({ length: n }, (_, i) => `art_${String(i).padStart(2, "0")}`);
+  const recent = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const mock = await mockE621(
+    page,
+    names.flatMap((a, i) => [0, 1, 2].map((k) => ({ id: 3000 - i * 10 - k, artist: a, ...(i >= 32 ? { created_at: recent } : {}) }))),
+  );
+  mock.subscriptions = [];
+  let id = 5000;
+  mock.setFavorites(names.flatMap((a) => [0, 1, 2, 3].map(() => ({ id: id++, artist: a }))));
+  mock.tagCounts = Object.fromEntries(names.map((a) => [a, 140]));
+  await signIn(page);
+  return { mock, names };
+}
+
+test("Suggested: the bottom looks up the next ones and adds them below, then says that's everyone", async ({ page }) => {
+  const { mock } = await many(page, 40);
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const cards = page.getByTestId("sugg-card");
+  await expect(cards).toHaveCount(32, { timeout: 15_000 });
+  const batched = () => mock.searches.filter((s) => s.tags.startsWith("~") && s.limit === 320);
+  expect(batched()).toHaveLength(4);
+  await expect(page.getByTestId("suggested-end")).toHaveCount(0);
+  const first = await cards.evaluateAll((els) => els.map((e) => e.getAttribute("data-artist")));
+
+  await page.getByTestId("suggested-foot").scrollIntoViewIfNeeded();
+  await expect(cards).toHaveCount(40);
+  // one more search for the 8 left; the cards you passed stay where they were
+  expect(batched()).toHaveLength(5);
+  expect(batched()[4].tags).toContain("~art_32");
+  expect(await cards.evaluateAll((els) => els.slice(0, 32).map((e) => e.getAttribute("data-artist")))).toEqual(first);
+  await expect(cards.nth(32)).toHaveAttribute("data-artist", "art_32");
+  await expect(cards.first()).toHaveAttribute("data-artist", "art_00");
+  await expect(cards.nth(32).locator(".sugg-tile img")).toHaveCount(3);
+  const end = page.getByTestId("suggested-end");
+  await end.scrollIntoViewIfNeeded();
+  await expect(end).toContainText("That\u2019s everyone");
+  await expect(end).toContainText("You\u2019ve seen every artist you favorite a lot.");
+  await shot(page, "artists-suggested-end");
+  // nothing left: the end asks nothing more
+  await page.waitForTimeout(300);
+  expect(batched()).toHaveLength(5);
+});
+
+test("Suggested: a failed More says so at the bottom, with Try again", async ({ page }) => {
+  const { mock } = await many(page, 40);
+  let fail = true;
+  mock.searchFails = (tags) => fail && tags.includes("~art_32");
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const cards = page.getByTestId("sugg-card");
+  await expect(cards).toHaveCount(32, { timeout: 15_000 });
+  await page.getByTestId("suggested-foot").scrollIntoViewIfNeeded();
+  const failed = page.getByTestId("suggested-more-failed");
+  await expect(failed).toContainText("Couldn\u2019t look up more artists");
+  await expect(cards).toHaveCount(32);
+  // one failed search, not asked again until Try again
+  const failing = () => mock.searches.filter((s) => s.tags.includes("~art_32")).length;
+  await page.waitForTimeout(500);
+  expect(failing()).toBe(1);
+  fail = false;
+  await failed.getByTestId("state-retry").click();
+  await expect(cards).toHaveCount(40);
+  await expect(page.getByTestId("suggested-end")).toBeVisible();
+});
+
+test("Suggested with everyone in the first look says that's everyone, without asking for more", async ({ page }) => {
+  const { mock } = await many(page, 6);
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  await expect(page.getByTestId("sugg-card")).toHaveCount(6, { timeout: 15_000 });
+  await expect(page.getByTestId("suggested-end")).toContainText("That\u2019s everyone");
+  expect(mock.searches.filter((s) => s.tags.startsWith("~"))).toHaveLength(1);
+});
+
+test("Suggested: Not interested through a whole page brings in the next ones", async ({ page }) => {
+  test.setTimeout(90_000);
+  const { mock } = await many(page, 40);
+  await page.goto("/artists");
+  await page.getByRole("radio", { name: "Suggested" }).click();
+  const cards = page.getByTestId("sugg-card");
+  await expect(cards).toHaveCount(32, { timeout: 15_000 });
+  const batched = () => mock.searches.filter((s) => s.tags.startsWith("~") && s.limit === 320);
+  // (the foot can come into reach as the list shortens: then the next ones come in below)
+  for (let left = 32; left > 0; left--) {
+    const name = await cards.first().getAttribute("data-artist");
+    if (Number(name!.slice(4)) >= 32) break;
+    await cards.first().getByTestId("sugg-more").click();
+    await page.getByTestId("artist-hide").click();
+    await expect(page.locator(`[data-testid="sugg-card"][data-artist="${name}"]`)).toHaveCount(0);
+  }
+  await expect(cards).toHaveCount(8);
+  await expect(cards.first()).toHaveAttribute("data-artist", "art_32");
+  await expect(page.getByTestId("suggested-end")).toBeVisible();
+  await expect(page.getByTestId("suggested-none")).toHaveCount(0);
+  expect(batched()).toHaveLength(5);
+});

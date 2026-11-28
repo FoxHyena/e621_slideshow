@@ -6,10 +6,10 @@
  * each as an artist card with three of their newest posts.
  */
 import { ChevronDown, ChevronRight, ExternalLink, EyeOff, Heart, CircleMinus, MoreHorizontal, Search, Share } from "lucide-react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ACTION_MS } from "@/shell/toastLook";
-import Avatar from "@/components/Avatar";
+import Avatar, { AppMark } from "@/components/Avatar";
 import { Menu, MenuRow } from "@/components/Menu";
 import { StateBlock } from "@/components/State";
 import { TryAgain } from "@/components/StatePanels";
@@ -376,6 +376,8 @@ function Suggested() {
   const shown = a.all.filter((c) => !followed.has(c.name) || kept.has(c.name));
   // (`all` holds only who was looked up, and that leaves out who you follow: `found` counts them too)
   const few = !a.found;
+  // every card gone (followed or hidden) with more to look up: the foot asks for them
+  if (shown.length === 0 && a.more !== "end") return <SuggestedFoot more={a.more} all={a.all} />;
   if (shown.length === 0)
     return (
       <StateBlock
@@ -417,7 +419,45 @@ function Suggested() {
           <SuggestionCard key={c.name} c={c} tiles={a.tiles.get(c.name) ?? []} onFollowed={() => setKept((k) => new Set([...k, c.name]))} />
         ))}
       </div>
+      <SuggestedFoot more={a.more} all={a.all} />
     </>
+  );
+}
+
+/** The end of Suggested: the next ones are looked up as it comes near, or it says that's everyone. */
+function SuggestedFoot({ more, all }: { more: "idle" | "loading" | "error" | "end"; all: readonly unknown[] }) {
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el || more !== "idle") return;
+    if (typeof IntersectionObserver !== "function") return getArtists().more();
+    const io = new IntersectionObserver((entries) => entries[0].isIntersecting && getArtists().more(), { rootMargin: "800px" });
+    io.observe(el);
+    return () => io.disconnect();
+    // a new page, or any re-cut (a More that couldn't start yet), can leave the foot still in view:
+    // observing again asks again
+  }, [more, all]);
+  return (
+    <div className="feed-foot sugg-foot" data-testid="suggested-foot" data-more={more}>
+      {more === "error" ? (
+        <div className="feed-more-row" role="alert" data-testid="suggested-more-failed">
+          <span>Couldn&rsquo;t look up more artists</span>
+          <button type="button" className="btn-tonal" onClick={() => getArtists().more()} data-testid="state-retry">
+            Try again
+          </button>
+        </div>
+      ) : more === "end" ? (
+        <div className="feed-caught feed-end-moment" data-testid="suggested-end">
+          <AppMark className="feed-caught-mark" />
+          <b>That&rsquo;s everyone</b>
+          <small>You&rsquo;ve seen every artist you favorite a lot. Favorite more and check back.</small>
+        </div>
+      ) : more === "loading" ? (
+        <span className="feed-spinner" role="status" aria-label="Looking up more artists" />
+      ) : (
+        <div ref={sentinel} className="sugg-sentinel" aria-hidden />
+      )}
+    </div>
   );
 }
 

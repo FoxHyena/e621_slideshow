@@ -1,4 +1,4 @@
-import type { AutocompleteTag, CurrentUser, Post, SavedSearchRow, SubscribeResult, TagInfo, TagSubscription, UserProfile } from "./types";
+import type { AutocompleteTag, CurrentUser, Pool, Post, SavedSearchRow, SubscribeResult, TagInfo, TagSubscription, UserProfile } from "./types";
 
 export const E621_BASE = "https://e621.net";
 
@@ -237,6 +237,14 @@ export async function searchPosts(
     lane,
   });
   return postList(res);
+}
+
+/** e621's pools by id, up to 100 at once. Public, so no sign-in rides along (and no CORS preflight). */
+export async function getPools(ids: number[], creds: Credentials | null, lane: Lane = "user"): Promise<Pool[]> {
+  const res = await request<unknown>("/pools.json", { params: { "search[id]": ids.join(","), limit: 100 }, creds, anonymous: true, lane });
+  // anything but a list is a failure, not "no such pools" (which would stick for the visit)
+  if (!Array.isArray(res)) throw new E621Error("e621 sent something that isn't a list of pools", 0);
+  return res as Pool[];
 }
 
 export async function autocompleteTags(
