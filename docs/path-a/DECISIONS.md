@@ -2041,3 +2041,21 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   toast; a page on an older build than the worker in charge leaves it there. Checked for real: an open page on one build, the server rebuilt and restarted on another,
   the toast on return, and after Reload the page ran the new build's code. **Not checked:** an iPhone's
   home-screen app after a real deploy.
+
+## 2026-11-27 — For You: "Search further" in Tune, off by default
+- Owner: "since we extend our search past the top n breadth the feed is a little less tuned. I'd like to
+  be able to toggle that functionality (default off)".
+- **Change:**
+  - Tune has a switch, "Search further", with the line "When your top tags run out, go on with the next ones".
+  - Off (the default): the candidate search is round 1 only, the Breadth tags, as before 2026-11-27's rounds.
+  - On: up to `SEARCH_TIERS` (3) rounds, as built that day.
+  - It is saved with the search settings (`moreTags`). Settings saved before it read as off.
+  - Changing it is a new ranking input, like Breadth: For You offers Update ranking instead of re-ranking under you.
+  - The old app's Recommended follows the same switch.
+- When it is on, Tune lists the next rounds' tags as searched too.
+- **Mine:** the name and the line, and that it sits in the group with Filter artists.
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - With the switch off, the ranking's inputs read exactly as they did before the switch. A ranking saved by the last build is not offered as stale.
+  - The old app's show key carries the switch, so flipping it starts a new show instead of resuming the old one.
+  - Tune's Searched group followed round 1 only.
+  - The test now checks the Update ranking offer and the second round's tags.

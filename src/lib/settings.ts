@@ -36,6 +36,12 @@ export interface SearchSettings {
   source: Source;
   /** Recommended only: top-N tags used to gather candidates (capped by the tag budget) */
   breadth: number;
+  /**
+   * Recommended only: when the top tags run out, go on with the next ones by weight (searchTiers'
+   * rounds). Off by default (owner, 2026-11-27: the wider search made the feed "a little less tuned");
+   * missing in settings saved before it, which reads as off.
+   */
+  moreTags?: boolean;
   tags: string;
   ratings: { s: boolean; q: boolean; e: boolean };
   media: { image: boolean; gif: boolean; video: boolean };
@@ -76,6 +82,7 @@ export interface PlaybackSettings {
 export const DEFAULT_SEARCH: SearchSettings = {
   source: "search",
   breadth: 15,
+  moreTags: false,
   tags: "",
   ratings: { s: true, q: true, e: true },
   media: { image: true, gif: true, video: true },

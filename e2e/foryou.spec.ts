@@ -276,3 +276,54 @@ test("Tune's Filter artists takes artist tags out of your taste and the search; 
   expect(rankSearches().at(-1)).not.toContain("mock_artist");
   await expect(page.getByTestId("post-card").first()).toBeVisible();
 });
+
+/**
+ * Tune's "Search further" (owner, 2026-11-27: the wider search made the feed "a little less tuned"):
+ * off by default, For You searches its top tags only; on, it goes on with the next tags when those run out.
+ */
+test("Search further: off by default, only the top tags are searched; on, the next ones follow", async ({ page }) => {
+  const TAGS = ["pawpads", "toebeans", "fluffy_tail", "whiskers"];
+  const mock = await mockE621(
+    page,
+    defaultSpecs().map((s) => (s.id === 1100 ? { ...s, tags: ["pawpads", "solo"] } : s.id === 1050 ? { ...s, tags: [...TAGS, "solo"] } : s)),
+  );
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 2000 + i, tags: TAGS })));
+  mock.tagCounts = { pawpads: 5, toebeans: 6, fluffy_tail: 7, whiskers: 8 };
+  await signIn(page);
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem("breadth")) return;
+    sessionStorage.setItem("breadth", "1");
+    localStorage.setItem("e6ss:v1:search", JSON.stringify({ breadth: 2 }));
+  });
+  // the tag searches (the popular pages have no ~ tags)
+  const tagQueries = () => [...new Set(mock.searches.filter((s) => s.tags.startsWith("~") && / order:score$/.test(s.tags)).map((s) => s.tags))];
+
+  await page.goto("/for-you/tune");
+  const sw = page.getByTestId("rec-more-tags");
+  await expect(sw).not.toBeChecked();
+  const searchedTags = page.locator("[data-testid=rec-tag][data-searched=true]");
+  await expect(searchedTags).toHaveCount(2);
+  await page.goto("/for-you");
+  await firstRanked(page);
+  expect(tagQueries()).toHaveLength(1);
+
+  await page.goto("/for-you/tune");
+  await page.getByTestId("rec-more-tags").check({ force: true });
+  await page.reload();
+  await expect(page.getByTestId("rec-more-tags")).toBeChecked();
+  // Tune lists the next round's tags as searched too
+  await expect(searchedTags).toHaveCount(4);
+  mock.searches.length = 0;
+  await page.goto("/for-you");
+  await expect(page.getByTestId("post-card").first()).toBeVisible({ timeout: 15_000 });
+  // a changed search offers Update ranking (the saved list stays) rather than re-ranking under you
+  expect(tagQueries()).toHaveLength(0);
+  await page.getByTestId("update-ranking").click();
+  // round 1, then the next two tags by weight once round 1 runs out
+  await expect.poll(() => tagQueries().length, { timeout: 15_000 }).toBe(2);
+  const [first, second] = tagQueries();
+  expect(first).toMatch(/~pawpads/);
+  expect(first).toMatch(/~toebeans/);
+  expect(second).toMatch(/~fluffy_tail/);
+  expect(second).toMatch(/~whiskers/);
+});

@@ -294,6 +294,10 @@ describe("searchTiers", () => {
     expect(searchTiers(w, NO_OVERRIDES, 10, named, 3)).toHaveLength(1);
   });
 
+  it("one round (Search further off) is the plan alone", () => {
+    expect(searchTiers(w, NO_OVERRIDES, 3, named, 1)).toEqual([["artist_a", "kink_a", "kink_b"]]);
+  });
+
   it("starts with the plan For You has always searched, pins first", () => {
     const o = { pinned: ["kink_d"], muted: [] };
     expect(searchTiers(w, o, 3, named)[0]).toEqual(searchPlan(w, o, 3, named).map((p) => p.tag));

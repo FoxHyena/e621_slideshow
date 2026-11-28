@@ -32,7 +32,7 @@ import {
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
-import { recQueries, RecommendedQueue, searchTiers } from "@/lib/recommend/stream";
+import { recQueries, RecommendedQueue, SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
 import { encodeShare, encodeShareCreds } from "@/lib/share";
@@ -201,8 +201,11 @@ export default function App({
   );
   /** the same in rounds, for when the first tags run out (searchTiers) */
   const recTiers = useMemo(
-    () => (rec.profile ? searchTiers(rec.weights, rec.overrides, search.breadth, (t) => isName(rec.profile?.tags[t]?.cat)) : []),
-    [rec.weights, rec.profile, rec.overrides, search.breadth],
+    () =>
+      rec.profile
+        ? searchTiers(rec.weights, rec.overrides, search.breadth, (t) => isName(rec.profile?.tags[t]?.cat), search.moreTags ? SEARCH_TIERS : 1)
+        : [],
+    [rec.weights, rec.profile, rec.overrides, search.breadth, search.moreTags],
   );
   const isRec = (s: SearchSettings) => s.source === "recommended";
   const isFav = (s: SearchSettings) => s.source === "favorites";
@@ -213,7 +216,7 @@ export default function App({
   const buildFor = (s: SearchSettings): BuiltQuery =>
     isRec(s) ? buildRecommendedQuery(s, recTagNames, tagLimit) : buildQuery(effective(s), tagLimit);
   const keyFor = (s: SearchSettings, b: BuiltQuery) =>
-    queueKey(b, s.media, creds, isRec(s) ? rec.signature : null);
+    queueKey(b, s.media, creds, isRec(s) ? rec.signature + (s.moreTags ? "|further" : "") : null);
   const userName = user?.name ?? null;
   const built = useMemo(() => {
     if (search.source === "recommended") return buildRecommendedQuery(search, recTagNames, tagLimit);
