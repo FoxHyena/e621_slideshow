@@ -90,6 +90,35 @@ treat that message as your approval of any design.
    "Install the app" row on Settings (batch 4, drawn as an option, not to be built without your yes).
 5. **One check on your phone:** in Safari, is Share under "•••"? The install steps say it can be.
 
+## Open now (2026-11-27, late night)
+
+Drawn in the mock's second section, "On a post". Items 3 and 4 are picked; 1, 2 and 5 are not approved yet.
+
+1. **The post's bar opens the post.** You told the builder; it is built. The name and the mark open
+   the artist. The targets are mine: the name's is 28 tall, so a tap meant for the name can open the
+   post instead.
+2. **Post info shows the description.** You told the builder; it is built. Mine: it stops at 4 lines
+   with "Show all". The build shows all of it.
+3. ~~Why For You picked a post: Marked tags, A line, or Off.~~ **Picked by you: "Tags + Left".**
+   For You's tags stand first in the tag row with a spark.
+4. ~~A button that copies a post's link: Left, By the heart, or Off.~~ **Picked by you: "Tags + Left".**
+   A well at the left end of the footer.
+5. **The feed's ⋯ menu, drawn after your screenshots.** It had no drawing. My first drawing (a
+   title over a well of rows) looked out of place, as you said. It is now a chip's dropdown: the
+   same panel and rows as Media's, no title, on a phone and on a computer. Its right edge lines up
+   with the capsule's; that changes a rule you approved on the check list (left edges), for every ⋯.
+
+## Open now (2026-11-27, after midnight)
+
+After your two screenshots of the build on a computer. Not approved yet.
+
+1. **The post page's top.** Back and the tools stood 1 above the panels in the build; my phone
+   drawing had only 4. Now 16 on a phone and on a computer. On a computer the row spans both columns,
+   as built.
+2. **Settings' menus (Quality and the like).** The build followed my spec, and the spec was wrong: a
+   title that repeats the row, over a well inside a panel. Now the row drops the menu a chip drops,
+   at its right end, with no title. The row's arrow is ⌄, not ›.
+
 ## What was made
 
 | Batch | Commit | What | Builder's slice |

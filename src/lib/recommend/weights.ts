@@ -1,4 +1,4 @@
-import type { TagCategoryName } from "../e621/types";
+import type { Post, TagCategoryName } from "../e621/types";
 import { NOBODY, NOT_ARTISTS } from "../feed/format";
 import type { Profile } from "./profile";
 
@@ -171,4 +171,16 @@ export function searchPlan(
   }
   const signature = ranked.filter((t) => picked.has(t)).map((tag): PlannedSearch => ({ tag, kind: "signature" }));
   return [...pinned, ...signature];
+}
+
+/**
+ * Why For You picked a post: its tags with the strongest positive weights, strongest first (Post
+ * info's "For you because you fav otter and cozy a lot", and the marked tags on a For You card).
+ */
+export function pickedFor(post: Pick<Post, "tags">, weights: ReadonlyMap<string, number>, n = 2): string[] {
+  return Object.values(post.tags)
+    .flat()
+    .filter((t): t is string => !!t && (weights.get(t) ?? 0) > 0)
+    .sort((a, b) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0))
+    .slice(0, n);
 }

@@ -34,8 +34,12 @@ export function compact(n: number): string {
   return Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
-export function cardTags(post: Pick<Post, "tags">): (readonly [TagCategoryName, string])[] {
-  return TAG_ORDER.flatMap((c) => (post.tags[c] ?? []).map((t) => [c, t] as const));
+/** A card's tag row: by kind in e621's order; `first` (For You's picks, in their order) lead it. The artist is in the bar, never here. */
+export function cardTags(post: Pick<Post, "tags">, first: readonly string[] = []): (readonly [TagCategoryName, string])[] {
+  const all = TAG_ORDER.flatMap((c) => (post.tags[c] ?? []).map((t) => [c, t] as const));
+  if (!first.length) return all;
+  const lead = first.flatMap((t) => all.filter(([, x]) => x === t).slice(0, 1));
+  return [...lead, ...all.filter(([, x]) => !first.includes(x))];
 }
 
 /** The follow toast's second line: "2 skipped: saffron hare, harbor seal"; past two, "5 skipped: saffron hare, harbor seal and 3 more". */

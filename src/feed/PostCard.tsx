@@ -6,7 +6,9 @@
  * the right end. Its height comes from `layout.ts`, so the feed can window cards before their
  * pictures load.
  */
-import { ArrowUp, Heart, MoreHorizontal, Play, Volume2, VolumeX } from "lucide-react";
+import { ArrowUp, Heart, MoreHorizontal, Play } from "lucide-react";
+import { TOAST_ICONS } from "@/shell/toastLook";
+import { toast } from "sonner";
 import { memo, useEffect, useRef, useState, type RefObject } from "react";
 import type { Post } from "@/lib/e621/types";
 import { mediaKind, TAG_CATEGORY_COLORS } from "@/lib/e621/types";
@@ -46,6 +48,8 @@ export interface PostCardProps {
   follow?: boolean;
   /** the post page: no tag row (its tags are in their own panel) */
   tagless?: boolean;
+  /** For You: the tags it picked this post for; they lead the tag row with For You's spark */
+  marked?: string[];
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
 }
@@ -175,7 +179,8 @@ function CardMedia({ post, index, height, live, still, onOpen, onFaved }: { post
             setMuted((m) => !m);
           }}
         >
-          {muted ? <VolumeX aria-hidden /> : <Volume2 aria-hidden />}
+          {/* lucide's volume-x and volume-2, as masks (first-load budget) */}
+          <span aria-hidden className="post-mute-glyph" data-muted={muted || undefined} />
         </button>
       )}
       {burst > 0 && <Heart key={burst} className="heart-burst post-burst" aria-hidden />}
@@ -199,11 +204,11 @@ function openPostPage(id: number) {
   getNav().push({ screen: { kind: "post", id }, play: null });
 }
 
-function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, tagless, onOpen, onMenu }: PostCardProps) {
+function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, tagless, marked, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
   const seed = by[0] ?? `post:${post.id}`;
-  const tags = cardTags(post);
+  const tags = cardTags(post, marked);
   // "+N" opens the rest in the same row (it scrolls sideways), so the card keeps its height
   const [allTags, setAllTags] = useState(false);
   const tagRow = useRef<HTMLDivElement>(null);
@@ -226,7 +231,10 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         <div ref={who} className="post-who">
           {/* The bar opens the post's page; the artist's mark and name open the artist (owner,
               2026-11-27: "Unless we tap artist's name, tapping the post's bar should open the post") */}
-          <button type="button" className="post-by" aria-label={`Open post ${post.id}`} onClick={() => openPostPage(post.id)} data-testid="card-open" />
+          {/* on the post page (the only tagless card) the bar's post part does nothing: no button there */}
+          {!tagless && (
+            <button type="button" className="post-by" aria-label={`Open post ${post.id}`} onClick={() => openPostPage(post.id)} data-testid="card-open" />
+          )}
           {by[0] ? (
             <button type="button" className="post-artist-mark" tabIndex={-1} aria-hidden onClick={() => openArtistPage(by[0])}>
               <Avatar seed={seed} fresh={fresh} className="post-avatar" />
@@ -277,7 +285,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
             }}
           />
         )}
-        <button type="button" className="post-menu" aria-label="More" aria-haspopup="dialog" onClick={() => onMenu(post)} data-testid="card-menu">
+        <button data-pop-end type="button" className="post-menu" aria-label="More" aria-haspopup="dialog" onClick={() => onMenu(post)} data-testid="card-menu">
           <MoreHorizontal aria-hidden />
         </button>
       </header>
@@ -289,6 +297,8 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
             type="button"
             className="post-tag"
             style={{ color: `var(--color-tag-${c}, ${TAG_CATEGORY_COLORS[c]})` }}
+            data-marked={marked?.includes(t) || undefined}
+            aria-label={marked?.includes(t) ? `${t.replaceAll("_", " ")}, For You picked this` : undefined}
             data-picked={hold.held?.tag === t || undefined}
             onPointerDown={(e) => hold.onPointerDown(e, t, c)}
             onClick={(e) => hold.onClick(e, t, c)}
@@ -297,6 +307,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
             data-testid="card-tag"
             data-tag={t}
           >
+            {marked?.includes(t) && <span aria-hidden className="post-tag-spark" />}
             {t.replaceAll("_", " ")}
           </button>
         ))}
@@ -317,6 +328,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         )}
       </div>}
       <footer className="post-foot">
+        <CopyLink id={post.id} />
         <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>
           <ArrowUp aria-hidden />
           {compact(post.stats.score.total)}
@@ -324,6 +336,34 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         <FavPill post={post} btnRef={fav} onFaved={faved} />
       </footer>
     </article>
+  );
+}
+
+/**
+ * Copy link (DESIGN.md "Post panel", Footer; owner's pick "Tags + Left"): a well at the footer's left
+ * end copies the post's link in this app, `/post/<number>`, the link "Share post" shares. The glyph is
+ * a green check for 1.4 s.
+ */
+function CopyLink({ id }: { id: number }) {
+  const [done, setDone] = useState(false);
+  const timer = useRef(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${location.origin}/post/${id}`);
+    } catch {
+      toast("Couldn't copy the link", { icon: TOAST_ICONS.error });
+      return;
+    }
+    setDone(true);
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setDone(false), 1400);
+    toast("Link copied", { icon: <span className="glyph-link" /> });
+  };
+  return (
+    <button type="button" className="post-copy" aria-label="Copy link" data-done={done || undefined} onClick={() => void copy()} data-testid="card-copy">
+      {/* the link and check glyphs are CSS masks (globals.css), not icon components: the feed's first load is at its budget */}
+    </button>
   );
 }
 

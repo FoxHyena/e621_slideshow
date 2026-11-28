@@ -1866,6 +1866,125 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   card's size). The e2e suite's post pages now make the dev server ask e621 for made-up numbers; those
   come back empty and change nothing on screen.
 
+## 2026-11-27 — The post's bar opens the post; the name and the mark open the artist
+- Owner, relayed by the builder (I did not hear it from the owner): "Unless we tap artist's name,
+  tapping the post's bar should open the post, not the artist page now".
+- Built first, on `main` as `8d957a7` (pull request 37, by its title; I did not test it). The mark
+  opening the artist is the builder's call; the design keeps it.
+- **Mine:** the targets. The name's is its text and 6 at each side, at least 44 wide and 28 tall. It is
+  under 44 tall because the time and number line under it belongs to the post. A tap meant for the name
+  can land on that line and open the post; Back returns. The owner has been told.
+- The mock's "Getting to it" row said the header opens the artist; it now says the bar opens the post.
+
+## 2026-11-27 — Post info shows the description
+- Owner, relayed by the builder: "hitting I on a post doesn't show its description".
+- Built first (`8d957a7`): a "Description" part under the stat wells and the "For you because" line,
+  above the tags.
+- **Mine:** the label is a tag kind's label; the text stops at 4 lines with "Show all". The build
+  shows all of it. Not yet approved by the owner.
+
+## 2026-11-27 — A screen's ⋯ menu gets a drawing: a dropdown, like a chip's
+- Owner, with two screenshots of the build on a computer (For You's and Following's ⋯ menus): "This
+  menu may also need some spacing help".
+- **The design's fault:** this menu was never drawn. UX.md lists its rows only. The build made it from
+  a titled sheet and control rows with 32 icon wells.
+- Measured from the screenshots, halved from 2x: the popover is 300 wide; the title is 16 from the
+  left; a row's wash is 48 tall, 8 from the sides and 20 from the bottom. The popover's left edge
+  lines up with the ⋯, so it hangs to the right of the capsule.
+- **First drawing (mine, withdrawn):** a title, then a Well group of 52 rows, as in a post's ⋯.
+  Owner, of the phone version: "The border radius and item alignment here seem rough and out of place
+  with our other screens, is that right?" It was. The title stood at 16 and the icons at 30, and a 16
+  well sat 16 inside a 24 panel, so the corners did not run parallel.
+- **Drawn now (mine):** the chip's dropdown, on a phone and on a computer. The Panel with 4 above and
+  below and 16 at the sides, 260 wide, no title; rows 56 tall with a 32 icon well, as Media's. The
+  wash is 8 from the panel on three sides with a 16 radius (24 − 8). A row that cannot be used now is
+  at 45%. The build keeps its rows; it loses the title and takes the dropdown's padding.
+- **Changed with it (mine):** a ⋯ lines up its popover's right edge, not its left. The popover rule
+  was approved on the check list with left edges; the owner has been told of the change.
+- Measured in the mock: 260 by 120 with two rows, 64 with one; 8 under the capsule.
+
+## 2026-11-27 — For You marks its tags; a well copies a post's link (owner: "Tags + Left")
+- Owner: "Would also love to explore designing, in the for you feed items, showing somehow the tags
+  this is related to in their tuning, like we do in the info page. Also maybe exploring having another
+  button on the bottom of feed items that copies its link for you".
+- Drawn with a switch each. Tags: Marked tags, A line, Off. Copy link: Left, By the heart, Off.
+- Owner, asked "Which do you pick for the two ideas on a post?": "Tags + Left".
+- **Marked tags.** On a For You post the tags Post info's "For you because" line names stand first in
+  the tag row, each with a 12 spark in Link Blue. The post's height does not change (579 in the mock,
+  with or without). A line would have added 26.
+- **Left.** A Well 36 by 28 at the left end of the footer, 8 before the comic's well. A tap copies
+  `/post/<number>`, shows a check for 1.4 s and the toast "Link copied".
+- **Mine:** every measurement, the check, the failure toast "Couldn't copy the link", and that the
+  well is on a post in every feed and on the post page.
+- Not built. Nobody has tried the copy on a phone.
+
+## 2026-11-27 — Built: the post's bar, the description's 4 lines, Copy link, For You's marked tags, a screen's ⋯ as a dropdown
+- From the design commit 3507b7d (owner: "Commit and send" to all five), on "Merge, then build".
+- **The bar:** the name's target is its text and 6 at each side, at least 44 wide, from the panel's top
+  to the bottom of the name line (28). Pressed or under the pointer, the bar's post part turns the time
+  and number line white. On the post page the card has no bar button at all, so that part does nothing.
+- **Post info's description:** 4 lines with an ellipsis (a line clamp across DText's paragraphs, which
+  stay 8 apart), then "Show all" 4 below (28 tall, a 44 touch area), shown only when the text is cut.
+- **Copy link:** a 36 by 28 Well at the footer's left end, on every card (feeds and the post page). It
+  copies `<origin>/post/<number>`; the glyph is a green check for 1.4 s, toast "Link copied"; if the
+  clipboard refuses, "Couldn't copy the link" with the alert glyph. **Mine:** no fallback prompt here
+  (Share post keeps its own).
+- **For You's marked tags:** the tags Post info's "For you because" line names (the post's two
+  strongest positive weights, now one helper, `pickedFor`) lead the tag row with a 12 spark, 8 in and 4
+  before the word; accessible name ends ", For You picked this". **Mine:** an artist tag among them is
+  not added to the row, since the artist is in the bar.
+- **A screen's ⋯ menu** (Following, For You) is the chip's dropdown, 260 wide, no title, hung 8 under
+  the tools capsule with right edges lined up, on a phone too. **Every popover a ⋯ opens** lines up
+  right edges: a ⋯ in a tools capsule with the capsule, a post's ⋯ with itself (`data-pop-end` on each
+  ⋯; `popEdge` in `src/shell/opener.ts`).
+- Tests: `e2e/post-more.spec.ts` (all five, phone and computer); the desktop ⋯ tests now expect the
+  dropdown and the capsule's right edge.
+- **Mine, for the budget:** the first full run put the feed's first load at 200.1 KB (over 200). The
+  link, check and spark glyphs on the card are lucide's own paths drawn as CSS masks instead of icon
+  components; the failed copy uses the toast's own alert icon.
+- A fresh code review (owner: one before every draft) found 7 small things. Fixed: Tab onto a link
+  past the 4th line opens the whole description; the description's state resets per post; it checks
+  again once fonts load; a ⋯'s right-edge lining is taken when pressed; a dropdown with every row
+  disabled holds focus itself. Left: a picked artist tag isn't marked on the card (it isn't in the
+  row), and a very short name's target is the spec's 44 wide.
+## 2026-11-27 — The post page's title row; a row's value drops the chip's menu
+- Owner, with two screenshots of the build on a computer (the post page's top; Settings' "Quality"
+  menu): "Computer post page and settings dropdowns might need some fixes too".
+- **The post page.** In the build Back and the tools capsule stand 1 above the panels (measured from
+  the screenshot: 2 px at a scale of 1.91). The spec gave no number. The mock had 16 on a computer
+  and only 4 on a phone, so the phone drawing was at fault too. Now: 12 under the title row on both,
+  which puts the 44 controls 16 above the panel.
+- **Kept from the build (mine):** on a computer the title row spans both columns. The drawing had the
+  capsule at the end of the 600 column, with an empty corner over the right column.
+- **Settings' menus.** The build followed the spec: a titled sheet as a popover, holding the Well
+  menu. The spec was the fault. The title repeats the row's label right above it, and the Well's 26
+  corners sit 16 inside the panel's 24. Now a row's value drops the chip's menu: no title, the Panel
+  is the track, 220 wide, at the row's right end. The row ends in ⌄, not ›.
+- **Mine:** all of it. Not yet approved by the owner. Measured in the mock, below.
+
+## 2026-11-27 — Built: the post page's title row; a row's value drops the chip's menu
+- From the design commit 8773cd7 (owner: "Commit and send").
+- **The post page:** 16 under the title row, on a phone and on a computer, so Back and the tools capsule stand
+  16 above the panels. The drawing says 12 under a 52 row. The build's row is the 44 controls themselves,
+  so the space is 16 here. On a computer the row already spans both columns, and both columns start level.
+- **A row's value:** Quality, Longest video and Load ahead in Settings, and Quality in Quick settings, now
+  drop the chip's menu. It has no title, is 220 wide, sits 8 under the row, and its right edge is on the
+  row's content edge. The row ends in a muted ⌄ that turns up and white while the menu is open (150 ms, like
+  a chip's).
+- **Mine:**
+  - Transition (Classic only) is the same kind of row, so it drops the same menu.
+  - A row low on the page opens its menu 8 above itself when it doesn't fit below and there's more room
+    above. It rises 4 instead of dropping 4.
+  - Quick settings on a phone: Quality is the sheet's last row, at the screen's foot, so its menu always
+    opens above the row. The sheet stays open under it. Esc, Back or a tap outside closes only the menu.
+- Not checked on a real phone.
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - Focus goes back to the row or chip when a dropdown closes and focus was left nowhere. This was the old
+    sheet's gap too.
+  - The menu is measured at its own width before it decides between above and below.
+  - It opens above only when there's real room there (at least its height, or 160).
+  - The ⌄ keeps still under reduced motion.
+  - The flip test now sets the row at the window's foot and checks that the menu opened above.
 ## 2026-11-27 — Switching between the feed and the grid keeps the post you were looking at
 - Owner: "When I switch from feed to grid in for you, scroll is out of place in grid."
 - **Cause:** the switch kept the page's offset. The grid is far shorter than the feed, so the same
@@ -1880,6 +1999,10 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the top case.
 - **Left as it was:** a card the grid opens the feed at (tap or switch) sits 12 below the top of the
   view, so on For You and Following its head is under the floating capsule.
+- **Mine, for the budget:** with main's grid fix (PR 40) merged in, the feed's first load came to 200.1 KB.
+  The row menu's placement moved out of Dropdown into `src/shell/rowMenu.ts`, which only Settings and the
+  player load. The card's sound button draws lucide's volume-2 and volume-x as CSS masks, not icon
+  components. First load is now 199.8 KB.
 
 ## 2026-11-27 — A deploy reaches an open app
 - Owner: "I dunno if I'm seeing the auto updates come through without fully quitting/reopening the app."

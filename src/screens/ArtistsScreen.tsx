@@ -245,7 +245,7 @@ function FollowingList({ sort }: { sort: Sort }) {
                   <small>{rowLine(r, now)}</small>
                 </span>
               </button>
-              <button type="button" className="row-more" aria-label={`More for ${label(r.name)}`} aria-haspopup="dialog" onClick={() => getNav().openSheet(`artist:${r.name}`)} data-testid="artist-more">
+              <button data-pop-end type="button" className="row-more" aria-label={`More for ${label(r.name)}`} aria-haspopup="dialog" onClick={() => getNav().openSheet(`artist:${r.name}`)} data-testid="artist-more">
                 <MoreHorizontal aria-hidden />
               </button>
             </li>
@@ -457,7 +457,7 @@ function SuggestionCard({
           </span>
         </button>
         <FollowPill name={c.name} onFollowed={onFollowed} />
-        <button type="button" className="row-more" aria-label={`More for ${label(c.name)}`} aria-haspopup="dialog" onClick={() => getNav().openSheet(`sugg:${c.name}`)} data-testid="sugg-more">
+        <button data-pop-end type="button" className="row-more" aria-label={`More for ${label(c.name)}`} aria-haspopup="dialog" onClick={() => getNav().openSheet(`sugg:${c.name}`)} data-testid="sugg-more">
           <MoreHorizontal aria-hidden />
         </button>
       </div>

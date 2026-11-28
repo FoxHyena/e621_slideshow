@@ -572,7 +572,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
         </div>
       </div>
 
-      {sheet === "player-settings" && <QuickSettingsSheet base={base} playback={playback} />}
+      {(sheet === "player-settings" || sheet === "player-quality") && <QuickSettingsSheet base={base} playback={playback} picking={sheet === "player-quality"} />}
       {sheet === "player-quality" && <QualitySheet base={base} playback={playback} />}
       {sheet === "player-info" && current && <PlayerInfoSheet post={current} base={base} />}
     </div>

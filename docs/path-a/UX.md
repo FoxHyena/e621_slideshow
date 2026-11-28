@@ -172,6 +172,12 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
 - **Artists on a card:** non-artist tags (`conditional_dnp`, `sound_warning`, …) stripped. The first
   artist shows; more than one adds "+N", which opens a picker. No artist: "unknown artist", not tappable.
   Names ellipsize; every tap target is ≥ 44 px, ≥ 8 px apart.
+- **Copy link (owner, 2026-11-27: "Tags + Left"):** a well at the left end of the card's footer copies
+  `/post/<id>` and shows the toast "Link copied". **For You** marks the tags it picked a post for:
+  they stand first in the tag row with a spark. See DESIGN.md "Post panel" and "Tag".
+- **The bar's taps (owner, 2026-11-27):** the name and the avatar open the artist; the rest of the bar
+  (the time and number line, the empty part) opens the post page `/post/<id>`. On the post page that
+  part does nothing. The name's target is 28 tall; see DESIGN.md "Post panel", Header.
 - **[+ Follow]** on For You, Results and Favorites cards for artists you don't follow. Tap → wiggle,
   becomes a small **✓** in place (no reflow), toast "Following artist_x · Undo". Tapping ✓ unfollows
   with the same toast. At 500: toast "e621 allows 500 follows". On failure: rolls back, toast with the reason.

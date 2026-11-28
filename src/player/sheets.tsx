@@ -4,8 +4,8 @@
  * The player's sheets (DESIGN.md "Player sheets"): Quick settings (the sliders button) and Post info
  * (ⓘ). Both are the app's Panel sheet, not glass; opening one pauses the slideshow.
  */
-import { ArrowUp, ChevronRight, ExternalLink, Heart, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowUp, ChevronDown, ChevronRight, ExternalLink, Heart, Sparkles } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
 import { Menu, MenuRow } from "@/components/Menu";
@@ -20,8 +20,11 @@ import { ago, artists, compact } from "@/lib/feed/format";
 import type { PlaybackSettings } from "@/lib/settings";
 import { getNav, type Entry } from "@/nav/history";
 import { blacklistLine, openArtist, openResults } from "@/screens/actions";
+import { Dropdown } from "@/shell/Dropdown";
+import { underRow } from "@/shell/rowMenu";
 import { Sheet, SheetClose } from "@/shell/Sheet";
 import { getPrefs } from "@/state/prefs";
+import { pickedFor } from "@/lib/recommend/weights";
 import { getRec, weightsOf } from "@/state/rec";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
@@ -57,7 +60,7 @@ function usePlaybackSetter(base: Entry) {
 }
 
 /** Style, speed, fit, mute and quality, straight on the sheet. */
-export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
+export function QuickSettingsSheet({ base, playback, picking = false }: { base: Entry; playback: PlaybackSettings; picking?: boolean }) {
   const { set, fromLink, target } = usePlaybackSetter(base);
   const p = playback;
   return (
@@ -110,12 +113,20 @@ export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: 
             data-testid="quick-mute"
           />
         </label>
-        <button type="button" className="list-row" onClick={() => getNav().openSheet("player-quality")} data-testid="quick-quality">
+        <button
+          type="button"
+          className="list-row"
+          onClick={() => getNav().openSheet("player-quality")}
+          aria-haspopup="dialog"
+          aria-expanded={picking}
+          data-menu="player-quality"
+          data-testid="quick-quality"
+        >
           <span className="row-text">
             <b>Quality</b>
           </span>
           <span className="row-value">{QUALITY.find((q) => q.value === p.quality)?.label}</span>
-          <ChevronRight aria-hidden className="row-chev" />
+          <ChevronDown aria-hidden className="row-chev row-drop" />
         </button>
       </div>
       <button
@@ -132,11 +143,11 @@ export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: 
   );
 }
 
-/** Quality, as a menu over Quick settings; Back returns to it. */
+/** Quality, the chip's menu dropped from its row in Quick settings (designer, 2026-11-27); Back returns to it. */
 export function QualitySheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
   const { set } = usePlaybackSetter(base);
   return (
-    <Sheet title="Quality" testId="sheet-quality">
+    <Dropdown anchor="player-quality" label="Quality" width={220} menu at={underRow} testId="sheet-quality">
       <Menu label="Quality">
         {QUALITY.map((q) => (
           <MenuRow
@@ -152,7 +163,7 @@ export function QualitySheet({ base, playback }: { base: Entry; playback: Playba
           </MenuRow>
         ))}
       </Menu>
-    </Sheet>
+    </Dropdown>
   );
 }
 
@@ -172,12 +183,7 @@ export const RATING: Record<Rating, string> = { s: "Safe", q: "Questionable", e:
 function useWhy(post: Post, forYou: boolean): string[] {
   const rec = useStore(getRec().store, (r) => r);
   const weights = useMemo(() => (forYou ? weightsOf(rec) : null), [forYou, rec]);
-  if (!weights) return [];
-  return Object.values(post.tags)
-    .flat()
-    .filter((t): t is string => !!t && (weights.get(t) ?? 0) > 0)
-    .sort((a, b) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0))
-    .slice(0, 2);
+  return weights ? pickedFor(post, weights) : [];
 }
 
 export const fileSize = (bytes: number) => (bytes >= 1 << 20 ? `${(bytes / (1 << 20)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
@@ -290,9 +296,7 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
       {post.description?.trim() && (
         <section className="info-kind" aria-label="Description">
           <h3 className="info-label">Description</h3>
-          <div className="post-desc" data-testid="info-desc">
-            <DText text={post.description} onPost={(id) => void openPost(id)} />
-          </div>
+          <InfoDesc key={post.id} text={post.description} onPost={(id) => void openPost(id)} />
         </section>
       )}
       {KINDS.map(([c, label]) => {
@@ -336,5 +340,47 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
       </div>
       <TagActionsOverlay hold={hold} recommended={false} onAction={(t, a) => void act(t, a)} targets={tagTargets(forYou, true)} />
     </Sheet>
+  );
+}
+
+/**
+ * Post info's description (DESIGN.md "Post info"): at most 4 lines, ending in an ellipsis, so a long
+ * one can't push the tags off the sheet; "Show all" opens the rest in place and goes away.
+ */
+function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [cut, setCut] = useState(false);
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el || open) return;
+    const check = () => setCut(el.scrollHeight > el.clientHeight + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    // a face that loads late can reflow the text without changing the box's size
+    void document.fonts?.ready.then(check);
+    return () => ro.disconnect();
+  }, [open, text]);
+  return (
+    <>
+      <div
+        ref={box}
+        className="post-desc"
+        data-capped={open ? undefined : ""}
+        data-testid="info-desc"
+        // Tab onto a link past the 4th line: open it all, rather than scroll the clipped box
+        onFocusCapture={(e) => {
+          if (!open && e.target.getBoundingClientRect().bottom > e.currentTarget.getBoundingClientRect().bottom + 1) setOpen(true);
+        }}
+      >
+        <DText text={text} onPost={onPost} />
+      </div>
+      {cut && !open && (
+        <button type="button" className="info-more" onClick={() => setOpen(true)} data-testid="info-desc-more">
+          Show all
+        </button>
+      )}
+    </>
   );
 }

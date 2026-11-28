@@ -136,9 +136,9 @@ test.describe("a card's bar, and Post info (owner, 2026-11-27)", () => {
     const box = (await bar.boundingBox())!;
     await bar.click({ position: { x: box.width - 24, y: box.height / 2 } });
     await expect(page).toHaveURL(/\/post\/1149$/);
-    // on the post's own page the bar does nothing
-    await postPage(page).getByTestId("card-open").click({ position: { x: box.width - 24, y: box.height / 2 } });
-    await expect(page).toHaveURL(/\/post\/1149$/);
+    // on the post's own page the bar does nothing: it has no button (DESIGN.md "Post panel", Header)
+    await expect(postPage(page).getByTestId("post-card")).toBeVisible();
+    await expect(postPage(page).getByTestId("card-open")).toHaveCount(0);
     await page.goBack();
     await expect(page).toHaveURL(/\/search\?tags=wolf$/);
     await card.getByTestId("card-artist").click();

@@ -10,6 +10,7 @@ import { ArrowUp, MoreHorizontal, RotateCw, Search, SlidersHorizontal } from "lu
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, recSteps } from "@/components/Loader";
 import { searchPosts } from "@/lib/e621/client";
+import type { Post } from "@/lib/e621/types";
 import { DEFAULT_FILTERS, type Filters } from "@/lib/feed/filters";
 import { DEFAULT_TAG_LIMIT } from "@/lib/query/build";
 import { IdListQueue } from "@/lib/recommend/restore";
@@ -24,7 +25,8 @@ import { getNav, openSheetName } from "@/nav/history";
 import { isLocked, setLockedY } from "@/nav/scroll";
 import { useScreen } from "@/shell/context";
 import { TitleRow } from "@/shell/TitleRow";
-import { Sheet, SheetAction } from "@/shell/Sheet";
+import { Dropdown } from "@/shell/Dropdown";
+import { SheetAction } from "@/shell/Sheet";
 import { getFeeds, type Feed, type FeedSpec } from "@/state/feeds";
 import { getPrefs } from "@/state/prefs";
 import { getRec, learnedOf, signatureOf, weightsOf, type RecState } from "@/state/rec";
@@ -36,7 +38,7 @@ import { toast } from "sonner";
 import { onFeedTag } from "./actions";
 import { FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, useFeed, useShownFeed } from "./feedParts";
 import { ErrorPanel, quietEmpty, StateBlock } from "@/components/State";
-import { MIN_SUPPORT } from "@/lib/recommend/weights";
+import { MIN_SUPPORT, pickedFor } from "@/lib/recommend/weights";
 
 /** How long a saved ranking is shown again instead of ranking afresh (UX §3). */
 export const RANKED_TTL = 30 * 60_000;
@@ -68,6 +70,16 @@ export const rankedAtOf = (q: SlideQueue): number | null =>
   q instanceof IdListQueue ? q.savedAt : (rankedAt.get(q) ?? null);
 
 const POPULAR: FeedSpec = { kind: "search", tags: "order:rank", filters: DEFAULT_FILTERS };
+
+/** A card's marked tags, one array per post while `weights` holds, so a memoized card doesn't redraw. */
+function markerFor(weights: ReadonlyMap<string, number>): (post: Post) => string[] {
+  const seen = new WeakMap<Post, string[]>();
+  return (post) => {
+    let m = seen.get(post);
+    if (!m) seen.set(post, (m = pickedFor(post, weights)));
+    return m;
+  };
+}
 
 function minutesAgo(at: number, now: number): string {
   const m = Math.max(0, Math.floor((now - at) / 60_000));
@@ -140,6 +152,8 @@ export function ForYouScreen() {
   const ready = session.ready && r.loaded && r.name === name;
 
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the tags For You picked each post for (DESIGN.md "Tag", a marked tag): one array per post while the weights hold
+  const marks = useMemo(() => markerFor(weights), [weights]);
   const plan = useMemo(() => (r.profile ? searchTiers(weights, r.overrides, breadth, (t) => isName(r.profile?.tags[t]?.cat)) : []), [weights, r.profile, r.overrides, breadth]);
   const filterKey = JSON.stringify([name, applied.media, applied.date, applied.minScore, ratings]);
   const inputs = JSON.stringify([signatureOf(r), breadth]);
@@ -323,7 +337,7 @@ export function ForYouScreen() {
           </button>
           <GridToggle grid={grid} setGrid={setGrid} />
           {signedIn && (
-            <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="for-you-more">
+            <button data-pop-end type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" data-menu="menu" onClick={() => getNav().openSheet("menu")} data-testid="for-you-more">
               <MoreHorizontal aria-hidden />
             </button>
           )}
@@ -348,7 +362,7 @@ export function ForYouScreen() {
               </button>
             </div>
           )}
-          <Body r={r} ready={ready} feed={feed} planEmpty={plan.length === 0} grid={grid} route={route} onTag={onTag} />
+          <Body r={r} ready={ready} feed={feed} planEmpty={plan.length === 0} grid={grid} route={route} onTag={onTag} marks={marks} />
           {!ranking && <PlayFab feed={feed} route={route} />}
           <FilterSheet
             sheet={sheet}
@@ -360,11 +374,12 @@ export function ForYouScreen() {
             dateAny={DATE_ANY}
           />
           {sheet === "menu" && (
-            <Sheet title="For You" testId="sheet-for-you-menu" pop>
+            // a dropdown under the tools capsule (DESIGN.md "A screen's ⋯ menu")
+            <Dropdown anchor="menu" label="For You" width={260} testId="sheet-for-you-menu">
               <div className="sheet-rows" data-wells>
                 <SheetAction icon={RotateCw} label="Refresh" onClick={() => void doRefresh()} disabled={!choice || busy} data-testid="for-you-refresh" />
               </div>
-            </Sheet>
+            </Dropdown>
           )}
           {postSheet(sheet) !== null && <PostMenu feed={feed} id={postSheet(sheet)!} />}
         </>
@@ -382,7 +397,9 @@ function Body({
   grid,
   route,
   onTag,
+  marks,
 }: {
+  marks: (post: Post) => string[];
   r: RecState;
   ready: boolean;
   feed: Feed | null;
@@ -465,6 +482,7 @@ function Body({
       onTag={onTag}
       recommended
       follow
+      marks={marks}
     />
   );
 }

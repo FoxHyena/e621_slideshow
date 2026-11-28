@@ -119,7 +119,7 @@ export function PostScreen({ id }: { id: number }) {
           </button>
         )}
         {post && (
-          <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet(`post:${id}`)} data-testid="post-more">
+          <button data-pop-end type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet(`post:${id}`)} data-testid="post-more">
             <MoreHorizontal aria-hidden />
           </button>
         )}

@@ -164,7 +164,7 @@ export function ResultsScreen({ params }: { params: string }) {
           <Star aria-hidden className={savedOne ? "fill-current text-gold" : undefined} />
         </button>
         <GridToggle grid={grid} setGrid={setGrid} />
-        <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")}>
+        <button data-pop-end type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")}>
           <MoreHorizontal aria-hidden />
         </button>
       </Toolbar>

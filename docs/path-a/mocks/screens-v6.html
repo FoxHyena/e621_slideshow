@@ -1173,6 +1173,50 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 .dpost6 .head6 { padding-left: 0; padding-right: 0; margin-bottom: 12px; }
 .dpost6 .grid6 { padding: 0; grid-template-columns: repeat(3, 1fr); }
 .dpost6 .shead6 { padding: 4px 16px 12px; }
+
+/* ============ On a post: the bar's taps, Description, two ideas, the feed's ⋯ menu (2026-11-27) ============ */
+#root:not([data-why="tags"]) .ifw-tags, #root:not([data-why="line"]) .ifw-line,
+#root:not([data-copy="left"]) .ifc-left, #root:not([data-copy="heart"]) .ifc-heart { display: none; }
+/* Why For You picked it. Marked tags: For You's spark inside the tag. A line: one line under the picture. */
+.tag6 > .ic { flex: none; margin: 0 4px 0 -2px; color: var(--link); }
+.whyl6 { display: flex; align-items: center; gap: 6px; height: 18px; margin: var(--edge) 2px 0; font: var(--t-foot); color: var(--muted); white-space: nowrap; }
+.whyl6 .ic { flex: none; color: var(--link); }
+.whyl6 span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.whyl6 b { color: var(--text); font-weight: 500; }
+/* Copy link: a well the size of a tag, 36 wide. */
+.cplink6 { flex: none; width: 36px; height: var(--h-w); border-radius: 999px; background: var(--well); box-shadow: var(--sunk); display: grid; place-items: center; color: var(--link); position: relative; }
+.cplink6::before { content: ""; position: absolute; inset: -8px -4px; }
+.cplink6:active { background: #071631; }
+.cplink6.ifc-left { margin-right: auto; }
+.cplink6.ifc-left:has(+ .cpill6) { margin-right: -4px; }
+.cplink6 .ok, .cplink6.done .ln { display: none; }
+.cplink6.done .ok { display: block; color: var(--score); }
+/* Description, wherever it shows; in Post info it stops at 4 lines. */
+.p6 .desc6 { margin: 0; font: var(--t-body); color: var(--text); text-wrap: pretty; }
+.p6 .desc6.clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.dmore6 { display: block; height: 28px; margin-top: 4px; font: var(--t-foot-r); line-height: 28px; color: var(--link); position: relative; }
+.dmore6::before { content: ""; position: absolute; inset: -8px 0; }
+/* Page chrome: where a tap on the bar goes. The tints are the drawing's, not the app's. */
+.zones6 .ph { border-radius: 10px; background: rgba(110,220,150,.16); outline: 1.5px dashed rgba(110,220,150,.85); outline-offset: 3px; }
+.zones6 .ph .who, .zones6 .ph .name > span { background: rgba(120,170,255,.3); outline: 1.5px dashed rgba(150,190,255,.95); outline-offset: 2px; border-radius: 6px; }
+.zones6 .ph .who { border-radius: 999px; }
+.zones6 .ph .more6 { background: var(--panel-a); }
+.zleg6 { display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 4px 16px 0; font: var(--t-foot); color: var(--muted); }
+.zleg6 i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
+.zleg6 i.a { background: rgba(120,170,255,.55); } .zleg6 i.p { background: rgba(110,220,150,.45); }
+/* A screen's ⋯ menu: a dropdown like a chip's; a row that cannot be used now is at 45%. */
+.srow6.off > * { opacity: .45; }
+.tmenu6 { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; width: 343px; max-width: 100%; margin: 0 auto; padding: 20px 0 28px; }
+.tmenu6 .drop6 { max-width: 100%; }
+
+/* The post page's title row: 12 under it, so Back and the tools stand 16 above the panels. On a computer it spans both columns. (2026-11-27) */
+.pph6 { margin-bottom: 12px; }
+.dpostw6 { width: 968px; max-width: 100%; margin: 0 auto; }
+.dpostw6 > .head6 { padding-left: 0; padding-right: 0; }
+.dpostw6 .dpost6 > .r { padding-top: 0; }
+/* A row whose value drops a menu: ⌄ in place of ›, and the menu hangs from the row's right end. */
+.srow6.open > .ic.chev { transform: rotate(180deg); color: var(--text); }
+.vmenu6 { display: flex; justify-content: flex-end; margin: 8px calc(var(--inset) + 16px) 0 0; }
 </style>
 
 <div class="wrap" id="root">
@@ -1236,12 +1280,50 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <tr><th>Save</th><td>Not in the app</td><td>One glass button. On an iPhone it opens the phone's share sheet with the picture in it, where "Save Image" is. On a computer it downloads the file. While the file comes, the button dims and brightens. Two toasts cover the cases where it cannot finish; they are drawn under the viewer. The second has an "Open" button for the full picture in a new tab.</td><td>A web page cannot write to Photos itself, and e621's file host lets only e621.net read its files. So the file comes through this app's own server (your pick: "Build pass-through"). Built, and not tried on a real iPhone. The two toasts' words are mine; the build's were one line each and the longer one did not fit a phone.</td></tr>
         <tr><th>Videos</th><td>A tap plays or pauses in place</td><td>Unchanged. Videos do not open the viewer in this pass.</td><td>Zoom and Save are for pictures. Other option: a full-screen video, later.</td></tr>
         <tr><th>The post page</th><td>None</td><td>A pushed screen at <code>/post/&lt;number&gt;</code>: Back and the tools (Share, ⋯), the post panel without its tag strip, the comic, a panel with the description and every tag by kind, Source and "Open on e621", then six more posts from the artist.</td><td>It is what a link needs to land on, and it is the only place every tag shows without opening a sheet.</td></tr>
-        <tr><th>Getting to it</th><td></td><td>From a link; from a post's ⋯ › "Open post"; from a comic's thumbs.</td><td>The header already opens the artist and the picture opens the viewer, so there is no third thing left to tap on a card. Other option: make the time and number line a link (small on a phone).</td></tr>
+        <tr><th>Getting to it</th><td></td><td>From a link; from a tap on a post's bar, anywhere but the name and the mark (you, 2026-11-27); from a post's ⋯ › "Open post"; from a comic's thumbs.</td><td>You asked for the bar to open the post: "Unless we tap artist's name, tapping the post's bar should open the post, not the artist page now". Before that the header opened the artist, and only ⋯ led here.</td></tr>
         <tr><th>Share post</th><td>Following and For You share the e621 link</td><td>Every feed shares <code>/post/&lt;number&gt;</code> through the phone's share sheet. With no share sheet it copies the link and a toast says "Link copied".</td><td>You asked for links that come back to this app.</td></tr>
         <tr><th>The link's preview</th><td>None</td><td>The site's name, "mossy otter on eLicks21", one line of numbers, and the picture. <b>Picked by you: Picture</b>, whatever the rating. A post e621 hides from signed-out visitors gets a drawn card with the artist's mark and name and no art, because its picture cannot be fetched.</td><td>A chat shows the preview to everyone in it, without a tap; the person sharing chooses where. The other option, covering Questionable and Explicit posts, is gone.</td></tr>
         <tr><th>A comic</th><td>None</td><td>A comic is an e621 pool. On a card: a well at the left of the footer, "3 / 12". In the viewer: a capsule with its name, and sideways drags turn pages. On the post page: its name and a strip of page thumbs. "Open as a feed" is Results for that pool in page order.</td><td>Each page is a post with its own favorites, so reading page by page keeps the heart and Save per page. Other option: one long strip you scroll; the feed already is that.</td></tr>
         <tr><th>When a link cannot show the post</th><td></td><td>Hidden by e621: the gate the feed already has. Deleted or wrong number: Goo looking, "No post #… on e621". On your blacklist: the same gate shape, saying which tag, with "Show it".</td><td>All three are shapes the app has.</td></tr>
         <tr><th>For the builder</th><td>The app runs in the browser only</td><td>A preview needs each post page to answer with its title and picture before any script runs. A pool's name and pages need one more call to e621.</td><td>This is the part that costs the most to build. I have not checked what e621 allows a server to fetch.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="postmore" aria-label="On a post">
+    <h2 class="pg-h2" style="margin-top:40px">On a post: the bar, Description, two ideas, and the feed's ⋯ menu</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Marked tags, and Left</span>What you asked for on 2026-11-27. Two things are decided by you and drawn as decided: the post's bar opens the post, and Post info shows the description (it is in the Post info drawing further down). Two were ideas with a switch each, and you picked ("Tags + Left"): For You marks the tags it picked a post for, and a well at the left of the footer copies the post's link. The switches still show the other options. The feed's ⋯ menu had no drawing; it has one now. The pictures are stand-ins.</p>
+    <div class="optrow" style="margin:14px 0 28px">
+      <div class="optg"><span>Why For You picked a post</span><div class="pick" data-opt="why"><button type="button" data-v="tags" aria-pressed="true">Marked tags</button><button type="button" data-v="line" aria-pressed="false">A line</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+      <div class="optg"><span>Copy link</span><div class="pick" data-opt="copy"><button type="button" data-v="left" aria-pressed="true">Left</button><button type="button" data-v="heart" aria-pressed="false">By the heart</button><button type="button" data-v="off" aria-pressed="false">Off</button></div></div>
+    </div>
+    <div class="cols">
+      <section class="col" aria-label="Why For You picked a post">
+        <div class="col-head"><h2 class="pg-h3">1. Why For You picked this post</h2><p>Try the first switch. Marked tags: the tags from your tuning stand first in the tag row and carry For You's spark. A line: one line under the picture names them. Off is the app today.</p></div>
+        <div class="under" id="u-why" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="A button that copies the link">
+        <div class="col-head"><h2 class="pg-h3">2. A button that copies the link</h2><p>Try the second switch. The button is a well, like a tag. A tap copies the link to the post in this app. Tap it here to see the check.</p></div>
+        <div class="under" id="u-copy" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="Where a tap on the bar goes">
+        <div class="col-head"><h2 class="pg-h3">3. Where a tap on the bar goes</h2><p>Decided by you. The name opens the artist. The rest of the bar opens the post. The mark opens the artist too: the builder chose that and I agree.</p></div>
+        <div class="under" id="u-bar" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="The feed's menu">
+        <div class="col-head"><h2 class="pg-h3">4. The feed's ⋯ menu</h2><p>A dropdown, like the one under a chip: the same panel and rows as Media's. No title, because the screen's name stands beside the button. It hangs 8 under the capsule with their right edges lined up. The same on a phone and on a computer.</p></div>
+        <div class="under" id="u-fmenu" style="margin-top:0"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">What is decided</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Part</th><th>Today</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
+      <tbody>
+        <tr><th>The post's bar (decided by you)</th><td>The mark and the name opened the artist; the rest did nothing</td><td>The name and the mark open the artist. The time and number line and the empty part of the bar open the post page. "+1", Follow and ⋯ keep their jobs. On the post page the bar's post part does nothing.</td><td>Your words: "Unless we tap artist's name, tapping the post's bar should open the post, not the artist page now". The name's target is 28 tall, because the line under it belongs to the post. A tap meant for the name can land on that line and open the post; Back returns.</td></tr>
+        <tr><th>Description in Post info (decided by you)</th><td>Only on the post page</td><td>Under the three numbers and the "For you because" line, above the tags. It has the label a tag kind has. It shows 4 lines; "Show all" opens the rest.</td><td>Your words: "hitting I on a post doesn't show its description". The 4 lines are mine: a long description would push the tags off the sheet. The build shows all of it.</td></tr>
+        <tr><th>Why For You picked a post (picked by you: Marked tags)</th><td>Only in Post info</td><td><b>Marked tags:</b> the tags from your tuning stand first in the tag row, each with a 12 spark. <b>A line:</b> "Because you fav jackal and desert" under the picture. <b>Off.</b></td><td>You picked Marked tags. The reason sits on the tag itself, and the post does not grow. A line would make every For You post 26 taller.</td></tr>
+        <tr><th>Copy link (picked by you: Left)</th><td>⋯ › "Share post"</td><td>A well, 36 by 28, with the link glyph. <b>Left:</b> at the left end of the footer; on a comic page it stands before the comic's well. <b>By the heart:</b> between the score and the heart. <b>Off.</b> A tap copies the post's link in this app, the glyph is a check for 1.4 s, and the toast says "Link copied".</td><td>You picked Left. The space is empty, and a miss cannot favorite. By the heart is under the thumb, but a miss would favorite the post.</td></tr>
+        <tr><th>The feed's ⋯ menu</th><td>Built without a drawing: a title, then rows with icon wells; the wash is 8 from the sides and 20 from the bottom</td><td>A chip's dropdown: the panel with 4 above and below and 16 at the sides, 260 wide; rows 56 tall with a 32 icon well. No title. Right edges lined up with the capsule. The same on a phone and on a computer. A row that cannot be used now is at 45%.</td><td>The fault was the design's: this menu was never drawn. My first drawing put a well of rows under a title; you said its corners and alignment looked out of place, and they were. Other option: a sheet from the bottom on a phone, as a post's ⋯ is.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -1689,6 +1771,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
     <section class="col" aria-label="Slideshow settings">
       <div class="col-head"><h2 class="pg-h3">Settings › Slideshow</h2><p>The controls a sub-page needs: style previews, a stepper, a small segmented control, switches and value rows.</p></div>
       <div class="phone-holder" id="s-slideshow"></div>
+        <div class="under" id="u-slideshow"></div>
     </section>
     <section class="col" aria-label="Sign-in sheet">
       <div class="col-head"><h2 class="pg-h3">Sign-in sheet</h2><p>Steps in wells, capsule fields, Paste sitting inside the key field, and the one gold button.</p></div>
@@ -2092,7 +2175,8 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   /* ---------- settings › slideshow ---------- */
   const sty = (name, on, inner) => `<button class="style6" type="button" aria-pressed="${on}"><i>${inner}</i>${name}</button>`;
   const A = v => `--art:${art('mossy otter', v)}`;
-  const vrow = (t, val) => `<button class="srow6" type="button"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${chev()}</button>`;
+  P.cdown = '<path d="m6 9 6 6 6-6"/>'; // the chevron; P.down becomes Save's arrow further down
+  const vrow = (t, val, cls = '') => `<button class="srow6 ${cls}" type="button" aria-haspopup="menu"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${ic('cdown', 16, 2.4, 'chev')}</button>`;
   const swrow = (t, s, on) => `<div class="srow6"><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
   const stylesHTML = `<div class="styles6" role="group" aria-label="Style">
         ${sty('Classic', true, `<u style="inset:22px 0;${A(0)}"></u>`)}
@@ -2226,6 +2310,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <div class="stat6"><b class="safe">Safe</b><small>rating</small></div>
       </div>
       <p class="why6">${ic('spark', 16, 2.2)}<span>For you because you fav <b>otter</b> and <b>cozy</b> a lot.</span></p>
+      <div class="tlabel6">Description</div><p class="desc6 clamp">Page three. Reed finally reaches the river, and it is colder than the map said. I drew the water four times before it looked wet. The next page comes on Friday, and after that the story moves to the old mill. Thank you for reading along.</p><button class="dmore6" type="button">Show all</button>
       ${tgroup('Characters', 'c', ['reed (mossy)'])}
       ${tgroup('Species', 's', ['otter', 'mustelid', 'mammal'])}
       ${tgroup('General', '', ['river', 'cozy', 'smile', 'sitting', 'scarf', 'autumn', 'leaves', 'outside', 'looking at viewer', 'detailed background'])}
@@ -3289,7 +3374,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 
   // 4. The post page
   const ptools = `<div class="tools6"><button type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
-  const phead = `<div class="head6"><div class="titlerow">${back()}${ptools}</div></div>`;
+  const phead = `<div class="head6 pph6"><div class="titlerow">${back()}${ptools}</div></div>`;
   const pagePost = comicArt(post({ ...CP, follow: false })).replace(/<div class="tags6">[\s\S]*?<\/div>/, '');
   const comicGroup = `<div class="group6 comic6"><button class="srow6" type="button" aria-label="${COMIC.name}, page ${COMIC.at} of ${COMIC.n}. Open as a feed"><span class="ico">${ic('frames', 20, 2)}</span><span class="lbl"><b>${COMIC.name}</b><small>Page ${COMIC.at} of ${COMIC.n}</small></span>${chev()}</button>
     <div class="cstrip6">${thumbs().map(k => `<button type="button" ${k === COMIC.at ? 'aria-current="page"' : ''} aria-label="Page ${k}">${cpage(k)}</button>`).join('')}</div></div>`;
@@ -3319,8 +3404,41 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
     <button class="gl6 dvnav6 l" type="button" aria-label="Previous page">${ic('left', 22, 2.4)}</button><button class="gl6 dvnav6 r" type="button" aria-label="Next page">${ic('right', 22, 2.4)}</button>
     <div class="dpbot6"><div class="dpctl6">${vwho('mossy otter', '3h ago · #4512290')}${vcomic}<div class="acts">${vacts(true)}</div></div></div>
     <aside class="sheet6 ipanel6" aria-label="Post info">${sinfo.replace(/<p class="why6">[\s\S]*?<\/p>/, '')}</aside>`, 'dplayer6 dview6');
-  $('d-post').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpost6"><div class="l">${phead}${pagePost}</div><div class="r">${comicGroup}${pinfo}${plinks}${pmore(3)}</div></div></div>`);
+  $('d-post').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpostw6">${phead}<div class="dpost6"><div class="l">${pagePost}</div><div class="r">${comicGroup}${pinfo}${plinks}${pmore(3)}</div></div></div></div>`);
   dfit();
+
+  // A row's value drops a menu (2026-11-27): the chip's menu, hanging from the row's right end
+  $('u-slideshow').innerHTML = strip('A row that picks one of a list', 'Tap "Quality" and the menu drops under it, at the row\'s right end. It is the menu a chip drops: no title, because the row names it. The arrow points up while it is open.',
+    `<div class="strip p6 pad"><div class="group6 flat" style="margin-bottom:0">${swrow('Mute videos', '', true)}${vrow('Quality', 'Original', 'open')}</div><div class="vmenu6"><div class="drop6 m still" style="width:220px">${menu('Quality', mrow('Sample') + mrow('Original', true))}</div></div><div style="height:8px"></div></div>`);
+
+  // On a post (2026-11-27): why For You picked it, a copy-link well, the bar's taps, the feed's ⋯ menu
+  P.checks = '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>';
+  rootEl.dataset.why = 'tags'; rootEl.dataset.copy = 'left';
+  const cplink = pos => `<button class="cplink6 ifc-${pos}" type="button" aria-label="Copy link">${ic('link', 16, 2.2, 'ln')}${ic('check', 16, 2.8, 'ok')}</button>`;
+  const withIdeas = (h, tuned = []) => {
+    h = h.replace('<footer class="pf">', `<footer class="pf">${cplink('left')}`).replace('<button class="fav6', m => cplink('heart') + m);
+    tuned.forEach(t => { h = h.replace(`type="button">${t}</button>`, `type="button">${ic('spark', 12, 2.6, 'ifw-tags')}${t}</button>`); });
+    if (tuned.length) h = h.replace('<div class="tags6">', `<p class="whyl6 ifw-line">${ic('spark', 14, 2.4)}<span>Because you fav ${tuned.map(t => `<b>${t}</b>`).join(' and ')}</span></p><div class="tags6">`);
+    return h;
+  };
+  const fyPost = post({ ...P5, time: '5h ago', follow: false, more: 9, tags: [['s', 'jackal'], ['', 'desert'], ['', 'sunset'], ['s', 'canine'], ['', 'dunes']] });
+  $('u-why').innerHTML = strip('A For You post', 'From an artist you do not follow. "jackal" and "desert" are tags For You learned from your favorites.', `<div class="strip p6 pad">${withIdeas(fyPost, ['jackal', 'desert'])}</div>`);
+  $('u-copy').innerHTML = [
+    strip('On a comic page', 'With Left, the link well stands first, then the comic\'s well, 8 apart.', `<div class="strip p6 pad">${withIdeas(comicCard)}</div>`),
+    strip('After a tap', 'The toast the app already has for a copied link.', toasts({ icon: 'link', title: 'Link copied' })),
+  ].join('');
+  $('u-bar').innerHTML = strip('The two targets', 'The tints are the drawing\'s. ⋯ keeps its own job.', `<div class="strip p6 pad zones6">${post({ ...P2, isNew: false, ar: '16/9' })}<div class="zleg6"><span><i class="a"></i>Opens the artist</span><span><i class="p"></i>Opens the post</span></div></div>`);
+  const menuRow = ([i, t, cls = '']) => `<button class="srow6 ${cls}" type="button" role="menuitem" ${cls.includes('off') ? 'aria-disabled="true"' : ''}><span class="ico">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b></span></button>`;
+  const fmenu = (...r) => `<div class="strip p6"><div class="tmenu6">${tools()}<div class="drop6 still" role="menu" style="width:260px"><div class="qrows6 ico">${r.map(menuRow).join('')}</div></div></div></div>`;
+  $('u-fmenu').innerHTML = [
+    strip('Following', 'The pointer is on "Refresh": its wash is 8 from the panel on three sides, and its corners follow the panel\'s. There is nothing new to mark, so the second row is dimmed.', fmenu(['refresh', 'Refresh', 'hov'], ['checks', 'Mark all as seen', 'off'])),
+    strip('For You', 'One row.', fmenu(['refresh', 'Refresh'])),
+    strip('Beside the Media chip\'s dropdown', 'The same panel and the same rows. The menu\'s rows have no switch.', `<div class="strip p6 ddpair6" style="align-items:center"><div class="drop6 still" style="width:260px"><div class="qrows6 ico">${mediaSw('image', 'Images', true)}${mediaSw('frames', 'GIFs', true)}${mediaSw('film', 'Videos', false)}</div></div></div>`),
+  ].join('');
+  document.addEventListener('click', e => {
+    const c = e.target.closest('.cplink6'); if (c) { c.classList.add('done'); setTimeout(() => c.classList.remove('done'), 1400); return; }
+    const m = e.target.closest('.dmore6'); if (m) { m.previousElementSibling.classList.remove('clamp'); m.remove(); }
+  });
 
   // The viewer's hands, enough to try them: one tap hides the buttons, a double tap zooms, a sideways drag turns a comic's page.
   document.querySelectorAll('.view6').forEach(v => {

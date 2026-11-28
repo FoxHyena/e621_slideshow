@@ -127,22 +127,21 @@ test("a grid uses the full width; a tile's right-click menu is a popover at the 
   await expect(tiles.first()).toHaveAccessibleName(/favorited/);
 });
 
-test("a ⋯ opens its menu as a popover under it; a click away or Esc closes it; a titled sheet with its own job is a dialog", async ({ page }) => {
+test("a screen's ⋯ opens its dropdown under the tools capsule; a click away or Esc closes it; a titled sheet with its own job is a dialog", async ({ page }) => {
   await following(page);
   await page.goto("/following");
   await expect(page.getByTestId("post-card").first()).toBeVisible();
   const more = page.getByTestId("following-more");
-  const at = (await more.boundingBox())!;
+  const at = (await page.locator(".tools").filter({ has: more }).boundingBox())!;
   await more.click();
   const menu = page.getByTestId("sheet-following-menu");
   const pop = await settled(menu.getByRole("dialog"));
-  // 300 wide, 8 below the ⋯; left edges lined up, or right edges when it would leave the window
-  expect(pop.width).toBe(300);
+  // the chip's dropdown (DESIGN.md "A screen's ⋯ menu", 2026-11-27): 260 wide, 8 under the capsule, right edges lined up, no title
+  expect(pop.width).toBe(260);
   expect(Math.abs(pop.y - (at.y + at.height + 8))).toBeLessThanOrEqual(1);
-  if (at.x + 300 > 1280 - 8) expect(Math.abs(pop.x + 300 - (at.x + at.width))).toBeLessThanOrEqual(1);
-  else expect(Math.abs(pop.x - at.x)).toBeLessThanOrEqual(1);
-  await expect(menu.getByRole("heading", { name: "Following" })).toBeVisible();
-  await expect(menu.getByTestId("sheet-close")).toBeHidden();
+  expect(Math.abs(pop.x + 260 - (at.x + at.width))).toBeLessThanOrEqual(1);
+  await expect(menu.getByRole("heading")).toHaveCount(0);
+  await expect(menu.getByTestId("sheet-close")).toHaveCount(0);
   await shot(page, "desktop-popover");
   // a click away closes it
   await page.mouse.click(400, 700);
@@ -162,13 +161,13 @@ test("a ⋯ opens its menu as a popover under it; a click away or Esc closes it;
   await expect(keys.getByTestId("sheet-close")).toBeVisible();
 });
 
-test("an artist's ⋯ near the window's right edge lines the popover up by right edges", async ({ page }) => {
+test("an artist's ⋯ lines the popover up by right edges with its tools capsule (DESIGN.md Popover, 2026-11-27)", async ({ page }) => {
   await following(page);
   await page.goto("/artist/fox_artist");
   const more = page.getByTestId("artist-menu");
   await expect(more).toBeVisible();
   await page.setViewportSize({ width: 1000, height: 800 });
-  const at = (await more.boundingBox())!;
+  const at = (await page.locator(".tools").filter({ has: more }).boundingBox())!;
   await more.click();
   const menu = page.getByTestId("sheet-artist-menu");
   const pop = await settled(menu.getByRole("dialog"));

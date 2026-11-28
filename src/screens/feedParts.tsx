@@ -216,7 +216,7 @@ export function FeedBody({
   /** where the reading place is kept; tab roots name the tab, since their entry changes per visit */
   anchorKey?: string;
   recommended?: boolean;
-} & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView" | "follow">) {
+} & Pick<FeedViewProps, "rowsFor" | "fresh" | "caughtNote" | "onExpand" | "onView" | "follow" | "marks">) {
   const { entry } = useScreen();
   const setGrid = useContext(GridSet);
   if (!feed) return <div className="feed-list" data-testid="feed-waiting" />;

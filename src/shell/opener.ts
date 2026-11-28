@@ -10,8 +10,10 @@
 
 export interface Opener {
   el: Element | null;
-  /** the opener's box when it was pressed (in case it has gone since) */
+  /** the box a popover lines up with when it was pressed (in case it has gone since): see popEdge */
   rect: DOMRect;
+  /** a ⋯: line up right edges */
+  end: boolean;
   /** the pointer, for a right-click; null for a click or a key */
   point: { x: number; y: number } | null;
   at: number;
@@ -29,7 +31,8 @@ function note(e: MouseEvent) {
   if (!el) return;
   // a right-click by the menu key has no pointer of its own (0, 0): hang it from the element
   const point = e.type === "contextmenu" && (e.clientX !== 0 || e.clientY !== 0) ? { x: e.clientX, y: e.clientY } : null;
-  last = { el, rect: el.getBoundingClientRect(), point, at: performance.now() };
+  const edge = popEdge(el);
+  last = { el, rect: (edge.box ?? el).getBoundingClientRect(), end: edge.end, point, at: performance.now() };
 }
 
 /** Starts listening (capture, so it runs before the opener's own handler). */
@@ -58,9 +61,19 @@ const GAP = 8;
 const INSET = 8;
 
 /**
+ * What a popover lines up with. A ⋯ (`data-pop-end`) ends its bar, so its popover lines up right
+ * edges: with the tools capsule when the ⋯ is in one, else with the ⋯ itself (DESIGN.md "On a
+ * computer", Popover, 2026-11-27).
+ */
+export function popEdge(el: Element | null): { box: Element | null; end: boolean } {
+  const end = el?.closest("[data-pop-end]") ?? null;
+  return end ? { box: end.closest(".tools") ?? end, end: true } : { box: el, end: false };
+}
+
+/**
  * Where a popover of `w` by `h` goes: 8 below the opener with left edges lined up (right edges when
- * it would leave the window), or above it when there's no room below and more above. At a pointer:
- * its top left corner at the pointer, moved in to stay inside the window.
+ * it would leave the window, or always for a ⋯), or above it when there's no room below and more
+ * above. At a pointer: its top left corner at the pointer, moved in to stay inside the window.
  */
 export function placePopover(o: Opener, w: number, h: number, vw: number, vh: number): { left: number; top: number; maxHeight: number } {
   if (o.point) {
@@ -68,8 +81,10 @@ export function placePopover(o: Opener, w: number, h: number, vw: number, vh: nu
     const top = Math.min(Math.max(INSET, o.point.y), Math.max(INSET, vh - INSET - h));
     return { left, top, maxHeight: vh - top - INSET };
   }
-  const r = o.el?.isConnected ? o.el.getBoundingClientRect() : o.rect;
-  let left = r.left;
+  // read again if it is still there (the page may have moved); else as it was when pressed
+  const box = o.el?.isConnected ? popEdge(o.el).box : null;
+  const r = box ? box.getBoundingClientRect() : o.rect;
+  let left = o.end ? r.right - w : r.left;
   if (left + w > vw - INSET) left = r.right - w;
   left = Math.min(Math.max(INSET, left), vw - INSET - w);
   const below = vh - INSET - (r.bottom + GAP);
