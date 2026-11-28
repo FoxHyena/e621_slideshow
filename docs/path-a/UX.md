@@ -179,8 +179,10 @@ Every feed screen shares one layout: **header** (title, actions on the right), *
   - **Single tap** (after a 200 ms double-tap guard, media only): images open the player **paused** on
     that post (a full-screen viewer that can start the slideshow); videos play/pause in place.
   - **Changed 2026-11-27 (owner-approved; DESIGN.md "A post on its own"):** a single tap on an image
-    or a grid tile opens the **picture viewer**, not the paused player. The player opens from Play and
+    in a feed opens the **picture viewer**, not the paused player. The player opens from Play and
     from ⋯ › Play from here. In the viewer a double tap zooms; it does not favorite there.
+  - **Grid tiles (owner, 2026-11-27: "Keep list behavior"):** a tap on a grid tile does not open the
+    viewer. It turns the feed to a list at that post, as it has since 2026-11-26.
   - **Double tap** favorites (never unfavorites) with one big heart over the picture.
   - Videos: one live `<video>` at a time (the card nearest the middle, muted, `playsinline`); others are
     posters with a ▶ glyph. A mute button sits bottom-right. If autoplay is blocked (Low Power Mode) the
