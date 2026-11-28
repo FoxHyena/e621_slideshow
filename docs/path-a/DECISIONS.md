@@ -1615,3 +1615,18 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   post, and the picture there opens the viewer. "Play from here" stays in the tile's menu.
 - Changed: DESIGN.md's viewer bullet, UX.md's Media taps note, the "Tapping a picture" row of the
   table in `screens-v6.html`. No drawing changes.
+
+## 2026-11-27 — Fixed: the sign-in sheet's spacing, back to the drawing
+- Owner, with a screenshot on a computer: "analyze the sign-in form for spacing issues". Measured
+  against `screens-v6.html` (DESIGN.md "Sign-in sheet"); the same on a phone, so not a computer-only
+  fault. What was off, and what it is now:
+  - Step 1 (the link) stood 44 tall and the other two 28, so the gaps were 16 then 8. All three are
+    28 and 8 apart; the link's tap target still reaches 44 (an invisible 8 above and below).
+  - The steps to "Username" were 24 apart, the labels 16 in and 6 above their fields, and a field to
+    the next label 8. Now 16; 14 in (the field's own text inset); 4 above; 12.
+  - The shield note was 16 in on both sides with 12 above and 4 below; now flush with the fields,
+    16 under the key field and 12 above the switch row.
+  - "Remember on this device" was a 56 list row with its text flush left and the switch 4 short of
+    the fields' right end, 8 above Sign in. Now a 44 row, flush on both sides, callout-rounded, 16
+    above Sign in. Paste sits 6 from the key field's end (was 10).
+- New e2e test `sign-in-sheet.spec.ts` measures each of these on a computer and a phone.

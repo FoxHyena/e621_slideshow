@@ -5757,41 +5757,56 @@ li[data-state="done"] .first-step-n svg,
   font-weight: 600;
   color: var(--color-link);
 }
+/* 28 tall like the other two steps, so the three sit 8 apart; the tap target still reaches 44 */
 .signin-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-height: 44px;
+  min-height: 28px;
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   font-weight: 600;
   color: var(--color-link);
 }
+.signin-link::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
 .signin-link svg {
   width: 16px;
   height: 16px;
 }
+/* DESIGN.md "Sign-in sheet", as screens-v6 draws it: the label 14 in (the field's own text inset),
+   4 above its field; 12 between a field and what follows */
 .signin-label {
-  margin: 8px 0 6px 16px;
+  margin: 0 0 4px 14px;
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
   font-weight: 600;
   color: var(--color-muted);
 }
+.signin .field6 {
+  margin-bottom: 12px;
+}
 .signin-key input {
   font-family: var(--font-mono);
   letter-spacing: 0.08em;
+}
+.signin-key.field6 {
+  padding-right: 4px;
 }
 .signin-paste.btn-tonal {
   flex: none;
   height: 32px;
   padding: 0 14px;
-  margin-right: -6px;
+  margin-right: 2px;
   font-size: var(--text-footnote);
 }
 .signin-hint,
 .signin-error {
-  margin: 8px 16px 0;
+  margin: -4px 14px 0;
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-danger);
@@ -5803,7 +5818,7 @@ li[data-state="done"] .first-step-n svg,
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin: 12px 16px 4px;
+  margin: 4px 0 12px;
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
@@ -5815,12 +5830,23 @@ li[data-state="done"] .first-step-n svg,
   margin-top: 1px;
   color: var(--color-score);
 }
-.signin-remember {
-  padding-inline: 0 4px;
+.signin-hint + .signin-note,
+.signin-error + .signin-note {
+  margin-top: 12px;
+}
+/* the switch row: 44, flush with the fields on both sides, 16 above Sign in */
+.signin-remember.list-row {
+  min-height: var(--spacing-control);
+  padding: 0;
+  margin-bottom: 16px;
+}
+.signin-remember b {
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  font-weight: 600;
 }
 .signin-go {
   width: 100%;
-  margin-top: 8px;
 }
 
 /* Settings' sub-pages (DESIGN.md "Settings: Account, Content, For You, App"). */
