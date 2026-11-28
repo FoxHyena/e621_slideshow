@@ -126,7 +126,7 @@ export function FollowingScreen() {
       </button>
       <GridToggle grid={grid} setGrid={setGrid} />
       {feedReady && (
-        <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
+        <button data-pop-end type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" data-menu="menu" onClick={() => getNav().openSheet("menu")} data-testid="following-more">
           <MoreHorizontal aria-hidden />
         </button>
       )}

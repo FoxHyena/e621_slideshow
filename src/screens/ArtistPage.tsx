@@ -197,7 +197,7 @@ export function ArtistScreen({ name: typed, params }: { name: string; params: st
           <Share aria-hidden />
         </button>
         <GridToggle grid={grid} setGrid={setGrid} />
-        <button type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet(MENU)} data-testid="artist-menu">
+        <button data-pop-end type="button" className="toolbar-circle" aria-label="More" aria-haspopup="dialog" onClick={() => getNav().openSheet(MENU)} data-testid="artist-menu">
           <MoreHorizontal aria-hidden />
         </button>
       </Toolbar>

@@ -115,6 +115,8 @@ export interface FeedViewProps {
   recommended?: boolean;
   /** cards offer Follow for artists you don't follow (For You, Results, Favorites) */
   follow?: boolean;
+  /** For You: the tags it picked each post for, marked and first in the card's tag row (same array per post, for memo) */
+  marks?: (post: Post) => string[];
   /**
    * Following: the rows between cards (the "You're caught up" divider, folded runs), from the
    * posts as they are now. Without it every post is its own row.
@@ -149,6 +151,7 @@ export function FeedView({
   onTag,
   recommended = false,
   follow = false,
+  marks,
   rowsFor,
   fresh,
   caughtNote,
@@ -468,6 +471,7 @@ export function FeedView({
                     hold={hold}
                     fresh={fresh?.(p) ?? false}
                     follow={follow}
+                    marked={marks?.(p)}
                     onOpen={onOpen}
                     onMenu={onMenu}
                   />

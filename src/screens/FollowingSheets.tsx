@@ -1,8 +1,9 @@
 "use client";
 
-/** Following's ⋯ menu and its "Mark all as seen" check: their own chunk, loaded when one opens. */
+/** Following's ⋯ menu (a dropdown, DESIGN.md "A screen's ⋯ menu") and its "Mark all as seen" check: their own chunk, loaded when one opens. */
 import { CheckCheck, RotateCw } from "lucide-react";
 import { getNav } from "@/nav/history";
+import { Dropdown } from "@/shell/Dropdown";
 import { Sheet, SheetAction } from "@/shell/Sheet";
 
 export default function FollowingSheets({
@@ -21,7 +22,7 @@ export default function FollowingSheets({
 }) {
   if (sheet === "menu")
     return (
-      <Sheet title="Following" testId="sheet-following-menu" pop>
+      <Dropdown anchor="menu" label="Following" width={260} testId="sheet-following-menu">
         <div className="sheet-rows" data-wells>
           <SheetAction
             icon={RotateCw}
@@ -43,7 +44,7 @@ export default function FollowingSheets({
             data-testid="following-mark-all"
           />
         </div>
-      </Sheet>
+      </Dropdown>
     );
   const { n, more } = count;
   return (

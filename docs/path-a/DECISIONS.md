@@ -1916,3 +1916,33 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Mine:** every measurement, the check, the failure toast "Couldn't copy the link", and that the
   well is on a post in every feed and on the post page.
 - Not built. Nobody has tried the copy on a phone.
+
+## 2026-11-27 — Built: the post's bar, the description's 4 lines, Copy link, For You's marked tags, a screen's ⋯ as a dropdown
+- From the design commit 3507b7d (owner: "Commit and send" to all five), on "Merge, then build".
+- **The bar:** the name's target is its text and 6 at each side, at least 44 wide, from the panel's top
+  to the bottom of the name line (28). Pressed or under the pointer, the bar's post part turns the time
+  and number line white. On the post page the card has no bar button at all, so that part does nothing.
+- **Post info's description:** 4 lines with an ellipsis (a line clamp across DText's paragraphs, which
+  stay 8 apart), then "Show all" 4 below (28 tall, a 44 touch area), shown only when the text is cut.
+- **Copy link:** a 36 by 28 Well at the footer's left end, on every card (feeds and the post page). It
+  copies `<origin>/post/<number>`; the glyph is a green check for 1.4 s, toast "Link copied"; if the
+  clipboard refuses, "Couldn't copy the link" with the alert glyph. **Mine:** no fallback prompt here
+  (Share post keeps its own).
+- **For You's marked tags:** the tags Post info's "For you because" line names (the post's two
+  strongest positive weights, now one helper, `pickedFor`) lead the tag row with a 12 spark, 8 in and 4
+  before the word; accessible name ends ", For You picked this". **Mine:** an artist tag among them is
+  not added to the row, since the artist is in the bar.
+- **A screen's ⋯ menu** (Following, For You) is the chip's dropdown, 260 wide, no title, hung 8 under
+  the tools capsule with right edges lined up, on a phone too. **Every popover a ⋯ opens** lines up
+  right edges: a ⋯ in a tools capsule with the capsule, a post's ⋯ with itself (`data-pop-end` on each
+  ⋯; `popEdge` in `src/shell/opener.ts`).
+- Tests: `e2e/post-more.spec.ts` (all five, phone and computer); the desktop ⋯ tests now expect the
+  dropdown and the capsule's right edge.
+- **Mine, for the budget:** the first full run put the feed's first load at 200.1 KB (over 200). The
+  link, check and spark glyphs on the card are lucide's own paths drawn as CSS masks instead of icon
+  components; the failed copy uses the toast's own alert icon.
+- A fresh code review (owner: one before every draft) found 7 small things. Fixed: Tab onto a link
+  past the 4th line opens the whole description; the description's state resets per post; it checks
+  again once fonts load; a ⋯'s right-edge lining is taken when pressed; a dropdown with every row
+  disabled holds focus itself. Left: a picked artist tag isn't marked on the card (it isn't in the
+  row), and a very short name's target is the spec's 44 wide.
