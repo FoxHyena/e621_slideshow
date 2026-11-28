@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Post } from "../e621/types";
 import { parseBlacklist } from "../query/blacklist";
-import { DEFAULT_SEARCH } from "../settings";
+import { DEFAULT_SEARCH, qualityWeightOf } from "../settings";
 import { RecommendedQueue, REC_PAGE_SIZE, type RecFetch, type TagQuery } from "../recommend/stream";
 import { makePost } from "./fixtures";
 
@@ -56,6 +56,55 @@ describe("RecommendedQueue", () => {
     await q.ensure();
     expect(api.calls.map(label)).toEqual(["or1", "pop1", "m1", "pop2", "m2"]);
     expect(q.exhausted).toBe(true);
+  });
+
+  it("Taste ↔ Popular re-sorts a finished ranking with no new searches; while searching, the end uses it", async () => {
+    const api = controlled();
+    const q = new RecommendedQueue([tq("or")], api.fetch, weights, filter, none, undefined, null, null, 2);
+    // taste order best > good > a; favorites the other way round (at 2, popularity wins: a, good, best)
+    const best = makePost({ tagList: ["best"], stats: { fav_count: 0 } });
+    const good = makePost({ tagList: ["good"], stats: { fav_count: 50 } });
+    const a = makePost({ tagList: ["a"], stats: { fav_count: 900 } });
+    // still searching: it waits for the end, which ranks with the new weight
+    expect(q.reweigh(0.5)).toBe(false);
+    expect(q.reweigh(0)).toBe(false);
+    expect(q.posts).toHaveLength(0);
+    await flush();
+    api.calls[0].resolve([best, good, a]);
+    await q.ensure();
+    expect(ids(q)).toEqual([best.id, good.id, a.id]);
+    expect(q.reweigh(2)).toBe(true);
+    expect(ids(q)).toEqual([a.id, good.id, best.id]);
+    expect(q.reweigh(2)).toBe(false);
+    expect(api.calls).toHaveLength(1);
+  });
+
+  it("Taste ↔ Popular re-sorts what an errored search found", async () => {
+    const api = controlled();
+    const q = new RecommendedQueue([tq("or", 2)], api.fetch, weights, filter, none, undefined, null, null, 0);
+    const best = makePost({ tagList: ["best"], stats: { fav_count: 0 } });
+    const a = makePost({ tagList: ["a"], stats: { fav_count: 900 } });
+    await flush();
+    api.calls[0].resolve(full(best, a));
+    await flush();
+    api.calls[1].reject(new Error("Rate limited by e621"));
+    await q.ensure();
+    expect(q.error).toBe("Rate limited by e621");
+    const at = (x: Post) => ids(q).indexOf(x.id);
+    expect(at(best)).toBeLessThan(at(a));
+    expect(q.reweigh(2)).toBe(true);
+    expect(q.weight).toBe(2);
+    expect(at(a)).toBeLessThan(at(best));
+    expect(api.calls).toHaveLength(2);
+  });
+
+  it("a saved Taste ↔ Popular off the slider is clamped; not a number reads as the default", () => {
+    expect(qualityWeightOf(0.75)).toBe(0.75);
+    expect(qualityWeightOf(5)).toBe(2);
+    expect(qualityWeightOf(-1)).toBe(0);
+    expect(qualityWeightOf(Number.NaN)).toBeUndefined();
+    expect(qualityWeightOf("1")).toBeUndefined();
+    expect(qualityWeightOf(undefined)).toBeUndefined();
   });
 
   it("shows nothing until the search ends, then everything ranked best first", async () => {

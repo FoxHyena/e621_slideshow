@@ -135,6 +135,8 @@ export class RecommendedQueue implements SlideQueue {
      * these (pinned ones). The learned weights still hold artists the favorites never had.
      */
     private keepArtists: ReadonlySet<string> | null = null,
+    /** Tune's Taste ↔ Popular (rankAll's quality weight) */
+    private qualityWeight = QUALITY_WEIGHT,
   ) {
     this.filter = { ...filter, seen: new Set(), stats: this.stats };
     void this.run();
@@ -242,8 +244,7 @@ export class RecommendedQueue implements SlideQueue {
       this.running = false;
       this.loading = false;
       if (!this.disposed) {
-        const learned = this.learned;
-        this.ranked = rankAll(this.ranked, QUALITY_WEIGHT, learned ? (r) => learnedScore(this.taste(r.post), learned) : undefined);
+        this.rank();
         this.changed();
       }
     }
@@ -260,6 +261,29 @@ export class RecommendedQueue implements SlideQueue {
       this.ranked.push({ post, ...r });
       this.matches.set(post.id, r);
     }
+  }
+
+  /**
+   * Tune's Taste ↔ Popular moved: re-sort the found posts by the new weight, with no new searches.
+   * True when the published order changed; a search still running ranks with it when it ends.
+   */
+  /** Taste ↔ Popular's weight its order uses (or will, once the search ends). */
+  get weight(): number {
+    return this.qualityWeight;
+  }
+
+  reweigh(w: number): boolean {
+    if (w === this.qualityWeight) return false;
+    this.qualityWeight = w;
+    if (this.disposed || !(this.exhausted || this.error)) return false;
+    this.rank();
+    this.changed();
+    return true;
+  }
+
+  private rank() {
+    const learned = this.learned;
+    this.ranked = rankAll(this.ranked, this.qualityWeight, learned ? (r) => learnedScore(this.taste(r.post), learned) : undefined);
   }
 
   /** What a post's taste is scored on: all of it, or (Filter artists) all but who drew it. */

@@ -7,12 +7,13 @@
  * ⋯ › Refresh ranks again in the background, keeping the old list until you swap it in.
  */
 import { ArrowUp, MoreHorizontal, RotateCw, Search, SlidersHorizontal } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Loader, recSteps } from "@/components/Loader";
 import { searchPosts } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
 import { DEFAULT_FILTERS, type Filters } from "@/lib/feed/filters";
 import { DEFAULT_TAG_LIMIT } from "@/lib/query/build";
+import { QUALITY_WEIGHT } from "@/lib/recommend/rank";
 import { IdListQueue } from "@/lib/recommend/restore";
 import { recQueries, RecommendedQueue, SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, NO_OVERRIDES } from "@/lib/recommend/weights";
@@ -113,6 +114,8 @@ export function ForYouScreen() {
   const breadth = useStore(prefs.store, (p) => p.search.breadth);
   // Tune's "Search further": the next tags' rounds when the top ones run out (off: the top tags only)
   const rounds = useStore(prefs.store, (p) => (p.search.moreTags ? SEARCH_TIERS : 1));
+  // Tune's Taste ↔ Popular: re-sorts a finished ranking in place (no new searches)
+  const qw = useStore(prefs.store, (p) => p.search.qualityWeight ?? QUALITY_WEIGHT);
   const reg = getFeeds();
   const generation = useStore(reg.generation, (g) => g);
   const [grid, setGrid] = useState(false);
@@ -221,6 +224,7 @@ export function ForYouScreen() {
           },
           learnedOf(r),
           r.overrides.noArtists ? new Set(r.overrides.pinned) : null,
+          qw,
         );
         holder.q = q;
         return q;
@@ -236,15 +240,31 @@ export function ForYouScreen() {
   useStore(feed?.version ?? reg.generation, (v) => v);
   useStore(next?.version ?? reg.generation, (v) => v);
 
-  // Keep a finished ranking for a reload or a return (only where the sign-in itself is kept).
   const q = feed?.queue;
   const done = q instanceof RecommendedQueue && q.exhausted && !q.error;
+  // Taste ↔ Popular moved: a ranking still searching takes the new weight for its order; a finished
+  // one re-sorts and starts at the top, like a new ranking. Tune is pushed over For You (hidden: no
+  // effects), so this runs when For You is shown again, after the shell has put its place back.
+  const toTop = useRef(false);
+  useEffect(() => {
+    if (next?.queue instanceof RecommendedQueue) next.queue.reweigh(qw);
+    if (q instanceof RecommendedQueue && q.reweigh(qw) && shown.current) toTop.current = true;
+  }, [q, next, qw]);
+  // The top once the re-sorted list is committed: FeedView's own layout effect (a child's, so first)
+  // keeps the card that was in view in place, which would pull the page back down.
+  useLayoutEffect(() => {
+    if (!toTop.current) return;
+    toTop.current = false;
+    if (isLocked()) setLockedY(0);
+    else window.scrollTo(0, 0);
+  });
+  // Keep a finished ranking for a reload or a return (only where the sign-in itself is kept).
   useEffect(() => {
     if (!done || !choice || !name || !getSession().store.get().remember) return;
     const at = rankedAtOf(q);
     if (at === null) return;
-    storage.saveRanked(name, { key: choice.filterKey, inputs: choice.inputs, ids: q.posts.slice(0, RANKED_MAX).map((p) => p.id), at });
-  }, [done, q, choice, name]);
+    storage.saveRanked(name, { key: choice.filterKey, inputs: choice.inputs, ids: q.posts.slice(0, RANKED_MAX).map((p) => p.id), at, qw: q.weight });
+  }, [done, q, choice, name, qw]);
   // For You's feeds are never evicted (a ranking is costly to redo): drop the ones left behind (new
   // filters, a swap, a dropped refresh), stopping any still fetching, so the same key would make a
   // new ranking instead of handing back a stopped one.
@@ -269,7 +289,9 @@ export function ForYouScreen() {
 
   const nextReady = !!next && next.queue.exhausted && !next.queue.error;
   const nextFailed = !!refresh && !!next?.queue.error;
-  const stale = !!choice && choice.inputs !== inputs && canRank;
+  // a restored list holds ids only: ordered by another Taste ↔ Popular, it can't re-sort, so it's stale
+  const otherWeight = !!choice?.restore && (choice.restore.qw ?? QUALITY_WEIGHT) !== qw;
+  const stale = !!choice && (choice.inputs !== inputs || otherWeight) && canRank;
   const ranking = q instanceof RecommendedQueue && !q.exhausted && !q.error;
   const at = q ? rankedAtOf(q) : null;
 
@@ -289,7 +311,7 @@ export function ForYouScreen() {
   // stays until the Update ranking pill swaps the new one in. ⋯ › Refresh always ranks again.
   const pull = () => {
     if (!choice || busy) return;
-    if (at !== null && Date.now() - at < FRESH_MS) {
+    if (!stale && at !== null && Date.now() - at < FRESH_MS) {
       const m = Math.max(1, Math.round((Date.now() - at) / 60_000));
       toast(`Already fresh, ranked ${m} min ago`);
       return;

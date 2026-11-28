@@ -10,6 +10,7 @@ import {
   DEFAULT_PLAYBACK,
   DEFAULT_SEARCH,
   type PlaybackSettings,
+  qualityWeightOf,
   type SearchSettings,
 } from "./settings";
 
@@ -66,6 +67,8 @@ export interface RankedList {
   inputs: string;
   ids: number[];
   at: number;
+  /** Tune's Taste ↔ Popular it was ordered by (missing: the even 1); another offers Update ranking */
+  qw?: number;
 }
 
 /** Following's "new since" threshold for a session (UX §5), so a reload shows the same dots. */
@@ -139,6 +142,7 @@ export const storage = {
       media: { ...DEFAULT_SEARCH.media, ...s.media },
       date: { ...DEFAULT_SEARCH.date, ...s.date },
       minScore: s.minScore ?? null,
+      qualityWeight: qualityWeightOf(s.qualityWeight),
     };
   },
   saveSearch: (s: SearchSettings) => {
@@ -198,7 +202,7 @@ export const storage = {
       Array.isArray(r.ids) &&
       r.ids.every((id) => Number.isInteger(id) && id > 0) &&
       typeof r.at === "number"
-      ? r
+      ? { ...r, qw: qualityWeightOf(r.qw) }
       : null;
   },
   saveRanked: (username: string, r: RankedList | null) => write(`ranked:${username}`, r),

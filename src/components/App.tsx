@@ -32,6 +32,7 @@ import {
   DEFAULT_TAG_LIMIT,
   type BuiltQuery,
 } from "@/lib/query/build";
+import { QUALITY_WEIGHT } from "@/lib/recommend/rank";
 import { recQueries, RecommendedQueue, SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, searchPlan, topTags } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type PlaybackSettings, type SearchSettings } from "@/lib/settings";
@@ -216,7 +217,7 @@ export default function App({
   const buildFor = (s: SearchSettings): BuiltQuery =>
     isRec(s) ? buildRecommendedQuery(s, recTagNames, tagLimit) : buildQuery(effective(s), tagLimit);
   const keyFor = (s: SearchSettings, b: BuiltQuery) =>
-    queueKey(b, s.media, creds, isRec(s) ? rec.signature + (s.moreTags ? "|further" : "") : null);
+    queueKey(b, s.media, creds, isRec(s) ? rec.signature + (s.moreTags ? "|further" : "") + `|qw${s.qualityWeight ?? QUALITY_WEIGHT}` : null);
   const userName = user?.name ?? null;
   const built = useMemo(() => {
     if (search.source === "recommended") return buildRecommendedQuery(search, recTagNames, tagLimit);
@@ -243,6 +244,7 @@ export default function App({
         onChange,
         rec.learned,
         rec.overrides.noArtists ? new Set(rec.overrides.pinned) : null,
+        s.qualityWeight,
       );
     } else {
       q = new PostQueue(b, s.media, (tags, page, limit) => searchPosts(tags, page, limit, creds), ctx, onChange);

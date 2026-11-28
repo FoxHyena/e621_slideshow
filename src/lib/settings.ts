@@ -23,6 +23,14 @@ export const ORDER_LABELS: Record<Order, string> = {
 
 export type Source = "search" | "favorites" | "recommended";
 
+/** Tune's Taste ↔ Popular: 0 is taste only, 2 counts popularity double (1, the middle, is even). */
+export const QUALITY_WEIGHT_MAX = 2;
+
+/** A saved Taste ↔ Popular, kept on the slider (missing or not a number: undefined, the even middle). */
+export function qualityWeightOf(w: unknown): number | undefined {
+  return typeof w === "number" && Number.isFinite(w) ? Math.min(QUALITY_WEIGHT_MAX, Math.max(0, w)) : undefined;
+}
+
 /** How many top profile tags Recommended ORs together to find candidates. */
 export const BREADTH_MIN = 2;
 export const BREADTH_MAX = 30;
@@ -42,6 +50,12 @@ export interface SearchSettings {
    * missing in settings saved before it, which reads as off.
    */
   moreTags?: boolean;
+  /**
+   * Recommended only: Tune's Taste ↔ Popular, how much a post's favorites (against posts its age)
+   * count beside its taste in the final order (rank.ts QUALITY_WEIGHT is the even middle, 1). Missing
+   * reads as 1. Re-sorts a finished ranking without searching again.
+   */
+  qualityWeight?: number;
   tags: string;
   ratings: { s: boolean; q: boolean; e: boolean };
   media: { image: boolean; gif: boolean; video: boolean };

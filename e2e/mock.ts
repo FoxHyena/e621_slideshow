@@ -17,6 +17,8 @@ export interface MockPostSpec {
   ext?: string;
   rating?: "s" | "q" | "e";
   is_favorited?: boolean;
+  /** favorites on e621 (default 3): For You's popularity */
+  favs?: number;
   hidden?: boolean;
   duration?: number;
   /** the artist tag (default `mock_artist`) */
@@ -51,7 +53,7 @@ export function mockPost(spec: MockPostSpec) {
     },
     stats: {
       score: { up: 5, down: 1, total: 4 },
-      fav_count: 3,
+      fav_count: spec.favs ?? 3,
       is_favorited: spec.is_favorited ?? false,
     },
     tags: { general: spec.tags ?? ["solo"], artist: spec.artists ?? [spec.artist ?? "mock_artist"], species: ["wolf"] },
