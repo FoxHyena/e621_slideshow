@@ -39,7 +39,7 @@ export interface Route {
   /** `?view=<postId>`, the picture viewer over the screen (DESIGN.md "A post on its own") */
   view?: string | null;
   /**
-   * `?read=<pool>&post=<postId>`, the comic reader over the screen (DESIGN.md "Comics, part two"): over
+   * `?read=<pool>-<postId>`, the comic reader over the screen (DESIGN.md "Comics, part two"): over
    * the comic's page, or over the player (with `play`, the slide it was opened from).
    */
   read?: Read | null;
@@ -56,21 +56,16 @@ export function parseRoute(pathname: string, search: string): Route {
   const q = new URLSearchParams(search);
   const play = q.get("play");
   const view = q.get("view");
-  const pool = q.get("read");
-  const page = q.get("post");
+  const read = /^([1-9]\d{0,9})-([1-9]\d{0,9})$/.exec(q.get("read") ?? "");
   q.delete("play");
   q.delete("view");
-  if (pool !== null) {
-    q.delete("read");
-    q.delete("post");
-  }
+  if (read) q.delete("read");
   const rest = q.toString();
   const path = pathname.replace(/\/+$/, "") || "/";
   const parts = path.split("/").filter(Boolean);
   const screen = parseScreen(path, parts, rest);
-  const id = /^[1-9]\d{0,9}$/;
   // the reader stands over the player or over the screen itself
-  if (pool && page && id.test(pool) && id.test(page)) return { screen, play: play || null, read: { pool: Number(pool), page: Number(page) } };
+  if (read) return { screen, play: play || null, read: { pool: +read[1], page: +read[2] } };
   // the player wins if a URL somehow names both
   return !play && view && /^\d+$/.test(view) ? { screen, play: null, view } : { screen, play: play || null };
 }
@@ -107,9 +102,8 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
       return params ? { kind: "artist", name, params } : { kind: "artist", name };
     }
     case "post":
-      return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: "post", id: Number(parts[1]) } : notFound(path);
     case "comic":
-      return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: "comic", id: Number(parts[1]) } : notFound(path);
+      return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: parts[0], id: Number(parts[1]) } : notFound(path);
     default:
       return notFound(path);
   }
@@ -134,9 +128,8 @@ export function screenPath(s: Screen): string {
     case "artist":
       return `/artist/${encodeURIComponent(s.name)}${s.params ? `?${s.params}` : ""}`;
     case "post":
-      return `/post/${s.id}`;
     case "comic":
-      return `/comic/${s.id}`;
+      return `/${s.kind}/${s.id}`;
     case "root":
       return s.params ? `/?${s.params}` : "/";
     case "notFound":
@@ -146,10 +139,10 @@ export function screenPath(s: Screen): string {
 
 export function routeUrl(r: Route): string {
   const base = screenPath(r.screen);
-  const q: [string, string][] = r.play ? [["play", r.play]] : r.view && !r.read ? [["view", r.view]] : [];
-  if (r.read) q.push(["read", String(r.read.pool)], ["post", String(r.read.page)]);
-  if (!q.length) return base;
-  return `${base}${base.includes("?") ? "&" : "?"}${q.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&")}`;
+  const [k, v] = r.play ? ["play", r.play] : r.view ? ["view", r.view] : [null, null];
+  let q = k && v ? `${k}=${encodeURIComponent(v)}` : "";
+  if (r.read) q += `${q && "&"}read=${r.read.pool}-${r.read.page}`;
+  return q ? `${base}${base.includes("?") ? "&" : "?"}${q}` : base;
 }
 
 /** The tab a screen belongs to when it is that tab's root, else null (a pushed screen). */
@@ -180,14 +173,8 @@ export function parentOf(r: Route, openedFrom: Tab | null): Route | null {
       return s.section ? { screen: { kind: "settings", section: null }, play: null } : tab("following");
     case "tune":
       return tab("for-you");
-    case "search":
-    case "results":
-    case "favorites":
-    case "artist":
-    case "post":
-    case "comic":
-    case "notFound":
-    case "root":
+    // search, results, favorites, artist, post, comic, notFound, root
+    default:
       return tab(openedFrom ?? "following");
   }
 }

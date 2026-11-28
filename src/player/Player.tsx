@@ -36,7 +36,7 @@ import { shareUrlFor } from "./share";
 import { TimeLeft } from "./timeLeft";
 import { visitPlayback } from "./visit";
 
-export { Reader, Viewer } from "./Viewer";
+export { Viewer } from "./Viewer";
 
 const HIDE_CONTROLS_MS = 2500;
 /** A second tap this soon is a double tap (toggles nothing, favorites). */
@@ -98,7 +98,8 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   const index = Math.max(0, found);
   const current: Post | undefined = found >= 0 ? posts[index] : undefined;
 
-  const [paused, setPaused] = useState(takePaused);
+  // opened under the reader (a reload of its link): paused, as closing the reader leaves it
+  const [paused, setPaused] = useState(() => takePaused() || reading);
   // a link visit on a browser with no account says so for the show's first 4 s
   const fromLink = base.route.screen.kind === "results" && decodeResults(base.route.screen.params).link !== null;
   const nobody = useStore(getSession().store, (s) => s.ready && s.user === null && s.creds === null);

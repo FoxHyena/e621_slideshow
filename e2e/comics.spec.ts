@@ -316,7 +316,7 @@ test.describe("comics, part two, on a phone", () => {
   test("the reader: paused at first, the count in pages, the capsule, the end, Read again, and back to the comic", async ({ page }) => {
     await page.goto("/comic/77");
     await page.getByTestId("comic-play").click();
-    await expect(page).toHaveURL(/\/comic\/77\?read=77&post=2003$/);
+    await expect(page).toHaveURL(/\/comic\/77\?read=77-2003$/);
     const r = reader(page);
     await expect(r.getByTestId("viewer-count")).toHaveText("1 / 5");
     // owner: "Start paused": the bar empty and the full time
@@ -360,7 +360,7 @@ test.describe("comics, part two, on a phone", () => {
   test("playing, the reader turns a page each Comic page time, and stops at the end", async ({ page }) => {
     await page.clock.install();
     await page.addInitScript(() => localStorage.setItem("e6ss:v1:playback", JSON.stringify({ comicPageSec: 10 })));
-    await page.goto("/comic/77?read=77&post=2002");
+    await page.goto("/comic/77?read=77-2002");
     const r = reader(page);
     await expect(r.getByTestId("viewer-count")).toHaveText("4 / 5");
     await expect(r.getByTestId("time-left")).toHaveText("10 s");
@@ -374,6 +374,20 @@ test.describe("comics, part two, on a phone", () => {
     await page.clock.runFor(30_000);
     await expect(r.getByTestId("comic-end")).toBeVisible();
     await expect(r).toHaveAttribute("data-post-id", "2004");
+    // back to the last page and playing again, it gets the whole page time (a review: the end came straight back)
+    await page.keyboard.press("ArrowLeft");
+    await expect(r.getByTestId("comic-end")).toHaveCount(0);
+    await r.getByTestId("pause-button").click();
+    await page.clock.runFor(5_000);
+    await expect(r.getByTestId("comic-end")).toHaveCount(0);
+    await page.clock.runFor(6_000);
+    await expect(r.getByTestId("comic-end")).toBeVisible();
+  });
+
+  test("a reader link to a post the comic doesn't list opens its first page", async ({ page }) => {
+    await page.goto("/comic/77?read=77-999999");
+    await expect(page).toHaveURL(/\/comic\/77\?read=77-2003$/);
+    await expect(reader(page).getByTestId("viewer-count")).toHaveText("1 / 5");
   });
 
   test("a slide that is a comic's page carries the capsule; it opens the reader there and holds the show", async ({ page }) => {
@@ -383,7 +397,7 @@ test.describe("comics, part two, on a phone", () => {
     await expect(cap).toContainText("Read from page 3");
     await shot(page, "comic-slide");
     await cap.click();
-    await expect(page).toHaveURL(/\/search\?tags=wolf&play=2005&read=77&post=2005$/);
+    await expect(page).toHaveURL(/\/search\?tags=wolf&play=2005&read=77-2005$/);
     const r = reader(page);
     await expect(r.getByTestId("viewer-count")).toHaveText("3 / 5");
     await expect(r).toHaveAttribute("data-pages", "");
@@ -412,7 +426,7 @@ test.describe("comics, part two, on a phone", () => {
     await row.click();
     await page.getByRole("radio", { name: "30 s" }).click();
     await expect(row).toContainText("30 s");
-    await page.goto("/comic/77?read=77&post=2003");
+    await page.goto("/comic/77?read=77-2003");
     await expect(reader(page).getByTestId("time-left")).toHaveText("30 s");
     await reader(page).getByTestId("quick-settings-button").click();
     const quick = page.getByTestId("quick-comic-time");

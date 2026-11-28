@@ -2345,3 +2345,46 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **For the builder to choose:** the reader's URL state, and how the device stores where you stopped.
 - Not drawn: both screens on a computer, and the comic page's link preview.
 - Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-28 — Comics, part two, built (builder)
+- Owner, on the design above: "Commit and send". It reached me from the designer.
+- **Built as drawn:**
+  - The comic's page, `/comic/<pool>`, signed out too.
+  - The gold ring on where you stopped, with Play there.
+  - The slide's capsule, "Read from page N".
+  - The reader, which starts paused and counts pages, then the end slide.
+  - "Comic page time" (10/20/30/45 s, 20 to start), in Settings › Slideshow and in Quick settings.
+  - "Open comic" in place of "Open as a feed".
+- **Mine, the two the design left to me:**
+  - **The reader's URL:** `?read=<pool>-<post>` on the screen it stands over. Over a slide it keeps `play`
+    (`/search?tags=wolf&play=2005&read=77-2005`). Over the comic's page it has no `play`. Back closes the
+    reader onto what is under it. A reader link to a post the pool doesn't list opens the comic's first page.
+  - **Where you stopped:** localStorage `e6ss:v1:comicPlaces`, a list of [pool, post] pairs with the newest
+    last, at most 200 comics. It is this device's, read again on every write so two tabs don't undo each
+    other. It is kept in src/feed/comics.tsx, not src/lib/storage.ts, because storage.ts is in the first load.
+- **Mine, not drawn:**
+  - A video page plays to its end, under the player's video rules. It plays only while the page's time
+    runs.
+  - A page the reader can't show (one e621 hides, or one on your blacklist) says so on the stage.
+  - On a computer, the reader is the player's window with the capsule over the bar. The comic's page is a
+    600 column with five tiles to a row.
+  - The reader is the viewer in a reading mode, in the player's chunk. It shares the viewer's pinch,
+    sideways turns and drag down. On a computer, ← and → turn pages and Space plays.
+- **Not built:** the comic page's link preview (not drawn), and the comic page's Play stepping aside on
+  scroll.
+- **Mine, for the budget:** the first load came to 200.1 KB.
+  - The reader's URL went from two params to one.
+  - The post page and the comic's page share one lazy slot.
+  - The offline banner's wifi icons are lucide's own paths, drawn as CSS masks.
+  - First load is now 199.9 KB.
+- A code review (owner: one before every draft) found 10 things. All are fixed:
+  - **Page time:** the end came straight back after ← and Play. A new page time, or a video's length,
+    didn't move the page's end.
+  - **Video:** a video page played while the reader was paused.
+  - **Buttons:** they didn't come back on a mouse move or a key. A drag right on the end didn't go back.
+  - **Places:** past 200 comics, the cap dropped the lowest pool numbers first, not the oldest.
+  - **Show:** a reload under the reader left the show unpaused.
+  - **Links:** a reader link to a page the comic doesn't list got stuck.
+  - **Refresh:** it kept the retry wait.
+  - **Tests:** the end → ← → Play path had no test. It does now.
+- Also in this branch: PR 53's fix for the flash on a page turn (cherry-picked).

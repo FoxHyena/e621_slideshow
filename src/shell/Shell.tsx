@@ -22,7 +22,7 @@ import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { watchPresses } from "./opener";
 import { ScreenContext } from "./context";
 import { TabBar, useRail } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, ComicScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, PostScreen, prefetchScreens, Reader, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, PostScreen, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -200,7 +200,7 @@ export default function Shell() {
       // An overlay closed (a sheet over the player included): focus goes back to what opened it.
       const now = shown.stack[shown.index];
       if (isOverlay(left) && left.key !== now.key && (shown.cause === "back" || shown.cause === "pop")) {
-        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=reader], [data-testid=player]:not([inert]), [data-testid=viewer]") : screenOf(to);
+        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=reader],[data-testid=player]:not([inert]),[data-testid=viewer]") : screenOf(to);
         restoreFocus(left.key, box);
       }
       return;
@@ -321,12 +321,7 @@ export default function Shell() {
           <Player key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
-      {overlay?.route.read && (
-        <Suspense fallback={null}>
-          <Reader key={`${cur.key}:read`} base={cur} top={overlay} />
-        </Suspense>
-      )}
-      {overlay?.route.view && overlay.route.play == null && !overlay.route.read && (
+      {(overlay?.route.read || (overlay?.route.view && overlay.route.play == null)) && (
         <Suspense fallback={null}>
           {/* one viewer for a comic's every page: a turn doesn't open it again (Viewer keys each page) */}
           <Viewer key={cur.key} base={cur} top={overlay} />
@@ -363,9 +358,9 @@ function PushedScreen({ e }: { e: Entry }) {
     case "artist":
       return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
     case "post":
-      return <PostScreen id={screen.id} />;
     case "comic":
-      return <ComicScreen id={screen.id} />;
+      // one lazy slot for both: each costs the first load its name
+      return <PostScreen id={screen.id} comic={screen.kind === "comic"} />;
     case "tune":
       return <TuneScreen />;
     case "settings":

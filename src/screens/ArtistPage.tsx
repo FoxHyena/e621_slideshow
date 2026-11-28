@@ -7,6 +7,8 @@
  * name and a Follow pill. A name e621 doesn't know is an empty state; a tag that isn't an artist
  * keeps the hero with a tag in the mark's place and "Follow tag". Its own chunk.
  */
+import { PostScreen } from "./PostPage";
+import { ComicScreen } from "./ComicPage";
 import { ChevronLeft, Clock, ExternalLink, Heart, Image as ImageIcon, Link2, MoreHorizontal, Search, Share, Tag } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Avatar from "@/components/Avatar";
@@ -32,10 +34,14 @@ import { getRec } from "@/state/rec";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { copyText, onFeedTag, shareArtist } from "./actions";
-export { PostScreen } from "./PostPage";
 export { ComicWell } from "@/feed/comics";
-export { ComicScreen } from "./ComicPage";
 import { FeedBody, GridSet, GridToggle, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
+
+
+/** `/post/<number>` or `/comic/<number>`: one lazy slot in the shell for the two (src/shell/lazy.ts). */
+export function PostOrComic({ id, comic }: { id: number; comic: boolean }) {
+  return comic ? <ComicScreen id={id} /> : <PostScreen id={id} />;
+}
 
 const CHIPS: ChipId[] = ["media", "hideFaved", "sort", "date", "score"];
 const label = (n: string) => n.replaceAll("_", " ");

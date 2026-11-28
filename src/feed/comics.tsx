@@ -146,33 +146,35 @@ export function useComic(post: Post | null, pool: number | null = null): Comic |
 const PLACES_KEY = "e6ss:v1:comicPlaces";
 /** Comics kept at most; the longest unread go first. */
 const PLACES_MAX = 200;
-function loadPlaces(): Record<string, number> {
+/** [pool, post] pairs, the newest last: a list, as an object's number keys would sort by pool, not by when (a review). */
+type Places = [number, number][];
+function loadPlaces(): Places {
   try {
-    const v = JSON.parse(localStorage.getItem(PLACES_KEY) ?? "{}");
-    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
+    const v: unknown = JSON.parse(localStorage.getItem(PLACES_KEY) ?? "[]");
+    return Array.isArray(v) ? v.filter((e): e is [number, number] => Array.isArray(e) && typeof e[0] === "number" && typeof e[1] === "number") : [];
   } catch {
-    return {};
+    return [];
   }
 }
-const places = createStore<Record<string, number> | null>(null);
-const allPlaces = () => places.get() ?? (places.set(loadPlaces()), places.get()!);
+const places = createStore<Places | null>(null);
 
 /** The post you stopped on in this comic, or null. */
 export function usePlace(pool: number | null): number | null {
   const all = useStore(places, (p) => p);
   if (pool === null) return null;
   // read, not kept, while rendering: a store set here would update other components mid-render
-  const v = (all ?? loadPlaces())[pool];
-  return typeof v === "number" ? v : null;
+  return (all ?? loadPlaces()).find(([p]) => p === pool)?.[1] ?? null;
 }
 
 /** Keep the page open now as where you stopped in this comic. */
 export function setPlace(pool: number, page: number) {
-  const all = allPlaces();
-  if (all[pool] === page) return;
+  // read again each time: another tab may have kept places since
+  const all = loadPlaces();
+  const last = all[all.length - 1];
+  if (last && last[0] === pool && last[1] === page) return void (places.get() ?? places.set(all));
   // newest last: the oldest go first past the cap
-  const rest = Object.entries(all).filter(([k]) => k !== String(pool));
-  const next = Object.fromEntries([...rest.slice(Math.max(0, rest.length - PLACES_MAX + 1)), [String(pool), page]]);
+  const rest = all.filter(([p]) => p !== pool);
+  const next: Places = [...rest.slice(Math.max(0, rest.length - PLACES_MAX + 1)), [pool, page]];
   places.set(next);
   try {
     localStorage.setItem(PLACES_KEY, JSON.stringify(next));
@@ -187,7 +189,7 @@ export function setPlace(pool: number, page: number) {
 const pages = new Map<string, Page[]>();
 /** Comics whose last ask failed, all or in part: when the next may go. */
 const pagesRetry = new Map<string, number>();
-/** Bumped when an account's sign-in ends: pages asked before then aren't kept. */
+/** Bumped when an account's sign-in ends, or a comic is refreshed: pages asked before then aren't kept. */
 let pagesEra = 0;
 onAccountLeft((name) => {
   pagesEra++;
@@ -218,7 +220,13 @@ export function usePoolName(id: number | null): string | null {
 export function refreshComic(pool: number) {
   pools.delete(pool);
   failedUntil.delete(pool);
-  for (const k of [...pages.keys()]) if (k.split(":")[1] === String(pool)) pages.delete(k);
+  // an ask on its way now would bring back the old pages: it isn't kept (the others ask again)
+  pagesEra++;
+  for (const k of [...pages.keys(), ...pagesRetry.keys()])
+    if (k.split(":")[1] === String(pool)) {
+      pages.delete(k);
+      pagesRetry.delete(k);
+    }
   answered.set((n) => n + 1);
   pagesAnswered.set((n) => n + 1);
 }

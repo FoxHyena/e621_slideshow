@@ -34,7 +34,7 @@ import { savePost } from "./save";
 import { actionLook } from "@/shell/toastLook";
 import { ComicTimeSheet, PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
 import { TimeLeft } from "./timeLeft";
-import { ComicBar, PagesSheet, setPlace, useComic, usePages } from "@/feed/comics";
+import { ComicBar, PagesSheet, setPlace, useComic, usePages, usePool } from "@/feed/comics";
 import { FollowPill } from "@/feed/FollowPill";
 import { Goo } from "@/components/Goo";
 
@@ -109,8 +109,13 @@ function useViewedPost(base: Entry, id: string): { post: Post | null; missing: b
   return { post, missing: !inFeed && got !== null && got.post === null, inFeed: inFeed !== null, feedAnswered };
 }
 
-/** One page at a time: a comic's next page is a fresh picture (its zoom, its file, its loader). */
+/** The viewer, or the comic reader when the route names one (it shares the viewer's place in the shell). */
 export function Viewer({ base, top }: { base: Entry; top: Entry }) {
+  return top.route.read ? <Reader key="read" base={base} top={top} /> : <PictureViewer key="view" base={base} top={top} />;
+}
+
+/** One page at a time: a comic's next page is a fresh picture (its zoom, its file, its loader). */
+function PictureViewer({ base, top }: { base: Entry; top: Entry }) {
   // what a comic keeps from page to page ends with the viewer: the next one opens with its buttons
   useEffect(
     () => () => {
@@ -142,7 +147,7 @@ interface Reading {
  * Favorite, Post info, Quick settings and Share, Previous, Play and Next, and the bar. It starts
  * paused; playing, it turns a page each "Comic page time". After the last page, the end.
  */
-export function Reader({ base, top }: { base: Entry; top: Entry }) {
+function Reader({ base, top }: { base: Entry; top: Entry }) {
   const read = top.route.read!;
   // owner: "Start paused"
   const [paused, setPaused] = useState(true);
@@ -186,6 +191,12 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
   useEffect(() => {
     if (comic && post) setPlace(comic.pool.id, post.id);
   }, [comic?.pool.id, post?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // a reader link to a post the comic doesn't list (edited, or the pool changed since): its first page
+  const named = usePool(reading?.pool ?? null);
+  const stray = !!named && named.post_ids.length > 0 && !named.post_ids.includes(Number(id));
+  useEffect(() => {
+    if (stray && named) nav.replace({ ...top.route, read: { pool: named.id, page: named.post_ids[0] } });
+  }, [stray]); // eslint-disable-line react-hooks/exhaustive-deps
   const list = usePages(comic);
   const ids = comic?.pool.post_ids;
   const at = ids && post ? ids.indexOf(post.id) : -1;
@@ -231,7 +242,7 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
   /** Turn one page on (+1) or back (-1): the picture slides off, the next comes in from the other side. */
   const turn = (d: 1 | -1) => {
     if (reading?.ended) {
-      // Previous, or a drag to the right, goes back to the last page; the end goes no further
+      // Previous (←), or a drag to the right on the end, goes back to the last page; the end goes no further
       if (d === -1) reading.setEnded(false);
       return void paint(FIT, true);
     }
@@ -371,37 +382,63 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
   }, [playback.comicPageSec, playback.videoMaxSec, post, video, videoSec]);
   // it waits while a sheet is open, while the page is zoomed, and at the end
   const running = !!reading && loaded && !reading.paused && !reading.ended && sheet === null && !zoomed && !hidden;
-  const left = useRef<number | null>(null);
-  const onPageDone = useEffectEvent(() => turn(1));
+  // The time this page has played, as the bar counts it: a new page time (or a video's length, known
+  // once it loads) moves the end, not where it is. A page's round starts again when its time is up, on
+  // "Read again", or when the end is left (a review, 2026-11-28: the end came straight back).
+  const spent = useRef(0);
+  const [round, setRound] = useState(0);
+  const restart = () => {
+    spent.current = 0;
+    setRound((r) => r + 1);
+  };
+  const onPageDone = useEffectEvent(() => {
+    restart();
+    turn(1);
+  });
   useEffect(() => {
     if (!running) return;
     const started = Date.now();
-    const t = setTimeout(onPageDone, (left.current ??= pageMs));
+    let done = false;
+    const t = setTimeout(() => {
+      done = true;
+      onPageDone();
+    }, Math.max(0, pageMs - spent.current));
     return () => {
       clearTimeout(t);
-      left.current = Math.max(0, left.current! - (Date.now() - started));
+      // the page's time ran out: its round starts again from nothing
+      if (!done) spent.current += Date.now() - started;
     };
-  }, [running, pageMs]);
+  }, [running, pageMs, round]);
+  // a video page plays only while the page's time runs (paused, under a sheet, zoomed or at the end, it waits)
+  const clip = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = clip.current;
+    if (!v) return;
+    if (running) void v.play().catch(() => {});
+    else v.pause();
+  }, [running, loaded]);
   const bar = useRef<HTMLDivElement>(null);
   // while it plays, the buttons step aside after 2.5 s, as in the player; a tap brings them back
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const hovering = useRef(false);
+  /** The buttons come back (a move, a key, a tap) and, while it plays, step aside again after 2.5 s. */
+  const stepAside = (playing: boolean) => {
+    clearTimeout(hideTimer.current);
+    if (playing)
+      hideTimer.current = setTimeout(() => {
+        if (!hovering.current) setControls(() => false);
+      }, HIDE_CONTROLS_MS);
+  };
   const poke = () => {
     if (!reading) return;
-    clearTimeout(hideTimer.current);
-    if (reading.paused) return;
-    hideTimer.current = setTimeout(() => {
-      if (!hovering.current) setControls(() => false);
-    }, HIDE_CONTROLS_MS);
+    setControls(() => true);
+    stepAside(!reading.paused);
   };
   const play = (on: boolean) => {
     if (!reading) return;
     reading.setPaused(!on);
-    clearTimeout(hideTimer.current);
-    if (on)
-      hideTimer.current = setTimeout(() => {
-        if (!hovering.current) setControls(() => false);
-      }, HIDE_CONTROLS_MS);
+    setControls(() => true);
+    stepAside(on);
   };
   useEffect(() => () => clearTimeout(hideTimer.current), []);
   /** "Read again": page 1 (the first there is to read), paused. */
@@ -409,10 +446,20 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
     if (!reading || !ids) return;
     reading.setPaused(true);
     reading.setEnded(false);
+    restart();
     const i = ids.findIndex((_, k) => turnable(k));
     if (i >= 0 && ids[i] !== post?.id) goTo(ids[i]);
   };
   const shareIt = () => post && void sharePost(post);
+  // a drag to the right on the end goes back to the last page, as a turn back does
+  const endFrom = useRef<number | null>(null);
+  const endDown = (e: React.PointerEvent) => {
+    endFrom.current = e.target === e.currentTarget || !(e.target as Element).closest("button") ? e.clientX : null;
+  };
+  const endUp = (e: React.PointerEvent) => {
+    if (endFrom.current !== null && e.clientX - endFrom.current > TURN_PX) turn(-1);
+    endFrom.current = null;
+  };
 
   // ---- hands -------------------------------------------------------------------
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -516,8 +563,10 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
     }
     lastTap.current = t;
     tapTimer.current = setTimeout(() => {
-      setControls((c) => !c);
-      if (reading) clearTimeout(hideTimer.current);
+      const shown = !controls;
+      setControls(() => shown);
+      // shown again while it plays: they step aside again in 2.5 s
+      if (reading) stepAside(shown && !reading.paused);
     }, DOUBLE_TAP_MS);
   };
   const onPointerCancel = (e: React.PointerEvent) => {
@@ -627,7 +676,8 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
 
   const src = post ? displayUrl(post, "sample") : null;
   const full = post?.files.original.url ?? null;
-  const showControls = controls && !zoomed;
+  // paused, the reader keeps its buttons, as the player does
+  const showControls = (controls || !!reading?.paused) && !zoomed;
 
   const ended = !!reading?.ended;
   // the end's way back: to the slide the reader was opened from, or to the comic's page
@@ -667,8 +717,8 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
             {/* eslint-disable @next/next/no-img-element -- e621's CDN, shown as is */}
             {video ? (
               <video
+                ref={clip}
                 src={src}
-                autoPlay
                 playsInline
                 loop
                 muted={playback.videoMuted}
@@ -703,7 +753,7 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
       )}
       {burst > 0 && <Heart key={burst} className="heart-burst player-burst" aria-hidden />}
       {ended && comic && (
-        <div className="comic-end" data-testid="comic-end">
+        <div className="comic-end" data-testid="comic-end" onPointerDown={endDown} onPointerUp={endUp}>
           <Goo mood="wave" size={112} />
           <b>The end</b>
           <small>
@@ -799,6 +849,7 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
               <div className="player-progress">
                 {loaded && !hidden && (
                   <div
+                    key={round}
                     ref={bar}
                     className="progress-bar"
                     data-testid="progress"
