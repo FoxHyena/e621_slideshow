@@ -108,6 +108,17 @@ Drawn in the mock's second section, "On a post". Items 3 and 4 are picked; 1, 2 
    same panel and rows as Media's, no title, on a phone and on a computer. Its right edge lines up
    with the capsule's; that changes a rule you approved on the check list (left edges), for every ⋯.
 
+## Open now (2026-11-27, after midnight)
+
+After your two screenshots of the build on a computer. Not approved yet.
+
+1. **The post page's top.** Back and the tools stood 1 above the panels in the build; my phone
+   drawing had only 4. Now 16 on a phone and on a computer. On a computer the row spans both columns,
+   as built.
+2. **Settings' menus (Quality and the like).** The build followed my spec, and the spec was wrong: a
+   title that repeats the row, over a well inside a panel. Now the row drops the menu a chip drops,
+   at its right end, with no title. The row's arrow is ⌄, not ›.
+
 ## What was made
 
 | Batch | Commit | What | Builder's slice |
