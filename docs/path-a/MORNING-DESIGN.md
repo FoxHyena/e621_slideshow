@@ -21,6 +21,16 @@ New drawings, in the mock's first section, "A post on its own". **Approved by yo
    went against your idea from 2026-11-26 (a tile turns the feed to a list at that post). You told the
    builder "Keep list behavior", so only a picture in a feed opens the viewer.
 
+## Open now (2026-11-27, evening)
+
+1. **"Made by" on the App page, under About.** You asked for it; the place, the paper plane and the
+   sentence "Found a bug or want a feature? Send a message." are mine. Drawn in the mock, "4. App".
+   **Approved by you: "Yes, commit and send".**
+2. **Save's two toasts.** You said "Yes, write them". "The picture is ready" / "Tap Save again", and
+   "Couldn't save it here" / "The full picture opened in a new tab". Drawn under the viewer. The
+   build's wording differs (one line each); the builder is told.
+3. Not tried by anyone: Save on a real iPhone.
+
 ## Answered on the check list, 2026-11-27
 
 - **Agreed with my pick, 47 items:** every choice in batches 1 to 5 as drawn, the sidebar with names,
