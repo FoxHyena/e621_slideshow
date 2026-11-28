@@ -1735,3 +1735,54 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - [[wiki]] and {{tags}} show their words; "* " lines are a list.
   - [spoiler] is a Well bar until tapped.
   - [quote], [section] and the like keep their words without the tags.
+
+## 2026-11-27 — The date menu's Custom part: segments hug their words
+- Owner, with a screenshot of the build on a computer: "We may also need to make some spacing fixes
+  in the date filter dropdown".
+- Measured: the build matches `screens-v6.html` (rows, paddings, the 311 track), so the faults were
+  the drawing's. Three of them:
+  - "Custom…"'s capsule sat 4 above a full-width line. Now 8, and the line is 16 in from each side.
+  - The five kinds were equal segments of 61: "Between" (51 wide) had 5 at each side and 16 to
+    "Before". Now every word has 14 at each side.
+  - The units were drawn as three; the build added "years" (kept), which left "months" 1 at each
+    side. Now four units that hug their words, 8 at each side, beside a 72 number field (was 88).
+- Owner, asked "Commit and send the text spacing and both menu fixes?": "Commit and send".
+- **Mine:** the rule "segments hug their words when equal ones would leave a word less
+  than 10 from its segment's edge" (DESIGN.md "Segmented control"). Every other control keeps equal
+  segments.
+- Not chosen: the units on a row of their own under the number field (18 at each side, but 52 taller
+  and the number field stands alone); a 64 field (9 at each side; the field looks stubby).
+- For the build: the capsule's place and width come from the chosen button, not from an index.
+
+## 2026-11-27 — "Is the text spacing off?": measured, three options drawn; the owner picked C
+- Owner, with a screenshot of Settings' App rows on a computer: "is it just me or is the text
+  spacing off?"
+- Measured from the screenshot: the 32 well, 12 gap and 16 padding are to spec, and the six strings
+  are within 2 px of the mock's widths. The build is not at fault.
+- What the designer sees: Fredoka's word space is 0.24 em, narrow beside its wide bold letters
+  ("e621 button" reads as one cluster), and the 13 px system line under it runs loose by the
+  system's own spacing. Two rhythms, one above the other.
+- Drawn for the owner to pick: A, as is; B, word-spacing +0.08 em on everything set in the round
+  face; C, B and letter-spacing −0.02 em on the 13 px system line. The designer's pick is C.
+- Owner, asked "Which text spacing do you want: A, B or C?": "C".
+- Now in DESIGN.md, "Hierarchy", under the table: Fredoka everywhere has word-spacing 0.08 em; system
+  text at 13 (Footnote and Tag) has letter-spacing −0.02 em. **Mine:** that Tag takes it as well as
+  Footnote (the picture showed a Footnote line; Tag is the same face and size).
+- In the mock it is applied by a script that tags each element by the face it ends up in (2,635
+  elements). The build should set it where it sets the faces.
+- Checked in the mock at 400 and 1400 wide: no text newly cut off, no line newly wrapped, no sideways
+  scroll. Toasts measure 198 and 283 now (were 194 and 291).
+
+## 2026-11-27 — The ⋯ menu: labels line up with the name; 16 above the mark in a popover
+- Owner, with a screenshot of a post's ⋯ popover on a computer: "New design bug report in the item
+  dropdowns as well".
+- **The build's:** the context line keeps its phone padding (4 above) after the grabber is hidden, so
+  the mark is 4 from the popover's top and 16 from its side (`.sheet-ctx`, `globals.css`). The spec's
+  popover has 16 padding all round. Read from the code and the screenshot; not measured in a browser.
+- **The drawing's:** the name stood 64 from the panel's edge and the rows' labels 62. Icon to label
+  is now 14 (was 12) and the dividers start at 48 (was 46), so both stand at 64. The name and the
+  post number are 36 tall together (they were 40 in the mock, which put the mark 18 from the top).
+- The build's row has the icon 12 in and a 14 gap (labels at 62 too); the drawing's is 14 in and 14.
+- Owner, asked "Commit and send the text spacing and both menu fixes?": "Commit and send".
+- **Mine.** It applies to every ⋯ sheet (a post, a grid tile, an artist row, a
+  suggestion), on a phone too.
