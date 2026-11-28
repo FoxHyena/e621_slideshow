@@ -1208,6 +1208,15 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 .srow6.off > * { opacity: .45; }
 .tmenu6 { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; width: 343px; max-width: 100%; margin: 0 auto; padding: 20px 0 28px; }
 .tmenu6 .drop6 { max-width: 100%; }
+
+/* The post page's title row: 12 under it, so Back and the tools stand 16 above the panels. On a computer it spans both columns. (2026-11-27) */
+.pph6 { margin-bottom: 12px; }
+.dpostw6 { width: 968px; max-width: 100%; margin: 0 auto; }
+.dpostw6 > .head6 { padding-left: 0; padding-right: 0; }
+.dpostw6 .dpost6 > .r { padding-top: 0; }
+/* A row whose value drops a menu: ⌄ in place of ›, and the menu hangs from the row's right end. */
+.srow6.open > .ic.chev { transform: rotate(180deg); color: var(--text); }
+.vmenu6 { display: flex; justify-content: flex-end; margin: 8px calc(var(--inset) + 16px) 0 0; }
 </style>
 
 <div class="wrap" id="root">
@@ -1762,6 +1771,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
     <section class="col" aria-label="Slideshow settings">
       <div class="col-head"><h2 class="pg-h3">Settings › Slideshow</h2><p>The controls a sub-page needs: style previews, a stepper, a small segmented control, switches and value rows.</p></div>
       <div class="phone-holder" id="s-slideshow"></div>
+        <div class="under" id="u-slideshow"></div>
     </section>
     <section class="col" aria-label="Sign-in sheet">
       <div class="col-head"><h2 class="pg-h3">Sign-in sheet</h2><p>Steps in wells, capsule fields, Paste sitting inside the key field, and the one gold button.</p></div>
@@ -2165,7 +2175,8 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   /* ---------- settings › slideshow ---------- */
   const sty = (name, on, inner) => `<button class="style6" type="button" aria-pressed="${on}"><i>${inner}</i>${name}</button>`;
   const A = v => `--art:${art('mossy otter', v)}`;
-  const vrow = (t, val) => `<button class="srow6" type="button"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${chev()}</button>`;
+  P.cdown = '<path d="m6 9 6 6 6-6"/>'; // the chevron; P.down becomes Save's arrow further down
+  const vrow = (t, val, cls = '') => `<button class="srow6 ${cls}" type="button" aria-haspopup="menu"><span class="lbl"><b>${t}</b></span><span class="val">${val}</span>${ic('cdown', 16, 2.4, 'chev')}</button>`;
   const swrow = (t, s, on) => `<div class="srow6"><span class="lbl"><b>${t}</b>${s ? `<small>${s}</small>` : ''}</span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
   const stylesHTML = `<div class="styles6" role="group" aria-label="Style">
         ${sty('Classic', true, `<u style="inset:22px 0;${A(0)}"></u>`)}
@@ -3363,7 +3374,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 
   // 4. The post page
   const ptools = `<div class="tools6"><button type="button" aria-label="Share">${ic('share', 20, 2.2)}</button><button type="button" aria-label="More">${ic('more', 22, 2.4)}</button></div>`;
-  const phead = `<div class="head6"><div class="titlerow">${back()}${ptools}</div></div>`;
+  const phead = `<div class="head6 pph6"><div class="titlerow">${back()}${ptools}</div></div>`;
   const pagePost = comicArt(post({ ...CP, follow: false })).replace(/<div class="tags6">[\s\S]*?<\/div>/, '');
   const comicGroup = `<div class="group6 comic6"><button class="srow6" type="button" aria-label="${COMIC.name}, page ${COMIC.at} of ${COMIC.n}. Open as a feed"><span class="ico">${ic('frames', 20, 2)}</span><span class="lbl"><b>${COMIC.name}</b><small>Page ${COMIC.at} of ${COMIC.n}</small></span>${chev()}</button>
     <div class="cstrip6">${thumbs().map(k => `<button type="button" ${k === COMIC.at ? 'aria-current="page"' : ''} aria-label="Page ${k}">${cpage(k)}</button>`).join('')}</div></div>`;
@@ -3393,8 +3404,12 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
     <button class="gl6 dvnav6 l" type="button" aria-label="Previous page">${ic('left', 22, 2.4)}</button><button class="gl6 dvnav6 r" type="button" aria-label="Next page">${ic('right', 22, 2.4)}</button>
     <div class="dpbot6"><div class="dpctl6">${vwho('mossy otter', '3h ago · #4512290')}${vcomic}<div class="acts">${vacts(true)}</div></div></div>
     <aside class="sheet6 ipanel6" aria-label="Post info">${sinfo.replace(/<p class="why6">[\s\S]*?<\/p>/, '')}</aside>`, 'dplayer6 dview6');
-  $('d-post').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpost6"><div class="l">${phead}${pagePost}</div><div class="r">${comicGroup}${pinfo}${plinks}${pmore(3)}</div></div></div>`);
+  $('d-post').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpostw6">${phead}<div class="dpost6"><div class="l">${pagePost}</div><div class="r">${comicGroup}${pinfo}${plinks}${pmore(3)}</div></div></div></div>`);
   dfit();
+
+  // A row's value drops a menu (2026-11-27): the chip's menu, hanging from the row's right end
+  $('u-slideshow').innerHTML = strip('A row that picks one of a list', 'Tap "Quality" and the menu drops under it, at the row\'s right end. It is the menu a chip drops: no title, because the row names it. The arrow points up while it is open.',
+    `<div class="strip p6 pad"><div class="group6 flat" style="margin-bottom:0">${swrow('Mute videos', '', true)}${vrow('Quality', 'Original', 'open')}</div><div class="vmenu6"><div class="drop6 m still" style="width:220px">${menu('Quality', mrow('Sample') + mrow('Original', true))}</div></div><div style="height:8px"></div></div>`);
 
   // On a post (2026-11-27): why For You picked it, a copy-link well, the bar's taps, the feed's ⋯ menu
   P.checks = '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>';

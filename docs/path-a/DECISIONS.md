@@ -1865,6 +1865,7 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Tests: `src/lib/e621/__tests__/preview.test.ts` (the tags, the card for a hidden post, the ask, the
   card's size). The e2e suite's post pages now make the dev server ask e621 for made-up numbers; those
   come back empty and change nothing on screen.
+
 ## 2026-11-27 — The post's bar opens the post; the name and the mark open the artist
 - Owner, relayed by the builder (I did not hear it from the owner): "Unless we tap artist's name,
   tapping the post's bar should open the post, not the artist page now".
@@ -1946,3 +1947,17 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   again once fonts load; a ⋯'s right-edge lining is taken when pressed; a dropdown with every row
   disabled holds focus itself. Left: a picked artist tag isn't marked on the card (it isn't in the
   row), and a very short name's target is the spec's 44 wide.
+## 2026-11-27 — The post page's title row; a row's value drops the chip's menu
+- Owner, with two screenshots of the build on a computer (the post page's top; Settings' "Quality"
+  menu): "Computer post page and settings dropdowns might need some fixes too".
+- **The post page.** In the build Back and the tools capsule stand 1 above the panels (measured from
+  the screenshot: 2 px at a scale of 1.91). The spec gave no number. The mock had 16 on a computer
+  and only 4 on a phone, so the phone drawing was at fault too. Now: 12 under the title row on both,
+  which puts the 44 controls 16 above the panel.
+- **Kept from the build (mine):** on a computer the title row spans both columns. The drawing had the
+  capsule at the end of the 600 column, with an empty corner over the right column.
+- **Settings' menus.** The build followed the spec: a titled sheet as a popover, holding the Well
+  menu. The spec was the fault. The title repeats the row's label right above it, and the Well's 26
+  corners sit 16 inside the panel's 24. Now a row's value drops the chip's menu: no title, the Panel
+  is the track, 220 wide, at the row's right end. The row ends in ⌄, not ›.
+- **Mine:** all of it. Not yet approved by the owner. Measured in the mock, below.
