@@ -5,7 +5,8 @@ import { mockE621 } from "./mock";
  * The installed-app side (ENGINEERING.md §7, DESIGN.md "Install, update and the app icon"): the
  * manifest and icons, the CSP, Settings › App's install row per browser, and (against a production
  * build only, where the worker registers) the service worker: it caches this origin's files and
- * never an e621 answer, and an offline reload still opens the app.
+ * never an e621 answer, an offline reload still opens the app, and a deploy reaches an app that
+ * stays open.
  *
  *   pnpm build && pnpm start --port 3622
  *   E6_PWA=1 E6_BASE=http://localhost:3622 pnpm e2e e2e/pwa.spec.ts --workers 1
@@ -22,7 +23,14 @@ test.describe("manifest, icons, CSP", () => {
     const res = await request.get("/manifest.webmanifest");
     expect(res.ok()).toBe(true);
     const m = await res.json();
-    expect(m).toMatchObject({ id: "/following", name: "eLicks21", short_name: "eLicks21", start_url: "/following", display: "standalone", background_color: "#020F23" });
+    expect(m).toMatchObject({
+      id: "/following",
+      name: "eLicks21",
+      short_name: "eLicks21",
+      start_url: "/following",
+      display: "standalone",
+      background_color: "#020F23",
+    });
     expect(m.icons.map((i: { purpose: string }) => i.purpose)).toEqual(["any", "any", "maskable", "monochrome"]);
     for (const i of m.icons) expect((await request.get(i.src)).headers()["content-type"]).toBe("image/png");
     await mockE621(page);
@@ -114,5 +122,89 @@ test.describe("the service worker (production build)", () => {
     await context.setOffline(false);
     // The production app boots under its CSP (no unsafe-eval) without a violation.
     expect(csp).toEqual([]);
+  });
+
+  /** The worker in charge of this page, as its build (it is registered as /sw.js?v=<build>). */
+  const controllerBuild = (page: Page) => page.evaluate(() => new URL(navigator.serviceWorker.controller?.scriptURL ?? "http://x/").searchParams.get("v"));
+
+  test("a deploy reaches an open app: back at the front, the toast shows, and Reload runs the new build", async ({ page, context }) => {
+    await mockE621(page);
+    await page.goto("/following");
+    await expect.poll(() => controllerBuild(page)).not.toBeNull();
+    const first = await controllerBuild(page);
+    // the site now serves another build (the same files, under its own name)
+    const next = "e2e-next-build";
+    await context.route("**/version.json", (r) => r.fulfill({ json: { build: next } }));
+    // the app comes back to the front, never having been quit
+    await page.evaluate(() => {
+      (window as Window & { __stayed?: boolean }).__stayed = true;
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    const toast = page.locator("[data-sonner-toast]", { hasText: "New version ready" });
+    await expect(toast).toBeVisible();
+    await shot(page, "update-toast");
+    // the page reloads, and the new version is in charge; the old one's caches are gone
+    await Promise.all([page.waitForEvent("load"), toast.getByRole("button", { name: "Reload" }).click()]);
+    expect(await page.evaluate(() => (window as Window & { __stayed?: boolean }).__stayed ?? false)).toBe(false);
+    await expect.poll(() => controllerBuild(page)).toBe(next);
+    const names = await page.evaluate(() => caches.keys());
+    expect(names).toContain(`e6ss-static-${next}`);
+    expect(names.some((n) => n.endsWith(`-${first}`))).toBe(false);
+    // asking again finds nothing new: nothing downloads, no second toast
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+    await page.waitForTimeout(1500);
+    expect(
+      await page.evaluate(async () => {
+        const reg = await navigator.serviceWorker.getRegistration();
+        return !!(reg?.installing || reg?.waiting);
+      }),
+    ).toBe(false);
+    await expect(toast).toHaveCount(0);
+  });
+
+  test("a cold start on a newer build than the worker runs it without asking", async ({ page }) => {
+    await mockE621(page);
+    await page.goto("/following");
+    await expect.poll(() => controllerBuild(page)).not.toBeNull();
+    const build = await controllerBuild(page);
+    // an older version is put in charge (as if this build were deployed after the app last ran)
+    await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.register("/sw.js?v=e2e-older", { updateViaCache: "none" });
+      const w = reg.installing ?? reg.waiting;
+      if (w && w.state !== "installed") await new Promise<void>((ok) => w.addEventListener("statechange", () => w.state === "installed" && ok()));
+      reg.waiting?.postMessage({ type: "skip-waiting" });
+    });
+    await expect.poll(() => controllerBuild(page)).toBe("e2e-older");
+    // the next launch fetches this build's shell: it takes over quietly, no toast, no second reload
+    await page.reload();
+    await expect.poll(() => controllerBuild(page)).toBe(build);
+    await page.waitForTimeout(1000);
+    await expect(page.locator("[data-sonner-toast]", { hasText: "New version ready" })).toHaveCount(0);
+  });
+
+  test("a page on an older build than the worker in charge never puts its version back", async ({ page, context }) => {
+    await mockE621(page);
+    await page.goto("/following");
+    await expect.poll(() => controllerBuild(page)).not.toBeNull();
+    // a newer version is in charge, and the site serves it (this page came from an older shell)
+    const newer = "e2e-newer";
+    await context.route("**/version.json", (r) => r.fulfill({ json: { build: newer } }));
+    await page.evaluate(async (v) => {
+      const reg = await navigator.serviceWorker.register(`/sw.js?v=${v}`, { updateViaCache: "none" });
+      const w = reg.installing ?? reg.waiting;
+      if (w && w.state !== "installed") await new Promise<void>((ok) => w.addEventListener("statechange", () => w.state === "installed" && ok()));
+      reg.waiting?.postMessage({ type: "skip-waiting" });
+    }, newer);
+    await expect.poll(() => controllerBuild(page)).toBe(newer);
+    await page.reload();
+    await page.waitForTimeout(3000);
+    expect(await controllerBuild(page)).toBe(newer);
+    expect(
+      await page.evaluate(async () => {
+        const reg = await navigator.serviceWorker.getRegistration();
+        return !!(reg?.installing || reg?.waiting);
+      }),
+    ).toBe(false);
+    await expect(page.locator("[data-sonner-toast]", { hasText: "New version ready" })).toHaveCount(0);
   });
 });
