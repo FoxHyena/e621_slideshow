@@ -137,17 +137,22 @@ test("a grid tile of a post folded into \"+N more\" opens the run and lands on i
   expect((await card.boundingBox())!.y).toBeLessThan(40);
 });
 
-test("a screen past the divider, at rest, marks seen on e621; the dots stay for the session", async ({ page }) => {
+test("a screen past the divider, at rest, marks seen on e621; the counts clear, the dots stay for the session", async ({ page }) => {
   const mock = await followingSignedIn(page);
   await page.goto("/following");
   await expect(status(page)).toHaveText("10 new since your last visit");
+  await expect(page.getByTestId("play-count")).toHaveText("10");
   await scrollPast(page);
   await expect.poll(() => mock.visits).toBe(1);
   await expect(page.getByText("Marked as seen on e621").first()).toBeVisible();
   // The check for anything newer came first, with the feed's own search.
   expect(mock.searches.some((s) => s.tags === "search:subscriptions id:>1150")).toBe(true);
   expect(mock.lastSeen).toBe(1150);
-  await expect(status(page)).toHaveText("10 new since your last visit");
+  // Seen: the counts clear (owner, 2026-11-27: they didn't), while the dots stay where they were
+  await expect(status(page)).toHaveText("All caught up");
+  await expect(page.getByTestId("play-count")).toHaveCount(0);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.getByTestId("card-new").first()).toBeVisible();
   // A later session starts from the new marker.
   await page.reload();
   await expect(status(page)).toHaveText("All caught up");
@@ -179,7 +184,12 @@ test("newer posts on e621 hold the mark and offer the new-posts pill", async ({ 
   await expect(status(page)).toHaveText("10 new since your last visit");
   mock.setPosts([{ id: 1151, artist: "fox_artist" }, ...specs()]);
   await scrollPast(page);
-  await expect(page.getByTestId("new-posts-pill")).toBeVisible();
+  const pill = page.getByTestId("new-posts-pill");
+  await expect(pill).toBeVisible();
+  // scrolled down, it rides 12 under the floating title capsule, not behind it (owner, 2026-11-27)
+  const cap = (await page.getByTestId("top-bar").locator(".topcap").boundingBox())!;
+  await expect.poll(async () => Math.round((await pill.boundingBox())!.y - (cap.y + cap.height))).toBe(12);
+  expect(await pill.evaluate((p) => { const r = p.getBoundingClientRect(); return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === p || p.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)); })).toBe(true);
   expect(mock.visits).toBe(0);
   await page.getByTestId("new-posts-pill").click();
   await expect(status(page)).toHaveText("11 new since your last visit");

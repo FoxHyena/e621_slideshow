@@ -3409,10 +3409,12 @@ html {
   line-height: var(--text-section--line-height);
   font-weight: var(--text-section--font-weight);
 }
+/* it rides 12 under the floating title capsule once you scroll (4 + 52 down on a phone, 8 + 52 on a
+   computer); at 12 from the top it sat under the capsule, out of sight */
 .top-pill-row {
   position: sticky;
   z-index: 30;
-  top: 12px;
+  top: calc(env(safe-area-inset-top) + 68px);
   display: flex;
   justify-content: center;
   height: 0;
@@ -5648,6 +5650,9 @@ li[data-state="done"] .first-step-n svg,
   .compact-bar .topcap {
     width: 584px;
     margin: 0 auto;
+  }
+  .top-pill-row {
+    top: calc(env(safe-area-inset-top) + 72px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
