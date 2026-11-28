@@ -1829,3 +1829,39 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **The ⋯ menu:** the rows' icons 14 in, labels at 64 like the name, dividers from 48; as a popover
   the context line has 16 above, so the mark is 16 from the top. On a phone the grabber's space stays.
 - **Mine:** `e2e/menu-spacing.spec.ts` checks these numbers at 390 and 1280.
+
+## 2026-11-27 — Built: a post link's preview
+- Owner: "Build link previews". From DESIGN.md "A post on its own", "The link's preview".
+- **How a link gets its preview (the builder's question, answered):** `/post/<number>` now has
+  `generateMetadata` (`src/app/post/[id]/page.tsx`). The server asks e621 for the post, signed out
+  (it never has anyone's key), naming the app in its User-Agent and no person, with a 3 s limit; a
+  found post is kept ten minutes in the server's memory (a failure, or Cloudflare's challenge page
+  coming back as HTML, is not kept). A chat app's crawler gets the tags in the page's head; a browser
+  gets the page at once and the tags stream in after (Next's own split), so the post page is no slower.
+  **Mine:** Next's crawler list lacks Telegram, Bluesky, Mastodon, Matrix and Signal, so
+  `htmlLimitedBots` in `next.config.ts` is Next's list plus those.
+- **The tags:** site "eLicks21"; title "<artist> on eLicks21" (the first real artist; none: "Post #…
+  on eLicks21"); "Post #… on e621 · 1.2K score · 56 favorites" (the app's short numbers); the post's
+  sample picture whatever its rating (owner: "Picture"), a video's still. Twitter's large card too.
+  **Mine:** a picture chat apps refuse (under 300 wide, or a no-sample original over 5 MB) gives way to
+  the thumbnail if that is 300 wide, else to the drawn card.
+  **Mine:** no page title: the shell changes screens without a page load, so the tab would keep the
+  artist's name on every screen after; the tab stays "eLicks21". A post e621 can't find, or a slow or
+  failed ask, keeps the site's own preview.
+- **The drawn card** (`/post/<number>/card`, 1200 by 630) for a post e621 hides from signed-out
+  visitors: Panel Navy, the artist's mark on its raised disc (200), the name in Fredoka 600 (76), "#… ·
+  Explicit" in Muted (40), the wordmark at the bottom right (44). **Mine:** the sizes, and Fredoka is
+  fetched by the server from Google Fonts once per server (no visitor's data in the ask); without it
+  the card uses the renderer's own face. If e621 doesn't answer when the card is asked for, it is
+  drawn with the number only, never a broken picture; a card drawn short is kept 5 minutes, a full one
+  a day.
+- A fresh code review (owner: run one before every draft) found 7 things; all fixed: a type error that
+  would have failed the build, the card's 404 when e621 hiccups, a day's cache on a short card, the
+  missing chat crawlers, the site address behind a proxy, the challenge page being cached, and pictures
+  chat apps refuse.
+- Checked on the dev server with a Safe post: the crawler's tags and the card as drawn. **Not checked:**
+  whether e621 answers Vercel's servers (it answered this computer), and the preview in a real chat app
+  after deploying.
+- Tests: `src/lib/e621/__tests__/preview.test.ts` (the tags, the card for a hidden post, the ask, the
+  card's size). The e2e suite's post pages now make the dev server ask e621 for made-up numbers; those
+  come back empty and change nothing on screen.
