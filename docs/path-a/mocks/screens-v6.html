@@ -1074,6 +1074,23 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tile6.skt6 .nums { height: 18px; align-items: center; }
 .tile6.skt6 .nums .sk { height: 10px; }
 
+/* ============ The ⋯ menu: its labels line up with the name above them (2026-11-27) ============ */
+/* The name stands 64 from the panel's edge (16 + the 36 mark + 12). The rows' labels stood at 62: a 2 px miss, seen as a wobble down the left. Icon to label is now 14, so the labels and the dividers start at 48 inside the well, 64 from the panel. */
+.p6 .row6 { gap: 14px; }
+.p6 .row6 + .row6::before { left: 48px; }
+/* The number is a line of its own, so the name and number are 36 tall, the mark's height, and a popover's 16 padding is 16 above the mark as it is beside it. */
+.p6 .ctx small { display: block; }
+
+/* ============ Segments that hug their words; the date menu's Custom part (2026-11-27) ============ */
+/* With equal segments a long word is pressed against its capsule ("Between" had 5 at each side, "months" 1 once "years" joined). Here every word gets the same room at its sides, and the track's spare width is shared out equally. */
+.seg6.hug { display: flex; }
+.seg6.hug button { flex: 1 1 auto; }
+.seg6.hug .thumb { width: var(--tw, 0px); transform: translateX(var(--tx, 0px)); transition: transform .36s cubic-bezier(.3,1.35,.5,1), width .36s cubic-bezier(.3,1.35,.5,1); }
+@media (prefers-reduced-motion: reduce) { .seg6.hug .thumb { transition: none; } }
+/* The line under "Custom…": 8 below the chosen row's capsule (it was 4, and the capsule sat on the line), 16 in from each side like the menu's other dividers, 12 above the controls. */
+.drop6.m .cust6 { margin: 8px 12px 0; padding: 12px 0; }
+.drop6.m .nrow6 .field6 { flex-basis: 72px; }
+
 /* ============ A post on its own: the picture viewer, the post page, comics (owner-approved 2026-11-27) ============ */
 /* The viewer is the player's room (black, glass) with no slideshow in it. */
 .view6 .vstage { position: absolute; inset: 0; overflow: hidden; cursor: zoom-in; touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -2167,13 +2184,13 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   const mediaSw = (i, t, on) => `<div class="srow6"><span class="ico">${ic(i, 20, 2)}</span><span class="lbl"><b>${t}</b></span><button class="sw6" type="button" role="switch" aria-checked="${on}" aria-label="${t}"></button></div>`;
   $('u-sort').innerHTML = [
     strip('Media', 'More than one can be on, so these are switches, not a one-of list. The chip reads "Videos" here.', `<div class="strip p6 ddpair6">${openC(chip('Videos', true))}<div class="drop6 still" style="width:260px"><div class="qrows6 ico">${mediaSw('image', 'Images', false)}${mediaSw('frames', 'GIFs', false)}${mediaSw('film', 'Videos', true)}</div></div></div>`),
-    strip('Date, with Custom open', 'Custom adds its controls under the list, and the menu grows to the full width. Try the five kinds: the fields change. Apply is tonal here, not gold.', `<div class="strip p6 ddpair6">${openC(chip('Custom', true))}<div class="drop6 m still custom" style="width:343px">
+    strip('Date, with Custom open', 'Custom adds its controls under the list, and the menu grows to the full width. Try the five kinds: the fields change. The kinds and the units hug their words, so "Between" and "months" are not pressed against the capsule. Apply is tonal here, not gold.', `<div class="strip p6 ddpair6">${openC(chip('Custom', true))}<div class="drop6 m still custom" style="width:343px">
       ${menu('Date', mrow('Any') + mrow('Today') + mrow('This week') + mrow('This month') + mrow('Custom…', true, '', 'role="radio" data-custom'))}
       <div class="cust6" data-k="two">
-        <div class="seg6" style="--n:5;--i:3" role="group" aria-label="Kind of date"><span class="thumb"></span><button type="button" data-k="one" aria-pressed="false">On</button><button type="button" data-k="one" aria-pressed="false">After</button><button type="button" data-k="one" aria-pressed="false">Before</button><button type="button" data-k="two" aria-pressed="true">Between</button><button type="button" data-k="n" aria-pressed="false">Last</button></div>
+        <div class="seg6 hug" role="group" aria-label="Kind of date"><span class="thumb"></span><button type="button" data-k="one" aria-pressed="false">On</button><button type="button" data-k="one" aria-pressed="false">After</button><button type="button" data-k="one" aria-pressed="false">Before</button><button type="button" data-k="two" aria-pressed="true">Between</button><button type="button" data-k="n" aria-pressed="false">Last</button></div>
         <div class="pair6" data-for="two">${fld('From', `${ic('cal', 18, 2.2)}<span class="val">Nov 1, 2026</span>`)}${fld('To', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`)}</div>
         ${fld('Date', `${ic('cal', 18, 2.2)}<span class="val">Nov 25, 2026</span>`, '', 'data-for="one"')}
-        <div class="frow6" data-for="n"><span class="flabel6">In the last</span><div class="nrow6"><div class="field6 focus"><span class="val">7<span class="caret"></span></span></div><div class="seg6 big" style="--n:3;--i:0" role="group" aria-label="Unit"><span class="thumb"></span><button type="button" aria-pressed="true">days</button><button type="button" aria-pressed="false">weeks</button><button type="button" aria-pressed="false">months</button></div></div></div>
+        <div class="frow6" data-for="n"><span class="flabel6">In the last</span><div class="nrow6"><div class="field6 focus"><span class="val">7<span class="caret"></span></span></div><div class="seg6 big hug" role="group" aria-label="Unit"><span class="thumb"></span><button type="button" aria-pressed="true">days</button><button type="button" aria-pressed="false">weeks</button><button type="button" aria-pressed="false">months</button><button type="button" aria-pressed="false">years</button></div></div></div>
         ${applyT}
       </div></div></div>`),
     strip('Score', 'Tap Custom… for the number field.', `<div class="strip p6 ddpair6">${openC(chip('≥ 50', true))}<div class="drop6 m still" style="width:220px">
@@ -3326,6 +3343,32 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
       last = now; timer = setTimeout(() => { if (!v.classList.contains('zoomed')) v.dataset.chrome = v.dataset.chrome === '0' ? '1' : '0'; }, 300);
     });
   });
+
+  // Segments that hug their words: the capsule takes the chosen word's place and width.
+  const placeHug = g => { const b = g.querySelector('[aria-pressed="true"]'); if (!b || !b.offsetWidth) return; g.style.setProperty('--tw', b.offsetWidth + 'px'); g.style.setProperty('--tx', (b.offsetLeft - 3) + 'px'); };
+  const placeHugs = () => document.querySelectorAll('.seg6.hug').forEach(placeHug);
+  placeHugs(); document.fonts.ready.then(placeHugs); addEventListener('resize', placeHugs);
+  document.addEventListener('click', e => { if (e.target.closest('.seg6, .mrow6, .chip6')) requestAnimationFrame(placeHugs); });
+
+  // Type spacing (owner's pick, 2026-11-27: "C"). Everything set in the round face gets word-spacing .08em; system text at 13 px (Footnote, Tag) gets letter-spacing -.02em.
+  // Mock only: each element with words of its own is tagged by the face it ends up in. The build sets these where it sets the faces.
+  const spaced = new WeakSet();
+  const spaceType = () => {
+    const todo = [];
+    for (const el of document.querySelectorAll('.p6, .p6 *')) {
+      if (spaced.has(el)) continue;
+      let own = false; for (const n of el.childNodes) if (n.nodeType === 3 && n.nodeValue.trim()) { own = true; break; }
+      if (!own) continue;
+      const cs = getComputedStyle(el), fam = cs.fontFamily.replace(/^["']/, ''), round = fam.startsWith('Fredoka');
+      todo.push([el, round, !round && !/mono/i.test(fam) && cs.fontSize === '13px', cs.letterSpacing]);
+    }
+    for (const [el, round, foot, ls] of todo) { spaced.add(el); el.style.wordSpacing = round ? '.08em' : '0'; el.style.letterSpacing = foot ? '-.02em' : ls === '-0.26px' ? 'normal' : ls; }
+    if (todo.length) placeHugs();
+  };
+  let spaceRaf = 0;
+  const spaceSoon = () => { cancelAnimationFrame(spaceRaf); spaceRaf = requestAnimationFrame(spaceType); };
+  document.fonts.ready.then(spaceType); addEventListener('load', spaceType); spaceSoon();
+  new MutationObserver(spaceSoon).observe(document.getElementById('root'), { childList: true, subtree: true });
 
   const fit = () => document.querySelectorAll('.phone-holder').forEach(h => {
     const w = h.parentElement.clientWidth, z = Math.min(1, w / 375), el = h.firstElementChild; h.style.height = (812 * z) + 'px'; if (el) el.style.zoom = z;

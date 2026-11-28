@@ -215,6 +215,7 @@ function DateSheet({ filters, apply, anyLabel }: { filters: Filters; apply: (f: 
             options={CUSTOM_MODES}
             value={custom.mode as CustomMode}
             onChange={(mode) => set({ mode })}
+            hug={14}
             testId="date-mode"
           />
           {custom.mode === "between" ? (
@@ -237,7 +238,7 @@ function DateSheet({ filters, apply, anyLabel }: { filters: Filters; apply: (f: 
                     data-testid="date-amount"
                   />
                 </span>
-                <Seg label="Unit" big options={UNITS} value={custom.unit} onChange={(unit) => set({ unit })} testId="date-unit" />
+                <Seg label="Unit" big hug={8} options={UNITS} value={custom.unit} onChange={(unit) => set({ unit })} testId="date-unit" />
               </div>
             </div>
           ) : (

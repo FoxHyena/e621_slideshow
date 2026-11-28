@@ -34,6 +34,22 @@ New drawings, in the mock's first section, "A post on its own". **Approved by yo
      is likely to block it (the builder read this from the code; nobody tried it on a phone).
 3. Not tried by anyone: Save on a real iPhone.
 
+## Open now (2026-11-27, night)
+
+1. **The date menu's Custom part, redrawn after your screenshot.** The build matched my drawing; the
+   drawing was the fault. The kinds and the units now hug their words (every word has the same room
+   at its sides), the units include "years", and the line under "Custom…" has 8 above it.
+   **Approved by you: "Commit and send".**
+2. **"Is the text spacing off?"** The build's text matches the drawing to 2 px, so it is the type
+   itself. The round face has narrow word spaces and the small system line under it runs loose.
+   Three options were in a picture (as is; wider word spaces; that and a tighter small line).
+   **Picked by you: "C".** It is applied across the whole mock; nothing clips or wraps because of it.
+
+3. **The post's ⋯ menu on a computer, after your screenshot.** Two things. The build has the artist's
+   mark 4 from the popover's top; the drawing has 16 (the builder's to fix). And my drawing had the
+   rows' labels 2 px left of the name above them; they now line up at 64. **Approved by you:
+   "Commit and send".**
+
 ## Answered on the check list, 2026-11-27
 
 - **Agreed with my pick, 47 items:** every choice in batches 1 to 5 as drawn, the sidebar with names,

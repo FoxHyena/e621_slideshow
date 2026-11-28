@@ -535,6 +535,9 @@ html {
   pointer-events: auto;
   transition: transform 120ms ease-out;
   animation: tag-target 320ms cubic-bezier(0.3, 1.35, 0.5, 1) backwards;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .tag-target:nth-child(2) {
   animation-delay: 40ms;
@@ -592,6 +595,10 @@ html {
 /* ---- shell (src/shell) ------------------------------------------------- */
 
 :root {
+  /* DESIGN.md "Hierarchy", Spacing (owner-picked "C", 2026-11-27): Fredoka gets word-spacing 0.08em
+     and system text at 13 letter-spacing -0.02em, each set where its face is set. Footnote-size
+     rules that don't set a face use this, which a Fredoka rule turns off for what it holds. */
+  --ls-footnote: -0.02em;
   /* DESIGN.md bottom stack: the bar sits 22 from the bottom, above any larger safe area. */
   --bar-bottom: max(22px, calc(env(safe-area-inset-bottom) - 12px));
   /* the tube's middle stands 10 above its ends */
@@ -706,6 +713,8 @@ html {
   letter-spacing: -0.005em;
   white-space: nowrap;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
 }
 .wm i {
   font-style: normal;
@@ -743,6 +752,9 @@ html {
   font-size: 15px;
   line-height: 20px;
   font-weight: 500;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .side-tab[aria-current="page"] {
   color: var(--color-gold);
@@ -776,6 +788,9 @@ html {
   font-weight: 600;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .side-search {
   height: 44px;
@@ -807,6 +822,9 @@ html {
   line-height: 24px;
   font-weight: 600;
   text-align: center;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .side-account {
   margin-top: auto;
@@ -843,6 +861,7 @@ html {
   color: var(--color-muted);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
+  letter-spacing: var(--ls-footnote);
 }
 /* The goo's pools (DESIGN.md "The goo on a computer", "The pool on a phone"; src/components/Pool.tsx):
    over what's under them, taking no clicks; the copy under the goo is drawn again in Goo Ink, cut to
@@ -1075,6 +1094,9 @@ html {
   font-weight: 500;
   text-decoration: none;
   transition: color 200ms ease-out;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .tube-tab[aria-current="page"] {
   color: var(--color-gold);
@@ -1118,6 +1140,9 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-tab);
   font-weight: 500;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .goo-ink-tab[data-on] svg {
   color: #0a1d3b;
@@ -1282,6 +1307,8 @@ html {
   text-wrap: balance;
   overflow-wrap: anywhere;
   outline: none;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
 }
 .screen-note {
   margin-top: 8px;
@@ -1303,6 +1330,9 @@ html {
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 
 /* Interim home (slice 1): the legacy app in a box that keeps its fixed layers off the bar.
@@ -1573,6 +1603,9 @@ html {
   font-size: var(--text-headline);
   line-height: 20px;
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .post-name > span:first-child {
   overflow: hidden;
@@ -1600,15 +1633,21 @@ html {
   line-height: 16px;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .post-new {
   color: var(--color-gold);
   font-family: var(--font-rounded);
   font-weight: 500;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .post-id {
   font-family: var(--font-mono);
   font-size: 12px;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 /* The whole who-made-it block is one target; the text under it stays plain text. */
 .post-by {
@@ -1692,6 +1731,7 @@ html {
 .post-media-gone {
   font-size: var(--text-footnote);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .post-play {
   position: absolute;
@@ -1792,6 +1832,7 @@ html {
   -webkit-touch-callout: none;
   user-select: none;
   transition: transform 150ms ease-out;
+  letter-spacing: var(--ls-footnote);
 }
 .post-tag::before {
   content: "";
@@ -1813,6 +1854,9 @@ html {
   box-shadow: inset 0 0 0 1.5px rgba(180, 199, 217, 0.18);
   color: var(--color-muted);
   font-family: var(--font-rounded);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 
 /* Footer: score, then the favourite pill at the right end, under the thumb. */
@@ -1835,6 +1879,9 @@ html {
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .post-score svg {
   width: 18px;
@@ -1886,6 +1933,9 @@ html {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .fav-pill::before {
   content: "";
@@ -1961,6 +2011,9 @@ html {
   font-weight: 500;
   color: var(--color-fg);
   white-space: nowrap;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .follow-pill::before {
   content: "";
@@ -2149,6 +2202,7 @@ html {
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
   text-align: center;
+  letter-spacing: var(--ls-footnote);
 }
 .feed-empty {
   display: flex;
@@ -2187,6 +2241,9 @@ html {
   font-size: var(--text-headline);
   line-height: var(--text-headline--line-height);
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .btn-tonal svg,
 .btn-gold svg {
@@ -2235,6 +2292,9 @@ html {
   color: var(--color-fg);
   white-space: nowrap;
   transition: transform 100ms ease-out;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .chip::before {
   content: "";
@@ -2298,12 +2358,14 @@ html {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .link-note {
   margin: 8px 0 16px;
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .link-mine {
   display: flex;
@@ -2325,6 +2387,9 @@ html {
   font-family: var(--font-rounded);
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .nobody-banner > svg {
   flex: none;
@@ -2356,6 +2421,9 @@ html {
   font-family: var(--font-rounded);
   font-weight: 700;
   color: #fff;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .nobody-sign-in:active {
   transform: translateY(2px);
@@ -2542,6 +2610,8 @@ html {
   line-height: var(--text-section--line-height);
   font-weight: 600;
   letter-spacing: -0.005em;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
 }
 /* The ✕: a 36 round well, its edge on the 16 inset. */
 .sheet-x {
@@ -2639,6 +2709,8 @@ html {
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 16px;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 .well-group {
   border-radius: var(--radius-art);
@@ -2653,7 +2725,9 @@ html {
   gap: 14px;
   width: 100%;
   min-height: 52px;
-  padding: 0 16px 0 12px;
+  /* 14, the 20 icon, 14: the label starts 64 from the panel's edge, level with the context line's
+     name (16 + 36 + 12; DESIGN.md "Sheet (⋯ menu)", 2026-11-27: it stood at 62) */
+  padding: 0 16px 0 14px;
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
@@ -2661,6 +2735,9 @@ html {
   color: var(--color-fg);
   text-align: left;
   text-decoration: none;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .well-row > svg {
   flex: none;
@@ -2678,13 +2755,16 @@ html {
   font-size: var(--text-footnote);
   font-weight: 400;
   color: var(--color-muted);
+  word-spacing: normal;
+  --ls-footnote: -0.02em;
+  letter-spacing: -0.02em;
 }
 .well-row + .well-row::before {
   content: "";
   position: absolute;
   top: 0;
   right: 0;
-  left: 46px;
+  left: 48px;
   border-top: 1px solid rgba(180, 199, 217, 0.1);
 }
 .well-row:focus-visible {
@@ -2747,6 +2827,9 @@ html {
   color: var(--color-muted);
   text-align: left;
   transition: color 200ms ease-out;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .menu-row[aria-checked="true"] {
   color: var(--color-fg);
@@ -2770,6 +2853,9 @@ html {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .menu-act svg {
   width: 16px;
@@ -2816,6 +2902,9 @@ html {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .field-pair {
   display: grid;
@@ -2828,7 +2917,7 @@ html {
   gap: 8px;
 }
 .field-n > .field6 {
-  flex: 0 0 88px;
+  flex: 0 0 72px;
 }
 .field-n > .seg {
   flex: 1;
@@ -2861,6 +2950,8 @@ html {
   font-size: 16px;
   font-weight: 400;
   color: var(--color-fg);
+  word-spacing: normal;
+  --ls-footnote: -0.02em;
 }
 .field:focus {
   outline: none;
@@ -2894,6 +2985,7 @@ html {
   padding-left: 16px;
   font-size: var(--text-footnote);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .search-count[data-over] {
   color: var(--color-danger);
@@ -2944,6 +3036,9 @@ html {
   font-weight: 600;
   color: var(--color-link);
   text-decoration: none;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .link-row svg {
   width: 16px;
@@ -2961,6 +3056,9 @@ html {
   font-size: var(--text-callout);
   font-weight: 600;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 
 @media (min-width: 900px) {
@@ -3007,6 +3105,10 @@ html {
   }
   .sheet-layer[data-pop] .sheet-x {
     display: none;
+  }
+  /* no grabber in a popover: the context line starts 16 from the top, as from the side (it was 4) */
+  .sheet-layer[data-pop] .sheet-ctx {
+    padding-top: 16px;
   }
 }
 
@@ -3145,6 +3247,9 @@ html {
   font-size: var(--text-footnote);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .player-desktop {
   display: none;
@@ -3183,12 +3288,16 @@ html {
   font-weight: 600;
   white-space: nowrap;
   text-overflow: ellipsis;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .player-who .post-time {
   font-size: var(--text-footnote);
   line-height: 16px;
   color: rgba(255, 255, 255, 0.74);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .player-rail {
   display: flex;
@@ -3248,6 +3357,9 @@ html {
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.74);
   text-align: right;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .player-progress .progress-bar {
   height: 100%;
@@ -3429,6 +3541,7 @@ html {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .feed-loader {
   display: grid;
@@ -3442,6 +3555,9 @@ html {
   font-size: var(--text-section);
   line-height: var(--text-section--line-height);
   font-weight: var(--text-section--font-weight);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 /* it rides 12 under the floating title capsule once you scroll (4 + 52 down on a phone, 8 + 52 on a
    computer); at 12 from the top it sat under the capsule, out of sight */
@@ -3472,6 +3588,9 @@ html {
     var(--lit),
     0 var(--lip) 0 var(--lip-c),
     0 12px 24px rgba(0, 0, 0, 0.4);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .top-pill svg {
   width: 18px;
@@ -3499,6 +3618,7 @@ html {
   margin: -8px 0 16px 16px;
   font-size: var(--text-footnote);
   color: var(--color-danger);
+  letter-spacing: var(--ls-footnote);
 }
 .tune-note {
   max-width: 65ch;
@@ -3507,6 +3627,7 @@ html {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .panel-card .tune-note {
   margin: 8px 0 0;
@@ -3526,6 +3647,9 @@ html {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .list-group > li.tune-group + li.list-row::before {
   display: none;
@@ -3588,11 +3712,15 @@ html {
   line-height: var(--text-headline--line-height);
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .feed-caught small {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .feed-burst {
   justify-content: space-between;
@@ -3626,11 +3754,17 @@ html {
   text-align: center;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 0 0 2px var(--color-gold);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .screen-sub b {
   font-family: var(--font-rounded);
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .sheet-note {
   padding: 8px 4px 0;
@@ -3732,6 +3866,9 @@ html {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .list-label > button,
 .list-label > span:last-child:not(:first-child) {
@@ -3807,6 +3944,9 @@ html {
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .row-text > small {
   overflow: hidden;
@@ -3816,6 +3956,7 @@ html {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .row-value {
   flex: none;
@@ -3824,6 +3965,7 @@ html {
   color: var(--color-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 /* A chevron's ink, not its box, sits 16 from the edge. */
 .row-chev {
@@ -3934,6 +4076,8 @@ svg.lucide-droplets {
   color: var(--color-fg);
   caret-color: var(--color-gold);
   outline: none;
+  word-spacing: normal;
+  --ls-footnote: -0.02em;
 }
 .field6 input::placeholder {
   color: var(--color-muted);
@@ -3969,6 +4113,7 @@ svg.lucide-droplets {
   font-size: var(--text-footnote);
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 /* A field used as a button: looks the same, opens the real one. */
 button.field6 {
@@ -3978,6 +4123,9 @@ button.field6 {
   line-height: var(--text-callout--line-height);
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 button.field6 > svg {
   color: var(--color-muted);
@@ -4081,6 +4229,9 @@ button.field6:focus-visible {
   line-height: var(--text-callout--line-height);
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 
 /* Segmented control: a sunk track; the chosen segment rides a capsule that slides to it. */
@@ -4108,6 +4259,9 @@ button.field6:focus-visible {
   color: var(--color-muted);
   white-space: nowrap;
   transition: color 200ms ease-out;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .seg > button::before {
   content: "";
@@ -4137,6 +4291,23 @@ button.field6:focus-visible {
 }
 .seg[data-big] {
   height: var(--spacing-control);
+}
+/* segments that hug their words: each its word plus --hug at both sides, the rest shared equally;
+   the capsule takes the chosen one's place and width (set from the layout in Seg) */
+.seg[data-hug] {
+  display: flex;
+}
+.seg[data-hug] > button {
+  flex: 1 1 auto;
+  padding-inline: var(--hug);
+}
+.seg[data-hug] > .seg-thumb {
+  left: 0;
+  width: var(--thumb-w, 0);
+  transform: translateX(var(--thumb-x, 0));
+  transition:
+    transform 360ms var(--ease-slide),
+    width 360ms var(--ease-slide);
 }
 .seg[data-big] > button {
   font-size: var(--text-label);
@@ -4239,6 +4410,9 @@ button.field6:focus-visible {
   line-height: var(--text-callout--line-height);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 
 /* Slider: a 12 well track filled in Link Blue up to a 28 white thumb; 44 tall to touch. */
@@ -4351,12 +4525,16 @@ button.field6:focus-visible {
   font-size: var(--text-callout);
   line-height: var(--text-callout--line-height);
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .panel-card-head > span:last-child {
   font-size: var(--text-footnote);
   font-weight: 500;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .slider-ends {
   display: flex;
@@ -4365,6 +4543,7 @@ button.field6:focus-visible {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 
 /* The app mark at the foot of Settings. */
@@ -4391,6 +4570,7 @@ button.field6:focus-visible {
 .app-foot small {
   font-size: var(--text-footnote);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 
 /* Grid view: tiles cropped square, 16 radius, the sunk rim; score and favs under each one. */
@@ -4453,6 +4633,9 @@ button.field6:focus-visible {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .tile-nums > span {
   display: inline-flex;
@@ -4555,6 +4738,9 @@ button.field6:focus-visible {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .style-pick[aria-checked="true"] {
   color: var(--color-fg);
@@ -4667,6 +4853,8 @@ button.field6:focus-visible {
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 16px;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 .info-who:focus-visible {
   outline: 2px solid var(--color-gold);
@@ -4696,6 +4884,9 @@ button.field6:focus-visible {
   line-height: 22px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .stat-well b svg {
   width: 16px;
@@ -4705,6 +4896,7 @@ button.field6:focus-visible {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .stat-up {
   color: var(--color-score);
@@ -4730,6 +4922,7 @@ button.field6:focus-visible {
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .info-why svg {
   flex: none;
@@ -4751,6 +4944,9 @@ button.field6:focus-visible {
   line-height: var(--text-footnote--line-height);
   font-weight: 500;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .info-label span {
   font-variant-numeric: tabular-nums;
@@ -4777,6 +4973,8 @@ button.field6:focus-visible {
   font-size: 12px;
   line-height: 16px;
   color: var(--color-muted);
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 .info-foot .link-row {
   flex: none;
@@ -4934,6 +5132,9 @@ button.field6:focus-visible {
   line-height: var(--text-headline--line-height);
   font-weight: 600;
   text-wrap: balance;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .state-text {
   max-width: 30ch;
@@ -4975,6 +5176,8 @@ button.field6:focus-visible {
   color: var(--color-muted);
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 /* The quiet button: the lesser way out, under a gold or tonal one. No fill, no lip. */
 .btn-quiet {
@@ -4986,6 +5189,9 @@ button.field6:focus-visible {
   line-height: var(--text-callout--line-height);
   font-weight: 600;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .btn-quiet:active {
   background: rgba(255, 255, 255, 0.04);
@@ -5053,6 +5259,9 @@ button.field6:focus-visible {
   line-height: var(--text-footnote--line-height);
   font-weight: 600;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .state-banner svg {
   flex: none;
@@ -5134,6 +5343,7 @@ button.field6:focus-visible {
   line-height: var(--text-footnote--line-height);
   font-style: normal;
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .first-step-n,
 .pick-check {
@@ -5147,6 +5357,7 @@ button.field6:focus-visible {
   box-shadow: var(--shadow-sunk);
   font-size: var(--text-footnote);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .first-step-n svg,
 .pick-check svg {
@@ -5260,6 +5471,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .artists-tools {
   display: flex;
@@ -5306,6 +5518,7 @@ li[data-state="done"] .first-step-n svg,
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-footnote);
 }
 .artists-banner {
   margin-bottom: 16px;
@@ -5466,6 +5679,8 @@ li[data-state="done"] .first-step-n svg,
   line-height: 18px;
   color: var(--color-link);
   overflow-wrap: anywhere;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 .hero-stats {
   display: flex;
@@ -5505,6 +5720,9 @@ li[data-state="done"] .first-step-n svg,
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .hero-stat b svg {
   width: 16px;
@@ -5515,6 +5733,7 @@ li[data-state="done"] .first-step-n svg,
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
   white-space: nowrap;
+  letter-spacing: var(--ls-footnote);
 }
 .artist-hero .follow-hero {
   width: 100%;
@@ -5525,6 +5744,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 /* The top bar (DESIGN.md "Top bar", owner-picked 2026-11-26 "Capsule"): once the title has scrolled
    away, a floating capsule, the tab bar's sibling. The outer layer is the page fading to Ground behind
@@ -5588,6 +5808,9 @@ li[data-state="done"] .first-step-n svg,
   font-weight: 600;
   color: var(--color-gold);
   font-variant-numeric: tabular-nums;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .topbar[data-at] .tools {
   margin-left: auto;
@@ -5653,6 +5876,9 @@ li[data-state="done"] .first-step-n svg,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .compact-back {
   margin-right: -4px;
@@ -5734,10 +5960,18 @@ li[data-state="done"] .first-step-n svg,
 .drop .sheet-rows > .list-row {
   padding-inline: 0;
 }
+/* under the rows: 8, a 1 px line 16 in from each side (the menu's own divider), then 12 (DESIGN.md
+   "Menu", 2026-11-27; it was 4 under the rows and ran the full width) */
 .drop .menu-custom {
-  margin: 0;
-  padding: 12px;
-  border-top: 1px solid rgba(180, 199, 217, 0.1);
+  margin: 4px 0 0;
+  padding: 0 12px 12px;
+}
+.drop .menu-custom::before {
+  content: "";
+  flex: none;
+  height: 1px;
+  margin-inline: 4px;
+  background: rgba(180, 199, 217, 0.1);
 }
 .drop .link-lede,
 .drop .link-note {
@@ -5795,6 +6029,9 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   font-weight: 600;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 /* 28 tall like the other two steps, so the three sit 8 apart; the tap target still reaches 44 */
 .signin-link {
@@ -5807,6 +6044,9 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-callout);
   font-weight: 600;
   color: var(--color-link);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .signin-link::before {
   content: "";
@@ -5825,6 +6065,9 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   font-weight: 600;
   color: var(--color-muted);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .signin .field6 {
   margin-bottom: 12px;
@@ -5832,6 +6075,7 @@ li[data-state="done"] .first-step-n svg,
 .signin-key input {
   font-family: var(--font-mono);
   letter-spacing: 0.08em;
+  word-spacing: normal;
 }
 .signin-key.field6 {
   padding-right: 4px;
@@ -5842,6 +6086,7 @@ li[data-state="done"] .first-step-n svg,
   padding: 0 14px;
   margin-right: 2px;
   font-size: var(--text-footnote);
+  letter-spacing: var(--ls-footnote);
 }
 .signin-hint,
 .signin-error {
@@ -5849,6 +6094,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-danger);
+  letter-spacing: var(--ls-footnote);
 }
 .signin-hint {
   color: var(--color-muted);
@@ -5861,6 +6107,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .signin-note svg {
   flex: none;
@@ -5883,6 +6130,9 @@ li[data-state="done"] .first-step-n svg,
   font-family: var(--font-rounded);
   font-size: var(--text-callout);
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .signin-go {
   width: 100%;
@@ -5926,6 +6176,9 @@ li[data-state="done"] .first-step-n svg,
   line-height: 20px;
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .post-gate small {
   max-width: 26ch;
@@ -5933,6 +6186,7 @@ li[data-state="done"] .first-step-n svg,
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
   overflow-wrap: anywhere;
+  letter-spacing: var(--ls-footnote);
 }
 .post-gate .btn-tonal {
   margin-top: 12px;
@@ -6009,6 +6263,8 @@ li[data-state="done"] .first-step-n svg,
   font-size: 12px;
   line-height: 16px;
   color: var(--color-muted);
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 .post-links .row-text small {
   overflow: hidden;
@@ -6032,6 +6288,9 @@ li[data-state="done"] .first-step-n svg,
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .post-more-head .link-row {
   flex: none;
@@ -6102,6 +6361,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .group-note svg {
   flex: none;
@@ -6119,6 +6379,9 @@ li[data-state="done"] .first-step-n svg,
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .rating-letter[data-rating="s"] {
   color: var(--color-score);
@@ -6219,6 +6482,8 @@ li[data-state="done"] .first-step-n svg,
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 18px;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 
 /* ---- Install the app (slice 8; DESIGN.md "Install, update and the app icon", proposed) ---- */
@@ -6249,6 +6514,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .install-glyph {
   display: grid;
@@ -6265,6 +6531,7 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   line-height: var(--text-footnote--line-height);
   color: var(--color-muted);
+  letter-spacing: var(--ls-footnote);
 }
 .install-copy {
   width: 100%;
@@ -6289,6 +6556,8 @@ li[data-state="done"] .first-step-n svg,
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 12px 24px rgba(0, 0, 0, 0.4);
   color: var(--color-fg);
   font-family: var(--font-sans);
+  word-spacing: normal;
+  --ls-footnote: -0.02em;
 }
 /* sonner centres the list (its --width comes from the Toaster's style); the toast hugs its words,
    centred inside it, never past the 16 insets */
@@ -6407,6 +6676,7 @@ li[data-state="done"] .first-step-n svg,
   color: var(--color-link);
   white-space: nowrap;
   text-overflow: ellipsis;
+  letter-spacing: var(--ls-footnote);
 }
 .toast6-undo {
   position: relative;
@@ -6423,6 +6693,9 @@ li[data-state="done"] .first-step-n svg,
   font-size: var(--text-footnote);
   font-weight: 600;
   cursor: pointer;
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 /* the hit area reaches 44 */
 .toast6-undo::before {
@@ -6479,6 +6752,9 @@ li[data-state="done"] .first-step-n svg,
   line-height: var(--text-section--line-height);
   font-weight: 600;
   color: var(--color-fg);
+  word-spacing: 0.08em;
+  --ls-footnote: normal;
+  letter-spacing: normal;
 }
 .settings-section:first-of-type .settings-section-title {
   margin-top: 12px;
