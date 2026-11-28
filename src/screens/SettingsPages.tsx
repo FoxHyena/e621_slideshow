@@ -4,7 +4,7 @@
  * Settings' sub-pages (UX.md "Settings", DESIGN.md "Settings" and "Settings: Account, Content, For
  * You, App"): each a pushed screen with Back, the large title, then groups. Their own chunk.
  */
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, RefreshCw, Share, SlidersHorizontal, SquarePlus, Smartphone } from "lucide-react";
+import { AlertTriangle, Check, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, RefreshCw, Send, Share, SlidersHorizontal, SquarePlus, Smartphone } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
@@ -30,6 +30,8 @@ import { copyText, openArtist, openSignIn } from "./actions";
 import { GooRow } from "./GooRow";
 
 const SOURCE = "https://github.com/FoxHyena/e621_slideshow";
+/** Who made it (owner, 2026-11-27): the owner's Telegram, for bug reports and feature requests. */
+const MADE_BY = "https://t.me/hyenafox";
 const label = (n: string) => n.replaceAll("_", " ");
 
 export function SettingsPage({ section }: { section: Exclude<SettingsSection, "classic"> }) {
@@ -751,6 +753,24 @@ function AppPage() {
         </li>
       </ul>
       <Note>Not run by e621. It reads e621 with your own account and key.</Note>
+      <div className="list-label">
+        <span>Made by</span>
+      </div>
+      <ul className="list-group">
+        <li>
+          <a className="list-row" href={MADE_BY} target="_blank" rel="noopener" data-testid="made-by">
+            <span className="row-well" aria-hidden>
+              <Send />
+            </span>
+            <span className="row-text">
+              <b>Oreo</b>
+              <small>@hyenafox on Telegram</small>
+            </span>
+            <ExternalLink aria-hidden className="row-chev" />
+          </a>
+        </li>
+      </ul>
+      <Note>Found a bug or want a feature? Send a message.</Note>
       {sheet === "install" && <InstallSheet way={install} />}
       {sheet === "keys" && (
         <Sheet title="Keyboard shortcuts" testId="sheet-keys">

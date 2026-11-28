@@ -1696,3 +1696,18 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - This makes "Open" the third word the action slot can hold, after "Undo" and "Reload".
 - Not chosen: keep opening the tab by itself and show these words only when the browser blocks it.
   That gives two toasts for one failure.
+
+## 2026-11-27 — Built: "Made by", and Save's two toasts as designed
+- Owner: "Made by + Save toasts" (designs 886d01f and b214e46).
+- **Made by**, last on the App page: one row to `https://t.me/hyenafox` (new tab, `rel="noopener"`),
+  "Oreo" over "@hyenafox on Telegram", lucide's paper plane in the well; under it "Found a bug or
+  want a feature? Send a message."
+- **Save:** "The picture is ready" / "Tap Save again" (Save's arrow, 4 s). When the file can't be
+  fetched, nothing opens by itself any more: "Couldn't save it here" / "Open the full picture
+  instead" with "Open" (6 s, the ring); Open opens the original file in a new tab from its own tap.
+  The next tap on Save tries to save again.
+- **A toast in the viewer**, measured: it sat 168 from the bottom on a phone (above the feed's
+  Play, still in the page under the viewer) and 120 on a computer (the player's rule). Now 12 above
+  the viewer's artist row: 142 on a phone (34 or the safe area, + 108), 76 on a computer.
+- Tests: `viewer.spec.ts` (both toasts' words and places; no tab until Open), `settings.spec.ts`
+  (Made by).
