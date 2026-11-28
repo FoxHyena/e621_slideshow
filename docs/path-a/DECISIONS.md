@@ -2207,3 +2207,20 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   weight per tag, `model.ts`), so "Taste is how well its tags match yours" holds for both, leaving out
   the rating; I kept the sentence. "Popular is its favorites for
   its age" holds: the quality percentile compares favorites against posts of the same age.
+
+## 2026-11-27 — Tune's picture: the builder's five choices are kept (owner: "Keep and commit")
+- The builder built the card and the dots (draft PR 51, `claude/tune-picture`) and reported five
+  choices of its own. Told of them and asked "Keep the builder's five choices and write them into the
+  spec?", the owner said: "Keep and commit". The owner has not seen the build.
+- Now in DESIGN.md "Tune":
+  1. A thumb the blacklist or the rating setting hides is hidden in the card too; empty Well squares
+     until the thumbs arrive.
+  2. "Hide" is remembered by the device, not the account.
+  3. With no tag at exactly one dot, the second example is from the tags with the fewest dots.
+  4. A row that is not searched dims its dots.
+  5. The dots measure against the strongest unpinned tag. This changes my rule (the strongest tag of
+     all): a pin would have thinned every other row on a small profile.
+- Also written in: the search stop's sentence follows For You's Date, in the builder's wordings.
+- The builder's answer on the learned ranking: it also scores a post's rating, which the card's
+  sentence on Taste leaves out. The sentence stays.
+- Checked by me: the branch holds my design commit and the PR is an open draft. Not run, not seen.
