@@ -2294,3 +2294,25 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The builder's answer on the learned ranking: it also scores a post's rating, which the card's
   sentence on Taste leaves out. The sentence stays.
 - Checked by me: the branch holds my design commit and the PR is an open draft. Not run, not seen.
+
+## 2026-11-27 — Comics follow-ups: sign-out clears posts in memory, no "pool:77" in Recent searches, a video link waits for its feed
+- Owner, on what the comics review left open: "Fix all three".
+- **Sign-out.** The posts asked for one at a time (the post page, the viewer opened from a link) and a
+  comic's pages stayed in memory, keyed by the account, after a sign-out. Nothing was saved, but the
+  rule is that an account's records go with it. Now they go when that account's sign-in ends: a
+  sign-out, another account signing in, or leaving a link's sign-in. An answer still on its way for that
+  account isn't kept either.
+  - The watcher sits with these caches (src/feed/postCache.ts), not in the session. The session is in the
+    first load, which is at its 200 KB budget, and these caches only fill once a post is asked for.
+- **Open as a feed.** It no longer adds "pool:77" to Recent searches, where it meant nothing. Results' search
+  pill names the comic instead of showing "pool:77". Typing "pool:77" yourself still goes into history,
+  as any search does.
+- **A video opened from a link** (`/search?tags=…&view=<video>`) went to the post's page, not the paused
+  player, when the post's own answer came back before the feed's first page. With a saved sign-in this
+  was the usual order, since the feed waits for e621 to confirm it.
+  - Now a video waits for the feed's first answer. The wait starts once the sign-in is settled, and a link
+    with no feed gives up after 2 s.
+- Not changed (mine):
+  - A disabled turn button on the last page still drops keyboard focus.
+  - A comic that gains a page mid-visit shows it after a reload.
+  - The pill can show "pool:77" for a moment before the comic's name comes in.

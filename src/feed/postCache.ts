@@ -2,12 +2,53 @@
  * Posts asked of e621 one at a time this visit (the post page, the picture viewer opened from a link),
  * by whose sign-in asked and the post's number. One answer per post a visit, so Back and forward, and
  * the viewer opened from a post's page, don't ask again. null: e621 has no such post (or it was
- * deleted). In memory only.
+ * deleted). In memory only, and an account's go when its sign-in ends (onAccountLeft).
  */
+import type { Credentials } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
+import { getSession } from "@/state/session";
+import type { Store } from "@/state/store";
+
+// ---- an account's sign-in ending ----------------------------------------------------------
+// Here rather than in the session, which is in the first load: these caches only fill once a post
+// is asked for, so watching from then on is enough.
+
+const leftListeners = new Set<(name: string) => void>();
+/**
+ * What a module keeps per account in memory (posts asked for, a comic's pages) goes when that account's
+ * sign-in ends: a sign-out, another account signing in, leaving a link's sign-in. `name` is the
+ * username the sign-in asked with (`creds.username`), as those caches are keyed.
+ */
+export function onAccountLeft(fn: (name: string) => void): () => void {
+  leftListeners.add(fn);
+  return () => leftListeners.delete(fn);
+}
+let watching = false;
+/** Tell onAccountLeft's listeners when `store`'s username changes away from a name. */
+export function watchAccounts(store: Pick<Store<{ creds: Credentials | null }>, "get" | "subscribe">): () => void {
+  watching = true;
+  let was = store.get().creds?.username;
+  return store.subscribe(() => {
+    const now = store.get().creds?.username;
+    if (was && now !== was) for (const fn of leftListeners) fn(was);
+    was = now;
+  });
+}
+function watch() {
+  if (!watching && typeof window !== "undefined") watchAccounts(getSession().store);
+}
+
+// ---- the posts ------------------------------------------------------------------------------
 
 const known = new Map<string, Post | null>();
 const keyOf = (user: string | null | undefined, id: number | string) => `${user ?? ""}:${id}`;
+/** Bumped when an account's sign-in ends: an answer asked before then isn't kept. */
+let era = 0;
+onAccountLeft((name) => {
+  era++;
+  for (const k of known.keys()) if (k.startsWith(`${name}:`)) known.delete(k);
+  for (const k of asking.keys()) if (k.startsWith(`${name}:`)) asking.delete(k);
+});
 
 export const knownPost = (user: string | null | undefined, id: number | string) => known.get(keyOf(user, id));
 export const hasKnownPost = (user: string | null | undefined, id: number | string) => known.has(keyOf(user, id));
@@ -15,6 +56,7 @@ export const hasKnownPost = (user: string | null | undefined, id: number | strin
 /** e621's answer to `id:<n>`: a deleted post counts as none (its page says it may have been deleted). */
 function remember(user: string | null | undefined, id: number | string, found: Post | undefined): Post | null {
   const p = found && !found.flags?.deleted ? found : null;
+  watch();
   known.set(keyOf(user, id), p);
   return p;
 }
@@ -33,9 +75,19 @@ export function askPost(user: string | null | undefined, id: number | string, as
   const key = keyOf(user, id);
   let p = asking.get(key);
   if (!p) {
-    p = ask()
-      .then((ps) => remember(user, id, ps[0]))
-      .finally(() => asking.delete(key));
+    watch();
+    const asked = era;
+    const mine: Promise<Post | null> = ask()
+      .then((ps) => {
+        // the account that asked signed out meanwhile: the answer isn't kept
+        if (asked !== era) return ps[0] && !ps[0].flags?.deleted ? ps[0] : null;
+        return remember(user, id, ps[0]);
+      })
+      .finally(() => {
+        // only this ask's own entry: a later ask under the same key keeps its own
+        if (asking.get(key) === mine) asking.delete(key);
+      });
+    p = mine;
     asking.set(key, p);
   }
   return p;

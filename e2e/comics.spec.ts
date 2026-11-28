@@ -129,6 +129,10 @@ test.describe("on a phone", () => {
     const ids = page.locator("[data-testid=post-card]").filter({ visible: true });
     await expect(ids).toHaveCount(5);
     expect(await ids.evaluateAll((els) => els.map((e) => Number(e.getAttribute("data-post-id"))))).toEqual(PAGES);
+    // the pill names the comic; "pool:77" isn't kept in Recent searches
+    await expect(page.getByTestId("query-pill").filter({ visible: true })).toHaveText("Riverbank Tales");
+    const history = await page.evaluate(() => localStorage.getItem("e6ss:v1:history") ?? "");
+    expect(history).not.toContain("pool:");
   });
 
   test("the post page has the comic: its name and page, and a strip of every page", async ({ page }) => {
