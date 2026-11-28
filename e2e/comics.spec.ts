@@ -185,6 +185,37 @@ test("on a computer: two glass buttons and the arrow keys turn the page", async 
   await shot(page, "comic-viewer-desktop");
 });
 
+test("a page turn doesn't open the viewer again: no fade over the feed", async ({ page }) => {
+  // every time the viewer's open (a fade and a rise) starts
+  await page.addInitScript(() => {
+    const w = window as Window & { opens?: number };
+    w.opens = 0;
+    document.addEventListener("animationstart", (e) => e.animationName === "player-in" && w.opens!++, true);
+  });
+  const opens = () => page.evaluate(() => (window as Window & { opens?: number }).opens);
+  await page.goto("/search?tags=wolf&view=2005");
+  await expect(viewer(page)).toHaveAttribute("data-pages", "");
+  await expect.poll(opens).toBe(1);
+  for (const key of ["ArrowRight", "ArrowLeft"]) {
+    const was = await viewer(page).getAttribute("data-post-id");
+    await page.keyboard.press(key);
+    await expect(viewer(page)).not.toHaveAttribute("data-post-id", was!);
+  }
+  // the turned-to pages didn't play it again (it once flashed the feed through, then rose in)
+  await page.waitForTimeout(300);
+  expect(await opens()).toBe(1);
+});
+
+test("buttons hidden with a tap stay hidden from page to page", async ({ page }) => {
+  await page.goto("/search?tags=wolf&view=2005");
+  await expect(viewer(page)).toHaveAttribute("data-pages", "");
+  await page.getByTestId("viewer-stage").click();
+  await expect(viewer(page).getByTestId("controls")).toHaveAttribute("data-visible", "false");
+  await page.keyboard.press("ArrowRight");
+  await expect(viewer(page)).toHaveAttribute("data-post-id", "2002");
+  await expect(viewer(page).getByTestId("controls")).toHaveAttribute("data-visible", "false");
+});
+
 test("a page on your blacklist is turned past, and its picture isn't fetched ahead", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("e6ss:v1:search", JSON.stringify({ blacklist: "badtag" })));
   const asked: string[] = [];
