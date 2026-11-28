@@ -1630,3 +1630,34 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     the fields' right end, 8 above Sign in. Now a 44 row, flush on both sides, callout-rounded, 16
     above Sign in. Paste sits 6 from the key field's end (was 10).
 - New e2e test `sign-in-sheet.spec.ts` measures each of these on a computer and a phone.
+
+## 2026-11-27 — Save in the viewer: what the build added, written into the design
+- Built by the builder on PR #32 (`afad3d8`): Save fetches the file through the app's own `/media/…`
+  path, because e621's file host lets only e621.net read its files. Owner, to the builder: "Build
+  pass-through". The designer has those words from the builder, not from the owner directly.
+- The build added two things the design did not have: a toast when a phone needs a second tap to
+  open the share sheet, and a new tab with a toast when the file cannot be fetched. Owner, asked
+  "Write Save's two fallbacks into the design files?": "Yes, write them".
+- **Mine:** both toasts take the toast's two-line form. "The picture is ready" / "Tap Save again"
+  (was "The picture is ready: tap Save again", 301 wide at 375; it would be cut on a 320 phone).
+  "Couldn't save it here" / "The full picture opened in a new tab" (was "Couldn't save here: the full
+  picture opened in a new tab", 56 characters, cut at 375). Marks: Save's arrow in Link Blue; the
+  alert glyph in Danger.
+- **Mine:** a toast in the viewer floats 12 above the bottom stack: 142 from the bottom of a phone,
+  202 in a comic, 76 on a computer's stage. The build has 120 for the player's room, which would sit
+  10 into the artist's row by the mock's measures. Not checked in the build.
+- Kept from the build: the button's glass fades to 55% and back while the file comes; the file's name.
+- Not checked: Save on a real iPhone; whether a phone lets the new tab open after the wait for the
+  file (browsers often block a tab that is not opened straight from a tap).
+
+## 2026-11-27 — "Made by" on the App page
+- Owner: "I'd also like to add to the about a made by section, mentioning it's made by Oreo, linking
+  to my telegram (t.me/hyenafox), and a short sentence saying to reach out with bug reports or
+  feature requests".
+- Drawn in `screens-v6.html`, "4. App": label "Made by" under About's note; one row, "Oreo" over
+  "@hyenafox on Telegram", a paper plane in the well, the external-link glyph at the right; under it
+  "Found a bug or want a feature? Send a message."
+- **Mine:** its place (after About, last on the page), a group of its own rather than a third row in
+  About's flat group, the paper plane, and the sentence's words.
+- Owner, asked "Is "Made by" right as drawn?": "Yes, commit and send".
+- For the build: the row is a link to `https://t.me/hyenafox`, new tab, `rel="noopener"`.

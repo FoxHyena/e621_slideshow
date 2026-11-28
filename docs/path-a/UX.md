@@ -462,7 +462,8 @@ A grouped list; on phone each group is a sub-page, on desktop all on one page.
 4. **For You** (`/settings/for-you`): Tune ›, Hidden artists.
 5. **App** (`/settings/app`): Install app (per-platform steps; "Installed ✓" in standalone; note that
    links open in Safari, not the app, and that the two keep separate sign-ins), e621 button
-   (userscript), Keyboard shortcuts (desktop), About.
+   (userscript), Keyboard shortcuts (desktop), About, Made by (owner, 2026-11-27: "Oreo", a link to
+   `t.me/hyenafox`, and one sentence asking for bug reports and feature requests).
 
 ### Sign-in sheet
 
