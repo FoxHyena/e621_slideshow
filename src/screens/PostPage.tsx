@@ -8,6 +8,8 @@
  * The tab bar stays; there is no Play. On a wide computer the post keeps the 600 column and the rest
  * stands in a 344 column 24 to its right. Rides in the artist page's chunk (src/shell/lazy.ts).
  */
+import { askPost, hasKnownPost, knownPost } from "@/feed/postCache";
+import { revealed } from "@/feed/revealed";
 import { DText } from "@/lib/e621/dtext";
 import { ArrowUp, Ban, ChevronRight, ExternalLink, Heart, Link2, Lock, MoreHorizontal, Search, Share } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -39,34 +41,39 @@ const label = (t: string) => t.replaceAll("_", " ");
 
 type Found = { status: "loading" } | { status: "ready"; post: Post } | { status: "missing" } | { status: "error"; message: string };
 
-/** One answer per post a visit: Back and forward don't ask again. */
-const known = new Map<string, Post | null>();
-
+/** One answer per post a visit (src/feed/postCache.ts): Back and forward don't ask again. */
 function usePost(id: number): [Found, () => void] {
   const creds = useStore(getSession().store, (s) => s.creds);
   const ready = useStore(getSession().store, (s) => s.ready);
-  const key = `${creds?.username ?? ""}:${id}`;
+  const user = creds?.username;
+  const key = `${user ?? ""}:${id}`;
   const [found, setFound] = useState<{ key: string; f: Found } | null>(null);
   const [tries, setTries] = useState(0);
   useEffect(() => {
     if (!ready) return;
-    if (known.has(key)) return;
+    if (hasKnownPost(user, id)) return;
     let live = true;
-    searchPosts(`id:${id}`, 1, 1, creds)
-      .then((ps) => {
-        known.set(key, ps[0] ?? null);
-        if (live) setFound({ key, f: ps[0] ? { status: "ready", post: ps[0] } : { status: "missing" } });
+    askPost(user, id, () => searchPosts(`id:${id}`, 1, 1, creds))
+      .then((p) => {
+        if (live) setFound({ key, f: p ? { status: "ready", post: p } : { status: "missing" } });
       })
       .catch((e: unknown) => live && setFound({ key, f: { status: "error", message: e instanceof Error ? e.message : "e621 didn't answer." } }));
     return () => {
       live = false;
     };
-  }, [key, id, creds, ready, tries]);
-  if (known.has(key)) {
-    const p = known.get(key);
+  }, [key, user, id, creds, ready, tries]);
+  if (hasKnownPost(user, id)) {
+    const p = knownPost(user, id);
     return [p ? { status: "ready", post: p } : { status: "missing" }, () => {}];
   }
-  return [found?.key === key ? found.f : { status: "loading" }, () => setTries((t) => t + 1)];
+  return [
+    found?.key === key ? found.f : { status: "loading" },
+    // Try again shows the loader while it asks (a review, 2026-11-27: it looked like nothing happened)
+    () => {
+      setFound(null);
+      setTries((t) => t + 1);
+    },
+  ];
 }
 
 /** A source's site, for the Source row ("bsky.app"); only web links count. */
@@ -162,7 +169,7 @@ function PostBody({ post }: { post: Post }) {
   const username = useStore(getSession().store, (s) => s.user?.name);
   const blacklist = useStore(getPrefs().store, blacklistOf);
   const matched = useMemo(() => blacklistedBy(parseBlacklist(blacklist), post, { username }), [blacklist, post, username]);
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState(() => revealed.has(post.id));
   const hiddenByE621 = !post.files.original.url;
   const col = useRef<HTMLDivElement>(null);
   const { width, cap } = useColumn(col);
@@ -191,7 +198,10 @@ function PostBody({ post }: { post: Post }) {
       </Gate>
     ) : matched && !shown ? (
       <Gate post={post} now={now} icon={<Ban aria-hidden />} head="On your blacklist" text={`It matches “${matched.line}” in your blacklist.`}>
-        <button type="button" className="btn-tonal" onClick={() => setShown(true)} data-testid="post-show-it">
+        <button type="button" className="btn-tonal" onClick={() => {
+            revealed.add(post.id);
+            setShown(true);
+          }} data-testid="post-show-it">
           Show it
         </button>
       </Gate>
@@ -341,20 +351,43 @@ function Links({ post }: { post: Post }) {
 }
 
 /** "More from <artist>": six of their other posts as tiles; See all opens their page. */
+/** The ratings you have on, as e621 search words ("" with all three on), as a feed asks them. */
+function ratingWords(r: { s: boolean; q: boolean; e: boolean }): string {
+  const on = (["s", "q", "e"] as const).filter((k) => r[k]);
+  if (on.length === 1) return `rating:${on[0]}`;
+  if (on.length === 2) return `-rating:${(["s", "q", "e"] as const).find((k) => !r[k])}`;
+  return "";
+}
+
+/** Asked of e621 for More from: room for the blacklist to take some and still fill six. */
+const MORE_ASKED = 24;
+
 function MoreFrom({ post }: { post: Post }) {
   const by = artists(post)[0];
   const creds = useStore(getSession().store, (s) => s.creds);
+  const username = useStore(getSession().store, (s) => s.user?.name);
+  // Like every feed: only the ratings you have on, and nothing on your blacklist (a review, 2026-11-27)
+  const rating = useStore(getPrefs().store, (s) => ratingWords(s.search.ratings));
+  const blacklist = useStore(getPrefs().store, blacklistOf);
   const [more, setMore] = useState<{ id: number; posts: Post[] } | null>(null);
   useEffect(() => {
     if (!by) return;
     let live = true;
-    searchPosts(`${by} -id:${post.id}`, 1, MORE_SHOWN, creds)
-      .then((ps) => live && setMore({ id: post.id, posts: ps.filter((p) => p.id !== post.id && (p.files.preview.jpg || p.files.sample.jpg)).slice(0, MORE_SHOWN) }))
+    const rules = parseBlacklist(blacklist);
+    searchPosts(`${by} -id:${post.id} ${rating}`.trim(), 1, MORE_ASKED, creds)
+      .then(
+        (ps) =>
+          live &&
+          setMore({
+            id: post.id,
+            posts: ps.filter((p) => p.id !== post.id && (p.files.preview.jpg || p.files.sample.jpg) && !blacklistedBy(rules, p, { username })).slice(0, MORE_SHOWN),
+          }),
+      )
       .catch(() => live && setMore({ id: post.id, posts: [] }));
     return () => {
       live = false;
     };
-  }, [by, post.id, creds]);
+  }, [by, post.id, creds, rating, blacklist, username]);
   if (!by) return null;
   const posts = more?.id === post.id ? more.posts : null;
   if (posts && posts.length === 0) return null;

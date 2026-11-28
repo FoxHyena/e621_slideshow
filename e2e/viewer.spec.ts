@@ -163,6 +163,25 @@ test.describe("Save", () => {
     });
   });
 
+  test.describe("on a phone, a share sheet that refuses the file", () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    test("offers Open, not Tap Save again (a review, 2026-11-27: that looped)", async ({ page }) => {
+      await page.addInitScript(() => {
+        Object.assign(navigator, {
+          canShare: () => true,
+          share: async () => {
+            throw new DOMException("refused", "DataError");
+          },
+        });
+      });
+      await open(page);
+      await viewer(page).getByTestId("save-button").click();
+      const toast = page.locator("[data-sonner-toast]");
+      await expect(toast).toContainText("Couldn't save it here");
+      await expect(toast.getByRole("button", { name: "Open" })).toBeVisible();
+    });
+  });
+
   test("a file it can't fetch: the toast offers Open, and nothing opens by itself", async ({ page, context }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/search?tags=wolf&view=1149");

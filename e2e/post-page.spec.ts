@@ -125,6 +125,110 @@ test.describe("on a phone", () => {
   });
 });
 
+test.describe("a card's bar, and Post info (owner, 2026-11-27)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("the bar opens the post's page; the artist's name and mark open the artist", async ({ page }) => {
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf");
+    const card = page.locator('[data-testid=post-card][data-post-id="1149"]');
+    const bar = card.getByTestId("card-open");
+    const box = (await bar.boundingBox())!;
+    await bar.click({ position: { x: box.width - 24, y: box.height / 2 } });
+    await expect(page).toHaveURL(/\/post\/1149$/);
+    // on the post's own page the bar does nothing
+    await postPage(page).getByTestId("card-open").click({ position: { x: box.width - 24, y: box.height / 2 } });
+    await expect(page).toHaveURL(/\/post\/1149$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/search\?tags=wolf$/);
+    await card.getByTestId("card-artist").click();
+    await expect(page).toHaveURL(/\/artist\/mock_artist$/);
+    await page.goBack();
+    await card.locator(".post-artist-mark").click();
+    await expect(page).toHaveURL(/\/artist\/mock_artist$/);
+  });
+
+  test("I opens Post info with the post's description", async ({ page }) => {
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf&view=1149");
+    await expect(page.getByTestId("viewer")).toHaveAttribute("data-post-id", "1149");
+    await page.keyboard.press("i");
+    const desc = page.getByTestId("sheet-info").getByTestId("info-desc");
+    await expect(desc.locator(".dtext-h")).toHaveText("Reed");
+    await expect(desc.getByRole("link", { name: "More" })).toHaveAttribute("href", "https://example.com/more");
+  });
+});
+
+test.describe("what the viewer can't show goes to the post's page (a review, 2026-11-27)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("a link to a hidden post in the viewer lands on its page's Sign in gate, not a loader", async ({ page }) => {
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf&view=1146");
+    await expect(page).toHaveURL(/\/post\/1146$/);
+    await expect(page.getByTestId("post-gate")).toContainText("Sign in to see this post");
+    await expect(page.getByTestId("viewer")).toHaveCount(0);
+  });
+
+  test("a video with no feed behind it plays on its page, not in a player that never loads", async ({ page }) => {
+    await mockE621(page, [...POSTS, { id: 1144, ext: "webm" }]);
+    await page.goto("/post/1149?view=1144");
+    await expect(page).toHaveURL(/\/post\/1144$/);
+    await expect(page.locator('[data-testid=post-card][data-post-id="1144"]')).toBeVisible();
+    await expect(page.getByTestId("player")).toHaveCount(0);
+  });
+
+  test("a blacklisted post goes to its page's gate; after Show it, its picture opens in the viewer", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("e6ss:v1:search", JSON.stringify({ blacklist: "cozy river" })));
+    await mockE621(page, POSTS);
+    await page.goto("/search?tags=wolf&view=1149");
+    await expect(page).toHaveURL(/\/post\/1149$/);
+    await page.getByTestId("post-show-it").click();
+    await postPage(page).getByTestId("card-media").click();
+    await expect(page).toHaveURL(/\/post\/1149\?view=1149$/);
+    await expect(page.getByTestId("viewer")).toHaveAttribute("data-post-id", "1149");
+  });
+
+  test("the viewer from a post's page asks e621 nothing more, and takes the focus", async ({ page }) => {
+    const mock = await mockE621(page, POSTS);
+    await page.goto("/post/1149");
+    await expect(postPage(page).getByTestId("post-card")).toBeVisible();
+    await page.waitForTimeout(300);
+    // one ask for the post, however often the page's effect runs
+    expect(mock.searches.filter((s) => s.tags === "id:1149")).toHaveLength(1);
+    const asked = 1;
+    await postPage(page).getByTestId("card-media").click();
+    await expect(page.getByTestId("viewer")).toHaveAttribute("data-post-id", "1149");
+    await expect(page.getByTestId("viewer-pic")).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(mock.searches.filter((s) => s.tags === "id:1149")).toHaveLength(asked);
+    await expect.poll(() => page.evaluate(() => document.activeElement?.getAttribute("data-testid"))).toBe("viewer");
+  });
+
+  test("More from leaves out your blacklist and the ratings you have off", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("e6ss:v1:search", JSON.stringify({ blacklist: "gore", ratings: { s: true, q: true, e: false } })));
+    const mock = await mockE621(page, [POSTS[0], { id: 1148, tags: ["gore"] }, { id: 1147 }, { id: 1145 }]);
+    await page.goto("/post/1149");
+    const tiles = page.getByTestId("post-more-tile");
+    await expect(tiles.first()).toBeVisible();
+    expect(await tiles.evaluateAll((ts) => ts.map((t) => t.getAttribute("data-post-id")))).toEqual(["1147", "1145"]);
+    expect(mock.searches.some((s) => s.tags.startsWith("mock_artist -id:1149") && s.tags.includes("-rating:e"))).toBe(true);
+  });
+
+  test("Try again shows the loader while it asks", async ({ page }) => {
+    const mock = await mockE621(page, POSTS);
+    mock.searchFails = (t) => t === "id:1149";
+    await page.goto("/post/1149");
+    await expect(page.getByTestId("post-error")).toBeVisible();
+    mock.searchFails = () => false;
+    mock.searchDelay = (t) => (t === "id:1149" ? 800 : 0);
+    await page.getByTestId("post-error").getByRole("button", { name: "Try again" }).click();
+    await expect(page.getByTestId("post-error")).toHaveCount(0);
+    await expect(page.getByText("Finding post #1149")).toBeVisible();
+    await expect(postPage(page).getByTestId("post-card")).toBeVisible();
+  });
+});
+
 test("on a wide computer the rest stands in a 344 column 24 right of the post", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   mock = await mockE621(page, POSTS);
