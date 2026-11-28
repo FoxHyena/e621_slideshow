@@ -1560,12 +1560,13 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - From the design commit 2ce8910 (owner: "Approve"; "Zoom" for the double tap), on "Merge both,
   start viewer". `?view=<post number>` over the screen; Back, ✕ and Esc close it and land the feed on
   that post, as the player does. Code: `src/player/Viewer.tsx` (its own chunk, fetched when idle).
-- **A tap on a picture opens the viewer** (a card's picture, and a grid tile where a tile opens a post).
-  The player opens from Play, ⋯ › "Play from this post" and Play from here. A video still plays or
-  pauses in place on a card; **a video tile still opens the player paused** (DESIGN.md: no videos in
-  the viewer this pass). On Results, a grid tile still turns the feed to a list at that post (owner,
-  2026-11-26); DESIGN.md now says a tile opens the viewer. **Asked the owner which wins; tiles are
-  unchanged until then.**
+- **A tap on a card's picture opens the viewer.** The player opens from Play, ⋯ › "Play from this
+  post" and Play from here. A video still plays or pauses in place on a card (DESIGN.md: no videos in
+  the viewer this pass).
+- **Grid tiles keep turning the feed to a list at that post.** Owner, asked "Grid tiles on Results:
+  open the viewer, or keep turning the feed to a list?": "Keep list behavior" (2026-11-27). This
+  overrides DESIGN.md's "or a grid tile" in the viewer bullet; every grid (Following, For You,
+  Results, Favorites, an artist) already does it, so no tile opens the viewer.
 - Hands as drawn: one tap hides or shows the buttons (after 250 ms, so a double tap can cancel it);
   a double tap zooms to 2.5 at the point in 280 ms and back to fit, never favorites; pinch 1 to 5;
   a drag moves a zoomed picture; a drag down on an unzoomed one closes past 120 px, the picture
