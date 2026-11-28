@@ -113,10 +113,14 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     },
     [],
   );
-  return <ViewerPage key={top.route.view ?? ""} base={base} top={top} />;
+  // the room opens (a fade and a rise) on the first page only: a turned-to page is already in it
+  const [first] = useState(top.route.view);
+  const [turned, setTurned] = useState(false);
+  if (!turned && top.route.view !== first) setTurned(true);
+  return <ViewerPage key={top.route.view ?? ""} base={base} top={top} turned={turned} />;
 }
 
-function ViewerPage({ base, top }: { base: Entry; top: Entry }) {
+function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: boolean }) {
   const nav = getNav();
   const id = top.route.view ?? "";
   const sheet = top.sheet;
@@ -503,6 +507,7 @@ function ViewerPage({ base, top }: { base: Entry; top: Entry }) {
       data-post-id={post?.id}
       data-zoomed={zoomed || undefined}
       data-comic={comic ? "" : undefined}
+      data-turned={turned || undefined}
       data-pages={list ? "" : undefined}
     >
       <div
