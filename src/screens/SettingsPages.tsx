@@ -702,7 +702,7 @@ function AppPage() {
               <b>e621 button</b>
               <small>Adds an eLicks21 button to e621</small>
             </span>
-            <ExternalLink aria-hidden className="row-chev" />
+            <ExternalLink aria-hidden className="row-chev row-ext" />
           </a>
         </li>
         <li>
@@ -759,7 +759,7 @@ function AppPage() {
             <span className="row-text">
               <b>Source code</b>
             </span>
-            <ExternalLink aria-hidden className="row-chev" />
+            <ExternalLink aria-hidden className="row-chev row-ext" />
           </a>
         </li>
       </ul>
@@ -777,7 +777,7 @@ function AppPage() {
               <b>Oreo</b>
               <small>@hyenafox on Telegram</small>
             </span>
-            <ExternalLink aria-hidden className="row-chev" />
+            <ExternalLink aria-hidden className="row-chev row-ext" />
           </a>
         </li>
       </ul>

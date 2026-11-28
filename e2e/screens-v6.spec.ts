@@ -549,3 +549,60 @@ test("A post's +N tag shows the rest of its tags in the same row, and the card k
   await expect(card.getByTestId("card-tag").nth(12)).toBeFocused();
   expect((await box(card)).height).toBe(height);
 });
+
+/**
+ * Rows (designer, 2026-11-27; owner: "right icon seems too far right and line shouldn't extend all
+ * the way through"): what ends a row has its ink 16 from the panel's edge, each glyph pulled by its own
+ * empty margin (› 5, ⌄ 3, the external-link glyph 1); a divider stops where the content stops, 16
+ * before the panel's edge (in the ⋯ menu's well, 14).
+ */
+test("Rows: a row's end glyph's ink stands 16 from the panel's edge; dividers stop short of it", async ({ page }) => {
+  await mockE621(page);
+  // the ink's right end, from the glyph's drawn paths (stroke included), against its panel's right edge
+  const inkGap = (row: Locator, glyph: string) =>
+    row.evaluate((el, sel) => {
+      const svg = el.querySelector<SVGSVGElement>(sel)!;
+      const panel = el.closest("ul, .list-group, .well-group")!.getBoundingClientRect();
+      const r = svg.getBoundingClientRect();
+      const k = r.width / svg.viewBox.baseVal.width;
+      let right = -Infinity;
+      for (const p of svg.querySelectorAll<SVGGraphicsElement>("path, line, polyline, rect, circle")) {
+        const b = p.getBBox();
+        right = Math.max(right, b.x + b.width);
+      }
+      const stroke = Number(getComputedStyle(svg).strokeWidth.replace("px", "")) || 2;
+      return panel.right - (r.left + (right + stroke / 2) * k);
+    }, glyph);
+  const dividerGap = (row: Locator) =>
+    row.evaluate((el) => {
+      const panel = el.closest("ul, .list-group, .well-group")!.getBoundingClientRect();
+      const line = getComputedStyle(el, "::before");
+      return line.content === "none" ? null : panel.right - (el.getBoundingClientRect().right - parseFloat(line.right));
+    });
+
+  await page.goto("/settings/app");
+  const made = page.getByTestId("made-by");
+  await expect(made).toBeVisible();
+  expect(Math.abs((await inkGap(made, ".row-ext")) - 16)).toBeLessThan(1);
+  const source = page.locator(".list-row", { hasText: "Source code" });
+  expect(Math.abs((await inkGap(source, ".row-ext")) - 16)).toBeLessThan(1);
+  // Source code follows Version: its line stops 16 before the edge
+  expect(await dividerGap(source)).toBe(16);
+
+  await page.goto("/settings/slideshow");
+  const row = page.getByTestId("slideshow-quality");
+  await expect(row).toBeVisible();
+  expect(Math.abs((await inkGap(row, ".row-drop")) - 16)).toBeLessThan(1);
+  expect(await dividerGap(page.getByTestId("slideshow-videoMaxSec"))).toBe(16);
+
+  await page.goto("/settings");
+  const first = page.getByRole("list", { name: "Settings" }).locator(".list-row");
+  expect(Math.abs((await inkGap(first.nth(1), ".row-chev")) - 16)).toBeLessThan(1);
+  expect(await dividerGap(first.nth(1))).toBe(16);
+
+  await page.goto("/search?tags=wolf");
+  await page.getByTestId("card-menu").first().click();
+  const wells = page.getByTestId("sheet-post").locator(".well-row");
+  await expect(wells).toHaveCount(5);
+  expect(await dividerGap(wells.nth(1))).toBe(14);
+});

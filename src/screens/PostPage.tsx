@@ -333,7 +333,7 @@ function Links({ post }: { post: Post }) {
             <b>Source</b>
             <small>{src.site}</small>
           </span>
-          <ExternalLink aria-hidden className="row-chev" />
+          <ExternalLink aria-hidden className="row-chev row-ext" />
         </a>
       )}
       <a className="list-row" href={postPageUrl(post.id)} target="_blank" rel="noopener" data-testid="post-e621">
