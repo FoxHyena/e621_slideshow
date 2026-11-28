@@ -1575,11 +1575,22 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   I (Post info), + − 0 (zoom in, out, fit), like the player's keys.
 - **Mine:** the sample file shows first; once zoomed past fit the original file loads over it and
   fades in (200 ms), so zooming in gets the full picture without every open paying for it.
-- **Save:** e621's file host lets only e621.net read its files (CORS), and our page may not fetch
-  from it, so the app cannot put the file in a share sheet or start a download. For now Save opens
-  the original in a new tab, and holding the picture brings the phone's own menu (the viewer allows
-  it; the feed turns it off). A server route that passes the file through would allow the drawn Save;
-  **asked the owner.**
+- **Save, through our own pass-through.** e621's file host lets only e621.net read its files (CORS),
+  so the page can't hand a file to a share sheet or a download. Owner, told what a pass-through
+  means (Vercel's Acceptable Use Policy lists "proxy... or host media for hot-linking", and the
+  files would come from our domain): "Build pass-through" (2026-11-27). `next.config.ts` rewrites
+  `/media/ab/cd/<md5>.<png|jpg|jpeg|gif|webp>` to `static1.e621.net/data/...`, nothing else (any
+  other path is a 404). On Vercel that is an external rewrite: no function, so no 4.5 MB limit; a
+  2-minute timeout. Only Save uses it; pictures still load from e621 directly. Fetched with no
+  credentials (e621's files are public; the API key never goes near it).
+  - On a phone (coarse pointer) the share sheet gets the file, named `<artist>_e621_<id>.<ext>`;
+    on a computer it downloads. While the file comes, the glass breathes (aria-busy).
+  - **Mine:** a share sheet needs a fresh tap; if the fetch outlasted the tap's permission, the file
+    is kept and a toast says "The picture is ready: tap Save again".
+  - If the pass-through fails, the full picture opens in a new tab with a toast. Holding the picture
+    still brings the phone's own menu.
+  - Not checked: Save on a real iPhone, whether e621's Cloudflare lets Vercel's servers through, and
+    which Vercel transfer allowance this traffic counts against.
 - A reload or a link with `?view=` finds the post in the screen's feed, else asks e621 for `id:<n>`;
   none: "No post #… on e621".
 - **A video** (a grid tile, or a link with `?view=` to one) hands itself to the player, paused, in the

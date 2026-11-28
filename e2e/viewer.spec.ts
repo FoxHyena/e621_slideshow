@@ -96,6 +96,78 @@ test("a video hands itself to the player, paused, in the viewer's place", async 
   await expect(viewer(page)).toHaveCount(0);
 });
 
+test.describe("Save", () => {
+  const open = async (page: Page) => {
+    await page.unrouteAll({ behavior: "wait" });
+    mock = await mockE621(page, [{ id: 1149, realPath: true }, { id: 1148 }]);
+    await page.goto("/search?tags=wolf&view=1149");
+    await expect(viewer(page)).toHaveAttribute("data-post-id", "1149");
+  };
+
+  test("on a computer it downloads the file, fetched through our own /media pass-through", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await open(page);
+    const download = page.waitForEvent("download");
+    await viewer(page).getByTestId("save-button").click();
+    expect((await download).suggestedFilename()).toBe("mock_artist_e621_1149.png");
+    expect(mock.media.some((u) => new URL(u).pathname === `/media/00/00/${"1149".padStart(32, "0")}.png`)).toBe(true);
+  });
+
+  test.describe("on a phone", () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+    test("it hands the picture file to the share sheet", async ({ page }) => {
+      await page.addInitScript(() => {
+        const w = window as unknown as { shared: { name: string; type: string; size: number }[] };
+        w.shared = [];
+        Object.assign(navigator, {
+          canShare: (d: ShareData) => !!d.files?.length,
+          share: async (d: ShareData) => void w.shared.push(...(d.files ?? []).map((f) => ({ name: f.name, type: f.type, size: f.size }))),
+        });
+      });
+      await open(page);
+      await viewer(page).getByTestId("save-button").click();
+      await expect
+        .poll(() => page.evaluate(() => (window as unknown as { shared: { name: string; type: string }[] }).shared))
+        .toEqual([expect.objectContaining({ name: "mock_artist_e621_1149.png", type: "image/png" })]);
+    });
+
+    test("when the tap's permission ran out, the file waits for one more tap", async ({ page }) => {
+      await page.addInitScript(() => {
+        let calls = 0;
+        const w = window as unknown as { shares: number };
+        w.shares = 0;
+        Object.assign(navigator, {
+          canShare: () => true,
+          share: async () => {
+            if (calls++ === 0) throw new DOMException("no activation", "NotAllowedError");
+            w.shares++;
+          },
+        });
+      });
+      await open(page);
+      await viewer(page).getByTestId("save-button").click();
+      await expect(page.getByText("The picture is ready: tap Save again")).toBeVisible();
+      const fetched = mock.media.length;
+      await viewer(page).getByTestId("save-button").click();
+      await expect.poll(() => page.evaluate(() => (window as unknown as { shares: number }).shares)).toBe(1);
+      expect(mock.media.length).toBe(fetched);
+    });
+  });
+
+  test("a file it can't pass through opens in a new tab", async ({ page, context }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/search?tags=wolf&view=1149");
+    await expect(viewer(page)).toHaveAttribute("data-post-id", "1149");
+    // the new tab is outside the page's mock: keep it off the real e621
+    await context.route("https://static1.e621.net/**", (r) => r.fulfill({ body: "", contentType: "image/png" }));
+    const tab = context.waitForEvent("page");
+    await viewer(page).getByTestId("save-button").click();
+    expect((await tab).url()).toBe("https://static1.e621.net/data/mock/1149.png");
+    await expect(page.getByText("Couldn't save here")).toBeVisible();
+  });
+});
+
 test.describe("on a computer", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 

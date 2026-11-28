@@ -9,6 +9,7 @@
  */
 import { ChevronRight, Download, Heart, Info, Share, X } from "lucide-react";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { turnMark } from "@/feed/motion";
 import { searchPosts } from "@/lib/e621/client";
 import { mediaKind, type Post } from "@/lib/e621/types";
@@ -25,6 +26,7 @@ import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 import { sharePost } from "@/screens/actions";
 import { openPaused } from "./intent";
+import { savePost } from "./save";
 import { PlayerInfoSheet } from "./sheets";
 
 /** A second tap this soon is a double tap. */
@@ -249,15 +251,16 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     }
     favs.toggle(post);
   };
-  /**
-   * Save: e621's image host lets only e621 itself read its files (CORS), so the app can't hand the
-   * file to a share sheet or a download. The full picture opens on its own, to save from there; on
-   * a phone, holding the picture here brings the phone's own menu, Save included.
-   */
-  const save = () => {
-    if (post) window.open(post.files.original.url ?? displayUrl(post, "original") ?? "", "_blank", "noopener");
-  };
   const by = post ? (artists(post)[0] ?? null) : null;
+  /** Save (src/player/save.ts): the share sheet on a phone, a download on a computer. */
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    if (!post || saving) return;
+    setSaving(true);
+    const r = await savePost(post, by).finally(() => setSaving(false));
+    if (r === "again") toast("The picture is ready: tap Save again");
+    else if (r === "opened") toast("Couldn't save here: the full picture opened in a new tab");
+  };
 
   const onKey = useEffectEvent((e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -389,7 +392,14 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
               <button type="button" className="art-circle" aria-label="Share" onClick={() => void sharePost(post)} data-testid="share-button">
                 <Share aria-hidden />
               </button>
-              <button type="button" className="art-circle" aria-label="Save" onClick={save} data-testid="save-button">
+              <button
+                type="button"
+                className="art-circle"
+                aria-label="Save"
+                aria-busy={saving || undefined}
+                onClick={() => void save()}
+                data-testid="save-button"
+              >
                 <Download aria-hidden />
               </button>
             </div>

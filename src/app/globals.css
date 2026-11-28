@@ -3344,6 +3344,21 @@ html {
 .viewer-sharp[data-in] {
   opacity: 1;
 }
+/* Save while the file comes: the glass breathes */
+.viewer .art-circle[aria-busy] {
+  animation: save-wait 1s ease-in-out infinite alternate;
+}
+@keyframes save-wait {
+  to {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .viewer .art-circle[aria-busy] {
+    animation: none;
+    opacity: 0.55;
+  }
+}
 .viewer-who {
   text-align: left;
 }
