@@ -20,6 +20,7 @@ import { useScreen } from "@/shell/context";
 import { SECTION_LABEL } from "@/shell/screens";
 import { TitleRow } from "@/shell/TitleRow";
 import { Dropdown } from "@/shell/Dropdown";
+import { underRow } from "@/shell/rowMenu";
 import { Sheet } from "@/shell/Sheet";
 import { getArtists } from "@/state/artists";
 import { getFollows } from "@/state/follows";
@@ -460,7 +461,7 @@ function Slideshow() {
         Reset to defaults
       </button>
       {picking && (
-        <Dropdown anchor={`${SHEET}${picking}`} label={TITLES[picking]} width={220} menu rowEnd testId={`sheet-${picking}`}>
+        <Dropdown anchor={`${SHEET}${picking}`} label={TITLES[picking]} width={220} menu at={underRow} testId={`sheet-${picking}`}>
           <Menu label={TITLES[picking]}>
             {(CHOICES[picking] as { value: PlaybackSettings[ChoiceKey]; label: string }[]).map((c) => (
               <MenuRow

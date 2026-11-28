@@ -19,6 +19,8 @@ const GAP = 8;
 
 const back = () => void getNav().back();
 
+export type Place = { top: number; left: number; maxHeight: number; up?: boolean };
+
 /** The opener on show (a hidden screen keeps its own copy of the chips). */
 function anchorOf(name: string): HTMLElement | null {
   for (const el of document.querySelectorAll<HTMLElement>(`[data-menu="${CSS.escape(name)}"]`)) if (el.getClientRects().length > 0) return el;
@@ -30,7 +32,7 @@ export function Dropdown({
   label,
   width,
   menu,
-  rowEnd,
+  at,
   children,
   testId,
   onClose = back,
@@ -42,42 +44,31 @@ export function Dropdown({
   width: number;
   /** one of a list (the Menu with its sliding capsule): the Menu's own shape, no side padding */
   menu?: boolean;
-  /** a row's value: right edges lined up with the row's content edge (inside its padding) */
-  rowEnd?: boolean;
+  /** its own placement (a settings row's value: rowMenu.ts) */
+  at?: (anchor: HTMLElement | null, box: HTMLDivElement | null, w: number, vw: number) => Place;
   children: ReactNode;
   testId?: string;
   /** how a tap outside or Esc closes it (Media applies what changed) */
   onClose?: () => void;
 }) {
   const box = useRef<HTMLDivElement>(null);
-  const [at, setAt] = useState<{ top: number; left: number; width: number; maxHeight: number; up?: boolean } | null>(null);
+  const [pos, setAt] = useState<(Place & { width: number }) | null>(null);
 
   useLayoutEffect(() => {
     const place = () => {
       const vw = document.documentElement.clientWidth;
       const w = Math.min(width, vw - 2 * INSET);
-      // a ⋯ hangs it with right edges lined up (with its tools capsule); a chip, left edges
       const el = anchorOf(anchor);
-      const { box: edge, end } = rowEnd ? { box: el, end: true } : popEdge(el);
+      // a settings row's value has its own placement (rowMenu.ts, loaded only by the screens that use it)
+      if (at) return setAt({ width: w, ...at(el, box.current, w, vw) });
+      // a ⋯ hangs it with right edges lined up (with its tools capsule); a chip, left edges
+      const { box: edge, end } = popEdge(el);
       const r = edge?.getBoundingClientRect();
-      const right = r && rowEnd && el ? r.right - parseFloat(getComputedStyle(el).paddingRight) : r?.right;
-      let left = r && right !== undefined ? (end ? right - w : r.left) : INSET;
-      if (r && right !== undefined && left + w > vw - INSET) left = Math.max(INSET, right - w);
-      left = Math.min(Math.max(INSET, left), vw - INSET - w);
-      const vh = window.innerHeight;
-      // a row low on the page: above it when it doesn't fit below and there's more room above (measured
-      // at its own width, so the first pass and the next frame agree)
-      if (box.current) box.current.style.width = `${w}px`;
-      const h = box.current?.scrollHeight ?? 0;
-      const below = r ? vh - INSET - (r.bottom + GAP) : 0;
-      const above = r ? r.top - GAP - INSET : 0;
-      if (r && rowEnd && h > below && above > below && above >= Math.min(h, 160)) {
-        const top = Math.max(INSET, r.top - GAP - h);
-        setAt({ top, left, width: w, maxHeight: r.top - GAP - top, up: true });
-        return;
-      }
       const top = r ? r.bottom + GAP : 96;
-      setAt({ top, left, width: w, maxHeight: Math.max(160, vh - top - INSET) });
+      let left = r ? (end ? r.right - w : r.left) : INSET;
+      if (r && left + w > vw - INSET) left = Math.max(INSET, r.right - w);
+      left = Math.min(Math.max(INSET, left), vw - INSET - w);
+      setAt({ top, left, width: w, maxHeight: Math.max(160, window.innerHeight - top - INSET) });
     };
     place();
     // again a frame on: the page's scroll lock (a parent's effect, after this one) can drop the scrollbar
@@ -88,7 +79,7 @@ export function Dropdown({
       cancelAnimationFrame(again);
       window.removeEventListener("resize", place);
     };
-  }, [anchor, width, rowEnd]);
+  }, [anchor, width, at]);
 
   const close = useRef(onClose);
   useLayoutEffect(() => {
@@ -96,7 +87,7 @@ export function Dropdown({
   });
 
   // Focus the first control once it's placed (a hidden box can't take focus).
-  const placed = at !== null;
+  const placed = pos !== null;
   useEffect(() => {
     const el = box.current;
     if (!el || !placed) return;
@@ -160,8 +151,8 @@ export function Dropdown({
         aria-modal="true"
         tabIndex={-1}
         aria-label={label}
-        data-up={at?.up || undefined}
-        style={at ? { top: at.top, left: at.left, width: at.width, maxHeight: at.maxHeight } : { visibility: "hidden" }}
+        data-up={pos?.up || undefined}
+        style={pos ? { top: pos.top, left: pos.left, width: pos.width, maxHeight: pos.maxHeight } : { visibility: "hidden" }}
       >
         {children}
       </div>

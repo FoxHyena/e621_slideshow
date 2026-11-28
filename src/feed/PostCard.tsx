@@ -6,7 +6,7 @@
  * the right end. Its height comes from `layout.ts`, so the feed can window cards before their
  * pictures load.
  */
-import { ArrowUp, Heart, MoreHorizontal, Play, Volume2, VolumeX } from "lucide-react";
+import { ArrowUp, Heart, MoreHorizontal, Play } from "lucide-react";
 import { TOAST_ICONS } from "@/shell/toastLook";
 import { toast } from "sonner";
 import { memo, useEffect, useRef, useState, type RefObject } from "react";
@@ -179,7 +179,8 @@ function CardMedia({ post, index, height, live, still, onOpen, onFaved }: { post
             setMuted((m) => !m);
           }}
         >
-          {muted ? <VolumeX aria-hidden /> : <Volume2 aria-hidden />}
+          {/* lucide's volume-x and volume-2, as masks (first-load budget) */}
+          <span aria-hidden className="post-mute-glyph" data-muted={muted || undefined} />
         </button>
       )}
       {burst > 0 && <Heart key={burst} className="heart-burst post-burst" aria-hidden />}

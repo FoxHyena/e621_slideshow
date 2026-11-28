@@ -21,6 +21,7 @@ import type { PlaybackSettings } from "@/lib/settings";
 import { getNav, type Entry } from "@/nav/history";
 import { blacklistLine, openArtist, openResults } from "@/screens/actions";
 import { Dropdown } from "@/shell/Dropdown";
+import { underRow } from "@/shell/rowMenu";
 import { Sheet, SheetClose } from "@/shell/Sheet";
 import { getPrefs } from "@/state/prefs";
 import { pickedFor } from "@/lib/recommend/weights";
@@ -146,7 +147,7 @@ export function QuickSettingsSheet({ base, playback, picking = false }: { base: 
 export function QualitySheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
   const { set } = usePlaybackSetter(base);
   return (
-    <Dropdown anchor="player-quality" label="Quality" width={220} menu rowEnd testId="sheet-quality">
+    <Dropdown anchor="player-quality" label="Quality" width={220} menu at={underRow} testId="sheet-quality">
       <Menu label="Quality">
         {QUALITY.map((q) => (
           <MenuRow

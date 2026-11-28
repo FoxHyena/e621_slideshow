@@ -1999,3 +1999,7 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the top case.
 - **Left as it was:** a card the grid opens the feed at (tap or switch) sits 12 below the top of the
   view, so on For You and Following its head is under the floating capsule.
+- **Mine, for the budget:** with main's grid fix (PR 40) merged in, the feed's first load came to 200.1 KB.
+  The row menu's placement moved out of Dropdown into `src/shell/rowMenu.ts`, which only Settings and the
+  player load. The card's sound button draws lucide's volume-2 and volume-x as CSS masks, not icon
+  components. First load is now 199.8 KB.
