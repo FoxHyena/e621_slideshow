@@ -3542,6 +3542,10 @@ html {
 .viewer {
   background: rgb(0 0 0 / calc(1 - var(--drop, 0)));
 }
+/* a comic's turned-to page is in the room already: it doesn't open again over the feed */
+.viewer[data-turned] {
+  animation: none;
+}
 .viewer-stage {
   overflow: hidden;
   cursor: zoom-in;

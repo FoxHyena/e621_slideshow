@@ -323,7 +323,8 @@ export default function Shell() {
       )}
       {overlay?.route.view && overlay.route.play == null && (
         <Suspense fallback={null}>
-          <Viewer key={`${cur.key}:${overlay.route.view}`} base={cur} top={overlay} />
+          {/* one viewer for a comic's every page: a turn doesn't open it again (Viewer keys each page) */}
+          <Viewer key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
       {/* DESIGN.md "Toast": one at a time, a mark, the words, at most one way back; 4 s, 6 s with an action */}
