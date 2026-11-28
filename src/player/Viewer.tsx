@@ -7,7 +7,7 @@
  * does not favorite here); pinch zooms 1 to 5 times, a drag moves a zoomed picture, and a drag down
  * on an unzoomed one closes. On a computer the wheel zooms and Post info stands beside the picture.
  */
-import { ChevronRight, Download, Heart, Info, Share, X } from "lucide-react";
+import { ChevronRight, CircleAlert, Download, Heart, Info, Share, X } from "lucide-react";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { turnMark } from "@/feed/motion";
@@ -27,6 +27,7 @@ import { useStore } from "@/state/store";
 import { sharePost } from "@/screens/actions";
 import { openPaused } from "./intent";
 import { savePost } from "./save";
+import { actionLook } from "@/shell/toastLook";
 import { PlayerInfoSheet } from "./sheets";
 
 /** A second tap this soon is a double tap. */
@@ -258,8 +259,17 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     if (!post || saving) return;
     setSaving(true);
     const r = await savePost(post, by).finally(() => setSaving(false));
-    if (r === "again") toast("The picture is ready: tap Save again");
-    else if (r === "opened") toast("Couldn't save here: the full picture opened in a new tab");
+    // DESIGN.md, the viewer's Save: two-line toasts; the failed one offers "Open" (6 s, with the ring)
+    if (r === "again") toast("The picture is ready", { description: "Tap Save again", icon: <Download /> });
+    else if (r === "failed") {
+      const url = post.files.original.url;
+      toast("Couldn't save it here", {
+        description: "Open the full picture instead",
+        icon: <CircleAlert data-tone="danger" />,
+        // straight from the tap on Open, so no browser blocks the tab
+        ...(url && { ...actionLook(), action: { label: "Open", onClick: () => void window.open(url, "_blank", "noopener") } }),
+      });
+    }
   };
 
   const onKey = useEffectEvent((e: KeyboardEvent) => {

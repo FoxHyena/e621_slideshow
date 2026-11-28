@@ -2,7 +2,8 @@
  * The picture viewer's Save (DESIGN.md "A post on its own"): on a phone the share sheet with the
  * picture file in it (Save Image is there); on a computer a download. e621's file host lets only
  * e621.net read its files, so the file comes through our own `/media/…` pass-through (next.config.ts),
- * with no credentials: e621's files are public. If that fails, the full picture opens in a new tab.
+ * with no credentials: e621's files are public. If that fails, nothing opens by itself (a phone
+ * blocks a tab that isn't opened straight from a tap): the caller offers "Open" for the full picture.
  */
 import type { Post } from "@/lib/e621/types";
 
@@ -23,27 +24,23 @@ function fileName(post: Post, artist: string | null): string {
 /** A phone or tablet: its share sheet is where Save Image lives. A computer downloads instead. */
 const touch = () => typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
 
-export type SaveResult = "shared" | "downloaded" | "cancelled" | "again" | "opened";
+export type SaveResult = "shared" | "downloaded" | "cancelled" | "again" | "failed";
 
 /** A fetched file, kept for a second tap: a share sheet needs a fresh tap if the fetch took long. */
 let held: { id: number; file: File } | null = null;
 
 export async function savePost(post: Post, artist: string | null): Promise<SaveResult> {
   const path = mediaPath(post);
-  const openFull = (): SaveResult => {
-    if (post.files.original.url) window.open(post.files.original.url, "_blank", "noopener");
-    return "opened";
-  };
-  if (!path) return openFull();
+  if (!path) return "failed";
   let file = held?.id === post.id ? held.file : null;
   if (!file) {
     try {
       const res = await fetch(path, { credentials: "omit" });
-      if (!res.ok) return openFull();
+      if (!res.ok) return "failed";
       const blob = await res.blob();
       file = new File([blob], fileName(post, artist), { type: blob.type || "image/png" });
     } catch {
-      return openFull();
+      return "failed";
     }
   }
   if (touch() && navigator.canShare?.({ files: [file] })) {

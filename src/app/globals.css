@@ -609,6 +609,11 @@ html {
 :root:not(:has(.play-fab:not([data-away]))) {
   --toast-bottom: calc(var(--bar-top) + 16px);
 }
+/* in the picture viewer, 12 above its bottom stack: the artist's row's top is 34 (or the safe area)
+   + 44 buttons + 16 + 36 from the bottom, so 142 on a phone (DESIGN.md, the viewer's Save) */
+.shell:has(.viewer) {
+  --toast-bottom: calc(max(34px, env(safe-area-inset-bottom)) + 108px);
+}
 
 ::selection {
   background: var(--color-raised-hi);
@@ -1360,6 +1365,10 @@ html {
   }
   .shell[data-immersive] {
     --toast-bottom: 120px;
+  }
+  /* the viewer on a computer: 12 above its one row of glass (44 tall, 20 up), centred on the stage */
+  .shell:has(.viewer) {
+    --toast-bottom: 76px;
   }
   .shell:not([data-immersive]) [data-sonner-toaster][data-x-position="center"] {
     /* (% of the window less any scrollbar gutter, unlike vw) */

@@ -1686,6 +1686,32 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Owner, asked "Is "Made by" right as drawn?": "Yes, commit and send".
 - For the build: the row is a link to `https://t.me/hyenafox`, new tab, `rel="noopener"`.
 
+## 2026-11-27 — A failed Save offers "Open"; no tab opens by itself
+- The builder, from the code (`src/player/save.ts`): the new tab is opened after the fetch has been
+  waited for, so a phone's browser is likely to block it. Not tried on a phone by anyone.
+- Owner, asked "Use the "Open" button on the failed-Save toast?": "Yes, commit and send".
+- **Mine:** the failure toast is "Couldn't save it here" / "Open the full picture
+  instead" with "Open" in the action slot (the toast's ring, 6 s). "Open" is a tap, so the tab opens
+  on every browser. It is the same on a computer, so there is one behaviour to learn. 291 wide at 375.
+- This makes "Open" the third word the action slot can hold, after "Undo" and "Reload".
+- Not chosen: keep opening the tab by itself and show these words only when the browser blocks it.
+  That gives two toasts for one failure.
+
+## 2026-11-27 — Built: "Made by", and Save's two toasts as designed
+- Owner: "Made by + Save toasts" (designs 886d01f and b214e46).
+- **Made by**, last on the App page: one row to `https://t.me/hyenafox` (new tab, `rel="noopener"`),
+  "Oreo" over "@hyenafox on Telegram", lucide's paper plane in the well; under it "Found a bug or
+  want a feature? Send a message."
+- **Save:** "The picture is ready" / "Tap Save again" (Save's arrow, 4 s). When the file can't be
+  fetched, nothing opens by itself any more: "Couldn't save it here" / "Open the full picture
+  instead" with "Open" (6 s, the ring); Open opens the original file in a new tab from its own tap.
+  The next tap on Save tries to save again.
+- **A toast in the viewer**, measured: it sat 168 from the bottom on a phone (above the feed's
+  Play, still in the page under the viewer) and 120 on a computer (the player's rule). Now 12 above
+  the viewer's artist row: 142 on a phone (34 or the safe area, + 108), 76 on a computer.
+- Tests: `viewer.spec.ts` (both toasts' words and places; no tab until Open), `settings.spec.ts`
+  (Made by).
+
 ## 2026-11-27 — Fixed: the top pill hid under the title; Following's counts didn't clear
 - Owner: "update ranking and similar items seem to be trapped at top of scroll" and "Following post
   notifications don't seem to clear even after having seen/scrolled past the posts".
