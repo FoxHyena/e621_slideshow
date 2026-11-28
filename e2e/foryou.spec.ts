@@ -343,7 +343,9 @@ test("Taste or popular re-sorts the ranked list without searching again; a resto
   await signIn(page);
   await page.goto("/for-you");
   await firstRanked(page);
-  const searches = mock.searches.length;
+  // Tune's card asks for the newest favorites' thumbs by number (`id:`): not a ranking search
+  const rankingSearches = () => mock.searches.filter((s) => !s.tags.startsWith("id:")).length;
+  const searches = rankingSearches();
   const top2 = async () => (await cardIds(page)).filter((id) => id === 1050 || id === 1100);
   const setTaste = async (key: "Home" | "End", label: string) => {
     await page.getByTestId("open-tune").click();
@@ -363,7 +365,7 @@ test("Taste or popular re-sorts the ranked list without searching again; a resto
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await setTaste("End", "More popular · 2");
   await expect.poll(top2).toEqual([1100, 1050]);
-  expect(mock.searches.length).toBe(searches);
+  expect(rankingSearches()).toBe(searches);
   await expect(page.getByTestId("update-ranking")).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 
@@ -379,5 +381,90 @@ test("Taste or popular re-sorts the ranked list without searching again; a resto
   await page.getByTestId("update-ranking").click();
   await expect(page.getByTestId("update-ranking")).toHaveCount(0);
   await expect.poll(top2).toEqual([1050, 1100]);
-  expect(mock.searches.length).toBeGreaterThan(searches);
+  expect(rankingSearches()).toBeGreaterThan(searches);
+});
+
+/**
+ * Tune's picture of how For You picks (DESIGN.md "Tune"; the owner, 2026-11-27: "Lock it"): five stops
+ * from the favorites to For You, the person's own numbers, two tags against e621's share, an order bar
+ * that follows Taste or popular, and five dots on every tag row. Hide folds it, and the device remembers.
+ */
+test("Tune: How For You picks draws the way from favorites to feed, follows Taste or popular, and Hide is kept", async ({ page }) => {
+  const mock = await withFavorites(page);
+  mock.tagCounts = { pawpads: 5, toebeans: 50, solo: 3_000_000 };
+  await page.goto("/for-you/tune");
+  await expect(page.getByTestId("rec-status")).toContainText("10 favorites");
+  const card = page.getByTestId("tune-picture");
+  await expect(card).toBeVisible();
+  // under the first line, before the sync row
+  const order = await page.evaluate(() => {
+    const c = document.querySelector('[data-testid="tune-picture"]')!;
+    return [c.previousElementSibling?.className, c.nextElementSibling?.className];
+  });
+  expect(order).toEqual(["screen-lede", "list-group tune-sync"]);
+  const stops = card.getByTestId("tg-stop");
+  await expect(stops).toHaveCount(5);
+  await expect(stops.locator("h3")).toHaveText(["Your favorites", "Your tags", "The search", "The order", "For You"]);
+  await expect(stops.locator(".tg-head > span")).toHaveText(["10 read", "Pin · Mute", "Breadth · 15 tags", "Taste or popular", "Best first"]);
+  // the newest favorites (the mock's 2000 is the newest favorited), asked once by number
+  await expect(card.getByTestId("tg-thumbs").locator("img")).toHaveCount(9);
+  const asked = mock.searches.filter((s) => s.tags.startsWith("id:"));
+  expect(asked).toHaveLength(1);
+  expect(asked[0].tags).toBe(`id:${Array.from({ length: 10 }, (_, i) => 2000 + i).join(",")}`);
+  // the two tags: the strongest one, and the one on the most favorites among the weakest
+  const tags = card.getByTestId("tg-tag");
+  await expect(tags.locator(".tg-tag-name")).toHaveText(["pawpads", "toebeans"]);
+  await expect(tags.first().locator(".tg-bar .v")).toHaveText(["100%", "0.4%"]);
+  await expect(tags.first().locator(".tg-tag-x")).toHaveText("230× e621");
+  // e621's bar is as long as its share is of yours, never under 8
+  const siteBar = await tags.first().locator(".tg-bar[data-site] i").evaluate((e) => e.getBoundingClientRect().width);
+  expect(siteBar).toBe(8);
+  await expect(card.getByTestId("tg-search-text")).toHaveText("It looks through the last 7 days for your top 15 tags, and adds the week's most popular.");
+  // the order bar: Taste 1 part, Popular the slider's number; at 0 all Taste and "Popular" dims
+  const popular = card.getByTestId("tg-mix-popular");
+  await expect(popular).toHaveCSS("flex-grow", "1");
+  const slider = page.getByTestId("rec-taste");
+  await slider.focus();
+  await slider.press("End");
+  await expect(popular).toHaveCSS("flex-grow", "2");
+  await slider.press("Home");
+  await expect(card.getByTestId("tg-mix")).toHaveAttribute("data-only", "true");
+  await expect(popular).toBeHidden();
+  await expect(card.locator(".tg-mix .ml span").last()).toHaveCSS("opacity", "0.45");
+  await slider.press("End");
+  // the goo is white, the drops ran (4 of them, one per stretch)
+  await expect(card.getByTestId("tg-drop")).toHaveCount(4);
+  await expect(card.locator(".tg-goo .n").first()).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  // the rows: five dots in place of "weight 3.4"; the strongest has five
+  const row = page.getByTestId("rec-tag").filter({ hasText: "pawpads" });
+  await expect(row.getByRole("img", { name: "Weight 5 of 5" })).toBeVisible();
+  await expect(row).not.toContainText("weight");
+  await expect(row.locator(".tune-tag-count")).toHaveText("10 favorites");
+  if (SHOTS) {
+    await page.setViewportSize({ width: 375, height: 1100 });
+    await page.screenshot({ path: `${SHOTS}/tune-rows.png`, fullPage: false, animations: "disabled" });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await card.screenshot({ path: `${SHOTS}/tune-picture.png`, animations: "disabled" });
+  }
+  // a muted tag has no dot lit
+  await page.getByRole("button", { name: "Mute toebeans" }).click();
+  await expect(page.getByTestId("rec-muted").getByRole("img", { name: "Weight 0 of 5" })).toBeVisible();
+  // Hide folds it to its top row (56 tall); the device remembers
+  await page.getByTestId("tune-picture-fold").click();
+  await expect(page.getByTestId("tune-picture-fold")).toHaveText("Show");
+  await expect(page.getByTestId("tune-picture-fold")).toHaveAttribute("aria-expanded", "false");
+  await expect(stops).toHaveCount(0);
+  expect(Math.round((await card.boundingBox())!.height)).toBe(56);
+  await page.reload();
+  await expect(page.getByTestId("tune-picture-fold")).toHaveText("Show");
+  await page.getByTestId("tune-picture-fold").click();
+  await expect(stops).toHaveCount(5);
+});
+
+test("Tune: with reduced motion the card's drops are at rest from the start", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await withFavorites(page);
+  await page.goto("/for-you/tune");
+  const drop = page.getByTestId("tg-drop").first();
+  await expect(drop).toHaveCSS("animation-name", "none");
 });

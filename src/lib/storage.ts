@@ -176,6 +176,9 @@ export const storage = {
   /** Which collapsible settings sections are expanded. */
   loadSections: (): Record<string, boolean> => read<Record<string, boolean>>("sections", {}),
   saveSections: (s: Record<string, boolean>) => write("sections", s),
+  /** Tune's "How For You picks" folded (DESIGN.md "Tune"): this device only */
+  loadTunePictureHidden: (): boolean => read<boolean>("tunePictureHidden", false) === true,
+  saveTunePictureHidden: (hidden: boolean) => write("tunePictureHidden", hidden || null),
   /** Favorites tag profile, per account. Can be large; save returns false if it didn't fit. */
   loadProfile: (username: string): Profile | null => {
     const p = read<Profile | null>(`profile:${username}`, null);

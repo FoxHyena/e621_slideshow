@@ -2185,3 +2185,25 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Left out of the picture on purpose:** the learned ranking (when it is fitted, it is the taste
   mark), the damping rules, and that characters count half. The card says what holds for both.
 - Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-27 — Built: Tune's "How For You picks" and the dots on tag rows (builder)
+- Built as the designer's entry above says (DESIGN.md "Tune", "How For You picks (the card)"), in
+  `src/screens/TunePicture.tsx`. At 343 wide it is 343 × 635, as drawn; folded, 56.
+- **Mine:** the newest favorites' thumbs come from one `id:` search for the 15 newest favorite numbers,
+  asked once a visit and kept in memory only. The blacklist and the ratings hide thumbs as in every
+  feed; until the answer comes the nine squares are empty Well.
+- **Mine:** "Hide" is kept per device in localStorage (`tunePictureHidden`), not per account.
+- **Mine:** the second tag falls back to the fewest dots when no tag has exactly one (with two tags
+  of equal weight, both show five).
+- **Mine:** the search stop's sentence follows For You's Date: "the last 7 days … the week's most
+  popular" by default; "today … today's", "this month … the month's", "the last 30 days … their most
+  popular", "posts since 2026-01-01 … their most popular". The number is one search's tags: Breadth,
+  or fewer when e621's tag limit cuts it (Search further's later rounds don't add to it).
+- **Mine, from review:** the strongest tag the dots measure against leaves out pins, since a pin sets
+  its tag to at least 1 and would otherwise thin every row's dots on a small profile. The thumbs are
+  forgotten on sign-out, and a failed ask is tried again next visit.
+- **Mine:** a row that isn't searched (dimmed) dims its dots too, as a muted one does.
+- **To the designer's questions:** the learned ranking scores a post by its tags and its rating (a fitted
+  weight per tag, `model.ts`), so "Taste is how well its tags match yours" holds for both, leaving out
+  the rating; I kept the sentence. "Popular is its favorites for
+  its age" holds: the quality percentile compares favorites against posts of the same age.

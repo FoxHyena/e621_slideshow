@@ -14,10 +14,12 @@ import { isName, searchPlan, topTags, type SearchKind } from "@/lib/recommend/we
 import { QUALITY_WEIGHT } from "@/lib/recommend/rank";
 import { BREADTH_MAX, BREADTH_MIN, DEFAULT_SEARCH, QUALITY_WEIGHT_MAX } from "@/lib/settings";
 import { getNav } from "@/nav/history";
-import { getPrefs } from "@/state/prefs";
+import { blacklistOf, getPrefs } from "@/state/prefs";
 import { getRec, weightsOf } from "@/state/rec";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
+import { countsOf } from "@/lib/recommend/sync";
+import { Pips, pipsOf, TunePicture, type TagShare } from "./TunePicture";
 
 /** Rows shown before Filter tags is needed. */
 const TAG_LIST_MAX = 100;
@@ -37,13 +39,14 @@ export function TuneScreen() {
   const search = useStore(prefs.store, (p) => p.search);
   const qw = search.qualityWeight ?? QUALITY_WEIGHT;
   const forYou = useStore(prefs.store, (p) => p.forYou);
+  const blacklist = useStore(prefs.store, blacklistOf);
   const [filter, setFilter] = useState("");
 
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
   const tags = useMemo(() => topTags(weights, weights.size), [weights]);
   // What For You actually searches: the plan (and with Search further, its next rounds), each cut to
   // what e621's tag limit leaves room for.
-  const { searched, capped } = useMemo(() => {
+  const { searched, capped, firstRound } = useMemo(() => {
     const named = (t: string) => isName(r.profile?.tags[t]?.cat);
     const rounds = search.moreTags ? SEARCH_TIERS : 1;
     const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth * rounds, named) : [];
@@ -52,8 +55,44 @@ export function TuneScreen() {
     const limit = session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
     const built = tiers.map((t) => buildRecommendedQuery(s, t, limit));
     const inQuery = new Set(built.flatMap((q) => q.candidates));
-    return { searched: new Map(plan.filter((p) => inQuery.has(p.tag)).map((p) => [p.tag, p.kind] as const)), capped: !!built[0]?.capped };
+    return {
+      searched: new Map(plan.filter((p) => inQuery.has(p.tag)).map((p) => [p.tag, p.kind] as const)),
+      capped: !!built[0]?.capped,
+      // one search's tags (the first round), for the card: Breadth, or fewer when the tag limit cuts it
+      firstRound: built[0]?.candidates.length ?? 0,
+    };
   }, [weights, r.profile, r.overrides, search.breadth, search.moreTags, search.ratings, forYou, session.user]);
+
+  // Dots on each row (DESIGN.md "Tune"): weight against the strongest tag's, in fifths. A pin sets its tag
+  // to at least 1 (weights.ts), so the strongest is measured without pins unless only pins are left.
+  const strongest = useMemo(() => {
+    let max = 0;
+    for (const [t, w] of weights) if (!r.overrides.pinned.includes(t)) max = Math.max(max, w);
+    if (max === 0) for (const w of weights.values()) max = Math.max(max, w);
+    return max;
+  }, [weights, r.overrides.pinned]);
+  const pipsFor = (tag: string) => (r.overrides.muted.includes(tag) ? 0 : pipsOf(weights.get(tag) ?? 0, strongest, r.overrides.pinned.includes(tag)));
+  // The card's two tags: the strongest one not pinned, and the one on the most favorites among those with one dot
+  const pictured = useMemo((): TagShare[] => {
+    const p = r.profile;
+    const nSite = r.cache.site?.n ?? 0;
+    if (!p || p.favIds.length === 0 || nSite === 0) return [];
+    const counts = countsOf(r.cache);
+    const share = (tag: string): TagShare | null => {
+      const st = p.tags[tag];
+      const c = counts[tag];
+      if (!st || !c) return null;
+      return { tag, cat: st.cat, mine: st.n / p.favIds.length, site: c / nSite, pips: pipsOf(weights.get(tag) ?? 0, strongest, false) };
+    };
+    const free = tags.filter((t) => !r.overrides.pinned.includes(t));
+    let first: TagShare | null = null;
+    for (const t of free) if ((first = share(t))) break;
+    const rest = free.filter((t) => t !== first?.tag).map(share).filter((t): t is TagShare => t !== null);
+    // one dot, or the fewest when none has one
+    const fewest = rest.reduce((m, t) => Math.min(m, t.pips), Infinity);
+    const second = rest.filter((t) => t.pips === fewest).sort((a, b) => b.mine - a.mine || a.tag.localeCompare(b.tag))[0] ?? null;
+    return [first, second].filter((t): t is TagShare => t !== null);
+  }, [r.profile, r.cache, r.overrides, weights, tags, strongest]);
 
   const signedIn = !!session.creds && !!session.user && !session.link;
   const { profile, overrides } = r;
@@ -90,13 +129,13 @@ export function TuneScreen() {
           <span className="tune-tag-name" style={{ color: `var(--color-tag-${cat})` }}>
             {label(tag)}
           </span>
-          {!muted && (
+          {!muted && profile?.tags[tag] && (
             <small className="tune-tag-count">
-              {profile?.tags[tag] ? `${profile.tags[tag].n.toLocaleString("en")} ${profile.tags[tag].n === 1 ? "favorite" : "favorites"} · ` : ""}
-              weight {(weights.get(tag) ?? 0).toFixed(1)}
+              {profile.tags[tag].n.toLocaleString("en")} {profile.tags[tag].n === 1 ? "favorite" : "favorites"}
             </small>
           )}
         </span>
+        <Pips n={pipsFor(tag)} cat={cat} />
         <button
           type="button"
           className="toggle"
@@ -137,6 +176,18 @@ export function TuneScreen() {
         </p>
       ) : (
         <>
+          {profile && profile.favIds.length > 0 && (
+            <TunePicture
+              profile={profile}
+              creds={session.creds}
+              search={search}
+              blacklist={blacklist}
+              date={forYou.date}
+              shown={pictured}
+              breadth={capped ? firstRound : search.breadth}
+              qw={qw}
+            />
+          )}
           <div className="list-group tune-sync">
             <div className="list-row">
               <span className="row-text" data-testid="rec-status" aria-live="polite">

@@ -212,7 +212,9 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       const ids = tags.match(/(?:^| )id:([\d,]+)/);
       if (ids) {
         const want = new Set(ids[1].split(",").map(Number));
-        list = list.filter((p) => want.has(p.id));
+        // a favorite is a post too (Tune's card asks for the newest favorites by number)
+        const extra = state.favPosts.filter((f) => !list.some((p) => p.id === f.id));
+        list = [...list, ...extra].filter((p) => want.has(p.id)).sort((x, y) => y.id - x.id);
       }
       // honour simple negations so blacklist-in-query behaves like e621
       const negs = tags.split(" ").filter((t) => /^-[a-z_]+$/.test(t)).map((t) => t.slice(1));
