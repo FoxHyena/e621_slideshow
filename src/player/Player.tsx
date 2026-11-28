@@ -510,19 +510,22 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
           onMouseEnter={() => (hovering.current = true)}
           onMouseLeave={() => (hovering.current = false)}
         >
-          {current && comic && <ComicBar comic={comic} onRead={read} />}
-          {current && (
-            <div className="player-who">
-              <Avatar seed={by ?? `post:${current.id}`} className="post-avatar" />
-              <span className="player-idn">
-                <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
-                <span className="post-time">
-                  {ago(current.created_at, now)} · #{current.id}
+          {/* the artist and the comic's capsule: one cell on a computer (globals.css), two rows on a phone */}
+          <div className="player-lead">
+            {current && comic && <ComicBar comic={comic} onRead={read} />}
+            {current && (
+              <div className="player-who">
+                <Avatar seed={by ?? `post:${current.id}`} className="post-avatar" />
+                <span className="player-idn">
+                  <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
+                  <span className="post-time">
+                    {ago(current.created_at, now)} · #{current.id}
+                  </span>
                 </span>
-              </span>
-              {by && <FollowPill key={by} name={by} art />}
-            </div>
-          )}
+                {by && <FollowPill key={by} name={by} art />}
+              </div>
+            )}
+          </div>
           <div className="player-rail">
             <button
               type="button"

@@ -3344,6 +3344,10 @@ html {
   padding: 104px var(--spacing-inset) max(34px, env(safe-area-inset-bottom));
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.78) 62%);
 }
+/* the artist and a comic's capsule: no box of its own on a phone (a cell of the row on a computer) */
+.player-lead {
+  display: contents;
+}
 .player-who {
   display: flex;
   align-items: center;
@@ -7605,19 +7609,43 @@ li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-r
     grid-area: transport;
     width: 300px;
   }
-  /* the player and the reader (Comics, part two, not drawn on a computer): the capsule over the bar */
-  .player:not(.viewer) .player-bottom:has(.viewer-comic),
-  .reader .player-bottom {
+  /* the player and the reader (DESIGN.md "Comics, part two", On a computer): the comic's capsule, 280
+     wide, 16 after the artist in the row's left cell */
+  .player-lead .viewer-comic {
+    margin: 0;
+  }
+  /* until the row has room for both (a review: from 900 the capsule ran over Play), it stands over the bar */
+  .player-bottom:has(> .player-lead .viewer-comic) {
     grid-template-areas:
       "comic comic comic"
       "bar bar bar"
       "who transport rail";
   }
-  .player:not(.viewer) .viewer-comic,
-  .reader .viewer-comic {
+  .player-lead .viewer-comic {
     grid-area: comic;
     justify-self: center;
-    width: 300px;
+    width: 280px;
+  }
+}
+@media (min-width: 1180px) {
+  .player-bottom:has(> .player-lead .viewer-comic) {
+    grid-template-areas:
+      "bar bar bar"
+      "who transport rail";
+  }
+  .player-lead {
+    grid-area: who;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+  .player-lead .player-who {
+    min-width: 0;
+  }
+  .player-lead .viewer-comic {
+    order: 1;
+    flex: none;
   }
 }
 /* The capsule's chevron: up in the reader (it opens the Pages sheet over it); on, in a slideshow */
@@ -7671,7 +7699,7 @@ li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-r
 .comic-desc .info-label {
   margin-top: 0;
 }
-/* every page, three to a row (five on a computer): 8 between columns, 12 between rows */
+/* every page, three to a row (four on a computer): 8 between columns, 12 between rows */
 .comic-pages {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7679,9 +7707,40 @@ li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-r
   align-items: start;
   padding: 0 0 24px;
 }
+/* On a computer (DESIGN.md "Comics, part two", On a computer): four to a row, 12 between columns, 16
+   between rows (a tile 141 wide in the 600 column). From 1280, the post page's two columns: the pages
+   in the 600, the artist, the description and "Open on e621" in the 344, 24 apart, starting level. */
 @media (min-width: 900px) {
   .comic-pages {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+}
+@media (min-width: 1280px) {
+  .screen-frame.comic-page {
+    max-width: calc(600px + 24px + 344px + 2 * var(--spacing-inset));
+  }
+  .comic-cols {
+    display: grid;
+    grid-template-columns: 600px 344px;
+    grid-template-rows: auto auto 1fr;
+    column-gap: 24px;
+    align-items: start;
+  }
+  .comic-main {
+    grid-column: 1;
+    grid-row: 1 / 4;
+  }
+  .comic-side,
+  .comic-links {
+    grid-column: 2;
+  }
+  .comic-head {
+    margin-bottom: 12px;
+  }
+  .comic-main .list-label {
+    height: 28px;
+    margin-top: 0;
   }
 }
 .comic-tile {

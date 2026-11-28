@@ -2403,3 +2403,19 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - **Mine:** every measurement; the keys; that the capsule in a slideshow stands in the same place.
 - Not drawn: the end slide on a computer, and the comic page's link preview.
 - Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-28 — Comics, part two on a computer, built (builder)
+- The designer sent the computer drawings (owner: "Lock them", then "Commit and send"). They replace the
+  stopgap I had built (one 600 column, five tiles to a row).
+- **Built as drawn:**
+  - The comic's page from 1280: the post page's two columns. The pages are four to a row in the 600,
+    141 wide, 12 between columns and 16 between rows. The artist, the description and "Open on e621" are
+    in the 344. Play is where a feed has it.
+  - The reader and the slideshow: the comic's capsule is 280 wide, 16 after the artist, in the one row
+    under the bar. The reader has no glass arrows and gains Full screen.
+  - Keys: ← → turn the page, Space starts and stops the timer, F is full screen, Esc closes.
+- **Mine:**
+  - From 900 to 1279 the comic's page is one 600 column with the pages four to a row, as from 1280.
+  - The end slide on a computer is the phone's, centred in the window (not drawn).
+- **Fixed on the way:** Space in the reader kept it paused. An e2e test now presses it.
+- **Mine, after a review:** from 900 to 1179 the row has no room for the artist and a 280 capsule (it ran over Play), so there the capsule stands centred over the bar. From 1180 it is in the row as drawn.

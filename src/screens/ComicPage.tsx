@@ -4,8 +4,8 @@
  * `/comic/<pool number>` (DESIGN.md "A post on its own", Comics, part two): a comic's own page, a
  * pushed screen that works signed out. Back and the tools (Share, ⋯); the name and one line ("A comic
  * · 12 pages · last page 3h ago"); the artist the first page credits, with Follow; the description;
- * every page three to a row (five on a computer), the one you stopped on ringed gold; "Open on
- * e621". Play opens the reader where you stopped. Rides in the artist page's chunk (src/shell/lazy.ts).
+ * every page three to a row, the one you stopped on ringed gold; "Open on e621". On a wide computer
+ * it is laid out as the post page is: the pages four to a row in the 600 column, the rest beside them. Play opens the reader where you stopped. Rides in the artist page's chunk (src/shell/lazy.ts).
  */
 import { BookOpen, ChevronRight, ExternalLink, Ban, Lock, MoreHorizontal, Play, RefreshCw, Share } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -187,55 +187,66 @@ export function ComicScreen({ id }: { id: number }) {
               {lastPage && ` · last page ${ago(lastPage.created_at, now)} ago`}
             </p>
           </div>
-          {by && (
-            <div className="list-group comic-artist">
-              <div className="list-row">
-                <button type="button" className="row-main" onClick={() => openArtist(by)} data-testid="comic-artist">
-                  <Avatar seed={by} className="post-avatar" />
-                  <span className="row-text">
-                    <b>{by.replaceAll("_", " ")}</b>
-                    {posts !== null && <small>{compact(posts)} posts</small>}
-                  </span>
-                </button>
-                <FollowPill key={by} name={by} />
+          {/* on a phone one column; on a wide computer the post page's two (globals.css) */}
+          <div className="comic-cols">
+            <div className="comic-side">
+              {by && (
+                <div className="list-group comic-artist">
+                  <div className="list-row">
+                    <button type="button" className="row-main" onClick={() => openArtist(by)} data-testid="comic-artist">
+                      <Avatar seed={by} className="post-avatar" />
+                      <span className="row-text">
+                        <b>{by.replaceAll("_", " ")}</b>
+                        {posts !== null && <small>{compact(posts)} posts</small>}
+                      </span>
+                    </button>
+                    <FollowPill key={by} name={by} />
+                  </div>
+                </div>
+              )}
+              {pool.description?.trim() && (
+                <section className="post-info-panel comic-desc" aria-label="Description">
+                  <h3 className="info-label">Description</h3>
+                  <InfoDesc
+                    text={pool.description.trim()}
+                    onPost={(pid) => getNav().push({ screen: { kind: "post", id: pid }, play: null })}
+                    testId="comic-desc"
+                  />
+                </section>
+              )}
+            </div>
+            <div className="comic-main">
+              <div className="list-label">
+                <span>{series ? "Pages" : "Posts"}</span>
+                {placeAt >= 0 && <span data-testid="comic-place">You are on page {placeAt + 1}</span>}
+              </div>
+              <div className="comic-pages" data-testid="comic-pages">
+                {ids.map((pid, i) => (
+                  <Tile
+                    key={pid}
+                    n={i + 1}
+                    page={list?.[i]}
+                    known={list !== null}
+                    here={i === placeAt}
+                    rules={rules}
+                    username={username}
+                    onOpen={() => getNav().push({ screen: entry.route.screen, play: null, view: String(pid) })}
+                  />
+                ))}
               </div>
             </div>
-          )}
-          {pool.description?.trim() && (
-            <section className="post-info-panel comic-desc" aria-label="Description">
-              <h3 className="info-label">Description</h3>
-              <InfoDesc text={pool.description.trim()} onPost={(pid) => getNav().push({ screen: { kind: "post", id: pid }, play: null })} testId="comic-desc" />
-            </section>
-          )}
-          <div className="list-label">
-            <span>{series ? "Pages" : "Posts"}</span>
-            {placeAt >= 0 && <span data-testid="comic-place">You are on page {placeAt + 1}</span>}
-          </div>
-          <div className="comic-pages" data-testid="comic-pages">
-            {ids.map((pid, i) => (
-              <Tile
-                key={pid}
-                n={i + 1}
-                page={list?.[i]}
-                known={list !== null}
-                here={i === placeAt}
-                rules={rules}
-                username={username}
-                onOpen={() => getNav().push({ screen: entry.route.screen, play: null, view: String(pid) })}
-              />
-            ))}
-          </div>
-          <div className="list-group comic-links">
-            <a className="list-row" href={poolUrl(id)} target="_blank" rel="noopener" data-testid="comic-e621">
-              <span className="row-well" aria-hidden>
-                <ExternalLink />
-              </span>
-              <span className="row-text">
-                <b>Open on e621</b>
-                <small>Pool #{id}</small>
-              </span>
-              <ChevronRight aria-hidden className="row-chev" />
-            </a>
+            <div className="list-group comic-links">
+              <a className="list-row" href={poolUrl(id)} target="_blank" rel="noopener" data-testid="comic-e621">
+                <span className="row-well" aria-hidden>
+                  <ExternalLink />
+                </span>
+                <span className="row-text">
+                  <b>Open on e621</b>
+                  <small>Pool #{id}</small>
+                </span>
+                <ChevronRight aria-hidden className="row-chev" />
+              </a>
+            </div>
           </div>
           {startAt >= 0 && (
             <button type="button" className="play-fab" aria-label={`Read from page ${startAt + 1}`} onClick={() => read(startAt)} data-testid="comic-play">

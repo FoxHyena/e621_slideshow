@@ -437,19 +437,63 @@ test.describe("comics, part two, on a phone", () => {
   });
 });
 
-test("on a computer: the comic's page five to a row in the 600 column; the reader is the player's window with the capsule", async ({ page }) => {
+test("on a computer: the comic's page in the post page's two columns; the reader's capsule after the artist in its row", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/comic/77");
   const tiles = page.getByTestId("comic-tile");
   await expect(tiles).toHaveCount(5);
-  const ys = await tiles.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
-  expect(new Set(ys).size).toBe(1);
+  // four to a row in the 600 column, 141 wide, 12 between columns and 16 between rows
+  const boxes = await tiles.evaluateAll((els) => els.map((e) => e.querySelector(".comic-pic")!.getBoundingClientRect().toJSON() as DOMRect));
+  expect(new Set(boxes.slice(0, 4).map((b) => Math.round(b.top))).size).toBe(1);
+  expect(Math.round(boxes[0].width)).toBe(141);
+  expect(Math.round(boxes[1].left - boxes[0].right)).toBe(12);
+  expect(boxes[4].top).toBeGreaterThan(boxes[0].top);
+  // the artist, the description and "Open on e621" in the 344 column beside them, starting level
+  const pages = (await page.getByTestId("comic-pages").boundingBox())!;
+  const artist = (await page.locator(".comic-artist").boundingBox())!;
+  const label = (await page.locator(".comic-main .list-label").boundingBox())!;
+  expect(Math.round(pages.width)).toBe(600);
+  expect(Math.round(artist.x - (pages.x + pages.width))).toBe(24);
+  expect(Math.round(artist.width)).toBe(344);
+  expect(Math.round(artist.y)).toBe(Math.round(label.y));
+  const e621 = (await page.getByTestId("comic-e621").boundingBox())!;
+  expect(Math.round(e621.x)).toBe(Math.round(artist.x));
   await shot(page, "comic-page-desktop");
   await page.getByTestId("comic-play").click();
   const r = reader(page);
   await expect(r.getByTestId("viewer-comic")).toBeVisible();
+  await expect(r.getByTestId("reader-fullscreen")).toBeVisible();
+  await expect(r.getByTestId("viewer-prev")).toHaveCount(0);
+  // one row under the bar: the artist, then the capsule (280 wide, 16 after), then the transport
   const cap = (await r.getByTestId("viewer-comic").boundingBox())!;
+  const who = (await r.locator(".player-who").boundingBox())!;
   const bar = (await r.getByTestId("progress").locator("..").boundingBox())!;
-  expect(cap.width).toBe(300);
-  expect(cap.y + cap.height).toBeLessThanOrEqual(bar.y);
+  const prev = (await r.getByTestId("reader-prev").boundingBox())!;
+  expect(cap.width).toBe(280);
+  expect(Math.round(cap.x - (who.x + who.width))).toBe(16);
+  expect(cap.y).toBeGreaterThan(bar.y + bar.height);
+  expect(cap.x + cap.width).toBeLessThan(prev.x);
   await shot(page, "comic-reader-desktop");
+  // Space starts and stops the timer; Esc closes
+  await page.keyboard.press("Space");
+  await expect(r).not.toHaveAttribute("data-paused", "true");
+  await page.keyboard.press("Space");
+  await expect(r).toHaveAttribute("data-paused", "true");
+  await page.keyboard.press("Escape");
+  await expect(reader(page)).toHaveCount(0);
+  // in a slideshow the capsule stands in the same place, after the artist
+  await page.goto("/search?tags=wolf&play=2005");
+  const p = page.getByTestId("player");
+  const slideCap = (await p.getByTestId("slide-comic").boundingBox())!;
+  const slideWho = (await p.locator(".player-who").boundingBox())!;
+  expect(slideCap.width).toBe(280);
+  expect(Math.round(slideCap.x - (slideWho.x + slideWho.width))).toBe(16);
+  await shot(page, "comic-slide-desktop");
+  // a narrower window has no room for both in the row: the capsule stands over the bar, clear of Play
+  await page.setViewportSize({ width: 1000, height: 800 });
+  const narrowCap = (await p.getByTestId("slide-comic").boundingBox())!;
+  const narrowBar = (await p.getByTestId("progress").locator("..").boundingBox())!;
+  expect(narrowCap.y + narrowCap.height).toBeLessThanOrEqual(narrowBar.y);
+  await expect(p.locator(".player-left")).toBeVisible();
+  await shot(page, "comic-slide-1000");
 });

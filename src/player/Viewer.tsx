@@ -7,7 +7,7 @@
  * does not favorite here); pinch zooms 1 to 5 times, a drag moves a zoomed picture, and a drag down
  * on an unzoomed one closes. On a computer the wheel zooms and Post info stands beside the picture.
  */
-import { ChevronLeft, ChevronRight, CircleAlert, Download, EyeOff, Heart, Info, Pause, Play, RefreshCw, Share, SkipBack, SkipForward, SlidersHorizontal, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleAlert, Download, EyeOff, Heart, Info, Maximize, Minimize, Pause, Play, RefreshCw, Share, SkipBack, SkipForward, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { turnMark } from "@/feed/motion";
@@ -141,7 +141,7 @@ interface Reading {
 }
 
 /**
- * The comic reader (`?read=<pool>&post=<postId>`, DESIGN.md "Comics, part two"): the player on one
+ * The comic reader (`?read=<pool>-<postId>`, DESIGN.md "Comics, part two"): the player on one
  * comic, a page at a time. The viewer's picture (pinch, sideways turns, a drag down to close) under
  * the player's chrome: the count in pages, the capsule (the Pages sheet), the artist with Follow,
  * Favorite, Post info, Quick settings and Share, Previous, Play and Next, and the bar. It starts
@@ -451,6 +451,19 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
     if (i >= 0 && ids[i] !== post?.id) goTo(ids[i]);
   };
   const shareIt = () => post && void sharePost(post);
+  // full screen, as the player has it (on a computer: its button, and F)
+  const [fullscreen, setFullscreen] = useState(false);
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void document.documentElement.requestFullscreen?.().catch(() => toast.error("Fullscreen isn't allowed here"));
+  };
+  useEffect(() => {
+    if (!reading) return;
+    const onChange = () => setFullscreen(!!document.fullscreenElement);
+    onChange();
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, [!!reading]); // eslint-disable-line react-hooks/exhaustive-deps
   // a drag to the right on the end goes back to the last page, as a turn back does
   const endFrom = useRef<number | null>(null);
   const endDown = (e: React.PointerEvent) => {
@@ -625,9 +638,10 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
       // the player's keys (UX §8), with ← → turning the page
       if (e.key === " ") {
         e.preventDefault();
-        return play(!reading.paused);
+        return play(reading.paused);
       }
       if (e.key === "s" || e.key === "S") return nav.openSheet("player-settings");
+      if (e.key === "f" || e.key === "F") return toggleFullscreen();
     }
     switch (e.key) {
       case "Escape":
@@ -781,6 +795,11 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
               {comic.page} / {comic.total}
             </span>
           )}
+          {reading && (
+            <button type="button" className="art-circle player-desktop" aria-label="Toggle fullscreen" onClick={toggleFullscreen} data-testid="reader-fullscreen">
+              {fullscreen ? <Minimize aria-hidden /> : <Maximize aria-hidden />}
+            </button>
+          )}
         </div>
         {comic && !reading && (
           <>
@@ -794,16 +813,18 @@ function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; t
         )}
         {post && reading && !ended && (
           <div className="player-bottom" onMouseEnter={() => (hovering.current = true)} onMouseLeave={() => (hovering.current = false)}>
-            {comic && <ComicBar comic={comic} up />}
-            <div className="player-who">
-              <Avatar seed={by ?? `post:${post.id}`} className="post-avatar" />
-              <span className="player-idn">
-                <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
-                <span className="post-time">
-                  {ago(post.created_at, now)} · #{post.id}
+            <div className="player-lead">
+              {comic && <ComicBar comic={comic} up />}
+              <div className="player-who">
+                <Avatar seed={by ?? `post:${post.id}`} className="post-avatar" />
+                <span className="player-idn">
+                  <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
+                  <span className="post-time">
+                    {ago(post.created_at, now)} · #{post.id}
+                  </span>
                 </span>
-              </span>
-              {by && <FollowPill key={by} name={by} art />}
+                {by && <FollowPill key={by} name={by} art />}
+              </div>
             </div>
             <div className="player-rail">
               <button
