@@ -61,6 +61,8 @@ export interface Post {
   uploader_name?: string;
   pools?: number[];
   sources?: string[];
+  /** DText */
+  description?: string;
   flags?: { deleted?: boolean; pending?: boolean; flagged?: boolean };
 }
 

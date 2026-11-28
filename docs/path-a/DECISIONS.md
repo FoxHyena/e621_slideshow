@@ -1630,3 +1630,27 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     the fields' right end, 8 above Sign in. Now a 44 row, flush on both sides, callout-rounded, 16
     above Sign in. Paste sits 6 from the key field's end (was 10).
 - New e2e test `sign-in-sheet.spec.ts` measures each of these on a computer and a phone.
+
+## 2026-11-27 — Built: the post page, Open post, Share post
+- Owner: "Post page first" (before link previews and comics). Built from DESIGN.md "A post on its
+  own": `/post/<number>` (1 to 10 digits, else the 404 screen), pushed over the tab it came from.
+- What it shows: the post's panel without its tag row (the tags stand below, by kind, artists
+  always shown), then the description, the file line, Source and Open on e621, and "More from
+  <artist>" (6 tiles, See all opens the artist). A tap on the picture opens the viewer over the
+  page (`/post/<n>?view=<n>`); a More-from tile opens that post's page.
+- Calls in the build, not in the drawing:
+  - The comic group is left out until comics are built.
+  - A post e621 hides from signed-out visitors, and one on your blacklist, show a post-shaped gate
+    (Sign in; or which line matched and Show it, for this visit only). The feed has no such gate
+    built, so there was nothing to reuse.
+  - The description shows as plain text (DText markup removed, links kept as their words).
+  - Source shows only http(s) links, by site name.
+  - On a computer two columns (600 and 344, 24 apart) only from 1280 wide; below that the rest
+    stands under the post.
+  - The page's own ⋯ has no Open post and no Play from this post.
+- "Open post" is the first row of every post's ⋯ (a card's and a held tile's). "Share post" now
+  shares `/post/<n>` in this app (was the post on e621); no sign-in rides along.
+- The post page rides in the artist page's chunk, so the first load gains no file name (198.8 KB).
+- Not built in this part: link previews, comics.
+- Tests: `e2e/post-page.spec.ts` (signed out from a link; the viewer; a wrong number; the hidden
+  and blacklist gates; Open post and Share post from a feed's ⋯; the two columns at 1440).

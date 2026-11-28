@@ -25,6 +25,8 @@ export type Screen =
   | { kind: "favorites"; params: string }
   /** `params`: the chips (the same filter params as Favorites), left out when none is set */
   | { kind: "artist"; name: string; params?: string }
+  /** `/post/<number>`: one post on its own page (DESIGN.md "A post on its own") */
+  | { kind: "post"; id: number }
   | { kind: "root"; params: string }
   | { kind: "notFound"; path: string };
 
@@ -82,6 +84,8 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
       if (!name) return notFound(path);
       return params ? { kind: "artist", name, params } : { kind: "artist", name };
     }
+    case "post":
+      return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: "post", id: Number(parts[1]) } : notFound(path);
     default:
       return notFound(path);
   }
@@ -105,6 +109,8 @@ export function screenPath(s: Screen): string {
       return s.params ? `/favorites?${s.params}` : "/favorites";
     case "artist":
       return `/artist/${encodeURIComponent(s.name)}${s.params ? `?${s.params}` : ""}`;
+    case "post":
+      return `/post/${s.id}`;
     case "root":
       return s.params ? `/?${s.params}` : "/";
     case "notFound":
@@ -149,6 +155,7 @@ export function parentOf(r: Route, openedFrom: Tab | null): Route | null {
     case "results":
     case "favorites":
     case "artist":
+    case "post":
     case "notFound":
     case "root":
       return tab(openedFrom ?? "following");

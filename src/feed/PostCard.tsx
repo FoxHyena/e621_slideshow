@@ -44,6 +44,8 @@ export interface PostCardProps {
   fresh?: boolean;
   /** For You, Results, Favorites: a Follow pill for an artist you don't follow */
   follow?: boolean;
+  /** the post page: no tag row (its tags are in their own panel) */
+  tagless?: boolean;
   onOpen: (post: Post, index: number) => void;
   onMenu: (post: Post) => void;
 }
@@ -189,7 +191,7 @@ function fadeTags(e: React.UIEvent<HTMLDivElement>) {
   r.style.setProperty("--fr", `${Math.min(28, Math.max(0, rest))}px`);
 }
 
-function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, onOpen, onMenu }: PostCardProps) {
+function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh = false, follow = false, tagless, onOpen, onMenu }: PostCardProps) {
   const by = artists(post);
   const name = by[0]?.replaceAll("_", " ");
   const seed = by[0] ?? `post:${post.id}`;
@@ -206,7 +208,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
   return (
     <article
       className="post"
-      style={{ height: CARD_CHROME + mediaHeight }}
+      style={{ height: CARD_CHROME - (tagless ? 36 : 0) + mediaHeight }}
       aria-label={`${fresh ? "New post" : "Post"} ${post.id}${name ? ` by ${name}` : ""}`}
       data-testid="post-card"
       data-post-id={post.id}
@@ -260,7 +262,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
         </button>
       </header>
       <CardMedia post={post} index={index} height={mediaHeight} live={live} still={still} onOpen={onOpen} onFaved={faved} />
-      <div ref={tagRow} className="post-tags" data-testid="card-tags" onScroll={fadeTags}>
+      {!tagless && <div ref={tagRow} className="post-tags" data-testid="card-tags" onScroll={fadeTags}>
         {shown.map(([c, t]) => (
           <button
             key={`${c}:${t}`}
@@ -293,7 +295,7 @@ function PostCardImpl({ post, index, mediaHeight, live, still, now, hold, fresh 
             +{more}
           </button>
         )}
-      </div>
+      </div>}
       <footer className="post-foot">
         <span className="post-score" aria-label={`Score ${post.stats.score.total}`}>
           <ArrowUp aria-hidden />
