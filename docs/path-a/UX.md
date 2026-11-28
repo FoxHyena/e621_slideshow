@@ -489,6 +489,10 @@ The rest is the designer's. Sizes are in DESIGN.md, "A post on its own".
 - **The end:** after the last page, an end slide with "Read again" and a way back ("Back to the
   slideshow" or "Back to Riverbank"). A comic does not loop.
 - **Close** returns to where it was opened from: the slide you left, paused, or the comic's page.
+- **On a computer** (owner, of the two drawings: "Lock them"): the comic's page is two columns, as the
+  post page is: the pages four to a row in the 600 column; the artist, the description and "Open on
+  e621" beside them. The reader is the player's window with the capsule in its row of controls. Keys:
+  ← → turn the page, Space starts and stops, Esc closes.
 
 ### Settings `/settings`
 

@@ -149,7 +149,9 @@ feed" and "Start paused".
 3. **The reader** is the player on one comic. It starts paused; the gold button turns the pages on
    "Comic page time" (20 s to start).
 4. **The end** has "Read again" and a way back.
-5. **Not drawn:** both on a computer.
+5. **On a computer** (you: "Lock them"): the comic's page is two columns, as the post page is, with
+   the pages four to a row. The reader is the player's window with the comic's capsule in its row of
+   controls. The end slide is not drawn there.
 
 ## What was made
 

@@ -1340,6 +1340,17 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 .cbare6 { height: 300px; background: #000; display: grid; place-items: center; overflow: hidden; }
 .cbare6 > div { width: 190px; }
 .vcomic6.go .chev { transform: none; }
+/* Comics, part two, on a computer (2026-11-28). Owner: "Lock them". */
+.dcomic6 .cgrid6 { grid-template-columns: repeat(4, 1fr); gap: 16px 12px; padding-bottom: 104px; }
+.dcomic6 .cdesc6 { margin-left: 0; margin-right: 0; }
+.dcomic6 .glabel6 { height: 28px; }
+.dplayer6.dread6 .stage, .dplayer6.dread6 .ts, .dplayer6.dread6 .bs { right: 0; }
+.dplayer6.dread6 .dptop6 { right: 16px; }
+.dplayer6.dread6 .dpbot6 { right: 24px; }
+.dplayer6.dread6 .stage .cpg6 { --g: 12px; width: auto; height: 100%; }
+.dplayer6.dread6 .stage .cpg6 i { height: auto; aspect-ratio: auto; }
+.dwho6 { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.dwho6 .vcomic6 { width: 280px; flex: none; }
 </style>
 
 <div class="wrap" id="root">
@@ -1515,6 +1526,12 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <div class="phone-holder" id="s-cend"></div>
       </section>
     </div>
+    <h2 class="pg-h2" style="margin-top:48px">The same two, on a computer</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: Lock them</span>You said "Yes, draw them", and then "Lock them". Both follow rules the app already has on a computer: the comic's page is laid out as the post page is, and the reader is the player's window. The switch above still works on the reader.</p>
+    <div class="dframes6" style="margin-top:24px">
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">5. The comic's page on a computer</h2><p>Two columns, as on the post page. The pages stand in the 600 column, four to a row. The artist, the description and "Open on e621" stand beside them. Back and the tools span both.</p></figcaption><div class="desk-holder" id="d-cpage"></div></figure>
+      <figure class="dfig6"><figcaption><h2 class="pg-h3">6. The reader on a computer</h2><p>The player's window. The comic's capsule stands after the artist, in the one row of controls. The arrow keys turn the page and Space starts or stops the timer. In a slideshow the capsule stands in the same place and reads "Read from page 3".</p></figcaption><div class="desk-holder" id="d-cread"></div></figure>
+    </div>
     <h2 class="pg-h2">What is decided, and what is yours</h2>
     <div class="tbl"><table>
       <thead><tr><th>Part</th><th>Today</th><th>Drawn</th><th>Why, and the other option</th></tr></thead>
@@ -1529,7 +1546,9 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <tr><th>Time on a comic page</th><td>The slideshow's time</td><td>Its own row in Slideshow settings and Quick settings: "Comic page time", 10, 20, 30 or 45 s. It starts at 20 s.</td><td>A comic page needs longer than a picture. Other option: one time for everything.</td></tr>
         <tr><th>The end</th><td></td><td>After the last page: Goo waving, "The end", the name and the page count, "Read again", and a button back to where you came from.</td><td>Without it the last page just stops, or wraps to page 1.</td></tr>
         <tr><th>A page e621 does not send</th><td>The build skips it</td><td>On the comic's page it keeps its place: an empty well with a lock and its number. The reader skips it.</td><td>The numbers stay true, and you can see that a page is missing.</td></tr>
-        <tr><th>Not drawn yet</th><td></td><td>Both screens on a computer. The comic page's link preview.</td><td>I would draw them once you have said yes to the phone.</td></tr>
+        <tr><th>The comic's page on a computer (you: "Lock them")</th><td></td><td>The post page's two columns, 968 wide in all. Left, 600: the pages, four to a row, each tile 141 wide. Right, 344: the artist, the description, "Open on e621". The name and its line stand over both, under Back and the tools. Play is at the bottom left, where a feed has it.</td><td>The pages are the comic, so they get the wide column. Not picked: one 600 column with everything stacked, as on a phone; the pages then start below the fold.</td></tr>
+        <tr><th>The reader on a computer (you: "Lock them")</th><td></td><td>The player's window, the page at full height. One row of controls: the artist and the capsule at the left, Previous, Play and Next in the middle, the four buttons at the right. The time bar is over the row. Keys: ← → turn the page, Space starts and stops, Esc closes.</td><td>The viewer on a computer puts the capsule in this row too. Not picked: two glass arrows at the page's sides, as the viewer has; the transport already does that job here.</td></tr>
+        <tr><th>Not drawn</th><td></td><td>The end slide and the slideshow's capsule on a computer: both are the phone's, in the player's window. The comic page's link preview.</td><td>The link preview needs the builder's answer on what the server can fetch first.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -3744,6 +3763,23 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
     <div class="cend6">${mascot('wave', 112)}<b>The end</b><small>${COMIC.name} · ${COMIC.n} pages</small>
       <div class="acts"><button class="gbtn6" type="button">${ic('refresh', 18, 2.2)}Read again</button><button class="gbtn6" type="button">Back to the slideshow</button></div></div>
     <div class="ptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="pcount6">${COMIC.n} / ${COMIC.n}</span></div><span class="home6"></span></div>`;
+
+  // Comics, part two, on a computer (2026-11-28)
+  {
+    const who = $('s-cpage').querySelector('.group6.who').outerHTML, desc = $('s-cpage').querySelector('.cdesc6').outerHTML;
+    $('d-cpage').innerHTML = desk(side('Following') + `<div class="dmain6 wide" style="overflow-y:auto"><div class="dpostw6">
+      <div class="head6 pph6"><div class="titlerow">${back()}${ptools}</div><h3 class="title6">${COMIC.name}</h3><p class="sub6">A comic · ${COMIC.n} pages · last page 3h ago</p></div>
+      <div class="dpost6 dcomic6"><div class="l"><div class="glabel6"><span>Pages</span><span style="padding-right:16px">You are on page ${CAT}</span></div><div class="cgrid6">${thumbs().map(k => cpt(k)).join('')}</div></div>
+        <div class="r">${who}${desc}<div class="group6">${srow('ext', 'Open on e621', 'Pool #77')}</div></div></div></div>${fab(0).replace('Play from here', `Read from page ${CAT}`)}</div>`);
+    const dread = playing => desk(`<div class="stage">${cpage(COMIC.at)}</div><div class="ts"></div><div class="bs"></div>
+      <div class="dptop6"><button class="gl6" type="button" aria-label="Close">${ic('x', 22, 2.4)}</button><span class="r"><span class="pcount6">${COMIC.at} / ${COMIC.n}</span><button class="gl6" type="button" aria-label="Full screen">${ic('full', 20, 2.2)}</button></span></div>
+      <div class="dpbot6"><div class="pbar6 ${playing ? '' : 'zero'}"><i></i><span>20 s</span></div>
+        <div class="dpctl6"><div class="dwho6"><div class="pwho6">${avatar('mossy otter')}<div class="idn"><b>mossy otter</b><small>3h ago · #4512290</small></div></div>${ccap(`Page ${COMIC.at} of ${COMIC.n}`)}</div>
+          <div class="ptrans6"><button class="gl6" type="button" aria-label="Previous page">${ic('prev', 20, 2.2, 'solid')}</button><button class="pplay6 lip6" type="button" aria-label="${playing ? 'Pause' : 'Play'}" data-playing="${playing ? 1 : 0}">${ic(playing ? 'pause' : 'play', 26, 0, 'solid')}</button><button class="gl6" type="button" aria-label="Next page">${ic('next', 20, 2.2, 'solid')}</button></div>
+          <div class="acts"><button class="gl6 pfav" type="button" aria-pressed="false" aria-label="Favorite">${ic('heart', 22, 2.4)}</button><button class="gl6" type="button" aria-label="Post info">${ic('info', 22, 2.2)}</button><button class="gl6" type="button" aria-label="Slideshow settings">${ic('sliders', 20, 2.2)}</button><button class="gl6" type="button" aria-label="Share">${ic('share', 20, 2.2)}</button></div></div></div>`, 'dplayer6 dread6');
+    $('d-cread').innerHTML = `<div><div class="cs-paused">${dread(false)}</div><div class="cs-playing">${dread(true)}</div></div>`;
+    dfit();
+  }
 
   // The viewer's hands, enough to try them: one tap hides the buttons, a double tap zooms, a sideways drag turns a comic's page.
   document.querySelectorAll('.view6').forEach(v => {

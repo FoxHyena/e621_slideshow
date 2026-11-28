@@ -2388,3 +2388,18 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - **Refresh:** it kept the retry wait.
   - **Tests:** the end → ← → Play path had no test. It does now.
 - Also in this branch: PR 53's fix for the flash on a page turn (cherry-picked).
+
+## 2026-11-28 — Comics, part two on a computer (owner: "Lock them")
+- After the phone design was sent to the builder I asked: draw the comic's page and the reader on a
+  computer next? Owner: "Yes, draw them". I drew both and asked whether to lock them as drawn. Owner:
+  "Lock them".
+- **The comic's page:** the post page's two columns, 968 wide in all. The pages get the 600 column,
+  four to a row (141 × 197 each). The artist, the description and "Open on e621" stand in the 344
+  column. Not picked: one 600 column with everything stacked.
+- **The reader:** the player's window, the page at full height, the capsule after the artist in the
+  one row of controls. Not picked: glass arrows at the page's sides, as the viewer has.
+- **This replaces** the stopgap sent to the builder with the phone design (one 600 column, five tiles
+  to a row).
+- **Mine:** every measurement; the keys; that the capsule in a slideshow stands in the same place.
+- Not drawn: the end slide on a computer, and the comic page's link preview.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
