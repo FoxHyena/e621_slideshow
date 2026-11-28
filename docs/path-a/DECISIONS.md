@@ -1555,3 +1555,15 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   parallel to the 26 end. **Mine, by the hover rule** ("radius = the container's less the gap"): in the
   52 bar the tools are 44 wide and the wash is a 44 circle, 4 inside on every side. Same on a phone,
   where there is no hover; the tools are 4 wider each there too.
+
+## 2026-11-27 — A grid tile does not open the viewer
+- The approved section said "Tapping a picture in a feed or a grid tile opens it". "or a grid tile" was
+  the designer's line. It went against the owner's idea of 2026-11-26 (a grid tile opens the feed at
+  that post), and the designer did not point that out when asking for approval.
+- Owner, asked by the builder "Grid tiles on Results: open the viewer, or keep turning the feed to a
+  list?": "Keep list behavior". The designer has this from the builder's message and from the
+  builder's entry on PR #32, not from the owner directly.
+- Now: only a picture in a feed opens the viewer. In every grid a tile turns the feed to a list at that
+  post, and the picture there opens the viewer. "Play from here" stays in the tile's menu.
+- Changed: DESIGN.md's viewer bullet, UX.md's Media taps note, the "Tapping a picture" row of the
+  table in `screens-v6.html`. No drawing changes.
