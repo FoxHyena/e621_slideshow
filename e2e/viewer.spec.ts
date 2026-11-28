@@ -147,7 +147,15 @@ test.describe("Save", () => {
       });
       await open(page);
       await viewer(page).getByTestId("save-button").click();
-      await expect(page.getByText("The picture is ready: tap Save again")).toBeVisible();
+      const toast = page.locator("[data-sonner-toast]");
+      await expect(toast).toContainText("The picture is ready");
+      await expect(toast.locator(".toast6-sub")).toHaveText("Tap Save again");
+      // 12 above the viewer's bottom stack (its artist's row): 142 from the bottom of the phone
+      const stack = (await viewer(page).getByTestId("viewer-artist").boundingBox())!;
+      // (polled: the toast slides in)
+      await expect.poll(async () => Math.round(stack.y - (await toast.evaluate((t) => t.getBoundingClientRect().bottom)))).toBe(12);
+      expect(Math.round(844 - (await toast.evaluate((t) => t.getBoundingClientRect().bottom)))).toBe(142);
+      await shot(page, "viewer-save-again");
       const fetched = mock.media.length;
       await viewer(page).getByTestId("save-button").click();
       await expect.poll(() => page.evaluate(() => (window as unknown as { shares: number }).shares)).toBe(1);
@@ -155,16 +163,27 @@ test.describe("Save", () => {
     });
   });
 
-  test("a file it can't pass through opens in a new tab", async ({ page, context }) => {
+  test("a file it can't fetch: the toast offers Open, and nothing opens by itself", async ({ page, context }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/search?tags=wolf&view=1149");
     await expect(viewer(page)).toHaveAttribute("data-post-id", "1149");
     // the new tab is outside the page's mock: keep it off the real e621
     await context.route("https://static1.e621.net/**", (r) => r.fulfill({ body: "", contentType: "image/png" }));
-    const tab = context.waitForEvent("page");
+    let tabs = 0;
+    context.on("page", () => tabs++);
     await viewer(page).getByTestId("save-button").click();
+    const toast = page.locator("[data-sonner-toast]");
+    await expect(toast).toContainText("Couldn't save it here");
+    await expect(toast.locator(".toast6-sub")).toHaveText("Open the full picture instead");
+    await expect(toast.locator(".toast6-mark svg")).toHaveAttribute("data-tone", "danger");
+    // on a computer: 76 from the bottom, centred on the stage (polled: the toast slides in)
+    await expect.poll(() => toast.evaluate((t) => Math.round(800 - t.getBoundingClientRect().bottom))).toBe(76);
+    expect(await toast.evaluate((t) => Math.round((t.getBoundingClientRect().left + t.getBoundingClientRect().right) / 2))).toBe(640);
+    await shot(page, "viewer-save-failed");
+    expect(tabs).toBe(0);
+    const tab = context.waitForEvent("page");
+    await toast.getByRole("button", { name: "Open" }).click();
     expect((await tab).url()).toBe("https://static1.e621.net/data/mock/1149.png");
-    await expect(page.getByText("Couldn't save here")).toBeVisible();
   });
 });
 
