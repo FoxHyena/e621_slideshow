@@ -137,6 +137,20 @@ You asked for a graphic of how For You picks. You locked "A with C".
 3. **Its order stop** follows the "Taste or popular" slider.
 4. **Its cost:** 635 tall, more than one screen, until hidden.
 
+## Picked (2026-11-28, comics part two)
+
+You said "Yes, comics part two" to the builder. You then made two calls: "It should keep playing the
+feed" and "Start paused".
+
+1. **A comic has its own page.** Its name, its artist, its description and every page in order. The
+   page you stopped on wears the gold ring. It takes the place of "Open as a feed".
+2. **A slideshow keeps playing the feed.** A slide that is a comic page shows a capsule, "Read from
+   page 3", and nothing else changes.
+3. **The reader** is the player on one comic. It starts paused; the gold button turns the pages on
+   "Comic page time" (20 s to start).
+4. **The end** has "Read again" and a way back.
+5. **Not drawn:** both on a computer.
+
 ## What was made
 
 | Batch | Commit | What | Builder's slice |

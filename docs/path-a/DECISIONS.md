@@ -2319,3 +2319,29 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - A disabled turn button on the last page still drops keyboard focus.
   - A comic that gains a page mid-visit shows it after a reload.
   - The pill can show "pool:77" for a moment before the comic's name comes in.
+
+## 2026-11-28 — Comics, part two: the comic's page and the reader (owner: "It should keep playing the feed", "Start paused")
+- The request reached me through the builder, who quoted the owner: "Yes, comics part two". The scope
+  was the builder's open item: "a comic's own page (like e621's pool page) and reading a comic in the
+  slideshow".
+- I drew four phone screens and sent them: the comic's page, a comic page in a slideshow, the reader,
+  and the end.
+- The owner asked: "So wait are these mocs for reading through a comic or playing it in the
+  slideshow?" Both: the reader is one screen, read by hand while paused and turned by the timer while
+  playing.
+- **Owner, on a slideshow that lands on a comic page:** "It should keep playing the feed". So the
+  slide only carries a capsule into the reader. Not picked: playing the comic's other pages next.
+- **Owner, on how the reader starts:** "Start paused".
+- The owner did not say "lock it" in words. I had told them the start was the one pick left before I
+  could lock it, and they answered it.
+- **Mine, seen by the owner in the drawings:** the comic's page and its order (name, artist,
+  description, pages three to a row, "Open on e621"); the gold ring on the page you stopped on; Play
+  on that page; the capsule's words; the reader as the player with a count in pages; the end slide;
+  the locked tile for a page e621 does not send; "Comic page time" with 10, 20, 30 and 45 s.
+- **Mine, not drawn:** the ⋯ menu's "Read from page 1"; that closing the reader leaves the slideshow
+  paused; that a comic does not loop; the artist row taking the first page's artist; five tiles to a
+  row on a computer.
+- **Changed with it:** "Open as a feed" becomes "Open comic", in the Pages sheet and on the post page.
+- **For the builder to choose:** the reader's URL state, and how the device stores where you stopped.
+- Not drawn: both screens on a computer, and the comic page's link preview.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
