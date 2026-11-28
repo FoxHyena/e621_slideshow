@@ -1711,3 +1711,27 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the viewer's artist row: 142 on a phone (34 or the safe area, + 108), 76 on a computer.
 - Tests: `viewer.spec.ts` (both toasts' words and places; no tab until Open), `settings.spec.ts`
   (Made by).
+
+## 2026-11-27 — Fixed: the top pill hid under the title; Following's counts didn't clear
+- Owner: "update ranking and similar items seem to be trapped at top of scroll" and "Following post
+  notifications don't seem to clear even after having seen/scrolled past the posts".
+- **The pill** ("Update ranking", "↑ N new posts") was sticky 12 from the top, so once you scrolled
+  it sat under the floating title capsule (higher up, and drawn over it). It now rides 12 under the
+  capsule: 68 from the top on a phone (4 + 52 + 12), 72 on a computer (8 + 52 + 12), plus the safe
+  area. Before you scroll it stays where it was, under the chips.
+- **The counts:** marking seen moved e621's marker but every count kept the session's number
+  ("10 new since your last visit", the tab and sidebar badge, Play's count) until the next session.
+  UX §5 had it so ("the subtitle counts new posts loaded so far"); the owner calls that a bug. Now,
+  once marked seen this session, those counts are 0 and the subtitle says "All caught up". The New
+  dots and the divider still stay put for the session, so nothing in the feed jumps.
+- Unchanged: when e621 has newer posts than the ones loaded, nothing is marked and the pill shows
+  (UX §5 rule 3); after the pill's tap, scrolling past marks as before.
+- **A post's description keeps its formatting** (owner, 2026-11-27, with a friend's report of
+  "h2." showing as text: "We should likely respect the formatting in descriptions"). This replaces
+  the post page's plain-text call. `src/lib/e621/dtext.tsx` turns the common DText into React,
+  never HTML:
+  - h1. to h6. become a bold line; [b] [i] [u] [s] [sup] [sub] keep their look.
+  - Links open in a new tab (web links only); "post #123" opens that post's page here.
+  - [[wiki]] and {{tags}} show their words; "* " lines are a list.
+  - [spoiler] is a Well bar until tapped.
+  - [quote], [section] and the like keep their words without the tags.

@@ -8,6 +8,7 @@
  * The tab bar stays; there is no Play. On a wide computer the post keeps the 600 column and the rest
  * stands in a 344 column 24 to its right. Rides in the artist page's chunk (src/shell/lazy.ts).
  */
+import { DText } from "@/lib/e621/dtext";
 import { ArrowUp, Ban, ChevronRight, ExternalLink, Heart, Link2, Lock, MoreHorizontal, Search, Share } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -66,16 +67,6 @@ function usePost(id: number): [Found, () => void] {
     return [p ? { status: "ready", post: p } : { status: "missing" }, () => {}];
   }
   return [found?.key === key ? found.f : { status: "loading" }, () => setTries((t) => t + 1)];
-}
-
-/** e621's description is DText: shown as plain text (its markup tags dropped, its links as their words). */
-function plain(dtext: string): string {
-  return dtext
-    .replace(/"([^"]+)":\S+/g, "$1")
-    .replace(/\[\/?[a-z]+(?:=[^\]]*)?\]/gi, "")
-    .replace(/\r\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
 }
 
 /** A source's site, for the Source row ("bsky.app"); only web links count. */
@@ -265,14 +256,17 @@ function Gate({ post, now, icon, head, text, children }: { post: Post; now: numb
 
 /** "Description" and every tag by kind, under the Post info sheet's labels; then the file line. */
 function TagsPanel({ post, hold }: { post: Post; hold: ReturnType<typeof useTagHold> }) {
-  const text = plain(post.description ?? "");
+  const text = post.description?.trim() ?? "";
   const f = post.files;
   return (
     <section className="post-info-panel" aria-label="About this post" data-testid="post-info">
       {text && (
         <>
           <h3 className="info-label">Description</h3>
-          <p className="post-desc">{text}</p>
+          {/* e621's DText with its formatting (src/lib/e621/dtext.tsx) */}
+          <div className="post-desc" data-testid="post-desc">
+            <DText text={text} onPost={(id) => getNav().push({ screen: { kind: "post", id }, play: null })} />
+          </div>
         </>
       )}
       {KINDS.map(([c, name]) => {

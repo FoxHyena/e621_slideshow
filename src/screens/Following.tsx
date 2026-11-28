@@ -266,9 +266,13 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
   const last = posts[posts.length - 1];
   // A failed page doesn't end the list: more new posts may still be past it.
   const more = !!q && !q.exhausted && (!last || isNew(last, threshold));
-  const label = newCountLabel(newCount, more);
+  // Once marked seen this session, nothing here is unseen: the counts (subtitle, badge, Play) clear,
+  // while the dots and the divider stay put on the session's threshold (UX §5 Following).
+  const seen = fs.marked !== null;
+  const unseen = seen ? 0 : newCount;
+  const label = newCountLabel(unseen, more && !seen);
   const me = useStore(getSession().store, (s) => s.user?.name ?? null);
-  useEffect(() => newOnFollowing.set({ user: me, count: newCount, more }), [me, newCount, more]);
+  useEffect(() => newOnFollowing.set({ user: me, count: unseen, more: more && !seen }), [me, unseen, more, seen]);
   const filtered = !isDefaultFilters(filters);
 
   const rowsFor = useCallback(
@@ -363,7 +367,7 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         <PullToRefresh enabled={visible && !sheet && !play} onRefresh={pull} />
       </Suspense>
       <p className="screen-sub" aria-live="polite" data-testid="following-status">
-        {label && newCount > 0 ? (
+        {label && unseen > 0 ? (
           <>
             <b>{label}</b> since your last visit
           </>
@@ -427,7 +431,7 @@ function FollowingFeed({ fs, grid, sheet }: { fs: FollowingState; grid: boolean;
         onExpand={(run) => setExpanded(expandRun(run))}
         onView={onView}
       />
-      <PlayFab feed={feed} route={route} count={newCount} />
+      <PlayFab feed={feed} route={route} count={unseen} />
       <FilterSheet
         sheet={sheet}
         filters={filters}

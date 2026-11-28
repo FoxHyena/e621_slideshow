@@ -3418,10 +3418,12 @@ html {
   line-height: var(--text-section--line-height);
   font-weight: var(--text-section--font-weight);
 }
+/* it rides 12 under the floating title capsule once you scroll (4 + 52 down on a phone, 8 + 52 on a
+   computer); at 12 from the top it sat under the capsule, out of sight */
 .top-pill-row {
   position: sticky;
   z-index: 30;
-  top: 12px;
+  top: calc(env(safe-area-inset-top) + 68px);
   display: flex;
   justify-content: center;
   height: 0;
@@ -5658,6 +5660,9 @@ li[data-state="done"] .first-step-n svg,
     width: 584px;
     margin: 0 auto;
   }
+  .top-pill-row {
+    top: calc(env(safe-area-inset-top) + 72px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .topbar[data-at] .topcap {
@@ -5923,9 +5928,55 @@ li[data-state="done"] .first-step-n svg,
   margin: 0;
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);
-  white-space: pre-line;
   overflow-wrap: anywhere;
   text-wrap: pretty;
+}
+/* DText's blocks (src/lib/e621/dtext.tsx): paragraphs 8 apart; a header is a bold line */
+.post-desc > p,
+.post-desc > ul {
+  margin: 8px 0 0;
+}
+.post-desc > :first-child {
+  margin-top: 0;
+}
+.post-desc .dtext-h {
+  font-weight: 700;
+}
+.post-desc ul {
+  padding-left: 20px;
+  list-style: disc;
+}
+.post-desc li[data-depth="2"] {
+  margin-left: 16px;
+}
+.post-desc li[data-depth="3"] {
+  margin-left: 32px;
+}
+.post-desc a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.post-desc u {
+  text-underline-offset: 2px;
+}
+/* a spoiler: a Well bar until tapped */
+.dtext-spoiler {
+  border-radius: 4px;
+  background: var(--color-well);
+  color: transparent;
+  cursor: pointer;
+}
+.dtext-spoiler * {
+  color: transparent;
+}
+.dtext-spoiler[data-shown] {
+  background: none;
+  color: inherit;
+  cursor: auto;
+}
+.dtext-spoiler[data-shown] * {
+  color: inherit;
 }
 .post-file {
   margin: 16px 0 0;

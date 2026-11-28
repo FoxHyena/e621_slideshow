@@ -11,7 +11,7 @@ const postPage = (page: Page) => page.getByTestId("post-page");
 
 let mock: E621Mock;
 const POSTS = [
-  { id: 1149, description: '[b]Page three.[/b] Reed reaches the river. "More":https://example.com/more', sources: ["not a link", "https://www.example.com/art/1"], tags: ["river", "cozy"] },
+  { id: 1149, description: 'h2. Reed\n[b]Page three.[/b] Reed reaches the river. "More":https://example.com/more', sources: ["not a link", "https://www.example.com/art/1"], tags: ["river", "cozy"] },
   { id: 1148 },
   { id: 1147 },
   { id: 1146, hidden: true },
@@ -31,7 +31,12 @@ test.describe("on a phone", () => {
     await expect(card.getByTestId("card-tags")).toHaveCount(0);
     await expect(page.getByTestId("play-fab")).toHaveCount(0);
     const info = page.getByTestId("post-info");
-    await expect(info).toContainText("Page three. Reed reaches the river. More");
+    // the description keeps its DText formatting: a header, bold, a link (a friend's report, 2026-11-27)
+    const desc = page.getByTestId("post-desc");
+    await expect(desc.locator(".dtext-h")).toHaveText("Reed");
+    await expect(desc).not.toContainText("h2.");
+    await expect(desc.locator("strong")).toHaveText("Page three.");
+    await expect(desc.getByRole("link", { name: "More" })).toHaveAttribute("href", "https://example.com/more");
     await expect(info.getByRole("region", { name: "Artists" })).toContainText("mock artist");
     await expect(info.getByRole("region", { name: "General" })).toContainText("river");
     await expect(info).toContainText("64 × 48 · PNG");
