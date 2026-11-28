@@ -19,7 +19,7 @@ import { blacklistedBy, parseBlacklist, type BlacklistRule } from "@/lib/query/b
 import { ID_BATCH, IdListQueue } from "@/lib/recommend/restore";
 import type { SearchSettings } from "@/lib/settings";
 import { revealed } from "@/feed/revealed";
-import { rememberPosts } from "@/feed/postCache";
+import { onAccountLeft, rememberPosts } from "@/feed/postCache";
 import { getNav } from "@/nav/history";
 import { useShownFeed } from "@/screens/feedParts";
 import { blacklistOf, getPrefs } from "@/state/prefs";
@@ -122,10 +122,32 @@ export function useComic(post: Post | null): Comic | null {
 const pages = new Map<string, Page[]>();
 /** Comics whose last ask failed, all or in part: when the next may go. */
 const pagesRetry = new Map<string, number>();
+/** Bumped when an account's sign-in ends: pages asked before then aren't kept. */
+let pagesEra = 0;
+onAccountLeft((name) => {
+  pagesEra++;
+  for (const k of [...pages.keys(), ...pagesRetry.keys()]) {
+    if (k.startsWith(`${name}:`)) {
+      pages.delete(k);
+      pagesRetry.delete(k);
+    }
+  }
+});
 const pagesAnswered = createStore(0);
 const asking = new Set<string>();
 /** Pages asked for at most: a long comic's strip shows these (a request is 100). */
 const PAGES_MAX = 500;
+
+/** A pool's name as e621 shows it (asked for if need be), or null until it's known. */
+export function usePoolName(id: number | null): string | null {
+  const creds = useStore(getSession().store, (s) => s.creds);
+  useStore(answered, (n) => n);
+  useEffect(() => {
+    if (id !== null) want(id, creds);
+  }, [id, creds]);
+  const pool = id === null ? undefined : pools.get(id);
+  return pool ? nameOf(pool) : null;
+}
 
 /** Every page's post (for the thumbs, and the page a drag turns to), asked 100 at a time. */
 export function usePages(comic: Comic | null): Page[] | null {
@@ -144,8 +166,11 @@ export function usePages(comic: Comic | null): Page[] | null {
     const batches: Promise<Post[]>[] = [];
     // the first hundred are on screen (the strip, the sheet, the page a drag turns to); the rest can wait
     for (let i = 0; i < ids.length; i += ID_BATCH) batches.push(searchPosts(`id:${ids.slice(i, i + ID_BATCH).join(",")}`, 1, ID_BATCH, creds, undefined, i === 0 ? "user" : "bg"));
+    const era = pagesEra;
     void Promise.allSettled(batches)
       .then((got) => {
+        // the account that asked signed out meanwhile: its pages aren't kept
+        if (era !== pagesEra) return;
         const byId = new Map(got.flatMap((r) => (r.status === "fulfilled" ? r.value : [])).map((p) => [p.id, p]));
         const before = pages.get(key);
         // a batch that failed keeps what an earlier ask had (or "not known yet")
@@ -256,7 +281,7 @@ export function ComicGroup({ post }: { post: Post }) {
 
 /** Results for the comic, in page order. */
 export function openComic(id: number) {
-  getPrefs().addHistory(`pool:${id}`);
+  // not into Recent searches: "pool:77" means nothing there, and the comic is a tap away on its pages
   getNav().push({ screen: { kind: "results", params: new URLSearchParams({ tags: `pool:${id}` }).toString() }, play: null });
 }
 

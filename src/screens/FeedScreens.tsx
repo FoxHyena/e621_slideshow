@@ -43,7 +43,7 @@ import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import type { Route } from "@/nav/routes";
 import { isLocked, setLockedY } from "@/nav/scroll";
-import { poolIdOf, usePoolFeed } from "@/feed/comics";
+import { poolIdOf, usePoolFeed, usePoolName } from "@/feed/comics";
 import { ALL_RATINGS, FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
 
 /**
@@ -77,6 +77,8 @@ export function ResultsScreen({ params }: { params: string }) {
   const pool = poolIdOf(r.tags);
   const plain = useFeed(pool === null ? spec : null, override);
   const pooled = usePoolFeed(pool, r.filters.media, override);
+  // the pill names the comic, not "pool:77"
+  const poolName = usePoolName(pool);
   const feed = pooled ?? plain;
   const [grid, setGrid] = useState(false);
   const saved = useStore(getPrefs().store, (p) => p.saved);
@@ -149,13 +151,11 @@ export function ResultsScreen({ params }: { params: string }) {
               type="button"
               className="field6"
               onClick={() => getNav().openSheet("edit")}
-              aria-label={`Search: ${tagText(r.tags)}. Edit`}
+              aria-label={`Search: ${poolName ?? tagText(r.tags)}. Edit`}
               data-testid="query-pill"
             >
               <Search aria-hidden />
-              <span>
-                <TagText tags={r.tags} />
-              </span>
+              <span>{poolName ?? <TagText tags={r.tags} />}</span>
             </button>
           </h1>
         }

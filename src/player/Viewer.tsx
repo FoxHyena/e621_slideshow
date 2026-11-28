@@ -60,8 +60,11 @@ interface View {
 }
 const FIT: View = { s: 1, x: 0, y: 0 };
 
+/** How long a link waits, once the sign-in is settled, for its screen's feed before it's taken as having none. */
+const FEED_WAIT_MS = 2000;
+
 /** The post: from the screen's feed when it is there, else asked of e621 (a reload, a link). */
-function useViewedPost(base: Entry, id: string): { post: Post | null; missing: boolean; inFeed: boolean } {
+function useViewedPost(base: Entry, id: string): { post: Post | null; missing: boolean; inFeed: boolean; feedAnswered: boolean } {
   const reg = getFeeds();
   useStore(reg.generation, (g) => g);
   const feed = reg.bound(base.key);
@@ -84,7 +87,20 @@ function useViewedPost(base: Entry, id: string): { post: Post | null; missing: b
     };
   }, [id, inFeed, got, creds, user]);
   const post = inFeed ?? got?.post ?? null;
-  return { post, missing: !inFeed && got !== null && got.post === null, inFeed: inFeed !== null };
+  // Whether "not in the feed" means anything yet: a reload asks for the post and the feed's first page
+  // together, and the post can come first.
+  // No feed binds before the sign-in is settled, so the wait starts from then; only a video waits.
+  const ready = useStore(getSession().store, (s) => s.ready);
+  const [late, setLate] = useState(false);
+  const waiting = ready && !inFeed && post !== null && mediaKind(post) === "video";
+  useEffect(() => {
+    if (!waiting) return;
+    const t = setTimeout(() => setLate(true), FEED_WAIT_MS);
+    return () => clearTimeout(t);
+  }, [waiting]);
+  const q = feed?.queue;
+  const feedAnswered = ready && ((!!q && (q.posts.length > 0 || q.exhausted || q.error !== null)) || late);
+  return { post, missing: !inFeed && got !== null && got.post === null, inFeed: inFeed !== null, feedAnswered };
 }
 
 /** One page at a time: a comic's next page is a fresh picture (its zoom, its file, its loader). */
@@ -104,7 +120,7 @@ function ViewerPage({ base, top }: { base: Entry; top: Entry }) {
   const nav = getNav();
   const id = top.route.view ?? "";
   const sheet = top.sheet;
-  const { post, missing, inFeed } = useViewedPost(base, id);
+  const { post, missing, inFeed, feedAnswered } = useViewedPost(base, id);
   const [now] = useState(() => Date.now());
   const [controls, setControlsState] = useState(chromeShown);
   const setControls = (f: (c: boolean) => boolean) =>
@@ -187,16 +203,17 @@ function ViewerPage({ base, top }: { base: Entry; top: Entry }) {
   // e621 hides from you, a post on your blacklist you haven't chosen to see there.
   const away =
     post !== null &&
-    ((video && !inFeed) || displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
+    ((video && !inFeed && feedAnswered) || displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
   useEffect(() => {
     if (!away || !post) return;
     nav.replace({ screen: { kind: "post", id: post.id }, play: null });
   }, [away]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!video || away) return;
+    // the player plays it from the feed: wait until it's there (or `away` takes it to its page)
+    if (!video || !inFeed || away) return;
     openPaused(true);
     nav.replace({ screen: top.route.screen, play: id });
-  }, [video]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [video, inFeed, away]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Closing lands the feed on this post, as the player's close does.
   useLayoutEffect(

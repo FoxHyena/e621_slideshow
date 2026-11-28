@@ -234,3 +234,16 @@ test.describe("on a computer", () => {
     await expect(viewer(page)).toHaveCount(0);
   });
 });
+
+test("a video's link waits for its feed, even when the post comes back first", async ({ page }) => {
+  await page.unrouteAll({ behavior: "wait" });
+  const mock = await mockE621(page, [{ id: 1150, ext: "webm", duration: 3 }, { id: 1149 }]);
+  // a saved sign-in: the feed waits for e621 to confirm it, the viewer asks for the post at once
+  await page.addInitScript(() => localStorage.setItem("e6ss:v1:creds", JSON.stringify({ username: "tester", apiKey: "goodkey" })));
+  // slower than the viewer's own wait for a feed (2 s): that wait starts once the sign-in is settled
+  mock.meDelay = 2500;
+  await page.goto("/search?tags=wolf&view=1150");
+  await expect(page).toHaveURL(/play=1150/);
+  await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "1150");
+  await expect(page).not.toHaveURL(/\/post\//);
+});
