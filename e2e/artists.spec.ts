@@ -158,6 +158,8 @@ test("Follow from favorites opens as a sheet and follows the picked ones in one 
   await page.getByTestId("follow-favs").click({ timeout: 15_000 });
   const sheet = page.getByTestId("sheet-follow-favorites");
   await expect(sheet.getByTestId("pick-row")).toHaveCount(4);
+  // a sheet's rows are unchanged by the rows fix (designer, 2026-11-27): the line runs to the body's edge
+  expect(await sheet.getByTestId("pick-row").nth(1).evaluate((el) => getComputedStyle(el, "::before").right)).toBe("0px");
   await expect(sheet.getByTestId("first-run-follow")).toHaveText("Follow 4 artists");
   await expect(sheet.getByText("You\u2019ve favorited these artists a lot.", { exact: true })).toBeVisible();
   await shot(page, "artists-follow-favs");

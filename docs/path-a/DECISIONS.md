@@ -2144,3 +2144,18 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   edge, where the row's content stops; in a ⋯ menu's well, 14 before. Rows on a sheet or in a
   dropdown already stopped there. No divider touches a panel's edge anywhere now.
 - Not changed: where a line starts (at the text), row heights, the 16 at each side.
+
+## 2026-11-27 — Built: a row's end glyph at 16, dividers stop at the content edge
+- Owner, on the designer's rows fix: "Commit and send".
+- **Built:**
+  - ⌄ (a row whose value drops a menu) is pulled 3, not 4.
+  - The external-link glyph (Source code, Made by, Telegram rows, the post page's e621 row) gets its own
+    `row-ext`, pulled 1, not the chevron's 5. All three glyphs' ink now ends 16 from the panel's edge.
+  - A divider in a group stops 16 before the panel's right edge; in a ⋯ menu's well, 14.
+  - Rows on a sheet (`sheet-rows`) and in a dropdown are unchanged, as specified. That includes
+    Follow from favorites: a group in a sheet whose rows have no side padding, so its line still runs
+    to the sheet body's edge (the mock's `.qrows6` case).
+  - **Left alone (mine):** the search field's suggestions (`.suggest`) still run their line to the
+    panel's edge. The mock has no rule for them; for the designer to say.
+- e2e "Rows: a row's end glyph's ink…" measures the drawn ink of each glyph, not its box. The Follow
+  from favorites test checks its line still runs to the edge.
