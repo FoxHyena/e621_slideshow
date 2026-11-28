@@ -374,13 +374,15 @@ function Suggested() {
     );
   if (a.status !== "ready") return <Reading a={a} />;
   const shown = a.all.filter((c) => !followed.has(c.name) || kept.has(c.name));
+  // (`all` holds only who was looked up, and that leaves out who you follow: `found` counts them too)
+  const few = !a.found;
   if (shown.length === 0)
     return (
       <StateBlock
         mood="look"
-        head={a.all.length === 0 ? "Not enough favorites yet" : "No one new to suggest"}
+        head={few ? "Not enough favorites yet" : "No one new to suggest"}
         text={
-          a.all.length === 0
+          few
             ? "Suggestions come from the artists you favorite. Favorite a few more posts, or look for artists yourself."
             : "You follow every artist you favorite a lot. Favorite more and check back."
         }

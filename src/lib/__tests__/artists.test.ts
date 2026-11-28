@@ -1,6 +1,6 @@
 import { skippedLine } from "../feed/format";
 import { describe, expect, it } from "vitest";
-import { affinity, groupByArtist, rankCandidates, rankWithRecency, recency, tileQueries, tileQuery } from "../recommend/artists";
+import { affinity, groupByArtist, rankCandidates, rankWithRecency, RECENCY_TOP, recency, rejoiners, tileQueries, tileQuery, toLookUp } from "../recommend/artists";
 import { artistRecall } from "../recommend/artistBacktest";
 import type { Profile } from "../recommend/profile";
 import { makePost } from "./fixtures";
@@ -53,6 +53,42 @@ describe("artist suggestions", () => {
     const out = rankWithRecency(cands, new Map([["active", now - 2 * 86_400_000]]), now);
     expect(out.map((s) => s.name)).toEqual(["active", "quiet"]);
     expect(out[1].lastPostAt).toBeNull();
+  });
+
+  it("picks whom to look up from those you neither follow nor hid: following most of the top still leaves a full list", () => {
+    // 50 artists, best first; you follow the top 30 and hid one more
+    const p = profile(Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`a${i}`, [60 - i, "artist"]])));
+    const cands = rankCandidates(p, {}, null, new Set());
+    const followed = new Set(Array.from({ length: 30 }, (_, i) => `a${i}`));
+    const top = toLookUp(cands, followed, new Set(["a31"]));
+    expect(top).toHaveLength(19);
+    expect(top[0].name).toBe("a30");
+    expect(top.map((c) => c.name)).not.toContain("a31");
+    // the old way, the top 32 then cut, left 1
+    expect(cands.slice(0, RECENCY_TOP).filter((c) => !followed.has(c.name) && c.name !== "a31")).toHaveLength(1);
+    // with plenty to pick from, it stops at RECENCY_TOP: the request count stays the same
+    const many = profile(Object.fromEntries(Array.from({ length: 100 }, (_, i) => [`b${i}`, [200 - i, "artist"]])));
+    const all = rankCandidates(many, {}, null, new Set());
+    const picked = toLookUp(all, new Set(all.slice(0, 30).map((c) => c.name)), new Set());
+    expect(picked).toHaveLength(RECENCY_TOP);
+    expect(tileQueries(picked.map((c) => c.name))).toHaveLength(RECENCY_TOP / 8);
+    expect(picked[0].name).toBe("b30");
+  });
+
+  it("who the lookup left out rejoins when shown again or unfollowed, if the lookup would have picked them", () => {
+    const p = profile(Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`a${i}`, [60 - i, "artist"]])));
+    const pool = rankCandidates(p, {}, null, new Set());
+    // a3 and a45 were hidden and a7 followed at lookup time
+    const picked = toLookUp(pool, new Set(["a7"]), new Set(["a3", "a45"]));
+    expect(picked.at(-1)!.name).toBe("a33");
+    const names = (skip: string[]) => rejoiners(pool, picked, (n) => skip.includes(n)).map((c) => c.name);
+    // all three shown again / unfollowed: a3 and a7 would have been picked; a45 ranks below the last
+    expect(names([])).toEqual(["a3", "a7"]);
+    // a7 still followed, or already given their own look: only a3
+    expect(names(["a7"])).toEqual(["a3"]);
+    // fewer than RECENCY_TOP were picked: everyone you could be suggested was, so anyone rejoins
+    const few = toLookUp(pool.slice(0, 10), new Set(), new Set(["a9"]));
+    expect(rejoiners(pool.slice(0, 10), few, () => false).map((c) => c.name)).toEqual(["a9"]);
   });
 
   it("batches the lookup 8 artists a search, any of them, newest first", () => {
