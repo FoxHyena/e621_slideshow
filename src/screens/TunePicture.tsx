@@ -13,7 +13,6 @@ import { dateMetatag, type DateFilter } from "@/lib/query/date";
 import { recommendedWindow } from "@/lib/query/build";
 import { blacklistedBy, parseBlacklist } from "@/lib/query/blacklist";
 import type { Profile } from "@/lib/recommend/profile";
-import { storage } from "@/lib/storage";
 import { getSession } from "@/state/session";
 import type { SearchSettings } from "@/lib/settings";
 
@@ -75,6 +74,27 @@ export function windowWords(date: DateFilter): { span: string; whose: string } {
       return { span: `posts before ${d.date}`, whose: "their" };
     case "between":
       return { span: `posts from ${d.date} to ${d.date2}`, whose: "their" };
+  }
+}
+
+/**
+ * "Hide" is kept per device (DESIGN.md "Tune"), under storage.ts's prefix. Kept here rather than in
+ * storage.ts, which is in the first load; this screen loads later.
+ */
+const HIDDEN_KEY = "e6ss:v1:tunePictureHidden";
+function loadHidden(): boolean {
+  try {
+    return localStorage.getItem(HIDDEN_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+function saveHidden(hidden: boolean): void {
+  try {
+    if (hidden) localStorage.setItem(HIDDEN_KEY, "true");
+    else localStorage.removeItem(HIDDEN_KEY);
+  } catch {
+    // full or off: just not kept
   }
 }
 
@@ -232,10 +252,10 @@ export function TunePicture({
   /** Taste or popular: popular's parts against taste's one */
   qw: number;
 }) {
-  const [hidden, setHidden] = useState(storage.loadTunePictureHidden);
+  const [hidden, setHidden] = useState(loadHidden);
   const toggle = () => {
     setHidden(!hidden);
-    storage.saveTunePictureHidden(!hidden);
+    saveHidden(!hidden);
   };
   const thumbs = useNewestFavorites(profile, creds, search, blacklist);
   const { span, whose } = windowWords(date);
