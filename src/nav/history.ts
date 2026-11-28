@@ -84,7 +84,7 @@ export function ownState(state: unknown = history.state): Record<string, unknown
 }
 
 /** The player and sheets sit over a screen instead of replacing it. */
-export const isOverlay = (e: Entry): boolean => e.route.play !== null || !!e.route.view || e.sheet !== null;
+export const isOverlay = (e: Entry): boolean => e.route.play !== null || !!e.route.view || !!e.route.read || e.sheet !== null;
 
 /**
  * The entry whose screen shows under stack[i]: itself, or for an overlay the nearest entry below

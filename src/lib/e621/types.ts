@@ -73,6 +73,8 @@ export interface Pool {
   category: "series" | "collection";
   post_ids: number[];
   updated_at?: string;
+  /** e621's DText */
+  description?: string;
 }
 
 export interface AutocompleteTag {

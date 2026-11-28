@@ -347,7 +347,7 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
  * Post info's description (DESIGN.md "Post info"): at most 4 lines, ending in an ellipsis, so a long
  * one can't push the tags off the sheet; "Show all" opens the rest in place and goes away.
  */
-function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void }) {
+export function InfoDesc({ text, onPost, testId = "info-desc" }: { text: string; onPost: (id: number) => void; testId?: string }) {
   const box = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [cut, setCut] = useState(false);
@@ -368,7 +368,7 @@ function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void
         ref={box}
         className="post-desc"
         data-capped={open ? undefined : ""}
-        data-testid="info-desc"
+        data-testid={testId}
         // Tab onto a link past the 4th line: open it all, rather than scroll the clipped box
         onFocusCapture={(e) => {
           if (!open && e.target.getBoundingClientRect().bottom > e.currentTarget.getBoundingClientRect().bottom + 1) setOpen(true);
@@ -377,7 +377,7 @@ function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void
         <DText text={text} onPost={onPost} />
       </div>
       {cut && !open && (
-        <button type="button" className="info-more" onClick={() => setOpen(true)} data-testid="info-desc-more">
+        <button type="button" className="info-more" onClick={() => setOpen(true)} data-testid={`${testId}-more`}>
           Show all
         </button>
       )}

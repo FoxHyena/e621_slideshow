@@ -3,8 +3,9 @@
 /**
  * Comics (DESIGN.md "A post on its own", "A comic"): an e621 pool of the "series" kind, its pages in
  * the pool's order. A post that is a page says so on its card (a "3 / 12" well), in the picture
- * viewer (the comic bar, the count, sideways drags, the Pages sheet) and on its own page (a group
- * with a strip of the pages). "Open as a feed" is Results for `pool:<id>`, in page order.
+ * viewer (the comic bar, the count, sideways drags, the Pages sheet) and on the post page (a group
+ * with a strip of the pages). "Open comic" opens the comic's own page (src/screens/ComicPage.tsx);
+ * Results for `pool:<id>` still list it in page order.
  *
  * Not in the feed's first load: the card's well comes in with the post page's chunk
  * (src/shell/lazy.ts), and the viewer and Results bring this module with them.
@@ -98,22 +99,86 @@ export type Page = Post | null | undefined;
 
 const nameOf = (p: Pool) => p.name.replaceAll("_", " ");
 
-/** The comic a post is a page of: its first "series" pool that lists it. A collection isn't a comic. */
-export function useComic(post: Post | null): Comic | null {
+/** The pool by number, once e621 has answered (undefined until then, null when it has none). */
+export function usePool(id: number | null): Pool | null | undefined {
   const creds = useStore(getSession().store, (s) => s.creds);
   useStore(answered, (n) => n);
-  const ids = post?.pools ?? [];
+  useEffect(() => {
+    if (id !== null) want(id, creds);
+  }, [id, creds]);
+  return id === null ? undefined : pools.get(id);
+}
+
+/** A comic as the reader or its page holds it: this pool, on the page with this post (page 1 if none). */
+export function comicOf(pool: Pool, page: number | null): Comic {
+  const at = page === null ? -1 : pool.post_ids.indexOf(page);
+  return { pool, name: nameOf(pool), page: Math.max(0, at) + 1, total: pool.post_ids.length };
+}
+
+/**
+ * The comic a post is a page of: its first "series" pool that lists it (a collection isn't a comic),
+ * or `pool` itself when the reader names it.
+ */
+export function useComic(post: Post | null, pool: number | null = null): Comic | null {
+  const creds = useStore(getSession().store, (s) => s.creds);
+  useStore(answered, (n) => n);
+  const ids = pool !== null ? [pool] : (post?.pools ?? []);
   const asked = ids.join(",");
   useEffect(() => {
     for (const id of ids) want(id, creds);
   }, [asked, creds]); // eslint-disable-line react-hooks/exhaustive-deps -- `ids` is `asked`
   for (const id of ids) {
-    const pool = pools.get(id);
-    if (!pool || pool.category !== "series") continue;
-    const at = pool.post_ids.indexOf(post!.id);
-    if (at >= 0) return { pool, name: nameOf(pool), page: at + 1, total: pool.post_ids.length };
+    const p = pools.get(id);
+    if (!p || (p.category !== "series" && pool === null) || !post) continue;
+    const at = p.post_ids.indexOf(post.id);
+    if (at >= 0) return { pool: p, name: nameOf(p), page: at + 1, total: p.post_ids.length };
   }
   return null;
+}
+
+// ---- where you stopped ------------------------------------------------------------
+
+/**
+ * The last page each comic had open in the reader or the viewer, by pool: this device's, not the
+ * account's (DESIGN.md "Comics, part two", Where you stopped). Kept in localStorage here rather than
+ * in src/lib/storage.ts, which rides in the first load.
+ */
+const PLACES_KEY = "e6ss:v1:comicPlaces";
+/** Comics kept at most; the longest unread go first. */
+const PLACES_MAX = 200;
+function loadPlaces(): Record<string, number> {
+  try {
+    const v = JSON.parse(localStorage.getItem(PLACES_KEY) ?? "{}");
+    return v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  } catch {
+    return {};
+  }
+}
+const places = createStore<Record<string, number> | null>(null);
+const allPlaces = () => places.get() ?? (places.set(loadPlaces()), places.get()!);
+
+/** The post you stopped on in this comic, or null. */
+export function usePlace(pool: number | null): number | null {
+  const all = useStore(places, (p) => p);
+  if (pool === null) return null;
+  // read, not kept, while rendering: a store set here would update other components mid-render
+  const v = (all ?? loadPlaces())[pool];
+  return typeof v === "number" ? v : null;
+}
+
+/** Keep the page open now as where you stopped in this comic. */
+export function setPlace(pool: number, page: number) {
+  const all = allPlaces();
+  if (all[pool] === page) return;
+  // newest last: the oldest go first past the cap
+  const rest = Object.entries(all).filter(([k]) => k !== String(pool));
+  const next = Object.fromEntries([...rest.slice(Math.max(0, rest.length - PLACES_MAX + 1)), [String(pool), page]]);
+  places.set(next);
+  try {
+    localStorage.setItem(PLACES_KEY, JSON.stringify(next));
+  } catch {
+    // full or off: kept for this visit
+  }
 }
 
 // ---- pages ----------------------------------------------------------------------
@@ -147,6 +212,15 @@ export function usePoolName(id: number | null): string | null {
   }, [id, creds]);
   const pool = id === null ? undefined : pools.get(id);
   return pool ? nameOf(pool) : null;
+}
+
+/** Ask for a comic's pages again (the comic's page, ⋯ › Refresh): its pool too, for pages added since. */
+export function refreshComic(pool: number) {
+  pools.delete(pool);
+  failedUntil.delete(pool);
+  for (const k of [...pages.keys()]) if (k.split(":")[1] === String(pool)) pages.delete(k);
+  answered.set((n) => n + 1);
+  pagesAnswered.set((n) => n + 1);
 }
 
 /** Every page's post (for the thumbs, and the page a drag turns to), asked 100 at a time. */
@@ -196,7 +270,7 @@ export function usePages(comic: Comic | null): Page[] | null {
 }
 
 /** A page's thumb, or nothing to show: hidden by e621, or on your blacklist (and not shown once). */
-function thumbOf(p: Post | null | undefined, rules: BlacklistRule[], username: string | undefined): string | null {
+export function thumbOf(p: Post | null | undefined, rules: BlacklistRule[], username: string | undefined): string | null {
   if (!p) return null;
   const src = p.files.preview.jpg ?? p.files.sample.jpg;
   if (!src) return null;
@@ -227,7 +301,7 @@ export function ComicWell({ post, onOpen }: { post: Post; onOpen: () => void }) 
 
 // ---- on the post page ------------------------------------------------------------
 
-/** The post page's comic: a row (it opens the comic as a feed), then every page as a thumb. */
+/** The post page's comic: a row (it opens the comic's page), then every page as a thumb. */
 export function ComicGroup({ post }: { post: Post }) {
   const comic = useComic(post);
   const list = usePages(comic);
@@ -279,29 +353,49 @@ export function ComicGroup({ post }: { post: Post }) {
   );
 }
 
-/** Results for the comic, in page order. */
+/** The comic's own page. */
 export function openComic(id: number) {
-  // not into Recent searches: "pool:77" means nothing there, and the comic is a tap away on its pages
-  getNav().push({ screen: { kind: "results", params: new URLSearchParams({ tags: `pool:${id}` }).toString() }, play: null });
+  getNav().push({ screen: { kind: "comic", id }, play: null });
+}
+
+/**
+ * Close the reader or the viewer (and the sheet over it) onto the comic's page: the one under it, or
+ * a new one pushed over what was under.
+ */
+export async function closeOntoComic(id: number, entries: number) {
+  for (let i = 0; i < entries; i++) await getNav().back();
+  const now = getNav().current().route;
+  const s = now.screen;
+  if (s.kind === "comic" && s.id === id && !now.play && !now.view && !now.read) return;
+  openComic(id);
 }
 
 // ---- in the viewer ------------------------------------------------------------------
 
-/** The viewer's comic bar: the comic's name and the page; it opens the Pages sheet. */
-export function ComicBar({ comic }: { comic: Comic }) {
+/**
+ * The viewer's comic bar: the comic's name and the page; it opens the Pages sheet. In a slideshow
+ * (`onRead`) it says "Read from page 3" and opens the reader there, its chevron pointing on.
+ */
+export function ComicBar({ comic, onRead }: { comic: Comic; onRead?: () => void }) {
+  const words = onRead ? `Read from page ${comic.page}` : `Page ${comic.page} of ${comic.total}`;
   return (
-    <button type="button" className="viewer-comic" aria-label={`${comic.name}. Show all pages`} onClick={() => getNav().openSheet("comic-pages")} data-testid="viewer-comic">
+    <button
+      type="button"
+      className="viewer-comic"
+      data-go={onRead ? "" : undefined}
+      aria-label={`${comic.name}. ${onRead ? words : "Show all pages"}`}
+      onClick={onRead ?? (() => getNav().openSheet("comic-pages"))}
+      data-testid={onRead ? "slide-comic" : "viewer-comic"}
+    >
       <Pages />
       <b>{comic.name}</b>
-      <small>
-        Page {comic.page} of {comic.total}
-      </small>
+      <small>{words}</small>
       <ChevronRight aria-hidden className="viewer-comic-chev" />
     </button>
   );
 }
 
-/** The Pages sheet: every page as a thumb, the current one ringed gold; "Open as a feed". */
+/** The Pages sheet: every page as a thumb, the current one ringed gold; "Open comic". */
 export function PagesSheet({ comic, post, onPage }: { comic: Comic; post: Post; onPage: (id: number) => void }) {
   const list = usePages(comic);
   const thumb = useThumbs(list);
@@ -309,12 +403,8 @@ export function PagesSheet({ comic, post, onPage }: { comic: Comic; post: Post; 
   const [now] = useState(() => Date.now());
   const ids = comic.pool.post_ids.slice(0, PAGES_MAX);
   const last = list?.[list.length - 1];
-  const open = async () => {
-    // close the sheet and the viewer, then the comic as a feed
-    await getNav().back();
-    await getNav().back();
-    openComic(comic.pool.id);
-  };
+  // close the sheet and the viewer (or the reader), onto the comic's page
+  const open = () => closeOntoComic(comic.pool.id, 2);
   return (
     <Sheet
       title={comic.name}
@@ -323,7 +413,7 @@ export function PagesSheet({ comic, post, onPage }: { comic: Comic; post: Post; 
         <div className="pages-foot">
           {last && <small>Last page {ago(last.created_at, now)}</small>}
           <button type="button" className="link-row" onClick={() => void open()} data-testid="pages-feed">
-            Open as a feed
+            Open comic
             <ChevronRight aria-hidden />
           </button>
         </div>

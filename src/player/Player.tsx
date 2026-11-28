@@ -72,7 +72,7 @@ export function usePlayback(base: Entry): PlaybackSettings {
     if (screen.kind !== "results") return saved;
     const link = decodeResults(screen.params).link;
     if (link?.kind !== "share") return saved;
-    return { ...DEFAULT_PLAYBACK, ...link.playback, preloadCount: saved.preloadCount, videoMuted: true, ...visit };
+    return { ...DEFAULT_PLAYBACK, ...link.playback, preloadCount: saved.preloadCount, comicPageSec: saved.comicPageSec, videoMuted: true, ...visit };
   }, [saved, screen, visit]);
 }
 

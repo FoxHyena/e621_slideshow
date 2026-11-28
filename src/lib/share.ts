@@ -23,7 +23,8 @@ const VERSION = "1";
 /** The parts of a show a link can set; anything missing takes the default. */
 export interface SharedShow {
   search: Pick<SearchSettings, "tags" | "ratings" | "media" | "order" | "seed" | "date" | "minScore">;
-  playback: Omit<PlaybackSettings, "preloadCount">;
+  /** your own Load ahead and Comic page time stand: a link carries the show, not your device's ways */
+  playback: Omit<PlaybackSettings, "preloadCount" | "comicPageSec">;
 }
 
 const RATINGS = ["s", "q", "e"] as const;

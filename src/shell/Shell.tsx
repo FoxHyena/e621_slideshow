@@ -22,7 +22,7 @@ import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { watchPresses } from "./opener";
 import { ScreenContext } from "./context";
 import { TabBar, useRail } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, PostScreen, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
+import { ArtistScreen, ArtistsScreen, ComicScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, PostScreen, prefetchScreens, Reader, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -240,7 +240,7 @@ export default function Shell() {
   }, [held]);
 
   const rail = useRail();
-  const barHidden = (immersive && onAccount) || overlay?.route.play != null || !!overlay?.route.view;
+  const barHidden = (immersive && onAccount) || overlay?.route.play != null || !!overlay?.route.view || !!overlay?.route.read;
   const ctx = (e: Entry, visible: boolean) => ({
     entry: e,
     visible,
@@ -321,7 +321,12 @@ export default function Shell() {
           <Player key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
-      {overlay?.route.view && overlay.route.play == null && (
+      {overlay?.route.read && (
+        <Suspense fallback={null}>
+          <Reader key={`${cur.key}:read`} base={cur} top={overlay} />
+        </Suspense>
+      )}
+      {overlay?.route.view && overlay.route.play == null && !overlay.route.read && (
         <Suspense fallback={null}>
           <Viewer key={`${cur.key}:${overlay.route.view}`} base={cur} top={overlay} />
         </Suspense>
@@ -358,6 +363,8 @@ function PushedScreen({ e }: { e: Entry }) {
       return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
     case "post":
       return <PostScreen id={screen.id} />;
+    case "comic":
+      return <ComicScreen id={screen.id} />;
     case "tune":
       return <TuneScreen />;
     case "settings":

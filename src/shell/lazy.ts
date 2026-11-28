@@ -32,6 +32,8 @@ export const FavoritesScreen = lazy(() => feedScreens().then((m) => ({ default: 
 export const ArtistScreen = lazy(() => artistPage().then((m) => ({ default: m.ArtistScreen })));
 /** The post page rides in the artist page's chunk: a chunk of its own costs the first load its file list. */
 export const PostScreen = lazy(() => artistPage().then((m) => ({ default: m.PostScreen })));
+/** A comic's page too (src/screens/ComicPage.tsx). */
+export const ComicScreen = lazy(() => artistPage().then((m) => ({ default: m.ComicScreen })));
 export const SearchScreen = lazy(() => searchScreen().then((m) => ({ default: m.SearchScreen })));
 export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYouScreen })));
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));
@@ -48,6 +50,8 @@ export const PostMenuSheet = lazy(() => filterSheets().then((m) => ({ default: m
 export const ComicWell = lazy(() => artistPage().then((m) => ({ default: m.ComicWell })));
 /** The picture viewer rides in the player's chunk: one more lazy chunk costs the cold load its name list. */
 export const Viewer = lazy(() => player().then((m) => ({ default: m.Viewer })));
+/** The comic reader is the viewer's, played (src/player/Viewer.tsx). */
+export const Reader = lazy(() => player().then((m) => ({ default: m.Reader })));
 
 /** Fetch every screen's code once the page is idle. */
 export function prefetchScreens(): () => void {

@@ -27,6 +27,8 @@ export type Screen =
   | { kind: "artist"; name: string; params?: string }
   /** `/post/<number>`: one post on its own page (DESIGN.md "A post on its own") */
   | { kind: "post"; id: number }
+  /** `/comic/<pool number>`: a comic's own page (DESIGN.md "A post on its own", Comics, part two) */
+  | { kind: "comic"; id: number }
   | { kind: "root"; params: string }
   | { kind: "notFound"; path: string };
 
@@ -36,6 +38,17 @@ export interface Route {
   play: string | null;
   /** `?view=<postId>`, the picture viewer over the screen (DESIGN.md "A post on its own") */
   view?: string | null;
+  /**
+   * `?read=<pool>&post=<postId>`, the comic reader over the screen (DESIGN.md "Comics, part two"): over
+   * the comic's page, or over the player (with `play`, the slide it was opened from).
+   */
+  read?: Read | null;
+}
+
+/** The comic the reader plays and the page (a post id) it is on. */
+export interface Read {
+  pool: number;
+  page: number;
 }
 
 /** Split a path + search into a route. `params` keep their order, minus `play`. */
@@ -43,12 +56,21 @@ export function parseRoute(pathname: string, search: string): Route {
   const q = new URLSearchParams(search);
   const play = q.get("play");
   const view = q.get("view");
+  const pool = q.get("read");
+  const page = q.get("post");
   q.delete("play");
   q.delete("view");
+  if (pool !== null) {
+    q.delete("read");
+    q.delete("post");
+  }
   const rest = q.toString();
   const path = pathname.replace(/\/+$/, "") || "/";
   const parts = path.split("/").filter(Boolean);
   const screen = parseScreen(path, parts, rest);
+  const id = /^[1-9]\d{0,9}$/;
+  // the reader stands over the player or over the screen itself
+  if (pool && page && id.test(pool) && id.test(page)) return { screen, play: play || null, read: { pool: Number(pool), page: Number(page) } };
   // the player wins if a URL somehow names both
   return !play && view && /^\d+$/.test(view) ? { screen, play: null, view } : { screen, play: play || null };
 }
@@ -86,6 +108,8 @@ function parseScreen(path: string, parts: string[], params: string): Screen {
     }
     case "post":
       return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: "post", id: Number(parts[1]) } : notFound(path);
+    case "comic":
+      return parts.length === 2 && /^[1-9]\d{0,9}$/.test(parts[1]) ? { kind: "comic", id: Number(parts[1]) } : notFound(path);
     default:
       return notFound(path);
   }
@@ -111,6 +135,8 @@ export function screenPath(s: Screen): string {
       return `/artist/${encodeURIComponent(s.name)}${s.params ? `?${s.params}` : ""}`;
     case "post":
       return `/post/${s.id}`;
+    case "comic":
+      return `/comic/${s.id}`;
     case "root":
       return s.params ? `/?${s.params}` : "/";
     case "notFound":
@@ -120,9 +146,10 @@ export function screenPath(s: Screen): string {
 
 export function routeUrl(r: Route): string {
   const base = screenPath(r.screen);
-  const [k, v] = r.play ? ["play", r.play] : r.view ? ["view", r.view] : [null, null];
-  if (!k || !v) return base;
-  return `${base}${base.includes("?") ? "&" : "?"}${k}=${encodeURIComponent(v)}`;
+  const q: [string, string][] = r.play ? [["play", r.play]] : r.view && !r.read ? [["view", r.view]] : [];
+  if (r.read) q.push(["read", String(r.read.pool)], ["post", String(r.read.page)]);
+  if (!q.length) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}${q.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&")}`;
 }
 
 /** The tab a screen belongs to when it is that tab's root, else null (a pushed screen). */
@@ -142,6 +169,8 @@ export function activeTab(s: Screen, openedFrom: Tab | null): Tab {
  * Returns null at a tab root (nothing above it in the app).
  */
 export function parentOf(r: Route, openedFrom: Tab | null): Route | null {
+  // the reader closes onto the slide it was opened from
+  if (r.read) return { screen: r.screen, play: r.play };
   if (r.play || r.view) return { screen: r.screen, play: null };
   const s = r.screen;
   switch (s.kind) {
@@ -156,6 +185,7 @@ export function parentOf(r: Route, openedFrom: Tab | null): Route | null {
     case "favorites":
     case "artist":
     case "post":
+    case "comic":
     case "notFound":
     case "root":
       return tab(openedFrom ?? "following");
