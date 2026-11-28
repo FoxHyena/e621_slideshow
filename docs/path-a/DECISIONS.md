@@ -2059,3 +2059,15 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - The old app's show key carries the switch, so flipping it starts a new show instead of resuming the old one.
   - Tune's Searched group followed round 1 only.
   - The test now checks the Update ranking offer and the second round's tags.
+
+## 2026-11-27 — A row's menu opens above when there is no room below
+- The builder, after building the row menu (pull request 42, as the builder reports; I did not test
+  it): in Quick settings on a phone "Quality" is the sheet's last row, so a menu cannot drop under it.
+  The builder's rule: when the menu does not fit below and there is more room above, it opens 8 above
+  the row and rises 4. The same happens to a low row in Settings in a short window.
+- **Kept (designer).** Written into DESIGN.md "Menu", "A row's value". Not drawn.
+- The builder also gave "Transition" (Classic only) the same menu; it is added to the list.
+- The post page: the build's title row is the 44 controls with 16 under them, not a 52 row with 12.
+  The result is the same 16 from the controls to the panels, which is what the spec asks for.
+- Owner, told of the rule and asked "Keep the builder's open-above rule and commit it?": "Keep and
+  commit". The owner has not seen it drawn or built.
