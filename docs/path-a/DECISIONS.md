@@ -2159,3 +2159,29 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     panel's edge. The mock has no rule for them; for the designer to say.
 - e2e "Rows: a row's end glyph's ink…" measures the drawn ink of each glyph, not its box. The Follow
   from favorites test checks its line still runs to the edge.
+
+## 2026-11-27 — Artists › Suggested loads more at the bottom, then says that's everyone
+- Owner: "When we scroll to the bottom it should load in more suggestions or say that it's out".
+- **Change:**
+  - Near the bottom of Suggested (800 before it), the next `RECENCY_TOP` (32) artists you favorite a
+    lot and neither follow nor hid are looked up and added below. It costs the same as the first look:
+    one search per 8 artists, plus up to 8 single looks.
+  - Each page is ranked with recency on its own and added after the last, so the cards you've passed
+    don't move. An artist who rejoins (an unfollow, Show) goes on the page their rank falls in.
+  - Nobody left: the feed's end moment, "That's everyone", with "You've seen every artist you favorite
+    a lot. Favorite more and check back." A list that holds everyone from the start shows it at once,
+    without a request.
+  - A failed look: the feed's last row, "Couldn't look up more artists" with Try again. The cards
+    stay.
+  - The pages are kept with the first look's hour; the next lookup starts again at page one.
+- **Mine:** the words of the end and the failed row; a spinner while it looks.
+- **Rejected:** a "Show more" button (the owner asked for the scroll); ranking every page together
+  (new cards would land among the ones you've read).
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - A More still running across Try again, a refresh or another sign-in blocked the next one without
+    a word. Now it is dropped with the lookup it was for, and the foot asks again on every re-cut.
+  - A More that landed during the hour's fresh lookup showed the old list for a moment.
+  - Every card gone (followed or hidden) with more to look up said "No one new to suggest". Now the
+    foot asks for the next ones.
+  - The tests: later artists now posted more recently, so ranking all pages together would fail the
+    "cards stay put" check; the failed More checks it isn't asked again until Try again.

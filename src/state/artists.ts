@@ -4,7 +4,8 @@
  * tag cache's post counts and the learned weights. The top ones you neither follow nor hid have
  * their newest posts looked up in a few batched searches (`~a ~b … order:id_desc`), which also give
  * each its three tiles; then the list is ranked once more with recency and kept an hour. Following
- * or hiding someone in that hour re-cuts the list without asking e621 again.
+ * or hiding someone in that hour re-cuts the list without asking e621 again. At the bottom of
+ * Suggested, More looks up the next ones the same way and adds them below.
  *
  * A borrowed sign-in (a share link's) has no profile here, so it gets no suggestions.
  */
@@ -16,6 +17,8 @@ import {
   groupByArtist,
   rankCandidates,
   rankWithRecency,
+  pageOf,
+  RECENCY_TOP,
   rejoiners,
   tileQueries,
   tileQuery,
@@ -55,6 +58,11 @@ export interface ArtistsState {
   found: number | null;
   hidden: readonly string[];
   error: string | null;
+  /**
+   * Suggested's foot: idle (more to look up, asked for at the bottom), loading, error (Try again),
+   * end (everyone you favorite a lot is in the list or followed)
+   */
+  more: "idle" | "loading" | "error" | "end";
 }
 
 export const SUGGEST_TTL = 60 * 60_000;
@@ -65,13 +73,19 @@ export interface ArtistsApi {
   ensure(force?: boolean): void;
   hide(name: string): void;
   unhide(name: string): void;
+  /** The bottom of Suggested: look up the next ones and add them below. */
+  more(): void;
 }
 
 interface Looked {
   user: string;
   at: number;
-  /** the looked-up candidates: kept for the hour, so a later fit doesn't reorder what you're reading */
-  cands: ArtistCandidate[];
+  /**
+   * the looked-up candidates, a page per lookup (the first, then each More): kept for the hour, so a
+   * later fit doesn't reorder what you're reading. Each page is ranked on its own and shown after the
+   * last, so loading more never moves a card you've passed.
+   */
+  pages: ArtistCandidate[][];
   /** every candidate when they were picked, best first (a refill asks it) */
   pool: ArtistCandidate[];
   /** who has had their own look since (a refill's): each once */
@@ -92,6 +106,7 @@ function create(): ArtistsApi {
     found: null,
     hidden: [],
     error: null,
+    more: "idle",
   });
   const patch = (p: Partial<ArtistsState>) => store.set((s) => ({ ...s, ...p }));
   /** patch only what changed: rec's progress ticks often, and every change re-renders the cards */
@@ -106,6 +121,8 @@ function create(): ArtistsApi {
   /** Try again: past an error once */
   let retrying = false;
   let epoch = 0;
+  /** More is running (one at a time) */
+  let moreRun: object | null = null;
 
   const account = (): { name: string; creds: Credentials } | null => {
     const s = getSession().store.get();
@@ -132,7 +149,7 @@ function create(): ArtistsApi {
   let lastCut: { followed: ReadonlySet<string>; hidden: readonly string[]; l: Looked } | null = null;
 
   /** Followed and hidden out; the list re-cut without asking e621 again. */
-  const cut = (cands: ArtistCandidate[], l: Looked) => {
+  const cut = (l: Looked) => {
     // Who you follow isn't known yet (or is still the last account's): a list cut now would offer them.
     const followed = followsOf(l.user);
     if (!followed) return patch({ status: "reading", step: "posts" });
@@ -140,13 +157,60 @@ function create(): ArtistsApi {
     if (s.status === "ready" && lastCut && lastCut.followed === followed && lastCut.hidden === s.hidden && lastCut.l === l) return;
     lastCut = { followed, hidden: s.hidden, l };
     const hidden = new Set(s.hidden);
-    const all = rankWithRecency(
-      cands.filter((c) => !hidden.has(c.name)),
-      l.lastPostAt,
-      Date.now(),
+    const now = Date.now();
+    const all = l.pages.flatMap((page) =>
+      rankWithRecency(
+        page.filter((c) => !hidden.has(c.name)),
+        l.lastPostAt,
+        now,
+      ),
     );
     const list = all.filter((c) => !followed.has(c.name));
-    patch({ status: "ready", step: null, done: undefined, total: undefined, list, all, tiles: l.tiles, error: null });
+    // loading or failed: that stands until it lands or Try again
+    const more = s.more === "loading" || s.more === "error" ? s.more : nextPage(l, followed, hidden, 1).length ? "idle" : "end";
+    patch({ status: "ready", step: null, done: undefined, total: undefined, list, all, tiles: l.tiles, error: null, more });
+  };
+
+  /** who More looks up next: the best of those not looked up yet, followed or hidden */
+  const nextPage = (l: Looked, followed: ReadonlySet<string>, hidden: ReadonlySet<string>, n = RECENCY_TOP) =>
+    toLookUp(l.pool, followed, new Set([...hidden, ...l.pages.flat().map((c) => c.name)]), n);
+
+  /**
+   * The newest posts of `cands`: one search per TILE_BATCH of them, then their own look for those a
+   * batch's page left out (a prolific neighbour can fill it), up to 8. Null once `alive` says the
+   * answer is for nobody now.
+   */
+  const lookTiles = async (
+    cands: ArtistCandidate[],
+    creds: Credentials,
+    alive: () => boolean,
+    onBatch?: (done: number) => void,
+  ): Promise<{ lastPostAt: Map<string, number>; tiles: Map<string, Post[]> } | null> => {
+    const keep = keepPost();
+    const ratings = getPrefs().store.get().search.ratings;
+    const env = { ratings, creds, user: getSession().store.get().user };
+    const lastPostAt = new Map<string, number>();
+    const tiles = new Map<string, Post[]>();
+    const take = (posts: Post[], names: string[]) => {
+      const g = groupByArtist(posts, names, keep);
+      for (const [n, t] of g.lastPostAt) lastPostAt.set(n, t);
+      for (const [n, t] of g.tiles) tiles.set(n, t);
+    };
+    const batches = tileQueries(cands.map((c) => c.name));
+    for (let i = 0; i < batches.length; i++) {
+      const q = feedQuery({ kind: "search", tags: tileQuery(batches[i]), filters: DEFAULT_FILTERS }, env);
+      const posts = await searchPosts(q, 1, 320, creds, undefined, "page");
+      if (!alive()) return null;
+      take(posts, batches[i]);
+      onBatch?.(i + 1);
+    }
+    for (const c of cands.filter((c) => !lastPostAt.has(c.name)).slice(0, 8)) {
+      const q = feedQuery({ kind: "search", tags: tileQuery([c.name]), filters: DEFAULT_FILTERS }, env);
+      const posts = await searchPosts(q, 1, 3, creds, undefined, "bg");
+      if (!alive()) return null;
+      take(posts, [c.name]);
+    }
+    return { lastPostAt, tiles };
   };
 
   const fromRec = (r: RecState, user: string): "wait" | "error" | ArtistCandidate[] => {
@@ -171,19 +235,21 @@ function create(): ArtistsApi {
       epoch++;
       looked = null;
       running = null;
+      moreRun = null;
       lastCut = null;
       wanted = false;
       if (store.get().user !== null || store.get().status !== "idle")
-        patch({ user: null, status: "idle", step: null, list: [], all: [], tiles: new Map(), favorites: 0, found: null, hidden: [], error: null });
+        patch({ user: null, status: "idle", step: null, list: [], all: [], tiles: new Map(), favorites: 0, found: null, hidden: [], error: null, more: "idle" });
       return;
     }
     if (store.get().user !== a.name) {
       epoch++;
       looked = null;
       running = null;
+      moreRun = null;
       lastCut = null;
       wanted = false;
-      patch({ user: a.name, status: "idle", list: [], all: [], tiles: new Map(), found: null, hidden: storage.loadHiddenArtists(a.name), error: null });
+      patch({ user: a.name, status: "idle", list: [], all: [], tiles: new Map(), found: null, hidden: storage.loadHiddenArtists(a.name), error: null, more: "idle" });
     }
     if (!wanted) return;
     // A failed read waits for Try again: store ticks don't hammer a failing e621.
@@ -209,7 +275,7 @@ function create(): ArtistsApi {
     // Everyone you favorite a lot, followed or not: following someone then re-cuts, not re-asks.
     if (looked && looked.user === a.name && Date.now() - looked.at < SUGGEST_TTL) {
       same({ favorites, found: got.length });
-      cut(looked.cands, looked);
+      cut(looked);
       return void refill();
     }
     if (running) return;
@@ -220,44 +286,26 @@ function create(): ArtistsApi {
     const top = toLookUp(got, followed, new Set(store.get().hidden));
     const mine = { key: a.name };
     running = mine;
+    // a More for the last lookup is for nobody now: its answer is dropped, and the next one may start
+    moreRun = null;
     const e = epoch;
-    const batches = tileQueries(top.map((c) => c.name));
-    patch({ status: "reading", step: "posts", done: 0, total: batches.length, favorites, found: got.length });
+    const total = tileQueries(top.map((c) => c.name)).length;
+    patch({ status: "reading", step: "posts", done: 0, total, favorites, found: got.length, more: "idle" });
+    const alive = () => running === mine && e === epoch;
     void (async () => {
-      const keep = keepPost();
-      const ratings = getPrefs().store.get().search.ratings;
-      const env = { ratings, creds: a.creds, user: getSession().store.get().user };
-      const lastPostAt = new Map<string, number>();
-      const tiles = new Map<string, Post[]>();
+      let seen: Awaited<ReturnType<typeof lookTiles>>;
       try {
-        for (let i = 0; i < batches.length; i++) {
-          const names = batches[i];
-          const q = feedQuery({ kind: "search", tags: tileQuery(names), filters: DEFAULT_FILTERS }, env);
-          const posts = await searchPosts(q, 1, 320, a.creds, undefined, "page");
-          if (running !== mine || e !== epoch) return;
-          const g = groupByArtist(posts, names, keep);
-          for (const [n, t] of g.lastPostAt) lastPostAt.set(n, t);
-          for (const [n, t] of g.tiles) tiles.set(n, t);
-          patch({ done: i + 1 });
-        }
-        // A prolific neighbour can fill a batch's page: those left with nothing get their own look.
-        for (const c of top.filter((c) => !lastPostAt.has(c.name)).slice(0, 8)) {
-          const q = feedQuery({ kind: "search", tags: tileQuery([c.name]), filters: DEFAULT_FILTERS }, env);
-          const posts = await searchPosts(q, 1, 3, a.creds, undefined, "bg");
-          if (running !== mine || e !== epoch) return;
-          const g = groupByArtist(posts, [c.name], keep);
-          for (const [n, t] of g.lastPostAt) lastPostAt.set(n, t);
-          for (const [n, t] of g.tiles) tiles.set(n, t);
-        }
+        seen = await lookTiles(top, a.creds, alive, (done) => patch({ done }));
       } catch (err) {
-        if (running !== mine || e !== epoch) return;
+        if (!alive()) return;
         running = null;
         return patch({ status: "error", step: null, error: err instanceof Error ? err.message : String(err) });
       }
+      if (!seen) return;
       running = null;
-      // only the looked-up top are suggested: the rest have no recency or tiles to show
-      looked = { user: a.name, at: Date.now(), cands: top, pool: got, asked: new Set(), lastPostAt, tiles };
-      cut(top, looked);
+      // only the looked-up top are suggested: the rest have no recency or tiles to show (More asks for them)
+      looked = { user: a.name, at: Date.now(), pages: [top], pool: got, asked: new Set(), ...seen };
+      cut(looked);
     })();
   };
 
@@ -283,7 +331,7 @@ function create(): ArtistsApi {
         if (!l || !a || a.name !== l.user || running || Date.now() - l.at >= SUGGEST_TTL) return;
         if (f.status === "idle" || f.status === "loading" || f.user !== l.user) return;
         const hidden = new Set(store.get().hidden);
-        const [c] = rejoiners(l.pool, l.cands, (n) => f.followed.has(n) || hidden.has(n) || l.asked.has(n));
+        const [c] = rejoiners(l.pool, l.pages.flat(), (n) => f.followed.has(n) || hidden.has(n) || l.asked.has(n));
         // as many as the lookup's own single looks at most: the rest come with the next lookup
         if (!c || l.asked.size >= REFILL_MAX) return;
         l.asked.add(c.name);
@@ -300,17 +348,54 @@ function create(): ArtistsApi {
         // applied to the lookup as it is now (another refill may have joined someone meanwhile);
         // a fresh lookup or another account since: that one is the list now
         const cur = looked;
-        if (e !== epoch || !cur || cur.at !== l.at || cur.user !== l.user || cur.cands.some((x) => x.name === c.name)) return;
+        if (e !== epoch || !cur || cur.at !== l.at || cur.user !== l.user || cur.pages.some((pg) => pg.some((x) => x.name === c.name))) return;
         const g = groupByArtist(posts, [c.name], keepPost());
         const lastPostAt = new Map(cur.lastPostAt);
         const tiles = new Map(cur.tiles);
         for (const [n, t] of g.lastPostAt) lastPostAt.set(n, t);
         for (const [n, t] of g.tiles) tiles.set(n, t);
-        looked = { ...cur, cands: [...cur.cands, c], lastPostAt, tiles };
-        cut(looked.cands, looked);
+        // into the page whose ranks they fall among, where the lookup would have put them
+        const at = pageOf(cur.pool, cur.pages, c.name);
+        looked = { ...cur, pages: cur.pages.map((pg, i) => (i === at ? [...pg, c] : pg)), lastPostAt, tiles };
+        cut(looked);
       }
     } finally {
       refilling = false;
+    }
+  };
+
+  const more = async () => {
+    const l = looked;
+    const a = account();
+    if (!l || !a || a.name !== l.user || running || moreRun) return;
+    const followed = followsOf(l.user);
+    if (!followed) return;
+    const next = nextPage(l, followed, new Set(store.get().hidden));
+    if (!next.length) return same({ more: "end" });
+    const mine = {};
+    moreRun = mine;
+    const e = epoch;
+    // for the lookup as it is now: a fresh one or another account since leaves this for nobody
+    const alive = () => moreRun === mine && !running && e === epoch && looked?.at === l.at && looked.user === l.user;
+    patch({ more: "loading" });
+    try {
+      const seen = await lookTiles(next, a.creds, alive);
+      if (!seen || !alive()) return;
+      const cur = looked!;
+      // a refill may have joined some of them meanwhile
+      const have = new Set(cur.pages.flat().map((c) => c.name));
+      const lastPostAt = new Map(cur.lastPostAt);
+      const tiles = new Map(cur.tiles);
+      for (const [n, t] of seen.lastPostAt) lastPostAt.set(n, t);
+      for (const [n, t] of seen.tiles) tiles.set(n, t);
+      looked = { ...cur, pages: [...cur.pages, next.filter((c) => !have.has(c.name))], lastPostAt, tiles };
+      moreRun = null;
+      patch({ more: "idle" });
+      cut(looked);
+    } catch {
+      if (alive()) patch({ more: "error" });
+    } finally {
+      if (moreRun === mine) moreRun = null;
     }
   };
 
@@ -321,6 +406,7 @@ function create(): ArtistsApi {
       if (force) {
         looked = null;
         running = null;
+        moreRun = null;
         lastCut = null;
         retrying = true;
         if (store.get().status === "error" && getRec().store.get().error) getRec().rebuild();
@@ -342,6 +428,9 @@ function create(): ArtistsApi {
       patch({ hidden });
       // (the re-cut gives them their own look when the lookup left them out)
       if (looked) run();
+    },
+    more() {
+      void more();
     },
   };
 
