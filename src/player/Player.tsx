@@ -30,11 +30,13 @@ import { useStore } from "@/state/store";
 import { copyText, sharePost } from "@/screens/actions";
 import { NotSignedIn } from "@/components/NotSignedIn";
 import { takePaused } from "./intent";
-import { PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
+import { ComicTimeSheet, PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
+import { ComicBar, useComic } from "@/feed/comics";
 import { shareUrlFor } from "./share";
+import { TimeLeft } from "./timeLeft";
 import { visitPlayback } from "./visit";
 
-export { Viewer } from "./Viewer";
+export { Reader, Viewer } from "./Viewer";
 
 const HIDE_CONTROLS_MS = 2500;
 /** A second tap this soon is a double tap (toggles nothing, favorites). */
@@ -86,7 +88,10 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   const queue = feed?.queue ?? null;
   const posts = queue?.posts ?? [];
   const playback = usePlayback(base);
-  const sheet = top.sheet;
+  /** the comic reader, opened from a slide's capsule, stands over the show and holds it */
+  const reading = !!top.route.read;
+  // (its sheets are its own)
+  const sheet = reading ? null : top.sheet;
 
   const wanted = top.route.play ?? "first";
   const found = wanted === "first" ? (posts.length ? 0 : -1) : posts.findIndex((p) => String(p.id) === wanted);
@@ -129,7 +134,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   /** the last post we were on, and where: if it leaves the queue (blacklisted, failed), move on from there */
   const placed = useRef<{ id: string; index: number } | null>(null);
   useEffect(() => {
-    if (!queue) return;
+    if (!queue || reading) return;
     if (wanted === "first") {
       if (posts.length) nav.replace({ screen: top.route.screen, play: String(posts[0].id) });
       else if (!queue.exhausted && !queue.error) void queue.ensure(0);
@@ -213,7 +218,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
   }, [current, ready, playback.intervalSec, playback.videoMaxSec]);
 
   // Opening a sheet pauses; closing it resumes.
-  const running = isReady && !paused && sheet === null;
+  const running = isReady && !paused && sheet === null && !reading;
   const timer = useRef<{ key: string; remaining: number }>({ key: "", remaining: 0 });
   const timerKey = `${current?.id}:${durationMs}`;
   const onTimerDone = useEffectEvent(() => void next());
@@ -233,7 +238,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
     toast.error(`Post #${id} didn't load, skipped`);
     void next();
   });
-  const stallWatch = !!current && !isReady && !paused && sheet === null;
+  const stallWatch = !!current && !isReady && !paused && sheet === null && !reading;
   useEffect(() => {
     if (!stallWatch || !current) return;
     const id = current.id;
@@ -348,7 +353,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
 
   // ---- keys (desktop, UX §8) ------------------------------------------------
   const onKey = useEffectEvent((e: KeyboardEvent) => {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented || isTyping(e.target) || sheet) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented || isTyping(e.target) || sheet || reading) return;
     switch (e.key) {
       case "ArrowRight":
         void next();
@@ -412,6 +417,14 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
 
   const bar = useRef<HTMLDivElement>(null);
   const by = current ? artists(current)[0] : undefined;
+  // a slide that is a comic's page carries the comic's capsule (owner: "It should keep playing the feed")
+  const comic = useComic(current ?? null);
+  const read = () => {
+    if (!current || !comic) return;
+    // the show holds where it is, and stays paused when the reader closes
+    setPaused(true);
+    nav.push({ screen: top.route.screen, play: String(current.id), read: { pool: comic.pool.id, page: current.id } });
+  };
   const count = `${index + 1} / ${posts.length}${queue && !queue.exhausted ? "+" : ""}`;
 
   return (
@@ -428,6 +441,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
       onPointerUp={onPointerUp}
       onPointerCancel={() => (drag.current = null)}
       data-testid="player"
+      inert={reading || undefined}
       data-post-id={current?.id}
       data-info={sheet === "player-info" || undefined}
     >
@@ -495,6 +509,7 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
           onMouseEnter={() => (hovering.current = true)}
           onMouseLeave={() => (hovering.current = false)}
         >
+          {current && comic && <ComicBar comic={comic} onRead={read} />}
           {current && (
             <div className="player-who">
               <Avatar seed={by ?? `post:${current.id}`} className="post-avatar" />
@@ -572,30 +587,12 @@ export function Player({ base, top }: { base: Entry; top: Entry }) {
         </div>
       </div>
 
-      {(sheet === "player-settings" || sheet === "player-quality") && <QuickSettingsSheet base={base} playback={playback} picking={sheet === "player-quality"} />}
+      {(sheet === "player-settings" || sheet === "player-quality" || sheet === "player-comic-time") && (
+        <QuickSettingsSheet base={base} playback={playback} picking={sheet === "player-quality"} pickingComic={sheet === "player-comic-time"} />
+      )}
       {sheet === "player-quality" && <QualitySheet base={base} playback={playback} />}
+      {sheet === "player-comic-time" && <ComicTimeSheet playback={playback} />}
       {sheet === "player-info" && current && <PlayerInfoSheet post={current} base={base} />}
     </div>
-  );
-}
-
-/** How long this slide has left ("4 s", "1:20"), read off the progress bar's own animation. */
-function TimeLeft({ bar }: { bar: React.RefObject<HTMLDivElement | null> }) {
-  const [left, setLeft] = useState<number | null>(null);
-  useEffect(() => {
-    const read = () => {
-      const a = bar.current?.getAnimations()[0];
-      const d = a?.effect?.getComputedTiming().duration;
-      setLeft(a && typeof d === "number" ? Math.ceil(Math.max(0, d - Number(a.currentTime ?? 0)) / 1000) : null);
-    };
-    read();
-    const id = setInterval(read, 250);
-    return () => clearInterval(id);
-  }, [bar]);
-  if (left === null) return <span className="player-left" />;
-  return (
-    <span className="player-left" data-testid="time-left">
-      {left < 60 ? `${left} s` : `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`}
-    </span>
   );
 }

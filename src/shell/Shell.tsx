@@ -200,7 +200,7 @@ export default function Shell() {
       // An overlay closed (a sheet over the player included): focus goes back to what opened it.
       const now = shown.stack[shown.index];
       if (isOverlay(left) && left.key !== now.key && (shown.cause === "back" || shown.cause === "pop")) {
-        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=player], [data-testid=viewer]") : screenOf(to);
+        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=reader], [data-testid=player]:not([inert]), [data-testid=viewer]") : screenOf(to);
         restoreFocus(left.key, box);
       }
       return;

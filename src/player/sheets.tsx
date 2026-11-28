@@ -59,8 +59,21 @@ function usePlaybackSetter(base: Entry) {
   return { set, fromLink, target };
 }
 
+/** A comic page's time in the reader (DESIGN.md "Comics, part two", Its time): its own, not Seconds per slide. */
+export const COMIC_TIMES = [10, 20, 30, 45];
+
 /** Style, speed, fit, mute and quality, straight on the sheet. */
-export function QuickSettingsSheet({ base, playback, picking = false }: { base: Entry; playback: PlaybackSettings; picking?: boolean }) {
+export function QuickSettingsSheet({
+  base,
+  playback,
+  picking = false,
+  pickingComic = false,
+}: {
+  base: Entry;
+  playback: PlaybackSettings;
+  picking?: boolean;
+  pickingComic?: boolean;
+}) {
   const { set, fromLink, target } = usePlaybackSetter(base);
   const p = playback;
   return (
@@ -92,6 +105,21 @@ export function QuickSettingsSheet({ base, playback, picking = false }: { base: 
             testId="quick-seconds"
           />
         </div>
+        <button
+          type="button"
+          className="list-row"
+          onClick={() => getNav().openSheet("player-comic-time")}
+          aria-haspopup="dialog"
+          aria-expanded={pickingComic}
+          data-menu="player-comic-time"
+          data-testid="quick-comic-time"
+        >
+          <span className="row-text">
+            <b>Comic page time</b>
+          </span>
+          <span className="row-value">{p.comicPageSec ?? 20} s</span>
+          <ChevronDown aria-hidden className="row-chev row-drop" />
+        </button>
         {p.style === "classic" && (
           <div className="list-row">
             <span className="row-text">
@@ -140,6 +168,30 @@ export function QuickSettingsSheet({ base, playback, picking = false }: { base: 
         More in Settings <ChevronRight aria-hidden />
       </button>
     </Sheet>
+  );
+}
+
+/** Comic page time, dropped from its row in Quick settings as Quality is; Back returns to it. */
+export function ComicTimeSheet({ playback }: { playback: PlaybackSettings }) {
+  return (
+    <Dropdown anchor="player-comic-time" label="Comic page time" width={220} menu at={underRow} testId="sheet-comic-time">
+      <Menu label="Comic page time">
+        {COMIC_TIMES.map((sec) => (
+          <MenuRow
+            key={sec}
+            on={(playback.comicPageSec ?? 20) === sec}
+            onPick={() => {
+              // your own way of reading, so your default even on a link's visit
+              getPrefs().setPlayback({ ...getPrefs().store.get().playback, comicPageSec: sec });
+              void getNav().back();
+            }}
+            testId={`comic-time-${sec}`}
+          >
+            {sec} s
+          </MenuRow>
+        ))}
+      </Menu>
+    </Dropdown>
   );
 }
 

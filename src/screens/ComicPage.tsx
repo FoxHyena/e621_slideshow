@@ -133,7 +133,7 @@ export function ComicScreen({ id }: { id: number }) {
   };
 
   return (
-    <div className="screen-frame post-page comic-page" data-testid="comic-page" data-pool-id={id}>
+    <div className="screen-frame comic-page" data-testid="comic-page" data-pool-id={id}>
       <Toolbar>
         {pool && (
           <button type="button" className="toolbar-circle" aria-label="Share comic" onClick={() => void share()} data-testid="comic-share">
@@ -159,7 +159,9 @@ export function ComicScreen({ id }: { id: number }) {
           <InlineLoader label={`Finding comic #${id}`} />
         </div>
       )}
-      {found.status === "missing" && <StateBlock mood="look" screen head={`No comic #${id} on e621`} text="It was deleted, or the link is wrong." testId="comic-missing" />}
+      {found.status === "missing" && (
+        <StateBlock mood="look" screen head={`No comic #${id} on e621`} text="It was deleted, or the link is wrong." testId="comic-missing" />
+      )}
       {found.status === "error" && (
         <StateBlock
           mood="oops"
@@ -182,7 +184,7 @@ export function ComicScreen({ id }: { id: number }) {
             </h1>
             <p className="comic-sub" data-testid="comic-sub">
               {series ? "A comic" : "A collection"} · {n} {unit}
-              {lastPage && ` · last page ${ago(lastPage.created_at, now)}`}
+              {lastPage && ` · last page ${ago(lastPage.created_at, now)} ago`}
             </p>
           </div>
           {by && (
@@ -211,7 +213,16 @@ export function ComicScreen({ id }: { id: number }) {
           </div>
           <div className="comic-pages" data-testid="comic-pages">
             {ids.map((pid, i) => (
-              <Tile key={pid} n={i + 1} page={list?.[i]} known={list !== null} here={i === placeAt} rules={rules} username={username} onOpen={() => getNav().push({ screen: entry.route.screen, play: null, view: String(pid) })} />
+              <Tile
+                key={pid}
+                n={i + 1}
+                page={list?.[i]}
+                known={list !== null}
+                here={i === placeAt}
+                rules={rules}
+                username={username}
+                onOpen={() => getNav().push({ screen: entry.route.screen, play: null, view: String(pid) })}
+              />
             ))}
           </div>
           <div className="list-group comic-links">
@@ -273,7 +284,23 @@ export function ComicScreen({ id }: { id: number }) {
  * One page: the whole page, not cropped, its number under it. A page e621 doesn't send keeps its place
  * as a locked well; one on your blacklist shows the gate's mark and opens the post page's gate.
  */
-function Tile({ n, page, known, here, rules, username, onOpen }: { n: number; page: Page; known: boolean; here: boolean; rules: BlacklistRule[]; username: string | undefined; onOpen: () => void }) {
+function Tile({
+  n,
+  page,
+  known,
+  here,
+  rules,
+  username,
+  onOpen,
+}: {
+  n: number;
+  page: Page;
+  known: boolean;
+  here: boolean;
+  rules: BlacklistRule[];
+  username: string | undefined;
+  onOpen: () => void;
+}) {
   const missing = known && page === null;
   const src = thumbOf(page, rules, username);
   const hidden = !!page && !src;
@@ -291,8 +318,14 @@ function Tile({ n, page, known, here, rules, username, onOpen }: { n: number; pa
       data-missing={missing || undefined}
     >
       <span className="comic-pic" data-empty={!src || undefined} style={src && ratio ? { aspectRatio: ratio } : undefined}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- e621's CDN thumbnails */}
-        {src ? <img src={src} alt="" loading="lazy" decoding="async" draggable={false} /> : missing ? <Lock aria-hidden /> : hidden ? <Ban aria-hidden /> : null}
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element -- e621's CDN thumbnails
+          <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
+        ) : missing ? (
+          <Lock aria-hidden />
+        ) : hidden ? (
+          <Ban aria-hidden />
+        ) : null}
       </span>
       {n}
     </button>

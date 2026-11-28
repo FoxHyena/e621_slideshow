@@ -401,9 +401,11 @@ const CHOICES = {
     { value: 0, label: "Whole video" },
   ] as Choice<"videoMaxSec">[],
   preloadCount: [1, 2, 3, 4, 6, 8].map((n) => ({ value: n, label: `${n} post${n === 1 ? "" : "s"}` })) as Choice<"preloadCount">[],
+  // DESIGN.md "Comics, part two", Its time (the reader's, not the slideshow's)
+  comicPageSec: [10, 20, 30, 45].map((n) => ({ value: n, label: `${n} s` })) as Choice<"comicPageSec">[],
 };
 type ChoiceKey = keyof typeof CHOICES;
-const TITLES: Record<ChoiceKey, string> = { transition: "Transition", quality: "Quality", videoMaxSec: "Longest video", preloadCount: "Load ahead" };
+const TITLES: Record<ChoiceKey, string> = { transition: "Transition", quality: "Quality", videoMaxSec: "Longest video", preloadCount: "Load ahead", comicPageSec: "Comic page time" };
 const SHEET = "choose:";
 
 function Slideshow() {
@@ -447,6 +449,7 @@ function Slideshow() {
           </span>
           <Stepper label="seconds per slide" value={p.intervalSec} min={1} max={60} format={(v) => `${v} s`} onChange={(intervalSec) => set({ intervalSec })} testId="slideshow-seconds" />
         </div>
+        {choiceRow("comicPageSec")}
         {p.style === "classic" && (
           <div className="list-row">
             <span className="row-text">

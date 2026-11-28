@@ -7,8 +7,8 @@
  * does not favorite here); pinch zooms 1 to 5 times, a drag moves a zoomed picture, and a drag down
  * on an unzoomed one closes. On a computer the wheel zooms and Post info stands beside the picture.
  */
-import { ChevronLeft, ChevronRight, CircleAlert, Download, Heart, Info, Share, X } from "lucide-react";
-import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, CircleAlert, Download, EyeOff, Heart, Info, Pause, Play, RefreshCw, Share, SkipBack, SkipForward, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { turnMark } from "@/feed/motion";
 import { searchPosts } from "@/lib/e621/client";
@@ -32,8 +32,11 @@ import { sharePost } from "@/screens/actions";
 import { openPaused } from "./intent";
 import { savePost } from "./save";
 import { actionLook } from "@/shell/toastLook";
-import { PlayerInfoSheet } from "./sheets";
-import { ComicBar, PagesSheet, useComic, usePages } from "@/feed/comics";
+import { ComicTimeSheet, PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
+import { TimeLeft } from "./timeLeft";
+import { ComicBar, PagesSheet, setPlace, useComic, usePages } from "@/feed/comics";
+import { FollowPill } from "@/feed/FollowPill";
+import { Goo } from "@/components/Goo";
 
 /** A second tap this soon is a double tap. */
 const DOUBLE_TAP_MS = 250;
@@ -48,6 +51,9 @@ const EDGE_PX = 24;
 /** A comic's page turns in this long (DESIGN.md "A comic"), and past this much of a sideways drag. */
 const TURN_MS = 320;
 const TURN_PX = 60;
+
+/** While the reader plays, the buttons step aside after this long (as in the player). */
+const HIDE_CONTROLS_MS = 2500;
 
 /** Kept from page to page of a comic: whether the buttons show, and which side the new page comes in from. */
 let chromeShown = true;
@@ -120,9 +126,44 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
   return <ViewerPage key={top.route.view ?? ""} base={base} top={top} turned={turned} />;
 }
 
-function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: boolean }) {
+/** What the reader keeps from page to page: whether its timer turns the pages, and the end. */
+interface Reading {
+  pool: number;
+  paused: boolean;
+  setPaused: (p: boolean) => void;
+  ended: boolean;
+  setEnded: (e: boolean) => void;
+}
+
+/**
+ * The comic reader (`?read=<pool>&post=<postId>`, DESIGN.md "Comics, part two"): the player on one
+ * comic, a page at a time. The viewer's picture (pinch, sideways turns, a drag down to close) under
+ * the player's chrome: the count in pages, the capsule (the Pages sheet), the artist with Follow,
+ * Favorite, Post info, Quick settings and Share, Previous, Play and Next, and the bar. It starts
+ * paused; playing, it turns a page each "Comic page time". After the last page, the end.
+ */
+export function Reader({ base, top }: { base: Entry; top: Entry }) {
+  const read = top.route.read!;
+  // owner: "Start paused"
+  const [paused, setPaused] = useState(true);
+  const [ended, setEnded] = useState(false);
+  useEffect(
+    () => () => {
+      chromeShown = true;
+      enterFrom = 0;
+    },
+    [],
+  );
+  const [first] = useState(read.page);
+  const [turned, setTurned] = useState(false);
+  if (!turned && read.page !== first) setTurned(true);
+  const reading: Reading = { pool: read.pool, paused, setPaused, ended, setEnded };
+  return <ViewerPage key={read.page} base={base} top={top} turned={turned} reading={reading} />;
+}
+
+function ViewerPage({ base, top, turned, reading }: { base: Entry; top: Entry; turned: boolean; reading?: Reading }) {
   const nav = getNav();
-  const id = top.route.view ?? "";
+  const id = reading ? String(top.route.read!.page) : (top.route.view ?? "");
   const sheet = top.sheet;
   const { post, missing, inFeed, feedAnswered } = useViewedPost(base, id);
   const [now] = useState(() => Date.now());
@@ -140,7 +181,11 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   const close = () => void nav.back();
 
   // ---- a comic (src/feed/comics.tsx): its pages, and the ones either side of this one --------
-  const comic = useComic(post);
+  const comic = useComic(post, reading?.pool ?? null);
+  // where you stopped in this comic: the last page open here or in the viewer
+  useEffect(() => {
+    if (comic && post) setPlace(comic.pool.id, post.id);
+  }, [comic?.pool.id, post?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const list = usePages(comic);
   const ids = comic?.pool.post_ids;
   const at = ids && post ? ids.indexOf(post.id) : -1;
@@ -178,14 +223,25 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   /** Go to a page in this viewer's place (Back still closes the viewer). */
   const goTo = (pid: number, from = 0) => {
     enterFrom = from;
-    nav.replace({ ...top.route, view: String(pid) });
+    nav.replace(reading ? { ...top.route, read: { pool: reading.pool, page: pid } } : { ...top.route, view: String(pid) });
   };
   const turning = useRef(false);
   const turnTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(turnTimer.current), []);
   /** Turn one page on (+1) or back (-1): the picture slides off, the next comes in from the other side. */
   const turn = (d: 1 | -1) => {
+    if (reading?.ended) {
+      // Previous, or a drag to the right, goes back to the last page; the end goes no further
+      if (d === -1) reading.setEnded(false);
+      return void paint(FIT, true);
+    }
     const pid = near(d);
+    // past the last page: the end (a comic does not loop, whatever Loop says)
+    if (pid === null && d === 1 && reading && list && !turning.current) {
+      reading.setPaused(true);
+      reading.setEnded(true);
+      return void paint(FIT, true);
+    }
     if (pid === null || turning.current) return void paint(FIT, true);
     const w = stage.current?.clientWidth ?? 0;
     if (reducedMotion() || !w) return goTo(pid);
@@ -202,19 +258,20 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   // Videos don't open the viewer in this pass (DESIGN.md): a video tile, or a link to one, opens the
   // player paused in this entry's place.
   const video = post !== null && mediaKind(post) === "video";
+  // the reader plays a comic's video page itself, and says so when a page can't be shown
+  const hidden =
+    post !== null && (displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
   // What the viewer can't show goes to the post's own page, which plays it or says why (a review,
   // 2026-11-27: these sat on a loader): a video with no feed for the player to find it in, a picture
   // e621 hides from you, a post on your blacklist you haven't chosen to see there.
-  const away =
-    post !== null &&
-    ((video && !inFeed && feedAnswered) || displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
+  const away = !reading && post !== null && ((video && !inFeed && feedAnswered) || hidden);
   useEffect(() => {
     if (!away || !post) return;
     nav.replace({ screen: { kind: "post", id: post.id }, play: null });
   }, [away]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     // the player plays it from the feed: wait until it's there (or `away` takes it to its page)
-    if (!video || !inFeed || away) return;
+    if (reading || !video || !inFeed || away) return;
     openPaused(true);
     nav.replace({ screen: top.route.screen, play: id });
   }, [video, inFeed, away]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -223,7 +280,7 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   useLayoutEffect(
     () => () => {
       const now = getNav().current().route;
-      if (now.view || now.play) return;
+      if (now.view || now.play || now.read) return;
       const y = revealY(base.key, Number(id));
       if (y !== null) setLockedY(y);
     },
@@ -300,6 +357,63 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
     const r = stage.current!.getBoundingClientRect();
     return [clientX - r.left - r.width / 2, clientY - r.top - r.height / 2] as const;
   };
+  // ---- the reader's timer (DESIGN.md "Comics, part two", Its time) -------------------------------
+  const playback = useStore(getPrefs().store, (p) => p.playback);
+  const [burst, setBurst] = useState(0);
+  const [videoSec, setVideoSec] = useState<number | null>(null);
+  const pageMs = useMemo(() => {
+    const ms = (playback.comicPageSec ?? 20) * 1000;
+    // a video page plays to its end, by the player's video rules
+    if (!post || !video) return ms;
+    const len = videoSec ?? post.files.meta.duration ?? 0;
+    const cap = playback.videoMaxSec > 0 ? playback.videoMaxSec : Infinity;
+    return Math.max(ms, Math.min(len, cap) * 1000);
+  }, [playback.comicPageSec, playback.videoMaxSec, post, video, videoSec]);
+  // it waits while a sheet is open, while the page is zoomed, and at the end
+  const running = !!reading && loaded && !reading.paused && !reading.ended && sheet === null && !zoomed && !hidden;
+  const left = useRef<number | null>(null);
+  const onPageDone = useEffectEvent(() => turn(1));
+  useEffect(() => {
+    if (!running) return;
+    const started = Date.now();
+    const t = setTimeout(onPageDone, (left.current ??= pageMs));
+    return () => {
+      clearTimeout(t);
+      left.current = Math.max(0, left.current! - (Date.now() - started));
+    };
+  }, [running, pageMs]);
+  const bar = useRef<HTMLDivElement>(null);
+  // while it plays, the buttons step aside after 2.5 s, as in the player; a tap brings them back
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hovering = useRef(false);
+  const poke = () => {
+    if (!reading) return;
+    clearTimeout(hideTimer.current);
+    if (reading.paused) return;
+    hideTimer.current = setTimeout(() => {
+      if (!hovering.current) setControls(() => false);
+    }, HIDE_CONTROLS_MS);
+  };
+  const play = (on: boolean) => {
+    if (!reading) return;
+    reading.setPaused(!on);
+    clearTimeout(hideTimer.current);
+    if (on)
+      hideTimer.current = setTimeout(() => {
+        if (!hovering.current) setControls(() => false);
+      }, HIDE_CONTROLS_MS);
+  };
+  useEffect(() => () => clearTimeout(hideTimer.current), []);
+  /** "Read again": page 1 (the first there is to read), paused. */
+  const again = () => {
+    if (!reading || !ids) return;
+    reading.setPaused(true);
+    reading.setEnded(false);
+    const i = ids.findIndex((_, k) => turnable(k));
+    if (i >= 0 && ids[i] !== post?.id) goTo(ids[i]);
+  };
+  const shareIt = () => post && void sharePost(post);
+
   // ---- hands -------------------------------------------------------------------
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<
@@ -387,12 +501,24 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
     if (t - lastTap.current < DOUBLE_TAP_MS) {
       clearTimeout(tapTimer.current);
       lastTap.current = 0;
+      if (reading) {
+        // as in the player: a double tap favorites (never un-favorites)
+        setBurst((b) => b + 1);
+        if (post && !favedOf(getFavs().store.get(), post)) {
+          if (getSession().store.get().creds) getGoo().addFav(post.id);
+          getFavs().toggle(post);
+        }
+        return;
+      }
       if (view.current.s > 1.01) paint(FIT, true);
       else zoomAt(TAP_ZOOM, ...fromCentre(e.clientX, e.clientY), true);
       return;
     }
     lastTap.current = t;
-    tapTimer.current = setTimeout(() => setControls((c) => !c), DOUBLE_TAP_MS);
+    tapTimer.current = setTimeout(() => {
+      setControls((c) => !c);
+      if (reading) clearTimeout(hideTimer.current);
+    }, DOUBLE_TAP_MS);
   };
   const onPointerCancel = (e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);
@@ -446,6 +572,14 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   const onKey = useEffectEvent((e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (sheet && e.key !== "Escape") return;
+    if (reading) {
+      // the player's keys (UX §8), with ← → turning the page
+      if (e.key === " ") {
+        e.preventDefault();
+        return play(!reading.paused);
+      }
+      if (e.key === "s" || e.key === "S") return nav.openSheet("player-settings");
+    }
     switch (e.key) {
       case "Escape":
         if (!sheet) close();
@@ -471,9 +605,11 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
       // a comic's pages (on a computer, beside the two glass buttons)
       case "ArrowRight":
         if (comic && view.current.s <= 1.01) turn(1);
+        if (reading) poke();
         break;
       case "ArrowLeft":
         if (comic && view.current.s <= 1.01) turn(-1);
+        if (reading) poke();
         break;
     }
   });
@@ -493,22 +629,29 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
   const full = post?.files.original.url ?? null;
   const showControls = controls && !zoomed;
 
+  const ended = !!reading?.ended;
+  // the end's way back: to the slide the reader was opened from, or to the comic's page
+  const backTo = top.route.play ? "Back to the slideshow" : comic ? `Back to ${comic.name}` : "Back";
+
   return (
     <div
       ref={box}
-      className="player viewer"
+      className={reading ? "player viewer reader" : "player viewer"}
       role="dialog"
       aria-modal="true"
-      aria-label="Picture"
+      aria-label={reading ? "Comic" : "Picture"}
       tabIndex={-1}
       data-controls={showControls || undefined}
       data-info={sheet === "player-info" || undefined}
-      data-testid="viewer"
+      data-testid={reading ? "reader" : "viewer"}
       data-post-id={post?.id}
       data-zoomed={zoomed || undefined}
       data-comic={comic ? "" : undefined}
       data-turned={turned || undefined}
       data-pages={list ? "" : undefined}
+      data-ended={ended || undefined}
+      data-paused={reading ? reading.paused || undefined : undefined}
+      onMouseMove={reading ? poke : undefined}
     >
       <div
         ref={stage}
@@ -519,18 +662,38 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
         onPointerCancel={onPointerCancel}
         data-testid="viewer-stage"
       >
-        {post && src && mediaKind(post) !== "video" && (
+        {post && src && !hidden && (!video || reading) && (
           <div ref={pic} className="viewer-pic" data-testid="viewer-pic">
             {/* eslint-disable @next/next/no-img-element -- e621's CDN, shown as is */}
-            <img ref={img} src={src} alt="" draggable={false} onLoad={() => setLoaded(true)} />
-            {sharp && full && full !== src && <img src={full} alt="" draggable={false} className="viewer-sharp" onLoad={(e) => e.currentTarget.setAttribute("data-in", "")} />}
+            {video ? (
+              <video
+                src={src}
+                autoPlay
+                playsInline
+                loop
+                muted={playback.videoMuted}
+                onLoadedMetadata={(e) => setVideoSec(Number.isFinite(e.currentTarget.duration) ? e.currentTarget.duration : null)}
+                onLoadedData={() => setLoaded(true)}
+              />
+            ) : (
+              <img ref={img} src={src} alt="" draggable={false} onLoad={() => setLoaded(true)} />
+            )}
+            {!video && sharp && full && full !== src && <img src={full} alt="" draggable={false} className="viewer-sharp" onLoad={(e) => e.currentTarget.setAttribute("data-in", "")} />}
             {/* eslint-enable @next/next/no-img-element */}
           </div>
         )}
       </div>
-      {post && !loaded && (
+      {post && !loaded && !hidden && !ended && (
         <div className="player-center">
-          <Loader step={{ phase: "media" }} size="md" bare delayMs={600} label="Loading image" icons={[ImageIcon]} />
+          <Loader step={{ phase: "media" }} size="md" bare delayMs={600} label={video ? "Loading video" : "Loading image"} icons={[ImageIcon]} />
+        </div>
+      )}
+      {reading && post && hidden && !ended && (
+        <div className="player-center">
+          <p className="player-note" data-testid="reader-hidden">
+            <EyeOff aria-hidden />
+            {displayUrl(post, "sample") === null ? "e621 doesn't show this page here" : "This page is on your blacklist"}
+          </p>
         </div>
       )}
       {!post && (
@@ -538,8 +701,27 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
           {missing ? <p className="player-note">No post #{id} on e621</p> : <Loader step={null} label="Finding the post" detail={`#${id}`} />}
         </div>
       )}
+      {burst > 0 && <Heart key={burst} className="heart-burst player-burst" aria-hidden />}
+      {ended && comic && (
+        <div className="comic-end" data-testid="comic-end">
+          <Goo mood="wave" size={112} />
+          <b>The end</b>
+          <small>
+            {comic.name} · {comic.total} {comic.total === 1 ? "page" : "pages"}
+          </small>
+          <div className="comic-end-acts">
+            <button type="button" className="glass-btn" onClick={again} data-testid="comic-again">
+              <RefreshCw aria-hidden />
+              Read again
+            </button>
+            <button type="button" className="glass-btn" onClick={close} data-testid="comic-end-back">
+              {backTo}
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="player-chrome" aria-hidden={!showControls || undefined} data-testid="controls" data-visible={showControls}>
+      <div className="player-chrome" aria-hidden={!(showControls || ended) || undefined} data-testid="controls" data-visible={showControls || ended}>
         <div className="player-top">
           <button type="button" className="art-circle" aria-label="Close" onClick={close} data-testid="viewer-close">
             <X aria-hidden />
@@ -550,7 +732,7 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
             </span>
           )}
         </div>
-        {comic && (
+        {comic && !reading && (
           <>
             <button type="button" className="art-circle viewer-turn" data-side="l" aria-label="Previous page" disabled={near(-1) === null} onClick={() => turn(-1)} data-testid="viewer-prev">
               <ChevronLeft aria-hidden />
@@ -560,7 +742,75 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
             </button>
           </>
         )}
-        {post && (
+        {post && reading && !ended && (
+          <div className="player-bottom" onMouseEnter={() => (hovering.current = true)} onMouseLeave={() => (hovering.current = false)}>
+            {comic && <ComicBar comic={comic} up />}
+            <div className="player-who">
+              <Avatar seed={by ?? `post:${post.id}`} className="post-avatar" />
+              <span className="player-idn">
+                <span className="post-name">{by?.replaceAll("_", " ") ?? "unknown artist"}</span>
+                <span className="post-time">
+                  {ago(post.created_at, now)} · #{post.id}
+                </span>
+              </span>
+              {by && <FollowPill key={by} name={by} art />}
+            </div>
+            <div className="player-rail">
+              <button
+                type="button"
+                className="art-circle"
+                aria-label={`Favorite, ${compact(post.stats.fav_count)}`}
+                aria-pressed={faved}
+                data-on={faved || undefined}
+                onClick={toggleFav}
+                data-testid="favorite-button"
+              >
+                <Heart aria-hidden />
+              </button>
+              <button
+                type="button"
+                className="art-circle"
+                aria-label="Post info"
+                aria-expanded={sheet === "player-info"}
+                onClick={() => (sheet === "player-info" ? void nav.back() : nav.openSheet("player-info"))}
+                data-testid="info-button"
+              >
+                <Info aria-hidden />
+              </button>
+              <button type="button" className="art-circle" aria-label="Slideshow settings" onClick={() => nav.openSheet("player-settings")} data-testid="quick-settings-button">
+                <SlidersHorizontal aria-hidden />
+              </button>
+              <button type="button" className="art-circle" aria-label="Share" onClick={shareIt} data-testid="share-button">
+                <Share aria-hidden />
+              </button>
+            </div>
+            <div className="player-transport">
+              <button type="button" className="art-circle" aria-label="Previous" onClick={() => turn(-1)} disabled={near(-1) === null} data-testid="reader-prev">
+                <SkipBack aria-hidden className="solid" />
+              </button>
+              <button type="button" className="player-play" aria-label={reading.paused ? "Play" : "Pause"} onClick={() => play(reading.paused)} data-testid="pause-button">
+                {reading.paused ? <Play aria-hidden /> : <Pause aria-hidden />}
+              </button>
+              <button type="button" className="art-circle" aria-label="Next" onClick={() => turn(1)} disabled={!list} data-testid="reader-next">
+                <SkipForward aria-hidden className="solid" />
+              </button>
+            </div>
+            <div className="player-bar">
+              <div className="player-progress">
+                {loaded && !hidden && (
+                  <div
+                    ref={bar}
+                    className="progress-bar"
+                    data-testid="progress"
+                    style={{ animationDuration: `${pageMs}ms`, animationPlayState: running ? "running" : "paused" }}
+                  />
+                )}
+              </div>
+              <TimeLeft bar={bar} />
+            </div>
+          </div>
+        )}
+        {post && !reading && (
           <div className="player-bottom">
             {comic && <ComicBar comic={comic} />}
             <button
@@ -622,12 +872,18 @@ function ViewerPage({ base, top, turned }: { base: Entry; top: Entry; turned: bo
       </div>
 
       {sheet === "player-info" && post && <PlayerInfoSheet post={post} base={base} />}
+      {reading && (sheet === "player-settings" || sheet === "player-quality" || sheet === "player-comic-time") && (
+        <QuickSettingsSheet base={base} playback={playback} picking={sheet === "player-quality"} pickingComic={sheet === "player-comic-time"} />
+      )}
+      {reading && sheet === "player-quality" && <QualitySheet base={base} playback={playback} />}
+      {reading && sheet === "player-comic-time" && <ComicTimeSheet playback={playback} />}
       {sheet === "comic-pages" && post && comic && (
         <PagesSheet
           comic={comic}
           post={post}
           onPage={(pid) =>
             void nav.back().then(() => {
+              reading?.setEnded(false);
               if (pid !== post.id) goTo(pid);
             })
           }

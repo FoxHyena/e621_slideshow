@@ -376,13 +376,14 @@ export async function closeOntoComic(id: number, entries: number) {
  * The viewer's comic bar: the comic's name and the page; it opens the Pages sheet. In a slideshow
  * (`onRead`) it says "Read from page 3" and opens the reader there, its chevron pointing on.
  */
-export function ComicBar({ comic, onRead }: { comic: Comic; onRead?: () => void }) {
+export function ComicBar({ comic, onRead, up }: { comic: Comic; onRead?: () => void; up?: boolean }) {
   const words = onRead ? `Read from page ${comic.page}` : `Page ${comic.page} of ${comic.total}`;
   return (
     <button
       type="button"
       className="viewer-comic"
       data-go={onRead ? "" : undefined}
+      data-up={up || undefined}
       aria-label={`${comic.name}. ${onRead ? words : "Show all pages"}`}
       onClick={onRead ?? (() => getNav().openSheet("comic-pages"))}
       data-testid={onRead ? "slide-comic" : "viewer-comic"}
@@ -411,7 +412,7 @@ export function PagesSheet({ comic, post, onPage }: { comic: Comic; post: Post; 
       testId="sheet-pages"
       footer={
         <div className="pages-foot">
-          {last && <small>Last page {ago(last.created_at, now)}</small>}
+          {last && <small>Last page {ago(last.created_at, now)} ago</small>}
           <button type="button" className="link-row" onClick={() => void open()} data-testid="pages-feed">
             Open comic
             <ChevronRight aria-hidden />

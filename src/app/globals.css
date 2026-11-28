@@ -7596,11 +7596,233 @@ li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-r
   .viewer-turn[data-side="r"] {
     right: 16px;
   }
-  .viewer-comic {
+  .viewer:not(.reader) .viewer-comic {
     grid-area: transport;
     width: 300px;
   }
+  /* the player and the reader (Comics, part two, not drawn on a computer): the capsule over the bar */
+  .player:not(.viewer) .player-bottom:has(.viewer-comic),
+  .reader .player-bottom {
+    grid-template-areas:
+      "comic comic comic"
+      "bar bar bar"
+      "who transport rail";
+  }
+  .player:not(.viewer) .viewer-comic,
+  .reader .viewer-comic {
+    grid-area: comic;
+    justify-self: center;
+    width: 300px;
+  }
 }
+/* The capsule's chevron: up in the reader (it opens the Pages sheet over it); on, in a slideshow */
+.viewer-comic[data-up] > .viewer-comic-chev {
+  transform: rotate(-90deg);
+}
+/* ---- Comics, part two (DESIGN.md "A post on its own"; src/screens/ComicPage.tsx) ---- */
+/* the comic's page: the pushed header, 16 above the title as on the post page */
+.comic-page > .head-row {
+  margin-bottom: 16px;
+}
+.comic-head {
+  margin: 0 0 16px;
+}
+.comic-head .screen-title {
+  margin: 0;
+}
+.comic-sub {
+  margin: 4px 0 0;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+/* the artist: the 36 mark, the name over "48 posts", Follow; the row opens their page */
+.comic-artist .list-row {
+  gap: 12px;
+}
+.row-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 44px;
+  text-align: left;
+}
+.row-main .post-avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+.row-main:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+/* the description: a Panel, 24 round, 16 inside */
+.comic-desc {
+  margin: 0 0 16px;
+}
+.comic-desc .info-label {
+  margin-top: 0;
+}
+/* every page, three to a row (five on a computer): 8 between columns, 12 between rows */
+.comic-pages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 8px;
+  align-items: start;
+  padding: 0 0 24px;
+}
+@media (min-width: 900px) {
+  .comic-pages {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.comic-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
+}
+.comic-pic {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: var(--radius-art);
+  overflow: hidden;
+  background: var(--color-panel-2);
+  box-shadow: var(--shadow-sunk-art);
+  transition: transform 100ms ease-out;
+}
+.comic-pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* a page e621 doesn't send (or your blacklist hides): a well with its mark, its place and number kept */
+.comic-pic[data-empty] {
+  display: grid;
+  place-items: center;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-muted);
+}
+.comic-pic[data-empty] svg {
+  width: 20px;
+  height: 20px;
+}
+.comic-tile:not(:disabled):active .comic-pic {
+  transform: scale(0.97);
+}
+.comic-tile[aria-current] {
+  color: var(--color-fg);
+}
+.comic-tile[aria-current] .comic-pic {
+  box-shadow:
+    0 0 0 2px var(--color-ground),
+    0 0 0 3.5px var(--color-gold);
+}
+.comic-tile:focus-visible {
+  outline: none;
+}
+.comic-tile:focus-visible .comic-pic {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+}
+.comic-links {
+  margin-bottom: 0;
+}
+/* the reader's end: on Player Black, Goo waving, "The end", and two glass buttons */
+.comic-end {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 32px 40px;
+  background: #000;
+  text-align: center;
+}
+.comic-end b {
+  margin-top: 12px;
+  font-family: var(--font-rounded);
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+}
+.comic-end small {
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  color: rgba(255, 255, 255, 0.74);
+}
+.comic-end-acts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 220px;
+  margin-top: 24px;
+}
+.glass-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--spacing-control);
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  font-weight: 600;
+  transition: transform 100ms ease-out;
+}
+.glass-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.glass-btn:active {
+  transform: scale(0.97);
+}
+.glass-btn:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+.reader[data-ended] .viewer-stage {
+  visibility: hidden;
+}
+.reader .player-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reader .player-note svg {
+  width: 20px;
+  height: 20px;
+}
+.reader .viewer-pic video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* The Pages sheet: four thumbs to a row, the number under each, the current one ringed gold */
 .sheet-sub {
   margin: 0;

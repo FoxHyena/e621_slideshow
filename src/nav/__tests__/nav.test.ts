@@ -26,6 +26,23 @@ describe("routes", () => {
     expect(p("/?v=1&tags=fox").screen).toEqual({ kind: "root", params: "v=1&tags=fox" });
   });
 
+  it("reads a comic's page and the reader over a screen or over the player (DESIGN.md \"Comics, part two\")", () => {
+    expect(p("/comic/77").screen).toEqual({ kind: "comic", id: 77 });
+    for (const u of ["/comic", "/comic/0", "/comic/x", "/comic/7/8"]) expect(p(u).screen.kind).toBe("notFound");
+    const over = p("/comic/77?read=77&post=2003");
+    expect(over).toEqual({ screen: { kind: "comic", id: 77 }, play: null, read: { pool: 77, page: 2003 } });
+    expect(routeUrl(over)).toBe("/comic/77?read=77&post=2003");
+    const onShow = p("/search?tags=wolf&play=2005&read=77&post=2005");
+    expect(onShow).toEqual({ screen: { kind: "results", params: "tags=wolf" }, play: "2005", read: { pool: 77, page: 2005 } });
+    expect(routeUrl(onShow)).toBe("/search?tags=wolf&play=2005&read=77&post=2005");
+    // Back with nothing under it: the reader closes onto the slide, then the slide onto the screen
+    expect(parentOf(onShow, null)).toEqual({ screen: onShow.screen, play: "2005" });
+    expect(parentOf(over, null)).toEqual({ screen: over.screen, play: null });
+    // a half-written reader is no reader: the screen keeps its own params
+    expect(p("/search?tags=wolf&read=77").read).toBeUndefined();
+    expect(p("/search?tags=wolf&post=1").screen).toEqual({ kind: "results", params: "tags=wolf&post=1" });
+  });
+
   it("treats unknown paths as not found", () => {
     for (const u of ["/nope", "/settings/nope", "/artist", "/artist/a/b", "/for-you/x", "/artist/%E0%A4%A"]) {
       expect(p(u).screen.kind).toBe("notFound");
