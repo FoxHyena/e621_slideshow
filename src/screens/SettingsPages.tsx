@@ -756,7 +756,7 @@ function AppPage() {
           <span className="row-text">
             <b>Version</b>
             {/* (announced by the toast that offered it; the line keeps the version you're on in view) */}
-            {updateReady && <small data-testid="update-ready">You have {process.env.APP_VERSION}; a new version is ready</small>}
+            {updateReady && <small data-testid="update-ready">You have {process.env.APP_VERSION_LONG}; a new version is ready</small>}
           </span>
           {updateReady ? (
             <button type="button" className="btn-tonal" data-size="compact" onClick={reloadToUpdate} aria-label="Reload to update" data-testid="update-reload">
@@ -765,7 +765,7 @@ function AppPage() {
             </button>
           ) : (
             <span className="row-value" data-testid="app-version">
-              {process.env.APP_VERSION}
+              {process.env.APP_VERSION_LONG}
             </span>
           )}
         </li>

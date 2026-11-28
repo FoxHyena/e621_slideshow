@@ -47,7 +47,7 @@ test("Settings: rows in groups, icon wells, row ends 16 in from the panel's edge
   const title = await box(page.locator(".title-row"));
   const account = await box(page.getByRole("list", { name: "Account" }));
   expect(Math.round(account.y - (title.y + title.height))).toBe(8);
-  await expect(page.locator(".app-foot")).toContainText(/Version \d+\.\d+\.\d+/);
+  await expect(page.locator(".app-foot")).toContainText(/Version \d{4}\.\d{2}\.\d{2}/);
   // the goo row: Wipe clean ends 16 in
   const goo = page.getByTestId("goo-row");
   const wipe = await box(page.getByTestId("goo-wipe"));

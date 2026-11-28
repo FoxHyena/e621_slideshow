@@ -186,7 +186,8 @@ test("App: the e621 button, keyboard shortcuts, About, Made by", async ({ page }
   await mockE621(page);
   await page.goto("/settings/app");
   await expect(page.getByTestId("userscript-install")).toHaveAttribute("href", "/e621-slideshow.user.js");
-  await expect(page.getByTestId("app-version")).not.toBeEmpty();
+  // the commit's day and its short id (owner, 2026-11-28: "Date, automatic")
+  await expect(page.getByTestId("app-version")).toHaveText(/^\d{4}\.\d{2}\.\d{2}( · [0-9a-f]{7})?$/);
   // Made by (owner, 2026-11-27): last on the page, one row to the owner's Telegram, in a new tab
   const made = page.getByTestId("made-by");
   await expect(made).toHaveAttribute("href", "https://t.me/hyenafox");
