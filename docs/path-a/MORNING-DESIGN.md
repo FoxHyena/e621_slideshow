@@ -119,6 +119,14 @@ After your two screenshots of the build on a computer. Not approved yet.
    title that repeats the row, over a well inside a panel. Now the row drops the menu a chip drops,
    at its right end, with no title. The row's arrow is ⌄, not ›.
 
+## Open now (2026-11-27, rows)
+
+After your screenshot of Settings' App rows. Not approved yet.
+
+1. **The icon at a row's right end.** The external-link glyph stood 12 from the edge and everything
+   else 16. The drawing was at fault; the build matched it. Now 16.
+2. **The line between rows** stops 16 before the panel's right edge, in every list.
+
 ## What was made
 
 | Batch | Commit | What | Builder's slice |

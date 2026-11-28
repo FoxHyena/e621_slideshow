@@ -2129,3 +2129,18 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - Two quick Shows lost the second one; a Show after the hour sent a wasted search.
   - A second review: those single searches are capped at 8 per lookup (unfollowing many at once,
     or on another device, would have sent one each), and a failed one no longer stops the rest.
+
+## 2026-11-27 — Rows: a glyph's pull is its own; a divider stops at the content edge
+- Owner, with a screenshot of Settings' App rows on a computer: "We should reinvestigate the spacing
+  on these types of components, right icon seems too far right and line shouldn't extend all the way
+  through".
+- Measured in the mock, every row in every group, sheet and dropdown: what ends a row stands 16 from
+  the panel's edge, with two exceptions. The external-link glyph's ink stood 12.3 from it, because it
+  took the chevron's pull of 5 and its own empty margin is 1. The ⌄ I added for menu rows stood 14.2
+  (its margin is 3). The build matched the drawing (12 in the screenshot), so the fault was the
+  drawing's.
+- **Fixed (mine):** › is pulled 5, ⌄ 3, the external-link glyph 1. All three now end 16.2 from the edge.
+- **The line.** The spec had it run from the text to the panel's right edge. Now it stops 16 before the
+  edge, where the row's content stops; in a ⋯ menu's well, 14 before. Rows on a sheet or in a
+  dropdown already stopped there. No divider touches a panel's edge anywhere now.
+- Not changed: where a line starts (at the text), row heights, the 16 at each side.
