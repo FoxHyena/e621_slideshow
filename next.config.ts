@@ -46,6 +46,14 @@ const nextConfig: NextConfig = {
   turbopack: { root: import.meta.dirname },
   // The dev badge sits on top of the slideshow corner.
   devIndicators: false,
+  /**
+   * A post link's preview (DESIGN.md "The link's preview"): these crawlers get the tags in the page's
+   * head; everyone else gets them streamed after. Next's own list (`html-bots.js` in next 16.3.8),
+   * copied because setting this replaces it, plus the chat apps it lacks: Telegram, Bluesky
+   * (Cardyb), Mastodon and its kin, Matrix (synapse), Signal, and the embed services.
+   */
+  htmlLimitedBots:
+    /[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight|TelegramBot|Bluesky|Cardyb|Mastodon|Pleroma|Akkoma|Misskey|synapse|Signal|Iframely|Embedly/i,
   env: {
     // Settings shows it under the app mark; inlined at build time.
     APP_VERSION: version,
