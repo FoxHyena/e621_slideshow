@@ -218,7 +218,8 @@ test("Sheets: Media is three switches; the ⋯ menu names the post and lists its
   await page.getByTestId("card-menu").first().click();
   const sheet = page.getByTestId("sheet-post");
   await expect(sheet.getByRole("dialog")).toHaveAccessibleName(/^Post \d+/);
-  await expect(sheet.locator(".well-row")).toHaveCount(4);
+  // Open post, Play from this post, Share post, Open on e621, Blacklist this artist
+  await expect(sheet.locator(".well-row")).toHaveCount(5);
   await expect(sheet.locator(".sheet-ctx small")).toHaveText(/^#\d+$/);
   await shot(page, "v6-post-menu", false);
   await page.goBack();

@@ -25,6 +25,9 @@ export interface MockPostSpec {
   artists?: string[];
   /** give the original e621's real file shape (`/data/ab/cd/<md5>.ext`), as Save's pass-through needs */
   realPath?: boolean;
+  /** DText, as e621 sends it */
+  description?: string;
+  sources?: string[];
 }
 
 export function mockPost(spec: MockPostSpec) {
@@ -56,7 +59,8 @@ export function mockPost(spec: MockPostSpec) {
     uploader_id: 1,
     uploader_name: "uploader",
     pools: [],
-    sources: [],
+    sources: spec.sources ?? [],
+    description: spec.description ?? "",
     flags: { deleted: false, pending: false, flagged: false },
   };
 }

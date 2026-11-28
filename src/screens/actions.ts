@@ -3,7 +3,6 @@
  * tag, artist and post actions (UX §5 "Feed card").
  */
 import { toast } from "sonner";
-import { postPageUrl } from "@/lib/e621/client";
 import type { Post } from "@/lib/e621/types";
 import { encodeResults, normTags, type Filters } from "@/lib/feed/filters";
 import type { SearchSettings } from "@/lib/settings";
@@ -100,8 +99,9 @@ export async function copyText(text: string, done: string): Promise<void> {
   }
 }
 
+/** Share a post's page in this app (DESIGN.md: `/post/<number>`, from every feed). */
 export async function sharePost(post: Post): Promise<void> {
-  const url = postPageUrl(post.id);
+  const url = `${location.origin}/post/${post.id}`;
   if (navigator.share) {
     try {
       await navigator.share({ url });
@@ -110,5 +110,5 @@ export async function sharePost(post: Post): Promise<void> {
       if (e instanceof DOMException && e.name === "AbortError") return;
     }
   }
-  await copyText(url, "Link to the post copied");
+  await copyText(url, "Link copied");
 }

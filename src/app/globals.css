@@ -5849,6 +5849,162 @@ li[data-state="done"] .first-step-n svg,
   width: 100%;
 }
 
+/* ---- the post page (src/screens/PostPage.tsx, DESIGN.md "A post on its own") ---- */
+.post-page-main .post {
+  margin-bottom: 16px;
+}
+.post-page-wait {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+/* the feed's gate, in the picture's place */
+.post.post-gated {
+  margin-bottom: 16px;
+}
+.post-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  aspect-ratio: 4 / 3;
+  padding: 24px;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+  text-align: center;
+  color: var(--color-link);
+}
+.post-gate > svg {
+  width: 28px;
+  height: 28px;
+}
+.post-gate b {
+  margin-top: 8px;
+  font-family: var(--font-rounded);
+  font-size: var(--text-headline);
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.post-gate small {
+  max-width: 26ch;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+.post-gate .btn-tonal {
+  margin-top: 12px;
+}
+/* one panel, 16 inside: the description, the tags by kind, the file line */
+.post-info-panel {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  box-shadow: var(--inset-shadow-lit), var(--inset-shadow-lit-b);
+}
+.post-info-panel > :first-child,
+.post-info-panel > .info-kind:first-child .info-label {
+  margin-top: 0;
+}
+.post-desc {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.post-file {
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-muted);
+}
+.post-links .row-text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* "More from": the section head, then three tiles to a row */
+.post-more-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+.post-more-head h2 {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-rounded);
+  font-size: 20px;
+  line-height: 25px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.post-more-head .link-row {
+  flex: none;
+  min-height: 25px;
+  padding: 0;
+  position: relative;
+}
+.post-more-head .link-row::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0;
+}
+.post-more-head .link-row svg {
+  width: 16px;
+  height: 16px;
+}
+.post-more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 8px;
+}
+.post-more-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  text-align: left;
+}
+.post-more-tile .tile-art {
+  width: 100%;
+  aspect-ratio: 1;
+}
+.post-more-tile.sk-tile {
+  aspect-ratio: 1;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk-art);
+}
+.post-more-tile:active .tile-art {
+  transform: scale(0.97);
+}
+.post-more-tile:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* On a wide computer: the post in the 600 column, the rest in a 344 column 24 to its right */
+@media (min-width: 1280px) {
+  .screen-frame.post-page {
+    max-width: calc(600px + 24px + 344px + 2 * var(--spacing-inset));
+  }
+  .post-page-cols {
+    display: grid;
+    grid-template-columns: 600px 344px;
+    column-gap: 24px;
+    align-items: start;
+  }
+}
+
 /* Settings' sub-pages (DESIGN.md "Settings: Account, Content, For You, App"). */
 .settings-page .screen-title {
   margin-bottom: 16px;

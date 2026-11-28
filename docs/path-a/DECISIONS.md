@@ -1630,3 +1630,58 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     the fields' right end, 8 above Sign in. Now a 44 row, flush on both sides, callout-rounded, 16
     above Sign in. Paste sits 6 from the key field's end (was 10).
 - New e2e test `sign-in-sheet.spec.ts` measures each of these on a computer and a phone.
+
+## 2026-11-27 — Built: the post page, Open post, Share post
+- Owner: "Post page first" (before link previews and comics). Built from DESIGN.md "A post on its
+  own": `/post/<number>` (1 to 10 digits, else the 404 screen), pushed over the tab it came from.
+- What it shows: the post's panel without its tag row (the tags stand below, by kind, artists
+  always shown), then the description, the file line, Source and Open on e621, and "More from
+  <artist>" (6 tiles, See all opens the artist). A tap on the picture opens the viewer over the
+  page (`/post/<n>?view=<n>`); a More-from tile opens that post's page.
+- Calls in the build, not in the drawing:
+  - The comic group is left out until comics are built.
+  - A post e621 hides from signed-out visitors, and one on your blacklist, show a post-shaped gate
+    (Sign in; or which line matched and Show it, for this visit only). The feed has no such gate
+    built, so there was nothing to reuse.
+  - The description shows as plain text (DText markup removed, links kept as their words).
+  - Source shows only http(s) links, by site name.
+  - On a computer two columns (600 and 344, 24 apart) only from 1280 wide; below that the rest
+    stands under the post.
+  - The page's own ⋯ has no Open post and no Play from this post.
+- "Open post" is the first row of every post's ⋯ (a card's and a held tile's). "Share post" now
+  shares `/post/<n>` in this app (was the post on e621); no sign-in rides along.
+- The post page rides in the artist page's chunk, so the first load gains no file name (198.8 KB).
+- Not built in this part: link previews, comics.
+- Tests: `e2e/post-page.spec.ts` (signed out from a link; the viewer; a wrong number; the hidden
+  and blacklist gates; Open post and Share post from a feed's ⋯; the two columns at 1440).
+
+## 2026-11-27 — Save in the viewer: what the build added, written into the design
+- Built by the builder on PR #32 (`afad3d8`): Save fetches the file through the app's own `/media/…`
+  path, because e621's file host lets only e621.net read its files. Owner, to the builder: "Build
+  pass-through". The designer has those words from the builder, not from the owner directly.
+- The build added two things the design did not have: a toast when a phone needs a second tap to
+  open the share sheet, and a new tab with a toast when the file cannot be fetched. Owner, asked
+  "Write Save's two fallbacks into the design files?": "Yes, write them".
+- **Mine:** both toasts take the toast's two-line form. "The picture is ready" / "Tap Save again"
+  (was "The picture is ready: tap Save again", 301 wide at 375; it would be cut on a 320 phone).
+  "Couldn't save it here" / "The full picture opened in a new tab" (was "Couldn't save here: the full
+  picture opened in a new tab", 56 characters, cut at 375). Marks: Save's arrow in Link Blue; the
+  alert glyph in Danger.
+- **Mine:** a toast in the viewer floats 12 above the bottom stack: 142 from the bottom of a phone,
+  202 in a comic, 76 on a computer's stage. The build has 120 for the player's room, which would sit
+  10 into the artist's row by the mock's measures. Not checked in the build.
+- Kept from the build: the button's glass fades to 55% and back while the file comes; the file's name.
+- Not checked: Save on a real iPhone; whether a phone lets the new tab open after the wait for the
+  file (browsers often block a tab that is not opened straight from a tap).
+
+## 2026-11-27 — "Made by" on the App page
+- Owner: "I'd also like to add to the about a made by section, mentioning it's made by Oreo, linking
+  to my telegram (t.me/hyenafox), and a short sentence saying to reach out with bug reports or
+  feature requests".
+- Drawn in `screens-v6.html`, "4. App": label "Made by" under About's note; one row, "Oreo" over
+  "@hyenafox on Telegram", a paper plane in the well, the external-link glyph at the right; under it
+  "Found a bug or want a feature? Send a message."
+- **Mine:** its place (after About, last on the page), a group of its own rather than a third row in
+  About's flat group, the paper plane, and the sentence's words.
+- Owner, asked "Is "Made by" right as drawn?": "Yes, commit and send".
+- For the build: the row is a link to `https://t.me/hyenafox`, new tab, `rel="noopener"`.

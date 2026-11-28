@@ -5,7 +5,7 @@
  * e621, Blacklist this artist) or a held grid tile's (Favorite, Open artist, Play from here, Open on
  * e621). Moved out of feedParts.tsx so it loads after the first load, in the filter sheets' chunk.
  */
-import { ExternalLink, Heart, Play, Share, User, UserX } from "lucide-react";
+import { ExternalLink, Heart, Image as ImageIcon, Play, Share, User, UserX } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import { postPageUrl } from "@/lib/e621/client";
 import { artists } from "@/lib/feed/format";
@@ -15,13 +15,15 @@ import { blacklistLine, openArtist, sharePost } from "@/screens/actions";
 import { useScreen } from "@/shell/context";
 import { Sheet } from "@/shell/Sheet";
 import { favedOf, getFavs } from "@/state/favs";
+import type { Post } from "@/lib/e621/types";
 import type { Feed } from "@/state/feeds";
 import { getGoo } from "@/state/goo";
 import { getSession } from "@/state/session";
 import { useStore } from "@/state/store";
 
-export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
-  const post = feed?.queue.posts.find((p) => p.id === id);
+/** `page`: the post page's own ⋯ (no Open post, no Play: the page has none), given its `post`. */
+export function PostMenu({ feed, id, post: given, page }: { feed: Feed | null; id: number; post?: Post; page?: boolean }) {
+  const post = given ?? feed?.queue.posts.find((p) => p.id === id);
   const { entry, sheet } = useScreen();
   const faved = useStore(getFavs().store, (s) => (post ? favedOf(s, post) : false));
   if (!post) return null;
@@ -47,6 +49,7 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
     >
       {tile ? (
         <div className="well-group">
+          <OpenPost post={post} close={close} />
           <button
             type="button"
             className="well-row"
@@ -94,7 +97,8 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
         </div>
       ) : (
       <div className="well-group">
-        <button
+        {!page && <OpenPost post={post} close={close} />}
+        {!page && <button
           type="button"
           className="well-row"
           onClick={async () => {
@@ -105,7 +109,7 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
         >
           <Play aria-hidden />
           <span>Play from this post</span>
-        </button>
+        </button>}
         <button type="button" className="well-row" onClick={() => void sharePost(post)}>
           <Share aria-hidden />
           <span>Share post</span>
@@ -132,5 +136,23 @@ export function PostMenu({ feed, id }: { feed: Feed | null; id: number }) {
       </div>
       )}
     </Sheet>
+  );
+}
+
+/** "Open post": the post's own page (DESIGN.md "A post on its own"), the first row of a post's ⋯. */
+function OpenPost({ post, close }: { post: Post; close: () => Promise<unknown> }) {
+  return (
+    <button
+      type="button"
+      className="well-row"
+      onClick={async () => {
+        await close();
+        getNav().push({ screen: { kind: "post", id: post.id }, play: null });
+      }}
+      data-testid="open-post"
+    >
+      <ImageIcon aria-hidden />
+      <span>Open post</span>
+    </button>
   );
 }

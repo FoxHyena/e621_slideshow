@@ -30,6 +30,8 @@ const shellScreens = () => import("@/shell/screens");
 export const ResultsScreen = lazy(() => feedScreens().then((m) => ({ default: m.ResultsScreen })));
 export const FavoritesScreen = lazy(() => feedScreens().then((m) => ({ default: m.FavoritesScreen })));
 export const ArtistScreen = lazy(() => artistPage().then((m) => ({ default: m.ArtistScreen })));
+/** The post page rides in the artist page's chunk: a chunk of its own costs the first load its file list. */
+export const PostScreen = lazy(() => artistPage().then((m) => ({ default: m.PostScreen })));
 export const SearchScreen = lazy(() => searchScreen().then((m) => ({ default: m.SearchScreen })));
 export const ForYouScreen = lazy(() => forYou().then((m) => ({ default: m.ForYouScreen })));
 export const TuneScreen = lazy(() => tune().then((m) => ({ default: m.TuneScreen })));

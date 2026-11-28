@@ -1216,7 +1216,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <tr><th>What the viewer holds</th><td></td><td>✕ at the top left. At the bottom the artist's row (it opens the artist) and four glass buttons: Favorite, Post info, Share, Save. All of it is the player's glass.</td><td>It looks like the player's sibling, so nothing new has to be learned. Post info is the player's sheet, unchanged.</td></tr>
         <tr><th>Hands</th><td></td><td>One tap hides or shows the buttons. Pinch zooms from 1 to 5 times and a drag moves the picture. Dragging down closes it, and the picture follows the finger. Holding the picture brings the phone's own menu (Save to Photos, Copy), which the feed turns off.</td><td>These are what X, Bluesky and Photos do.</td></tr>
         <tr><th>Double tap</th><td>Favorites, in feeds and in the player</td><td><b>Picked by you: Zoom.</b> To 2.5 times where you tapped, and back. The heart button is how you favorite here. In feeds and in the player a double tap still favorites.</td><td>It is what the apps you named do. The other option, Favorite, is gone.</td></tr>
-        <tr><th>Save</th><td>Not in the app</td><td>One glass button. On an iPhone it opens the phone's share sheet with the picture in it, where "Save Image" is. On a computer it downloads the file.</td><td>A web page cannot write to Photos itself. Not tried in a build yet.</td></tr>
+        <tr><th>Save</th><td>Not in the app</td><td>One glass button. On an iPhone it opens the phone's share sheet with the picture in it, where "Save Image" is. On a computer it downloads the file. While the file comes, the button dims and brightens. Two toasts cover the cases where it cannot finish; they are drawn under the viewer.</td><td>A web page cannot write to Photos itself, and e621's file host lets only e621.net read its files. So the file comes through this app's own server (your pick: "Build pass-through"). Built, and not tried on a real iPhone. The two toasts' words are mine; the build's were one line each and the longer one did not fit a phone.</td></tr>
         <tr><th>Videos</th><td>A tap plays or pauses in place</td><td>Unchanged. Videos do not open the viewer in this pass.</td><td>Zoom and Save are for pictures. Other option: a full-screen video, later.</td></tr>
         <tr><th>The post page</th><td>None</td><td>A pushed screen at <code>/post/&lt;number&gt;</code>: Back and the tools (Share, ⋯), the post panel without its tag strip, the comic, a panel with the description and every tag by kind, Source and "Open on e621", then six more posts from the artist.</td><td>It is what a link needs to land on, and it is the only place every tag shows without opening a sheet.</td></tr>
         <tr><th>Getting to it</th><td></td><td>From a link; from a post's ⋯ › "Open post"; from a comic's thumbs.</td><td>The header already opens the artist and the picture opens the viewer, so there is no third thing left to tap on a card. Other option: make the time and number line a link (small on a phone).</td></tr>
@@ -1405,7 +1405,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <div class="under" id="u-fy"></div>
       </section>
       <section class="col" aria-label="App">
-        <div class="col-head"><h2 class="pg-h3">4. App</h2><p>Install, the e621 button, shortcuts, and About. The note under Install says the one surprising thing about iPhone links.</p></div>
+        <div class="col-head"><h2 class="pg-h3">4. App</h2><p>Install, the e621 button, shortcuts, About, and who made it. The note under Install says the one surprising thing about iPhone links.</p></div>
         <div class="phone-holder" id="s-app"></div>
         <div class="under" id="u-app"></div>
       </section>
@@ -1420,7 +1420,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <tr><th>Ratings</th><td>Ratings (S/Q/E)</td><td>Three switch rows; the icon well holds the letter in e621's colour (S green, Q yellow, E red). The last one on cannot be turned off; a toast says why.</td><td>Switches, because more than one can be on, like the Media menu. Other option: a three-part segmented control (one at a time).</td></tr>
         <tr><th>Blacklist editor</th><td>Blacklist (editor, account sync, import defaults)</td><td>A field plus "Add", then one row per line with the tags and a 28 remove well; a line of help; then "Use my e621 blacklist" (switch) and "e621's default list" (Import).</td><td>Lines as rows can be removed one at a time and read like the search pills. Other option: one big text box, as on e621.</td></tr>
         <tr><th>Hidden artists</th><td>Hidden artists</td><td>The Artists list rows with a tonal "Show" in place of ⋯, and when each was hidden.</td><td>"Show" is the opposite of "Not interested" in plain words.</td></tr>
-        <tr><th>App page</th><td>Install app, e621 button, Keyboard shortcuts, About</td><td>Install is a row that opens the steps (next batch); in the installed app it reads "Installed" with a green check. About is two plain rows and one line saying the app is not run by e621.</td><td>"Source code" is a row I added; you kept it. "What's new" is dropped, on your say.</td></tr>
+        <tr><th>App page</th><td>Install app, e621 button, Keyboard shortcuts, About</td><td>Install is a row that opens the steps (next batch); in the installed app it reads "Installed" with a green check. About is two plain rows and one line saying the app is not run by e621. Under it, "Made by": one row, "Oreo" over "@hyenafox on Telegram", which opens t.me/hyenafox, and the line "Found a bug or want a feature? Send a message."</td><td>"Source code" is a row I added; you kept it. "What's new" is dropped, on your say. "Made by" is yours (2026-11-27); its place, the paper plane and the sentence's words are mine. You approved it as drawn.</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -2609,6 +2609,7 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   $('u-fy').innerHTML = strip('No hidden artists', 'One muted line in place of the list, saying how artists get here.', `<div class="strip p6" style="padding:16px 0 4px">${glab('Hidden artists')}<p class="gnote6" style="margin-top:0">None. "Not interested" on a suggestion puts an artist here.</p></div>`);
 
   // App
+  P.send = '<path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5z"/>';
   $('s-app').innerHTML = phone(`
     <div class="scroll6">${subHead('App')}
       <div class="group6" style="margin-top:16px">${srow('app', 'Install the app', 'Add it to your home screen')}</div>
@@ -2617,6 +2618,9 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
       ${glab('About')}
       <div class="group6 flat"><div class="srow6"><span class="lbl"><b>Version</b></span><span class="val">2.0</span></div><button class="srow6" type="button"><span class="lbl"><b>Source code</b></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
       <p class="gnote6">Not run by e621. It reads e621 with your own account and key.</p>
+      ${glab('Made by')}
+      <div class="group6"><button class="srow6" type="button"><span class="ico">${ic('send', 20, 2)}</span><span class="lbl"><b>Oreo</b><small>@hyenafox on Telegram</small></span>${ic('ext', 16, 2.2, 'chev')}</button></div>
+      <p class="gnote6">Found a bug or want a feature? Send a message.</p>
     </div>` + bottom('Settings'));
   const kb1 = (k, t) => `<div class="srow6"><span class="lbl"><b>${t}</b></span>${k.split(' ').map(x => `<span class="kbd6">${x}</span>`).join('')}</div>`;
   $('u-app').innerHTML = [
@@ -3249,7 +3253,9 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 
   // 1. The viewer
   $('s-view').innerHTML = viewer(vpage(`<i style="--art:${art('pastelbat', 0)}"></i>`), '', vbot('pastelbat', '5h ago · #4511902'));
-  $('u-view').innerHTML = strip('Zoomed in', 'The buttons leave and the picture fills the screen. Drag to move it. Pinch back, or double tap, to fit it again.', `<div class="strip" style="height:230px;background:#000"><i style="display:block;width:250%;margin:-150% 0 0 -30%;aspect-ratio:4/5;background:${art('pastelbat', 0)}"></i></div>`);
+  $('u-view').innerHTML = [strip('Zoomed in', 'The buttons leave and the picture fills the screen. Drag to move it. Pinch back, or double tap, to fit it again.', `<div class="strip" style="height:230px;background:#000"><i style="display:block;width:250%;margin:-150% 0 0 -30%;aspect-ratio:4/5;background:${art('pastelbat', 0)}"></i></div>`),
+    strip('Save, when it cannot finish in one tap', 'A phone opens its share sheet only straight after a tap. If the file took longer than that, it is kept and the first toast asks for one more tap. If the file cannot be fetched, the full picture opens in a new tab and the second toast says so.',
+      toasts({ icon: 'down', title: 'The picture is ready', sub: 'Tap Save again' }, { kind: 'bad', icon: 'alert', title: "Couldn't save it here", sub: 'The full picture opened in a new tab' }))].join('');
 
   // 2. A comic page in the viewer, 3. all the pages
   const CP = { ...P2, isNew: false, faved: false };

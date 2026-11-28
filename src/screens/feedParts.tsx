@@ -190,7 +190,7 @@ export function PlayFab({ feed, route, count = 0, gate }: { feed: Feed | null; r
 }
 
 /** A post's ⋯ sheet; its code loads with the filter sheets' chunk, after the first load (src/feed/PostMenu.tsx). */
-export function PostMenu(props: { feed: Feed | null; id: number }) {
+export function PostMenu(props: { feed: Feed | null; id: number; post?: Post; page?: boolean }) {
   return (
     <Suspense fallback={null}>
       <PostMenuSheet {...props} />

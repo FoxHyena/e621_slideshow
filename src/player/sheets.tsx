@@ -156,7 +156,7 @@ export function QualitySheet({ base, playback }: { base: Entry; playback: Playba
 }
 
 /** e621's order; an Artists group only when a post credits more than one artist. */
-const KINDS: [TagCategoryName, string][] = [
+export const KINDS: [TagCategoryName, string][] = [
   ["artist", "Artists"],
   ["copyright", "Copyrights"],
   ["character", "Characters"],
@@ -165,7 +165,7 @@ const KINDS: [TagCategoryName, string][] = [
   ["meta", "Meta"],
   ["lore", "Lore"],
 ];
-const RATING: Record<Rating, string> = { s: "Safe", q: "Questionable", e: "Explicit" };
+export const RATING: Record<Rating, string> = { s: "Safe", q: "Questionable", e: "Explicit" };
 
 /** "For you because you fav otter and cozy a lot": the post's two strongest profile tags. */
 function useWhy(post: Post, forYou: boolean): string[] {
@@ -179,7 +179,7 @@ function useWhy(post: Post, forYou: boolean): string[] {
     .slice(0, 2);
 }
 
-const size = (bytes: number) => (bytes >= 1 << 20 ? `${(bytes / (1 << 20)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+export const fileSize = (bytes: number) => (bytes >= 1 << 20 ? `${(bytes / (1 << 20)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 
 /** Who, three stats, why For You picked it, every tag by kind, and the file. Tap a tag for its targets. */
 export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
@@ -311,7 +311,7 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
       })}
       <div className="info-foot">
         <small>
-          {f.original.width} × {f.original.height} · {f.meta.ext.toUpperCase()} · {size(f.meta.size)}
+          {f.original.width} × {f.original.height} · {f.meta.ext.toUpperCase()} · {fileSize(f.meta.size)}
         </small>
         <a className="link-row" href={postPageUrl(post.id)} target="_blank" rel="noopener">
           Open on e621 <ExternalLink aria-hidden />

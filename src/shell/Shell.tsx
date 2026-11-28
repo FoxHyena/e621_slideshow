@@ -22,7 +22,7 @@ import { TOAST_CLASSES, TOAST_ICONS } from "./toastLook";
 import { watchPresses } from "./opener";
 import { ScreenContext } from "./context";
 import { TabBar, useRail } from "./TabBar";
-import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
+import { ArtistScreen, ArtistsScreen, FavoritesScreen, ForYouScreen, NotFoundScreen, Player, PostScreen, prefetchScreens, ResultsScreen, SearchScreen, SettingsAll, SettingsHome, SettingsPage, SignInSheet, TuneScreen, Viewer } from "./lazy";
 import { SIGN_IN_SHEET } from "@/nav/routes";
 
 /** The tab whose root this entry shows; the pre-boot `/` counts as Following. */
@@ -356,6 +356,8 @@ function PushedScreen({ e }: { e: Entry }) {
       return <FavoritesScreen params={screen.params} />;
     case "artist":
       return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
+    case "post":
+      return <PostScreen id={screen.id} />;
     case "tune":
       return <TuneScreen />;
     case "settings":
