@@ -1685,3 +1685,14 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   About's flat group, the paper plane, and the sentence's words.
 - Owner, asked "Is "Made by" right as drawn?": "Yes, commit and send".
 - For the build: the row is a link to `https://t.me/hyenafox`, new tab, `rel="noopener"`.
+
+## 2026-11-27 — A failed Save offers "Open"; no tab opens by itself
+- The builder, from the code (`src/player/save.ts`): the new tab is opened after the fetch has been
+  waited for, so a phone's browser is likely to block it. Not tried on a phone by anyone.
+- Owner, asked "Use the "Open" button on the failed-Save toast?": "Yes, commit and send".
+- **Mine:** the failure toast is "Couldn't save it here" / "Open the full picture
+  instead" with "Open" in the action slot (the toast's ring, 6 s). "Open" is a tap, so the tab opens
+  on every browser. It is the same on a computer, so there is one behaviour to learn. 291 wide at 375.
+- This makes "Open" the third word the action slot can hold, after "Undo" and "Reload".
+- Not chosen: keep opening the tab by itself and show these words only when the browser blocks it.
+  That gives two toasts for one failure.

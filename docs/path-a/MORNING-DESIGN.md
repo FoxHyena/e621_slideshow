@@ -29,6 +29,9 @@ New drawings, in the mock's first section, "A post on its own". **Approved by yo
 2. **Save's two toasts.** You said "Yes, write them". "The picture is ready" / "Tap Save again", and
    "Couldn't save it here" / "The full picture opened in a new tab". Drawn under the viewer. The
    build's wording differs (one line each); the builder is told.
+   - **Changed since, approved by you ("Yes, commit and send"):** the second toast is now "Couldn't save it here" / "Open the
+     full picture instead" with an "Open" button. The tab no longer opens by itself, because a phone
+     is likely to block it (the builder read this from the code; nobody tried it on a phone).
 3. Not tried by anyone: Save on a real iPhone.
 
 ## Answered on the check list, 2026-11-27
