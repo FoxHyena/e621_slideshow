@@ -1735,3 +1735,17 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - [[wiki]] and {{tags}} show their words; "* " lines are a list.
   - [spoiler] is a Well bar until tapped.
   - [quote], [section] and the like keep their words without the tags.
+
+## 2026-11-27 — Fixed: what a code review of the viewer, Save and the post page found
+- Owner: "Fix them", then "Also fix the rest of the findings too".
+- **What the viewer can't show goes to the post's page** (it sat on a loader): a video with no feed for
+  the player to find it in, a picture e621 hides from you (the page's Sign in gate), a post on your
+  blacklist (the page's gate). "Show it" there holds for this visit (`src/feed/revealed.ts`), so the
+  picture then opens in the viewer.
+- **More from** asks only the ratings you have on and leaves out your blacklist, as feeds do (it
+  asks 24 and shows 6).
+- **Save:** only a used-up tap ("NotAllowedError") asks for another; any other refusal by the share
+  sheet offers Open (it looped on "Tap Save again").
+- **Smaller:** the viewer takes the focus when it opens; one post is asked of e621 once a visit,
+  shared by the page and the viewer (`src/feed/postCache.ts`; the page asked 4 times); Try again
+  shows the loader while it asks; a deleted post e621 still sends counts as no post.

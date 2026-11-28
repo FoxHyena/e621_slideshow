@@ -15,6 +15,10 @@ import { searchPosts } from "@/lib/e621/client";
 import { mediaKind, type Post } from "@/lib/e621/types";
 import { ago, artists, compact } from "@/lib/feed/format";
 import { displayUrl } from "@/lib/slideshow/media";
+import { blacklistedBy, parseBlacklist } from "@/lib/query/blacklist";
+import { revealed } from "@/feed/revealed";
+import { askPost, hasKnownPost, knownPost } from "@/feed/postCache";
+import { blacklistOf, getPrefs } from "@/state/prefs";
 import Avatar from "@/components/Avatar";
 import { ImageIcon, Loader } from "@/components/Loader";
 import { getNav, type Entry } from "@/nav/history";
@@ -49,33 +53,37 @@ interface View {
 const FIT: View = { s: 1, x: 0, y: 0 };
 
 /** The post: from the screen's feed when it is there, else asked of e621 (a reload, a link). */
-function useViewedPost(base: Entry, id: string): { post: Post | null; missing: boolean } {
+function useViewedPost(base: Entry, id: string): { post: Post | null; missing: boolean; inFeed: boolean } {
   const reg = getFeeds();
   useStore(reg.generation, (g) => g);
   const feed = reg.bound(base.key);
   useStore(feed?.version ?? reg.generation, (v) => v);
   const inFeed = feed?.queue.posts.find((p) => String(p.id) === id) ?? null;
   const creds = useStore(getSession().store, (s) => s.creds);
+  const user = creds?.username;
+  // the post's page already asked for it (src/feed/postCache.ts): no second ask, no loader
+  const cached = hasKnownPost(user, id) ? { id, post: knownPost(user, id) ?? null } : null;
   const [fetched, setFetched] = useState<{ id: string; post: Post | null } | null>(null);
+  const got = cached ?? (fetched?.id === id ? fetched : null);
   useEffect(() => {
-    if (inFeed || fetched?.id === id) return;
+    if (inFeed || got) return;
     let live = true;
-    searchPosts(`id:${id}`, 1, 1, creds)
-      .then((ps) => live && setFetched({ id, post: ps[0] ?? null }))
+    askPost(user, id, () => searchPosts(`id:${id}`, 1, 1, creds))
+      .then((p) => live && setFetched({ id, post: p }))
       .catch(() => live && setFetched({ id, post: null }));
     return () => {
       live = false;
     };
-  }, [id, inFeed, fetched?.id, creds]);
-  const post = inFeed ?? (fetched?.id === id ? fetched.post : null);
-  return { post, missing: !inFeed && fetched?.id === id && fetched.post === null };
+  }, [id, inFeed, got, creds, user]);
+  const post = inFeed ?? got?.post ?? null;
+  return { post, missing: !inFeed && got !== null && got.post === null, inFeed: inFeed !== null };
 }
 
 export function Viewer({ base, top }: { base: Entry; top: Entry }) {
   const nav = getNav();
   const id = top.route.view ?? "";
   const sheet = top.sheet;
-  const { post, missing } = useViewedPost(base, id);
+  const { post, missing, inFeed } = useViewedPost(base, id);
   const [now] = useState(() => Date.now());
   const [controls, setControls] = useState(true);
   const [zoomed, setZoomed] = useState(false);
@@ -88,8 +96,20 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
   // Videos don't open the viewer in this pass (DESIGN.md): a video tile, or a link to one, opens the
   // player paused in this entry's place.
   const video = post !== null && mediaKind(post) === "video";
+  // What the viewer can't show goes to the post's own page, which plays it or says why (a review,
+  // 2026-11-27: these sat on a loader): a video with no feed for the player to find it in, a picture
+  // e621 hides from you, a post on your blacklist you haven't chosen to see there.
+  const blacklist = useStore(getPrefs().store, blacklistOf);
+  const username = useStore(getSession().store, (s) => s.user?.name);
+  const away =
+    post !== null &&
+    ((video && !inFeed) || displayUrl(post, "sample") === null || (!revealed.has(post.id) && blacklistedBy(parseBlacklist(blacklist), post, { username }) !== null));
   useEffect(() => {
-    if (!video) return;
+    if (!away || !post) return;
+    nav.replace({ screen: { kind: "post", id: post.id }, play: null });
+  }, [away]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!video || away) return;
     openPaused(true);
     nav.replace({ screen: top.route.screen, play: id });
   }, [video]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -305,12 +325,19 @@ export function Viewer({ base, top }: { base: Entry; top: Entry }) {
     return () => window.removeEventListener("keydown", h);
   }, []);
 
+  // Focus the viewer when it opens, as the player does, so keys and screen readers land here.
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    box.current?.focus({ preventScroll: true });
+  }, []);
+
   const src = post ? displayUrl(post, "sample") : null;
   const full = post?.files.original.url ?? null;
   const showControls = controls && !zoomed;
 
   return (
     <div
+      ref={box}
       className="player viewer"
       role="dialog"
       aria-modal="true"

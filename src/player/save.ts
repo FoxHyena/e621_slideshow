@@ -51,8 +51,13 @@ export async function savePost(post: Post, artist: string | null): Promise<SaveR
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") return "cancelled";
       // the tap's permission ran out while the file came: keep it, and ask for one more tap
-      held = { id: post.id, file };
-      return "again";
+      if (e instanceof DOMException && e.name === "NotAllowedError") {
+        held = { id: post.id, file };
+        return "again";
+      }
+      // anything else (the share sheet refused the file): another tap won't help; offer Open
+      held = null;
+      return "failed";
     }
   }
   const url = URL.createObjectURL(file);
