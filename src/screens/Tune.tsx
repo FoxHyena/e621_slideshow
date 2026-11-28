@@ -11,7 +11,8 @@ import { Field, Slider } from "@/components/v6";
 import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "@/lib/query/build";
 import { SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, searchPlan, topTags, type SearchKind } from "@/lib/recommend/weights";
-import { BREADTH_MAX, BREADTH_MIN, DEFAULT_SEARCH } from "@/lib/settings";
+import { QUALITY_WEIGHT } from "@/lib/recommend/rank";
+import { BREADTH_MAX, BREADTH_MIN, DEFAULT_SEARCH, QUALITY_WEIGHT_MAX } from "@/lib/settings";
 import { getNav } from "@/nav/history";
 import { getPrefs } from "@/state/prefs";
 import { getRec, weightsOf } from "@/state/rec";
@@ -34,6 +35,7 @@ export function TuneScreen() {
   const session = useStore(getSession().store, (s) => s);
   const prefs = getPrefs();
   const search = useStore(prefs.store, (p) => p.search);
+  const qw = search.qualityWeight ?? QUALITY_WEIGHT;
   const forYou = useStore(prefs.store, (p) => p.forYou);
   const [filter, setFilter] = useState("");
 
@@ -183,6 +185,29 @@ export function TuneScreen() {
             </p>
           </section>
 
+          {/* a friend's ask, via the owner (2026-11-27): "a useful slider (tag vs favcount weight)" */}
+          <section className="panel-card" aria-labelledby="tune-taste">
+            <label htmlFor="rec-taste" className="panel-card-head">
+              <span id="tune-taste">Taste or popular</span>
+              <span data-testid="rec-taste-value">{tasteLabel(qw)}</span>
+            </label>
+            <Slider
+              id="rec-taste"
+              min={0}
+              max={QUALITY_WEIGHT_MAX}
+              step={0.25}
+              value={qw}
+              aria-valuetext={tasteLabel(qw)}
+              onChange={(e) => prefs.setSearch({ ...prefs.store.get().search, qualityWeight: Number(e.target.value) })}
+              data-testid="rec-taste"
+            />
+            <div className="slider-ends" aria-hidden>
+              <span>Taste</span>
+              <span>Popular</span>
+            </div>
+            <p className="tune-note">How much a post&rsquo;s favorites count beside how well its tags match yours. Moving it re-sorts the list.</p>
+          </section>
+
           <div className="list-group tune-switches">
             {/* the owner's ask (2026-11-27): the wider search made the feed less tuned; off by default */}
             <label className="list-row">
@@ -280,4 +305,11 @@ export function TuneScreen() {
       )}
     </div>
   );
+}
+
+/** Taste ↔ Popular in words, with the number (popularity's weight; the middle, 1, is rank.ts's even blend). */
+function tasteLabel(w: number): string {
+  if (w === 0) return "Taste only";
+  if (w === QUALITY_WEIGHT) return "Even";
+  return `${w < QUALITY_WEIGHT ? "More taste" : "More popular"} · ${w}`;
 }

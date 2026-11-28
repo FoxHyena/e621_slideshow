@@ -2072,6 +2072,29 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Owner, told of the rule and asked "Keep the builder's open-above rule and commit it?": "Keep and
   commit". The owner has not seen it drawn or built.
 
+## 2026-11-27 — For You: "Taste or popular" in Tune
+- Owner, passing on a friend's note: "It's weighted a little more towards high ranking posts than tags,
+  compared to mine. That could be a useful slider (tag vs favcount weight), if it's not expensive to have".
+  Asked to pick between that slider and two other fixes: "Slider only".
+- **Change:**
+  - Tune has a slider, "Taste or popular", under Breadth. It sets rank.ts's quality weight, from 0
+    (taste only) to 2, in steps of 0.25. The middle, 1, is the even blend For You has used since
+    2026-11-25 and stays the default.
+  - It reads "Taste only", "Even", or "More taste" / "More popular" with the number (e.g. "More taste ·
+    0.75"). The ends are labelled Taste and Popular.
+  - It is saved with the search settings as `qualityWeight`. Settings saved before it read as 1; a saved
+    value off the slider is clamped to 0–2. The older slideshow screen uses it too.
+- **Cost:** moving it re-sorts a finished ranking in memory (`RecommendedQueue.reweigh`), with no new
+  e621 searches. The list then starts at the top.
+  - A list restored after a reload holds post ids only, so it can't re-sort. When it was ordered by
+    another weight (saved with it as `qw`), For You offers Update ranking.
+  - A search still running, and a Refresh running in the background, rank with the new weight when
+    they end.
+  - The scroll to the top waits a frame: the re-sorted list first keeps the card that was in view in
+    place (FeedView), which would otherwise pull the page back down.
+- **Mine:** the name, the words, the 0–2 range and the step.
+- Not changed: the 3 popular pages. The owner asked only for the slider.
+
 ## 2026-11-27 — Artists › Suggested picks whom to look up from the artists you don't follow
 - Owner: "I don't know that I'm seeing as many populate as I'd expect".
 - **Cause:** the lookup of newest posts took the top `RECENCY_TOP` (32) of every artist you favorite

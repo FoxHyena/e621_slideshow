@@ -255,7 +255,7 @@ test("Tune's Filter artists takes artist tags out of your taste and the search; 
 
   await page.getByTestId("open-tune").click();
   // Breadth's ends are how many tags, not a promise (owner)
-  await expect(page.locator(".slider-ends")).toHaveText("230");
+  await expect(page.locator('[aria-labelledby="tune-breadth"] .slider-ends')).toHaveText("230");
   await expect(page.getByTestId("tune")).not.toContainText("Surprise me");
   const sw = page.getByTestId("rec-no-artists");
   await expect(sw).not.toBeChecked();
@@ -326,4 +326,58 @@ test("Search further: off by default, only the top tags are searched; on, the ne
   expect(first).toMatch(/~toebeans/);
   expect(second).toMatch(/~fluffy_tail/);
   expect(second).toMatch(/~whiskers/);
+});
+
+/**
+ * Tune's Taste or popular (a friend's ask, via the owner: "tag vs favcount weight"): a finished
+ * ranking re-sorts with no new searches; a restored one (ids only) offers Update ranking instead.
+ */
+test("Taste or popular re-sorts the ranked list without searching again; a restored list offers Update ranking", async ({ page }) => {
+  // 1050 matches both profile tags but has 1 favorite; 1100 matches one and has 500
+  const mock = await mockE621(
+    page,
+    defaultSpecs().map((s) => (s.id === 1050 ? { ...s, tags: ["pawpads", "toebeans"], favs: 1 } : s.id === 1100 ? { ...s, tags: ["pawpads"], favs: 500 } : s)),
+  );
+  mock.setFavorites(Array.from({ length: 10 }, (_, i) => ({ id: 2000 + i, tags: ["pawpads", "toebeans"] })));
+  mock.tagCounts = { pawpads: 5, toebeans: 5 };
+  await signIn(page);
+  await page.goto("/for-you");
+  await firstRanked(page);
+  const searches = mock.searches.length;
+  const top2 = async () => (await cardIds(page)).filter((id) => id === 1050 || id === 1100);
+  const setTaste = async (key: "Home" | "End", label: string) => {
+    await page.getByTestId("open-tune").click();
+    const slider = page.getByTestId("rec-taste");
+    await expect(page.getByTestId("rec-taste-value")).toBeVisible();
+    await slider.focus();
+    await slider.press(key);
+    await expect(page.getByTestId("rec-taste-value")).toHaveText(label);
+    await page.goBack();
+    await expect(page.getByTestId("post-card").first()).toBeVisible();
+  };
+
+  await setTaste("Home", "Taste only");
+  await expect.poll(top2).toEqual([1050, 1100]);
+  // down the list, so starting at the top again shows
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await setTaste("End", "More popular · 2");
+  await expect.poll(top2).toEqual([1100, 1050]);
+  expect(mock.searches.length).toBe(searches);
+  await expect(page.getByTestId("update-ranking")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+
+  // a reload restores it in that order, ordered by the same weight: nothing stale
+  await page.reload();
+  await expect(page.getByTestId("post-card").first()).toBeVisible();
+  await expect.poll(top2).toEqual([1100, 1050]);
+  await expect(page.getByTestId("update-ranking")).toHaveCount(0);
+  // a restored list holds ids only: another weight offers Update ranking
+  await setTaste("Home", "Taste only");
+  await expect(page.getByTestId("update-ranking")).toBeVisible();
+  // Update ranking ranks afresh with it: taste first, and the pill goes
+  await page.getByTestId("update-ranking").click();
+  await expect(page.getByTestId("update-ranking")).toHaveCount(0);
+  await expect.poll(top2).toEqual([1050, 1100]);
+  expect(mock.searches.length).toBeGreaterThan(searches);
 });
