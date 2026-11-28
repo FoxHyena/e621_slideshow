@@ -1880,3 +1880,41 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   the top case.
 - **Left as it was:** a card the grid opens the feed at (tap or switch) sits 12 below the top of the
   view, so on For You and Following its head is under the floating capsule.
+
+## 2026-11-27 — A deploy reaches an open app
+- Owner: "I dunno if I'm seeing the auto updates come through without fully quitting/reopening the app."
+- **Why it didn't:** nothing in a running app ever looked for a new version. The worker was only
+  registered once, at launch, and the browser's own check comes on a page load (the shell changes
+  screens without one) or a day on. Even then it found nothing: `sw.js` is the same file every build,
+  only its `?v=<build>` differs, and the browser's check asks for the old `?v=` and compares bytes. So a new version was only found by a page load: a full quit and reopen.
+- **Now** (`src/shell/pwa.ts`): the app asks `/version.json` (the build this deploy serves; written once
+  per build, `src/app/version.json/route.ts`) each time it comes back to the front (`visibilitychange`,
+  window focus, back online), at most once a minute, and every half hour while it stays open. A build
+  it doesn't have is registered as `/sw.js?v=<that build>`: the new worker downloads unseen, then
+  "New version ready" shows as before (DESIGN.md "A new version"), and Reload takes it and reloads into
+  the new build. Cache names, scope and `sw.js` itself are unchanged; `/version.json` is not touched by
+  the worker (not a build file, not a page), and holds no one's data.
+- **A cold start runs the new version without asking** (DESIGN.md), which it didn't: the new shell came
+  from the network, then its own worker downloaded and the toast asked to reload into the build already
+  running. Now a waiting worker of this page's own build takes over quietly (no toast, no reload) and
+  is handed the chunks loaded so far. **Mine:** a browser tab of the old build left open beside it
+  loses the old caches then; its next lazy screen would fail anyway once the host stops serving the old
+  files.
+- **A launch never puts an older version back:** a page on another build than the worker in charge
+  registers its own only when `/version.json` says the site serves it (a newer shell from a cold
+  start); an older shell, or no answer, keeps what is there. A version already waiting is kept when the
+  page runs it or the active one's build.
+- Also fixed: the toast could be missed when the download began before the app started listening; and
+  it showed once per app run, so a second deploy before a reload never asked (now once per version).
+- **Mine:** half an hour, and once a minute at most on return; an ask with no answer (back from the
+  background before the network is up) doesn't count toward the minute.
+- A fresh code review (owner: run one before every draft) found 3 things; all fixed: a failed ask
+  held off the next one for a minute, a page on an older build could put its version back through the
+  new quiet takeover, and the deploy test could flip back after its Reload. Not changed: a new version
+  whose download keeps failing is tried again on each return (once a minute at most).
+- Tests: `e2e/pwa.spec.ts` (production build): the site starts serving another build, the app comes
+  back to the front, the toast shows without a reload, Reload puts the new version in charge and drops
+  the old caches, and asking again shows nothing; a cold start on a newer build takes over without a
+  toast; a page on an older build than the worker in charge leaves it there. Checked for real: an open page on one build, the server rebuilt and restarted on another,
+  the toast on return, and after Reload the page ran the new build's code. **Not checked:** an iPhone's
+  home-screen app after a real deploy.
