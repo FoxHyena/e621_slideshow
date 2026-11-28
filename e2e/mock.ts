@@ -42,6 +42,7 @@ export interface MockPool {
   name: string;
   category?: "series" | "collection";
   post_ids: number[];
+  description?: string;
 }
 
 export function mockPost(spec: MockPostSpec) {

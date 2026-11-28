@@ -5,7 +5,6 @@
  * headline, one sentence that says why, then the way out. Empty states sit on the ground; an error
  * sits in a panel where the first post would be; offline is a sunk banner, not a state.
  */
-import { Wifi, WifiOff } from "lucide-react";
 import { lazy, Suspense, useSyncExternalStore, type ReactNode } from "react";
 import { createStore, type Store } from "@/state/store";
 import { Goo, type GooMood } from "./Goo";
@@ -182,7 +181,8 @@ export function OfflineBanner() {
   // in the first load, not the lazy panels: offline, no chunk can come
   return (
     <div className="state-banner" data-ok={online || undefined} role="status" data-testid="offline-banner">
-      {online ? <Wifi aria-hidden /> : <WifiOff aria-hidden />}
+      {/* lucide's wifi and wifi-off, as masks (globals.css): the first load is at its budget */}
+      <i className="state-wifi" aria-hidden />
       <span>{online ? "Back online" : "You're offline. Showing what's loaded."}</span>
     </div>
   );

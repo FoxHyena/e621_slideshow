@@ -35,7 +35,7 @@ describe("share links", () => {
     const got = decode(encodeShare(search, playback))!;
     const { tags, ratings, media, order, seed, date, minScore } = search;
     expect(got.search).toEqual({ tags, ratings, media, order, seed, date, minScore });
-    expect(got.playback).toEqual({ ...playback, preloadCount: undefined });
+    expect(got.playback).toEqual({ ...playback, comicPageSec: undefined, preloadCount: undefined });
   });
 
   it("round-trips the within and preset date modes", () => {

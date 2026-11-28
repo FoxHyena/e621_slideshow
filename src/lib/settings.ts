@@ -91,6 +91,8 @@ export interface PlaybackSettings {
   /** 0 = play videos to their end */
   videoMaxSec: number;
   loop: boolean;
+  /** a comic's page in the reader (DESIGN.md "Comics, part two"): its own time, not `intervalSec` */
+  comicPageSec: number;
 }
 
 export const DEFAULT_SEARCH: SearchSettings = {
@@ -117,6 +119,7 @@ export const DEFAULT_PLAYBACK: PlaybackSettings = {
   videoMuted: true,
   videoMaxSec: 60,
   loop: true,
+  comicPageSec: 20,
 };
 
 export function randomSeed(): number {

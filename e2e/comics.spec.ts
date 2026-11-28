@@ -104,7 +104,7 @@ test.describe("on a phone", () => {
     await expect(page).toHaveURL(/\/search\?tags=wolf$/);
   });
 
-  test("the comic bar opens the Pages sheet; a thumb turns to it, Open as a feed shows the comic in page order", async ({ page }) => {
+  test("the comic bar opens the Pages sheet; a thumb turns to it, Open comic opens the comic's page", async ({ page }) => {
     await page.goto("/search?tags=wolf&view=2005");
     await viewer(page).getByTestId("viewer-comic").click();
     const sheet = page.getByTestId("sheet-pages");
@@ -122,10 +122,15 @@ test.describe("on a phone", () => {
     await expect(viewer(page).getByTestId("viewer-count")).toHaveText("1 / 5");
 
     await viewer(page).getByTestId("viewer-comic").click();
+    await expect(page.getByTestId("pages-feed")).toHaveText("Open comic");
     await page.getByTestId("pages-feed").click();
-    await expect(page).toHaveURL(/\/search\?tags=pool%3A77$/);
+    await expect(page).toHaveURL(/\/comic\/77$/);
     await expect(viewer(page)).toHaveCount(0);
-    // (the search it came from is still there, hidden)
+    await expect(page.getByTestId("comic-name")).toHaveText("Riverbank Tales");
+  });
+
+  test("Results for pool:77 list the comic in page order", async ({ page }) => {
+    await page.goto("/search?tags=pool%3A77");
     const ids = page.locator("[data-testid=post-card]").filter({ visible: true });
     await expect(ids).toHaveCount(5);
     expect(await ids.evaluateAll((els) => els.map((e) => Number(e.getAttribute("data-post-id"))))).toEqual(PAGES);
@@ -159,7 +164,7 @@ test.describe("on a phone", () => {
     const shown = page.getByTestId("post-comic").filter({ visible: true });
     await expect(shown.getByTestId("comic-thumb").nth(0)).toHaveAttribute("aria-current", "page");
     await shown.getByTestId("post-comic-open").click();
-    await expect(page).toHaveURL(/\/search\?tags=pool%3A77$/);
+    await expect(page).toHaveURL(/\/comic\/77$/);
   });
 });
 
@@ -183,6 +188,37 @@ test("on a computer: two glass buttons and the arrow keys turn the page", async 
   // the turned-to page slides all the way in (it once stayed off to the side)
   await expect(viewer(page).getByTestId("viewer-pic")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, 0)");
   await shot(page, "comic-viewer-desktop");
+});
+
+test("a page turn doesn't open the viewer again: no fade over the feed", async ({ page }) => {
+  // every time the viewer's open (a fade and a rise) starts
+  await page.addInitScript(() => {
+    const w = window as Window & { opens?: number };
+    w.opens = 0;
+    document.addEventListener("animationstart", (e) => e.animationName === "player-in" && w.opens!++, true);
+  });
+  const opens = () => page.evaluate(() => (window as Window & { opens?: number }).opens);
+  await page.goto("/search?tags=wolf&view=2005");
+  await expect(viewer(page)).toHaveAttribute("data-pages", "");
+  await expect.poll(opens).toBe(1);
+  for (const key of ["ArrowRight", "ArrowLeft"]) {
+    const was = await viewer(page).getAttribute("data-post-id");
+    await page.keyboard.press(key);
+    await expect(viewer(page)).not.toHaveAttribute("data-post-id", was!);
+  }
+  // the turned-to pages didn't play it again (it once flashed the feed through, then rose in)
+  await page.waitForTimeout(300);
+  expect(await opens()).toBe(1);
+});
+
+test("buttons hidden with a tap stay hidden from page to page", async ({ page }) => {
+  await page.goto("/search?tags=wolf&view=2005");
+  await expect(viewer(page)).toHaveAttribute("data-pages", "");
+  await page.getByTestId("viewer-stage").click();
+  await expect(viewer(page).getByTestId("controls")).toHaveAttribute("data-visible", "false");
+  await page.keyboard.press("ArrowRight");
+  await expect(viewer(page)).toHaveAttribute("data-post-id", "2002");
+  await expect(viewer(page).getByTestId("controls")).toHaveAttribute("data-visible", "false");
 });
 
 test("a page on your blacklist is turned past, and its picture isn't fetched ahead", async ({ page }) => {
@@ -212,4 +248,252 @@ test("closing the viewer while a page turns leaves the feed where it was", async
   await page.waitForTimeout(600);
   await expect(page).toHaveURL(/\/search\?tags=wolf$/);
   await expect(viewer(page)).toBeHidden();
+});
+
+// ---- Comics, part two (DESIGN.md "A post on its own"): the comic's page, the reader, the end ----
+
+const reader = (page: Page) => page.getByTestId("reader");
+const DESC =
+  "Reed leaves the burrow to find where the river starts. A quiet comic about walking, weather and the friends who turn up on the way. New pages on Fridays. It has run since spring, and the first chapter ends on page nine. ".repeat(
+    2,
+  );
+
+test.describe("comics, part two, on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("the comic's page: its name, the artist with Follow, the description, every page three to a row", async ({ page }) => {
+    // a sixth page e621 doesn't send keeps its place
+    mock.pools[0] = { ...mock.pools[0], post_ids: [...PAGES, 2099], description: DESC };
+    mock.tagCounts.mossy_otter = 48;
+    await page.goto("/comic/77");
+    await expect(page.getByTestId("comic-name")).toHaveText("Riverbank Tales");
+    await expect(page.getByTestId("comic-sub")).toHaveText(/^A comic · 6 pages · last page .+ ago$/);
+    await expect(page.getByTestId("comic-artist")).toContainText("mossy otter");
+    await expect(page.getByTestId("comic-artist")).toContainText("48 posts");
+    // the description: 4 lines, then Show all
+    const desc = page.getByTestId("comic-desc");
+    const lines = await desc.evaluate((el) => Math.round(el.clientHeight / parseFloat(getComputedStyle(el).lineHeight)));
+    expect(lines).toBe(4);
+    await page.getByTestId("comic-desc-more").click();
+    await expect(page.getByTestId("comic-desc-more")).toHaveCount(0);
+    // three to a row, 8 apart, 16 from the sides
+    const tiles = page.getByTestId("comic-tile");
+    await expect(tiles).toHaveCount(6);
+    const [a, b, c, d] = await Promise.all([0, 1, 2, 3].map(async (i) => (await tiles.nth(i).boundingBox())!));
+    expect(Math.round(a.x)).toBe(16);
+    expect(Math.round(b.x - (a.x + a.width))).toBe(8);
+    expect(Math.round(c.x + c.width)).toBe(390 - 16);
+    expect(Math.round(d.x)).toBe(16);
+    await expect(tiles.nth(0)).toHaveText("1");
+    await expect(tiles.nth(0).locator("img")).toHaveAttribute("src", /\/2003\./);
+    // the page e621 didn't send: a locked well, its number kept, and it doesn't open
+    await expect(tiles.nth(5)).toHaveAccessibleName("Page 6, not shown by e621");
+    await expect(tiles.nth(5)).toBeDisabled();
+    // nowhere stopped yet: no ring, and Play reads from page 1
+    await expect(page.getByTestId("comic-place")).toHaveCount(0);
+    await expect(page.getByTestId("comic-play")).toHaveAccessibleName("Read from page 1");
+    await expect(page.getByTestId("comic-e621")).toHaveAttribute("href", "https://e621.net/pools/77");
+    await expect(page.getByTestId("comic-e621")).toContainText("Pool #77");
+    await shot(page, "comic-page");
+  });
+
+  test("a page opens the viewer; the page you stopped on wears the ring, and Play starts there", async ({ page }) => {
+    await page.goto("/comic/77");
+    await page.getByTestId("comic-tile").nth(2).click();
+    await expect(viewer(page)).toHaveAttribute("data-post-id", "2005");
+    await page.keyboard.press("ArrowRight");
+    await expect(viewer(page)).toHaveAttribute("data-post-id", "2002");
+    await page.getByTestId("viewer-close").click();
+    await expect(viewer(page)).toHaveCount(0);
+    await expect(page.getByTestId("comic-tile").nth(3)).toHaveAttribute("aria-current", "page");
+    await expect(page.getByTestId("comic-place")).toHaveText("You are on page 4");
+    await expect(page.getByTestId("comic-play")).toHaveAccessibleName("Read from page 4");
+    // the device keeps it, not the visit
+    await page.reload();
+    await expect(page.getByTestId("comic-place")).toHaveText("You are on page 4");
+  });
+
+  test("the reader: paused at first, the count in pages, the capsule, the end, Read again, and back to the comic", async ({ page }) => {
+    await page.goto("/comic/77");
+    await page.getByTestId("comic-play").click();
+    await expect(page).toHaveURL(/\/comic\/77\?read=77-2003$/);
+    const r = reader(page);
+    await expect(r.getByTestId("viewer-count")).toHaveText("1 / 5");
+    // owner: "Start paused": the bar empty and the full time
+    await expect(r.getByTestId("pause-button")).toHaveAccessibleName("Play");
+    await expect(r.getByTestId("time-left")).toHaveText("20 s");
+    expect((await r.getByTestId("progress").boundingBox())!.width).toBeLessThan(1);
+    await expect(r.getByTestId("viewer-comic")).toContainText("Page 1 of 5");
+    await shot(page, "comic-reader");
+    await r.getByTestId("reader-next").click();
+    await expect(r).toHaveAttribute("data-post-id", "2001");
+    await expect(r.getByTestId("viewer-count")).toHaveText("2 / 5");
+    for (const id of ["2005", "2002", "2004"]) {
+      await page.keyboard.press("ArrowRight");
+      await expect(r).toHaveAttribute("data-post-id", id);
+    }
+    // past the last page: the end
+    await page.keyboard.press("ArrowRight");
+    const end = r.getByTestId("comic-end");
+    await expect(end).toContainText("The end");
+    await expect(end).toContainText("Riverbank Tales · 5 pages");
+    await expect(r.getByTestId("comic-end-back")).toHaveText("Back to Riverbank Tales");
+    await expect(r.getByTestId("viewer-count")).toHaveText("5 / 5");
+    await shot(page, "comic-end");
+    // Previous goes back to the last page
+    await page.keyboard.press("ArrowLeft");
+    await expect(end).toHaveCount(0);
+    await expect(r).toHaveAttribute("data-post-id", "2004");
+    await page.keyboard.press("ArrowRight");
+    await r.getByTestId("comic-again").click();
+    await expect(r).toHaveAttribute("data-post-id", "2003");
+    await expect(r.getByTestId("pause-button")).toHaveAccessibleName("Play");
+    await page.keyboard.press("ArrowRight");
+    await expect(r).toHaveAttribute("data-post-id", "2001");
+    // ✕ closes onto the comic's page, its ring moved
+    await r.getByTestId("viewer-close").click();
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page).toHaveURL(/\/comic\/77$/);
+    await expect(page.getByTestId("comic-place")).toHaveText("You are on page 2");
+  });
+
+  test("playing, the reader turns a page each Comic page time, and stops at the end", async ({ page }) => {
+    await page.clock.install();
+    await page.addInitScript(() => localStorage.setItem("e6ss:v1:playback", JSON.stringify({ comicPageSec: 10 })));
+    await page.goto("/comic/77?read=77-2002");
+    const r = reader(page);
+    await expect(r.getByTestId("viewer-count")).toHaveText("4 / 5");
+    await expect(r.getByTestId("time-left")).toHaveText("10 s");
+    await r.getByTestId("pause-button").click();
+    await expect(r.getByTestId("pause-button")).toHaveAccessibleName("Pause");
+    await page.clock.runFor(10_500);
+    await expect(r).toHaveAttribute("data-post-id", "2004");
+    await page.clock.runFor(11_000);
+    await expect(r.getByTestId("comic-end")).toBeVisible();
+    // the end stops the timer: a comic does not loop
+    await page.clock.runFor(30_000);
+    await expect(r.getByTestId("comic-end")).toBeVisible();
+    await expect(r).toHaveAttribute("data-post-id", "2004");
+    // back to the last page and playing again, it gets the whole page time (a review: the end came straight back)
+    await page.keyboard.press("ArrowLeft");
+    await expect(r.getByTestId("comic-end")).toHaveCount(0);
+    await r.getByTestId("pause-button").click();
+    await page.clock.runFor(5_000);
+    await expect(r.getByTestId("comic-end")).toHaveCount(0);
+    await page.clock.runFor(6_000);
+    await expect(r.getByTestId("comic-end")).toBeVisible();
+  });
+
+  test("a reader link to a post the comic doesn't list opens its first page", async ({ page }) => {
+    await page.goto("/comic/77?read=77-999999");
+    await expect(page).toHaveURL(/\/comic\/77\?read=77-2003$/);
+    await expect(reader(page).getByTestId("viewer-count")).toHaveText("1 / 5");
+  });
+
+  test("a slide that is a comic's page carries the capsule; it opens the reader there and holds the show", async ({ page }) => {
+    await page.goto("/search?tags=wolf&play=2005");
+    const cap = page.getByTestId("player").getByTestId("slide-comic");
+    await expect(cap).toContainText("Riverbank Tales");
+    await expect(cap).toContainText("Read from page 3");
+    await shot(page, "comic-slide");
+    await cap.click();
+    await expect(page).toHaveURL(/\/search\?tags=wolf&play=2005&read=77-2005$/);
+    const r = reader(page);
+    await expect(r.getByTestId("viewer-count")).toHaveText("3 / 5");
+    await expect(r).toHaveAttribute("data-pages", "");
+    await page.keyboard.press("ArrowRight");
+    await expect(r).toHaveAttribute("data-post-id", "2002");
+    // the show underneath didn't move
+    await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "2005");
+    // the end's way back names the slideshow
+    await page.keyboard.press("ArrowRight");
+    await expect(r).toHaveAttribute("data-post-id", "2004");
+    await page.keyboard.press("ArrowRight");
+    await expect(r.getByTestId("comic-end-back")).toHaveText("Back to the slideshow");
+    await r.getByTestId("comic-end-back").click();
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page).toHaveURL(/\/search\?tags=wolf&play=2005$/);
+    // back on the slide you left, paused
+    await expect(page.getByTestId("player")).toHaveAttribute("data-post-id", "2005");
+    await expect(page.getByTestId("player").getByTestId("pause-button")).toHaveAccessibleName("Play");
+  });
+
+  test("Comic page time: a row in Settings › Slideshow and in Quick settings, 20 s to start", async ({ page }) => {
+    await page.goto("/settings/slideshow");
+    const row = page.getByTestId("slideshow-comicPageSec");
+    await expect(row).toContainText("Comic page time");
+    await expect(row).toContainText("20 s");
+    await row.click();
+    await page.getByRole("radio", { name: "30 s" }).click();
+    await expect(row).toContainText("30 s");
+    await page.goto("/comic/77?read=77-2003");
+    await expect(reader(page).getByTestId("time-left")).toHaveText("30 s");
+    await reader(page).getByTestId("quick-settings-button").click();
+    const quick = page.getByTestId("quick-comic-time");
+    await expect(quick).toContainText("30 s");
+    await quick.click();
+    await page.getByTestId("comic-time-45").click();
+    await expect(quick).toContainText("45 s");
+  });
+});
+
+test("on a computer: the comic's page in the post page's two columns; the reader's capsule after the artist in its row", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/comic/77");
+  const tiles = page.getByTestId("comic-tile");
+  await expect(tiles).toHaveCount(5);
+  // four to a row in the 600 column, 141 wide, 12 between columns and 16 between rows
+  const boxes = await tiles.evaluateAll((els) => els.map((e) => e.querySelector(".comic-pic")!.getBoundingClientRect().toJSON() as DOMRect));
+  expect(new Set(boxes.slice(0, 4).map((b) => Math.round(b.top))).size).toBe(1);
+  expect(Math.round(boxes[0].width)).toBe(141);
+  expect(Math.round(boxes[1].left - boxes[0].right)).toBe(12);
+  expect(boxes[4].top).toBeGreaterThan(boxes[0].top);
+  // the artist, the description and "Open on e621" in the 344 column beside them, starting level
+  const pages = (await page.getByTestId("comic-pages").boundingBox())!;
+  const artist = (await page.locator(".comic-artist").boundingBox())!;
+  const label = (await page.locator(".comic-main .list-label").boundingBox())!;
+  expect(Math.round(pages.width)).toBe(600);
+  expect(Math.round(artist.x - (pages.x + pages.width))).toBe(24);
+  expect(Math.round(artist.width)).toBe(344);
+  expect(Math.round(artist.y)).toBe(Math.round(label.y));
+  const e621 = (await page.getByTestId("comic-e621").boundingBox())!;
+  expect(Math.round(e621.x)).toBe(Math.round(artist.x));
+  await shot(page, "comic-page-desktop");
+  await page.getByTestId("comic-play").click();
+  const r = reader(page);
+  await expect(r.getByTestId("viewer-comic")).toBeVisible();
+  await expect(r.getByTestId("reader-fullscreen")).toBeVisible();
+  await expect(r.getByTestId("viewer-prev")).toHaveCount(0);
+  // one row under the bar: the artist, then the capsule (280 wide, 16 after), then the transport
+  const cap = (await r.getByTestId("viewer-comic").boundingBox())!;
+  const who = (await r.locator(".player-who").boundingBox())!;
+  const bar = (await r.getByTestId("progress").locator("..").boundingBox())!;
+  const prev = (await r.getByTestId("reader-prev").boundingBox())!;
+  expect(cap.width).toBe(280);
+  expect(Math.round(cap.x - (who.x + who.width))).toBe(16);
+  expect(cap.y).toBeGreaterThan(bar.y + bar.height);
+  expect(cap.x + cap.width).toBeLessThan(prev.x);
+  await shot(page, "comic-reader-desktop");
+  // Space starts and stops the timer; Esc closes
+  await page.keyboard.press("Space");
+  await expect(r).not.toHaveAttribute("data-paused", "true");
+  await page.keyboard.press("Space");
+  await expect(r).toHaveAttribute("data-paused", "true");
+  await page.keyboard.press("Escape");
+  await expect(reader(page)).toHaveCount(0);
+  // in a slideshow the capsule stands in the same place, after the artist
+  await page.goto("/search?tags=wolf&play=2005");
+  const p = page.getByTestId("player");
+  const slideCap = (await p.getByTestId("slide-comic").boundingBox())!;
+  const slideWho = (await p.locator(".player-who").boundingBox())!;
+  expect(slideCap.width).toBe(280);
+  expect(Math.round(slideCap.x - (slideWho.x + slideWho.width))).toBe(16);
+  await shot(page, "comic-slide-desktop");
+  // a narrower window has no room for both in the row: the capsule stands over the bar, clear of Play
+  await page.setViewportSize({ width: 1000, height: 800 });
+  const narrowCap = (await p.getByTestId("slide-comic").boundingBox())!;
+  const narrowBar = (await p.getByTestId("progress").locator("..").boundingBox())!;
+  expect(narrowCap.y + narrowCap.height).toBeLessThanOrEqual(narrowBar.y);
+  await expect(p.locator(".player-left")).toBeVisible();
+  await shot(page, "comic-slide-1000");
 });

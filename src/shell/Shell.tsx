@@ -200,7 +200,7 @@ export default function Shell() {
       // An overlay closed (a sheet over the player included): focus goes back to what opened it.
       const now = shown.stack[shown.index];
       if (isOverlay(left) && left.key !== now.key && (shown.cause === "back" || shown.cause === "pop")) {
-        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=player], [data-testid=viewer]") : screenOf(to);
+        const box = isOverlay(now) ? document.querySelector<HTMLElement>("[data-testid=reader],[data-testid=player]:not([inert]),[data-testid=viewer]") : screenOf(to);
         restoreFocus(left.key, box);
       }
       return;
@@ -240,7 +240,7 @@ export default function Shell() {
   }, [held]);
 
   const rail = useRail();
-  const barHidden = (immersive && onAccount) || overlay?.route.play != null || !!overlay?.route.view;
+  const barHidden = (immersive && onAccount) || overlay?.route.play != null || !!overlay?.route.view || !!overlay?.route.read;
   const ctx = (e: Entry, visible: boolean) => ({
     entry: e,
     visible,
@@ -321,9 +321,10 @@ export default function Shell() {
           <Player key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
-      {overlay?.route.view && overlay.route.play == null && (
+      {(overlay?.route.read || (overlay?.route.view && overlay.route.play == null)) && (
         <Suspense fallback={null}>
-          <Viewer key={`${cur.key}:${overlay.route.view}`} base={cur} top={overlay} />
+          {/* one viewer for a comic's every page: a turn doesn't open it again (Viewer keys each page) */}
+          <Viewer key={cur.key} base={cur} top={overlay} />
         </Suspense>
       )}
       {/* DESIGN.md "Toast": one at a time, a mark, the words, at most one way back; 4 s, 6 s with an action */}
@@ -357,7 +358,9 @@ function PushedScreen({ e }: { e: Entry }) {
     case "artist":
       return <ArtistScreen name={screen.name} params={screen.params ?? ""} />;
     case "post":
-      return <PostScreen id={screen.id} />;
+    case "comic":
+      // one lazy slot for both: each costs the first load its name
+      return <PostScreen id={screen.id} comic={screen.kind === "comic"} />;
     case "tune":
       return <TuneScreen />;
     case "settings":

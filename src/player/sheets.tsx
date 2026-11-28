@@ -59,8 +59,21 @@ function usePlaybackSetter(base: Entry) {
   return { set, fromLink, target };
 }
 
+/** A comic page's time in the reader (DESIGN.md "Comics, part two", Its time): its own, not Seconds per slide. */
+export const COMIC_TIMES = [10, 20, 30, 45];
+
 /** Style, speed, fit, mute and quality, straight on the sheet. */
-export function QuickSettingsSheet({ base, playback, picking = false }: { base: Entry; playback: PlaybackSettings; picking?: boolean }) {
+export function QuickSettingsSheet({
+  base,
+  playback,
+  picking = false,
+  pickingComic = false,
+}: {
+  base: Entry;
+  playback: PlaybackSettings;
+  picking?: boolean;
+  pickingComic?: boolean;
+}) {
   const { set, fromLink, target } = usePlaybackSetter(base);
   const p = playback;
   return (
@@ -92,6 +105,21 @@ export function QuickSettingsSheet({ base, playback, picking = false }: { base: 
             testId="quick-seconds"
           />
         </div>
+        <button
+          type="button"
+          className="list-row"
+          onClick={() => getNav().openSheet("player-comic-time")}
+          aria-haspopup="dialog"
+          aria-expanded={pickingComic}
+          data-menu="player-comic-time"
+          data-testid="quick-comic-time"
+        >
+          <span className="row-text">
+            <b>Comic page time</b>
+          </span>
+          <span className="row-value">{p.comicPageSec ?? 20} s</span>
+          <ChevronDown aria-hidden className="row-chev row-drop" />
+        </button>
         {p.style === "classic" && (
           <div className="list-row">
             <span className="row-text">
@@ -140,6 +168,30 @@ export function QuickSettingsSheet({ base, playback, picking = false }: { base: 
         More in Settings <ChevronRight aria-hidden />
       </button>
     </Sheet>
+  );
+}
+
+/** Comic page time, dropped from its row in Quick settings as Quality is; Back returns to it. */
+export function ComicTimeSheet({ playback }: { playback: PlaybackSettings }) {
+  return (
+    <Dropdown anchor="player-comic-time" label="Comic page time" width={220} menu at={underRow} testId="sheet-comic-time">
+      <Menu label="Comic page time">
+        {COMIC_TIMES.map((sec) => (
+          <MenuRow
+            key={sec}
+            on={(playback.comicPageSec ?? 20) === sec}
+            onPick={() => {
+              // your own way of reading, so your default even on a link's visit
+              getPrefs().setPlayback({ ...getPrefs().store.get().playback, comicPageSec: sec });
+              void getNav().back();
+            }}
+            testId={`comic-time-${sec}`}
+          >
+            {sec} s
+          </MenuRow>
+        ))}
+      </Menu>
+    </Dropdown>
   );
 }
 
@@ -347,7 +399,7 @@ export function PlayerInfoSheet({ post, base }: { post: Post; base: Entry }) {
  * Post info's description (DESIGN.md "Post info"): at most 4 lines, ending in an ellipsis, so a long
  * one can't push the tags off the sheet; "Show all" opens the rest in place and goes away.
  */
-function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void }) {
+export function InfoDesc({ text, onPost, testId = "info-desc" }: { text: string; onPost: (id: number) => void; testId?: string }) {
   const box = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [cut, setCut] = useState(false);
@@ -368,7 +420,7 @@ function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void
         ref={box}
         className="post-desc"
         data-capped={open ? undefined : ""}
-        data-testid="info-desc"
+        data-testid={testId}
         // Tab onto a link past the 4th line: open it all, rather than scroll the clipped box
         onFocusCapture={(e) => {
           if (!open && e.target.getBoundingClientRect().bottom > e.currentTarget.getBoundingClientRect().bottom + 1) setOpen(true);
@@ -377,7 +429,7 @@ function InfoDesc({ text, onPost }: { text: string; onPost: (id: number) => void
         <DText text={text} onPost={onPost} />
       </div>
       {cut && !open && (
-        <button type="button" className="info-more" onClick={() => setOpen(true)} data-testid="info-desc-more">
+        <button type="button" className="info-more" onClick={() => setOpen(true)} data-testid={`${testId}-more`}>
           Show all
         </button>
       )}

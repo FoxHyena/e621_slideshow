@@ -42,6 +42,9 @@ Sheets (bottom sheets on phone, popovers on desktop; each adds a history entry, 
 └── sign-in · player quick settings · post info · follow-from-favorites · filter menus · ⋯ menus
 ```
 
+- **Added 2026-11-28 (DESIGN.md "A post on its own", Comics, part two):** a pushed screen
+  `/comic/<pool id>` (a comic's own page; works signed out) and the reader, an overlay that plays one
+  comic's pages (its URL state is the builder's to choose; a reload must come back to the same page).
 - **Added 2026-11-27 (owner-approved; DESIGN.md "A post on its own"):** a pushed screen `/post/<id>`
   (one post on its own page; works signed out) and an overlay `…?view=<postId>` (the picture viewer).
 - `/` redirects to `/following`.
@@ -461,6 +464,36 @@ appends to it as it goes (the feed grows too).
 - Desktop keys unchanged: ← → space F I L C O Esc; G / T close the player into the screen's grid / feed;
   S opens Settings.
 
+### Comic `/comic/<pool id>` and the reader (2026-11-28)
+
+The builder passed on the owner's "Yes, comics part two". The owner then made two calls, quoted below.
+The rest is the designer's. Sizes are in DESIGN.md, "A post on its own".
+
+- **The comic's page:** Back, Share and ⋯ ("Refresh", "Read from page 1"); the name; "A comic · 12
+  pages · last page 3h ago"; the artist with Follow; the description (4 lines, "Show all"); every page
+  three to a row with its number; "Open on e621". It takes the place of "Open as a feed".
+- A tap on a page opens the picture viewer on it. A page e621 does not send keeps its place as a locked
+  tile and does not open.
+- **Where you stopped:** kept by the device for each comic (the last page open in the reader or the
+  viewer). That page wears the gold ring, and Play starts there.
+- **Play** on this page opens the reader. So does the capsule on a comic page in a slideshow.
+- **In a slideshow** (owner: "It should keep playing the feed"): a slide that is a comic page shows a
+  capsule, "Riverbank · Read from page 3". The slideshow plays the feed as always. The capsule opens the
+  reader on that page and holds the slideshow.
+- **The reader** is the player on one comic: pages in order, the count in pages ("3 / 12"), the
+  player's gestures and keys, with Previous and Next turning the page. Its capsule opens the Pages
+  sheet.
+- **It starts paused** (owner: "Start paused"). ▶ turns the pages on "Comic page time" (10, 20, 30 or
+  45 s; 20 s to start), a row in Settings › Slideshow and in Quick settings.
+- One tap hides or shows the controls, playing or paused. The timer waits while a page is zoomed.
+- **The end:** after the last page, an end slide with "Read again" and a way back ("Back to the
+  slideshow" or "Back to Riverbank"). A comic does not loop.
+- **Close** returns to where it was opened from: the slide you left, paused, or the comic's page.
+- **On a computer** (owner, of the two drawings: "Lock them"): the comic's page is two columns, as the
+  post page is: the pages four to a row in the 600 column; the artist, the description and "Open on
+  e621" beside them. The reader is the player's window with the capsule in its row of controls. Keys:
+  ← → turn the page, Space starts and stops, Esc closes.
+
 ### Settings `/settings`
 
 A grouped list; on phone each group is a sub-page, on desktop all on one page.
@@ -469,7 +502,7 @@ A grouped list; on phone each group is a sub-page, on desktop all on one page.
    with warning, Sign out. Signed out: Sign in.
 2. **Content** (`/settings/content`): Ratings (S/Q/E), Blacklist (editor, account sync, import defaults).
 3. **Slideshow** (`/settings/slideshow`): style, seconds, preload, fit, transition, quality, max video,
-   mute, loop.
+   mute, loop, comic page time (2026-11-28).
 4. **For You** (`/settings/for-you`): Tune ›, Hidden artists.
 5. **App** (`/settings/app`): Install app (per-platform steps; "Installed ✓" in standalone; note that
    links open in Safari, not the app, and that the two keep separate sign-ins), e621 button

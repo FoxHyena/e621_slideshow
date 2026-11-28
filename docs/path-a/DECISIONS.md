@@ -2294,6 +2294,9 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The builder's answer on the learned ranking: it also scores a post's rating, which the card's
   sentence on Taste leaves out. The sentence stays.
 - Checked by me: the branch holds my design commit and the PR is an open draft. Not run, not seen.
+- Later the same day: I asked the owner to open PR 51's preview and check that the card's bar follows
+  "Taste or popular". The owner: "Yeah it looks good". So the line above, "The owner has not seen the
+  build", no longer holds. I still have not run it myself.
 
 ## 2026-11-27 — Comics follow-ups: sign-out clears posts in memory, no "pool:77" in Recent searches, a video link waits for its feed
 - Owner, on what the comics review left open: "Fix all three".
@@ -2316,3 +2319,103 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - A disabled turn button on the last page still drops keyboard focus.
   - A comic that gains a page mid-visit shows it after a reload.
   - The pill can show "pool:77" for a moment before the comic's name comes in.
+
+## 2026-11-28 — Comics, part two: the comic's page and the reader (owner: "It should keep playing the feed", "Start paused")
+- The request reached me through the builder, who quoted the owner: "Yes, comics part two". The scope
+  was the builder's open item: "a comic's own page (like e621's pool page) and reading a comic in the
+  slideshow".
+- I drew four phone screens and sent them: the comic's page, a comic page in a slideshow, the reader,
+  and the end.
+- The owner asked: "So wait are these mocs for reading through a comic or playing it in the
+  slideshow?" Both: the reader is one screen, read by hand while paused and turned by the timer while
+  playing.
+- **Owner, on a slideshow that lands on a comic page:** "It should keep playing the feed". So the
+  slide only carries a capsule into the reader. Not picked: playing the comic's other pages next.
+- **Owner, on how the reader starts:** "Start paused".
+- The owner did not say "lock it" in words. I had told them the start was the one pick left before I
+  could lock it, and they answered it.
+- **Mine, seen by the owner in the drawings:** the comic's page and its order (name, artist,
+  description, pages three to a row, "Open on e621"); the gold ring on the page you stopped on; Play
+  on that page; the capsule's words; the reader as the player with a count in pages; the end slide;
+  the locked tile for a page e621 does not send; "Comic page time" with 10, 20, 30 and 45 s.
+- **Mine, not drawn:** the ⋯ menu's "Read from page 1"; that closing the reader leaves the slideshow
+  paused; that a comic does not loop; the artist row taking the first page's artist; five tiles to a
+  row on a computer.
+- **Changed with it:** "Open as a feed" becomes "Open comic", in the Pages sheet and on the post page.
+- **For the builder to choose:** the reader's URL state, and how the device stores where you stopped.
+- Not drawn: both screens on a computer, and the comic page's link preview.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-28 — Comics, part two, built (builder)
+- Owner, on the design above: "Commit and send". It reached me from the designer.
+- **Built as drawn:**
+  - The comic's page, `/comic/<pool>`, signed out too.
+  - The gold ring on where you stopped, with Play there.
+  - The slide's capsule, "Read from page N".
+  - The reader, which starts paused and counts pages, then the end slide.
+  - "Comic page time" (10/20/30/45 s, 20 to start), in Settings › Slideshow and in Quick settings.
+  - "Open comic" in place of "Open as a feed".
+- **Mine, the two the design left to me:**
+  - **The reader's URL:** `?read=<pool>-<post>` on the screen it stands over. Over a slide it keeps `play`
+    (`/search?tags=wolf&play=2005&read=77-2005`). Over the comic's page it has no `play`. Back closes the
+    reader onto what is under it. A reader link to a post the pool doesn't list opens the comic's first page.
+  - **Where you stopped:** localStorage `e6ss:v1:comicPlaces`, a list of [pool, post] pairs with the newest
+    last, at most 200 comics. It is this device's, read again on every write so two tabs don't undo each
+    other. It is kept in src/feed/comics.tsx, not src/lib/storage.ts, because storage.ts is in the first load.
+- **Mine, not drawn:**
+  - A video page plays to its end, under the player's video rules. It plays only while the page's time
+    runs.
+  - A page the reader can't show (one e621 hides, or one on your blacklist) says so on the stage.
+  - On a computer, the reader is the player's window with the capsule over the bar. The comic's page is a
+    600 column with five tiles to a row.
+  - The reader is the viewer in a reading mode, in the player's chunk. It shares the viewer's pinch,
+    sideways turns and drag down. On a computer, ← and → turn pages and Space plays.
+- **Not built:** the comic page's link preview (not drawn), and the comic page's Play stepping aside on
+  scroll.
+- **Mine, for the budget:** the first load came to 200.1 KB.
+  - The reader's URL went from two params to one.
+  - The post page and the comic's page share one lazy slot.
+  - The offline banner's wifi icons are lucide's own paths, drawn as CSS masks.
+  - First load is now 199.9 KB.
+- A code review (owner: one before every draft) found 10 things. All are fixed:
+  - **Page time:** the end came straight back after ← and Play. A new page time, or a video's length,
+    didn't move the page's end.
+  - **Video:** a video page played while the reader was paused.
+  - **Buttons:** they didn't come back on a mouse move or a key. A drag right on the end didn't go back.
+  - **Places:** past 200 comics, the cap dropped the lowest pool numbers first, not the oldest.
+  - **Show:** a reload under the reader left the show unpaused.
+  - **Links:** a reader link to a page the comic doesn't list got stuck.
+  - **Refresh:** it kept the retry wait.
+  - **Tests:** the end → ← → Play path had no test. It does now.
+- Also in this branch: PR 53's fix for the flash on a page turn (cherry-picked).
+
+## 2026-11-28 — Comics, part two on a computer (owner: "Lock them")
+- After the phone design was sent to the builder I asked: draw the comic's page and the reader on a
+  computer next? Owner: "Yes, draw them". I drew both and asked whether to lock them as drawn. Owner:
+  "Lock them".
+- **The comic's page:** the post page's two columns, 968 wide in all. The pages get the 600 column,
+  four to a row (141 × 197 each). The artist, the description and "Open on e621" stand in the 344
+  column. Not picked: one 600 column with everything stacked.
+- **The reader:** the player's window, the page at full height, the capsule after the artist in the
+  one row of controls. Not picked: glass arrows at the page's sides, as the viewer has.
+- **This replaces** the stopgap sent to the builder with the phone design (one 600 column, five tiles
+  to a row).
+- **Mine:** every measurement; the keys; that the capsule in a slideshow stands in the same place.
+- Not drawn: the end slide on a computer, and the comic page's link preview.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-28 — Comics, part two on a computer, built (builder)
+- The designer sent the computer drawings (owner: "Lock them", then "Commit and send"). They replace the
+  stopgap I had built (one 600 column, five tiles to a row).
+- **Built as drawn:**
+  - The comic's page from 1280: the post page's two columns. The pages are four to a row in the 600,
+    141 wide, 12 between columns and 16 between rows. The artist, the description and "Open on e621" are
+    in the 344. Play is where a feed has it.
+  - The reader and the slideshow: the comic's capsule is 280 wide, 16 after the artist, in the one row
+    under the bar. The reader has no glass arrows and gains Full screen.
+  - Keys: ← → turn the page, Space starts and stops the timer, F is full screen, Esc closes.
+- **Mine:**
+  - From 900 to 1279 the comic's page is one 600 column with the pages four to a row, as from 1280.
+  - The end slide on a computer is the phone's, centred in the window (not drawn).
+- **Fixed on the way:** Space in the reader kept it paused. An e2e test now presses it.
+- **Mine, after a review:** from 900 to 1179 the row has no room for the artist and a 280 capsule (it ran over Play), so there the capsule stands centred over the bar. From 1180 it is in the row as drawn.
