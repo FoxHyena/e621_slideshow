@@ -16,6 +16,9 @@ import { getNav, openSheetName } from "@/nav/history";
 import { Dropdown } from "@/shell/Dropdown";
 import { SHEET_PREFIX, type ChipId } from "./Chips";
 
+/** the post ⋯ sheet rides in this chunk (src/feed/PostMenu.tsx) */
+export { PostMenu } from "./PostMenu";
+
 /** Focus a field as it appears (Custom… shows it after the sheet has opened). */
 const focusOnMount = (el: HTMLInputElement | null) => void el?.focus({ preventScroll: true });
 

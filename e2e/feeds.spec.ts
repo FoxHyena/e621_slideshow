@@ -184,13 +184,15 @@ test("a card's artist opens their posts, and Back returns to the same card", asy
 test.describe("player", () => {
   const slide = (page: Page) => page.locator("[data-testid=player] :is([data-testid=slide-image],[data-testid=slide-video])").first();
 
-  test("a tap on a picture opens it paused; closing lands the feed on the last post shown", async ({ page }) => {
+  test("⋯ › Play from this post opens the player; closing lands the feed on the last post shown", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/search?tags=wolf");
-    await page.locator('[data-post-id="1149"] [data-testid=card-media]').click();
+    await page.locator('[data-post-id="1149"] [data-testid=card-menu]').click();
+    await page.getByTestId("sheet-post").getByRole("button", { name: "Play from this post" }).click();
     await expect(page).toHaveURL(/play=1149/);
     const player = page.getByTestId("player");
     await expect(player).toHaveAttribute("data-post-id", "1149");
+    await page.getByTestId("pause-button").click();
     await expect(page.getByTestId("pause-button")).toHaveAccessibleName("Play");
     await expect(slide(page)).toBeVisible();
     await shot(page, "player");

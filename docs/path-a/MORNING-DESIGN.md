@@ -17,6 +17,9 @@ New drawings, in the mock's first section, "A post on its own". **Approved by yo
 3. ~~The rest of the section as drawn.~~ **Approved by you: "Approve".** The viewer, the comic well
    and pages, the post page, "Open post" in a post's ⋯, "Share post" sharing this app's link.
 4. **For the builder before any of it is built:** a link preview needs a server to answer for each post.
+5. **Corrected after your approval: a grid tile does not open the viewer.** My section said it did. That
+   went against your idea from 2026-11-26 (a tile turns the feed to a list at that post). You told the
+   builder "Keep list behavior", so only a picture in a feed opens the viewer.
 
 ## Answered on the check list, 2026-11-27
 

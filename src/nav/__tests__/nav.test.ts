@@ -40,6 +40,16 @@ describe("routes", () => {
     expect(routeUrl(p("/following?play=9"))).toBe("/following?play=9");
   });
 
+  it("pulls view (the picture viewer) out of the params; only a post number counts, and play wins", () => {
+    const r = p("/search?tags=wolf&view=123");
+    expect(r).toEqual({ screen: { kind: "results", params: "tags=wolf" }, play: null, view: "123" });
+    expect(routeUrl(r)).toBe("/search?tags=wolf&view=123");
+    expect(routeUrl(p("/following?view=9"))).toBe("/following?view=9");
+    expect(p("/following?view=abc")).toEqual({ screen: p("/following").screen, play: null });
+    expect(p("/following?view=5&play=7")).toEqual({ screen: p("/following").screen, play: "7" });
+    expect(parentOf(r, null)).toEqual({ screen: r.screen, play: null });
+  });
+
   it("round-trips artist names with odd characters", () => {
     const name = "a/b c?d#e";
     const url = routeUrl({ screen: { kind: "artist", name }, play: null });

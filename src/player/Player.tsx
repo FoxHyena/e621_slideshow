@@ -34,6 +34,8 @@ import { PlayerInfoSheet, QualitySheet, QuickSettingsSheet } from "./sheets";
 import { shareUrlFor } from "./share";
 import { visitPlayback } from "./visit";
 
+export { Viewer } from "./Viewer";
+
 const HIDE_CONTROLS_MS = 2500;
 /** A second tap this soon is a double tap (toggles nothing, favorites). */
 const DOUBLE_TAP_MS = 250;

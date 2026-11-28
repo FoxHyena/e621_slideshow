@@ -52,6 +52,20 @@ const nextConfig: NextConfig = {
     // The service worker's cache names and the update check carry it: one per deploy.
     NEXT_PUBLIC_BUILD_ID: buildId(),
   },
+  /**
+   * The picture viewer's Save (DESIGN.md "A post on its own"): e621's file host lets only e621.net
+   * read its files (CORS), so Save asks for the file here, same-origin, and this passes it through.
+   * Only e621's own file shape (`/data/ab/cd/<md5>.<image ext>`): it proxies nothing else. Owner
+   * chose this knowing Vercel's use policy names proxying media (DECISIONS 2026-11-27).
+   */
+  async rewrites() {
+    return [
+      {
+        source: "/media/:a([0-9a-f]{2})/:b([0-9a-f]{2})/:file([0-9a-f]{32}\\.(?:png|jpg|jpeg|gif|webp))",
+        destination: "https://static1.e621.net/data/:a/:b/:file",
+      },
+    ];
+  },
   async headers() {
     return [
       { source: "/(.*)", headers: [{ key: "Content-Security-Policy", value: csp }] },
