@@ -1865,3 +1865,54 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - Tests: `src/lib/e621/__tests__/preview.test.ts` (the tags, the card for a hidden post, the ask, the
   card's size). The e2e suite's post pages now make the dev server ask e621 for made-up numbers; those
   come back empty and change nothing on screen.
+## 2026-11-27 — The post's bar opens the post; the name and the mark open the artist
+- Owner, relayed by the builder (I did not hear it from the owner): "Unless we tap artist's name,
+  tapping the post's bar should open the post, not the artist page now".
+- Built first, on `main` as `8d957a7` (pull request 37, by its title; I did not test it). The mark
+  opening the artist is the builder's call; the design keeps it.
+- **Mine:** the targets. The name's is its text and 6 at each side, at least 44 wide and 28 tall. It is
+  under 44 tall because the time and number line under it belongs to the post. A tap meant for the name
+  can land on that line and open the post; Back returns. The owner has been told.
+- The mock's "Getting to it" row said the header opens the artist; it now says the bar opens the post.
+
+## 2026-11-27 — Post info shows the description
+- Owner, relayed by the builder: "hitting I on a post doesn't show its description".
+- Built first (`8d957a7`): a "Description" part under the stat wells and the "For you because" line,
+  above the tags.
+- **Mine:** the label is a tag kind's label; the text stops at 4 lines with "Show all". The build
+  shows all of it. Not yet approved by the owner.
+
+## 2026-11-27 — A screen's ⋯ menu gets a drawing: a dropdown, like a chip's
+- Owner, with two screenshots of the build on a computer (For You's and Following's ⋯ menus): "This
+  menu may also need some spacing help".
+- **The design's fault:** this menu was never drawn. UX.md lists its rows only. The build made it from
+  a titled sheet and control rows with 32 icon wells.
+- Measured from the screenshots, halved from 2x: the popover is 300 wide; the title is 16 from the
+  left; a row's wash is 48 tall, 8 from the sides and 20 from the bottom. The popover's left edge
+  lines up with the ⋯, so it hangs to the right of the capsule.
+- **First drawing (mine, withdrawn):** a title, then a Well group of 52 rows, as in a post's ⋯.
+  Owner, of the phone version: "The border radius and item alignment here seem rough and out of place
+  with our other screens, is that right?" It was. The title stood at 16 and the icons at 30, and a 16
+  well sat 16 inside a 24 panel, so the corners did not run parallel.
+- **Drawn now (mine):** the chip's dropdown, on a phone and on a computer. The Panel with 4 above and
+  below and 16 at the sides, 260 wide, no title; rows 56 tall with a 32 icon well, as Media's. The
+  wash is 8 from the panel on three sides with a 16 radius (24 − 8). A row that cannot be used now is
+  at 45%. The build keeps its rows; it loses the title and takes the dropdown's padding.
+- **Changed with it (mine):** a ⋯ lines up its popover's right edge, not its left. The popover rule
+  was approved on the check list with left edges; the owner has been told of the change.
+- Measured in the mock: 260 by 120 with two rows, 64 with one; 8 under the capsule.
+
+## 2026-11-27 — For You marks its tags; a well copies a post's link (owner: "Tags + Left")
+- Owner: "Would also love to explore designing, in the for you feed items, showing somehow the tags
+  this is related to in their tuning, like we do in the info page. Also maybe exploring having another
+  button on the bottom of feed items that copies its link for you".
+- Drawn with a switch each. Tags: Marked tags, A line, Off. Copy link: Left, By the heart, Off.
+- Owner, asked "Which do you pick for the two ideas on a post?": "Tags + Left".
+- **Marked tags.** On a For You post the tags Post info's "For you because" line names stand first in
+  the tag row, each with a 12 spark in Link Blue. The post's height does not change (579 in the mock,
+  with or without). A line would have added 26.
+- **Left.** A Well 36 by 28 at the left end of the footer, 8 before the comic's well. A tap copies
+  `/post/<number>`, shows a check for 1.4 s and the toast "Link copied".
+- **Mine:** every measurement, the check, the failure toast "Couldn't copy the link", and that the
+  well is on a post in every feed and on the post page.
+- Not built. Nobody has tried the copy on a phone.
