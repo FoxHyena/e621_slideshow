@@ -9,6 +9,7 @@ import { Fragment, useMemo, useState } from "react";
 import { InlineLoader, stepText } from "@/components/Loader";
 import { Field, Slider } from "@/components/v6";
 import { buildRecommendedQuery, DEFAULT_TAG_LIMIT } from "@/lib/query/build";
+import { SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, searchPlan, topTags, type SearchKind } from "@/lib/recommend/weights";
 import { BREADTH_MAX, BREADTH_MIN, DEFAULT_SEARCH } from "@/lib/settings";
 import { getNav } from "@/nav/history";
@@ -38,14 +39,19 @@ export function TuneScreen() {
 
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
   const tags = useMemo(() => topTags(weights, weights.size), [weights]);
-  // What For You actually searches: the plan, cut to what e621's tag limit leaves room for.
+  // What For You actually searches: the plan (and with Search further, its next rounds), each cut to
+  // what e621's tag limit leaves room for.
   const { searched, capped } = useMemo(() => {
-    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth, (t) => isName(r.profile?.tags[t]?.cat)) : [];
+    const named = (t: string) => isName(r.profile?.tags[t]?.cat);
+    const rounds = search.moreTags ? SEARCH_TIERS : 1;
+    const plan = r.profile ? searchPlan(weights, r.overrides, search.breadth * rounds, named) : [];
+    const tiers = r.profile ? searchTiers(weights, r.overrides, search.breadth, named, rounds) : [];
     const s = { ...DEFAULT_SEARCH, ratings: search.ratings, media: forYou.media, date: forYou.date, minScore: forYou.minScore, breadth: search.breadth };
-    const rq = buildRecommendedQuery(s, plan.map((p) => p.tag), session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT);
-    const inQuery = new Set(rq.candidates);
-    return { searched: new Map(plan.filter((p) => inQuery.has(p.tag)).map((p) => [p.tag, p.kind] as const)), capped: rq.capped };
-  }, [weights, r.profile, r.overrides, search.breadth, search.ratings, forYou, session.user]);
+    const limit = session.user?.tag_query_limit ?? DEFAULT_TAG_LIMIT;
+    const built = tiers.map((t) => buildRecommendedQuery(s, t, limit));
+    const inQuery = new Set(built.flatMap((q) => q.candidates));
+    return { searched: new Map(plan.filter((p) => inQuery.has(p.tag)).map((p) => [p.tag, p.kind] as const)), capped: !!built[0]?.capped };
+  }, [weights, r.profile, r.overrides, search.breadth, search.moreTags, search.ratings, forYou, session.user]);
 
   const signedIn = !!session.creds && !!session.user && !session.link;
   const { profile, overrides } = r;
@@ -177,8 +183,23 @@ export function TuneScreen() {
             </p>
           </section>
 
-          {/* the owner's ask (2026-11-26): taste without who drew it; a pinned artist still counts */}
-          <div className="list-group tune-artists">
+          <div className="list-group tune-switches">
+            {/* the owner's ask (2026-11-27): the wider search made the feed less tuned; off by default */}
+            <label className="list-row">
+              <span className="row-text">
+                <b>Search further</b>
+                <small>When your top tags run out, go on with the next ones</small>
+              </span>
+              <input
+                type="checkbox"
+                role="switch"
+                className="switch"
+                checked={!!search.moreTags}
+                onChange={(e) => prefs.setSearch({ ...prefs.store.get().search, moreTags: e.target.checked })}
+                data-testid="rec-more-tags"
+              />
+            </label>
+            {/* the owner's ask (2026-11-26): taste without who drew it; a pinned artist still counts */}
             <label className="list-row">
               <span className="row-text">
                 <b>Filter artists</b>

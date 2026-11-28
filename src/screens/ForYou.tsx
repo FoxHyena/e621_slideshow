@@ -14,7 +14,7 @@ import type { Post } from "@/lib/e621/types";
 import { DEFAULT_FILTERS, type Filters } from "@/lib/feed/filters";
 import { DEFAULT_TAG_LIMIT } from "@/lib/query/build";
 import { IdListQueue } from "@/lib/recommend/restore";
-import { recQueries, RecommendedQueue, searchTiers } from "@/lib/recommend/stream";
+import { recQueries, RecommendedQueue, SEARCH_TIERS, searchTiers } from "@/lib/recommend/stream";
 import { isName, NO_OVERRIDES } from "@/lib/recommend/weights";
 import { DEFAULT_SEARCH, type SearchSettings } from "@/lib/settings";
 import type { SlideQueue } from "@/lib/slideshow/queue";
@@ -111,6 +111,8 @@ export function ForYouScreen() {
   const applied = useStore(prefs.store, (p) => p.forYou);
   const ratings = useStore(prefs.store, (p) => p.search.ratings);
   const breadth = useStore(prefs.store, (p) => p.search.breadth);
+  // Tune's "Search further": the next tags' rounds when the top ones run out (off: the top tags only)
+  const rounds = useStore(prefs.store, (p) => (p.search.moreTags ? SEARCH_TIERS : 1));
   const reg = getFeeds();
   const generation = useStore(reg.generation, (g) => g);
   const [grid, setGrid] = useState(false);
@@ -154,9 +156,13 @@ export function ForYouScreen() {
   const weights = useMemo(() => weightsOf(r), [r.profile, r.cache, r.overrides]); // eslint-disable-line react-hooks/exhaustive-deps
   // the tags For You picked each post for (DESIGN.md "Tag", a marked tag): one array per post while the weights hold
   const marks = useMemo(() => markerFor(weights), [weights]);
-  const plan = useMemo(() => (r.profile ? searchTiers(weights, r.overrides, breadth, (t) => isName(r.profile?.tags[t]?.cat)) : []), [weights, r.profile, r.overrides, breadth]);
+  const plan = useMemo(
+    () => (r.profile ? searchTiers(weights, r.overrides, breadth, (t) => isName(r.profile?.tags[t]?.cat), rounds) : []),
+    [weights, r.profile, r.overrides, breadth, rounds],
+  );
   const filterKey = JSON.stringify([name, applied.media, applied.date, applied.minScore, ratings]);
-  const inputs = JSON.stringify([signatureOf(r), breadth]);
+  // (off reads as before the switch, so a ranking saved then isn't offered as stale)
+  const inputs = JSON.stringify(rounds > 1 ? [signatureOf(r), breadth, rounds] : [signatureOf(r), breadth]);
   const canRank = ready && !!name && plan.length > 0;
   const inputsRef = useRef(inputs);
   useEffect(() => {
