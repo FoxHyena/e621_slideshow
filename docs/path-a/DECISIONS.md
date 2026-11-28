@@ -1700,3 +1700,12 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   dots and the divider still stay put for the session, so nothing in the feed jumps.
 - Unchanged: when e621 has newer posts than the ones loaded, nothing is marked and the pill shows
   (UX §5 rule 3); after the pill's tap, scrolling past marks as before.
+- **A post's description keeps its formatting** (owner, 2026-11-27, with a friend's report of
+  "h2." showing as text: "We should likely respect the formatting in descriptions"). This replaces
+  the post page's plain-text call. `src/lib/e621/dtext.tsx` turns the common DText into React,
+  never HTML:
+  - h1. to h6. become a bold line; [b] [i] [u] [s] [sup] [sub] keep their look.
+  - Links open in a new tab (web links only); "post #123" opens that post's page here.
+  - [[wiki]] and {{tags}} show their words; "* " lines are a list.
+  - [spoiler] is a Well bar until tapped.
+  - [quote], [section] and the like keep their words without the tags.
