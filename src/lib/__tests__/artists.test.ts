@@ -1,6 +1,6 @@
 import { skippedLine } from "../feed/format";
 import { describe, expect, it } from "vitest";
-import { affinity, groupByArtist, rankCandidates, rankWithRecency, RECENCY_TOP, recency, rejoiners, tileQueries, tileQuery, toLookUp } from "../recommend/artists";
+import { affinity, groupByArtist, pageOf, rankCandidates, rankWithRecency, RECENCY_TOP, recency, rejoiners, tileQueries, tileQuery, toLookUp } from "../recommend/artists";
 import { artistRecall } from "../recommend/artistBacktest";
 import type { Profile } from "../recommend/profile";
 import { makePost } from "./fixtures";
@@ -89,6 +89,22 @@ describe("artist suggestions", () => {
     // fewer than RECENCY_TOP were picked: everyone you could be suggested was, so anyone rejoins
     const few = toLookUp(pool.slice(0, 10), new Set(), new Set(["a9"]));
     expect(rejoiners(pool.slice(0, 10), few, () => false).map((c) => c.name)).toEqual(["a9"]);
+  });
+
+  it("More's pages: the next ones after every page so far; a rejoiner goes on the page their rank falls in", () => {
+    const p = profile(Object.fromEntries(Array.from({ length: 80 }, (_, i) => [`a${i}`, [90 - i, "artist"]])));
+    const pool = rankCandidates(p, {}, null, new Set());
+    // a5 followed at the first lookup, a40 at the second
+    const first = toLookUp(pool, new Set(["a5", "a40"]), new Set());
+    const second = toLookUp(pool, new Set(["a5", "a40"]), new Set(first.map((c) => c.name)));
+    expect(second[0].name).toBe("a33");
+    expect(second.at(-1)!.name).toBe("a65");
+    const pages = [first, second];
+    expect(pageOf(pool, pages, "a5")).toBe(0);
+    expect(pageOf(pool, pages, "a40")).toBe(1);
+    // ranked past every page (or not a candidate): the last page
+    expect(pageOf(pool, pages, "a70")).toBe(1);
+    expect(pageOf(pool, pages, "nobody")).toBe(1);
   });
 
   it("batches the lookup 8 artists a search, any of them, newest first", () => {

@@ -30,6 +30,8 @@ export interface MockPostSpec {
   /** DText, as e621 sends it */
   description?: string;
   sources?: string[];
+  /** when it was posted (default 2024-05-01) */
+  created_at?: string;
 }
 
 export function mockPost(spec: MockPostSpec) {
@@ -44,7 +46,7 @@ export function mockPost(spec: MockPostSpec) {
   // e621's posts format since 2026-11-18, `mode=extended` (tags grouped by category)
   return {
     id: spec.id,
-    created_at: "2024-05-01T12:00:00.000-04:00",
+    created_at: spec.created_at ?? "2024-05-01T12:00:00.000-04:00",
     files: {
       meta: { md5: `md5${spec.id}`, ext, size: 1000, duration: spec.duration ?? null, has_sample: true },
       original: { width: 64, height: 48, url },
