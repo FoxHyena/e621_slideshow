@@ -2160,6 +2160,54 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - e2e "Rows: a row's end glyph's ink…" measures the drawn ink of each glyph, not its box. The Follow
   from favorites test checks its line still runs to the edge.
 
+## 2026-11-27 — Tune gets a picture of how For You picks (owner: "Lock it")
+- Owner: "I'd like to add a nice graphic to visually represent how the tuning and post weighing system
+  works to build the for you page that we could include in the tuning page as I've had some
+  questions. Would you be able to design a few approaches for me to pick from?"
+- Read first, on main (`src/lib/recommend/weights.ts`, `rank.ts`, `stream.ts`): a tag's weight is how
+  far its share of the favorites is above its share of e621, damped for small counts and for tags
+  that are broad on e621; For You searches the window for the top Breadth tags and adds three pages of
+  the window's best-scored posts; the order is the taste percentile plus the quality percentile
+  (favorites against posts of the same age).
+- Drawn (mine): A, the path from favorites to feed; B, one post with its two marks; C, two tags
+  against e621's share, with five dots on every tag row. My pick was C.
+- Owner: "A combined with C? Also keep in mind that we're making the comnination of popular vs taste
+  customizable".
+- Drawn (mine): one card. The path, with C's tag bars as its second stop, and C's dots on the rows.
+  The order stop reads the "Taste or popular" slider: Taste 1 part, Popular the slider's number.
+- Owner, asked 'Lock "A with C" as Tune's graphic and write it into the spec?': "Lock it".
+- **Mine:** every measurement and every sentence in the card; which two tags it shows; the dots' rule
+  (fifths of the strongest weight, rounded up; five when pinned); "Hide" and that the device
+  remembers it; that the card shows only once favorites are read.
+- **Read from the builder's uncommitted files, not from main:** the slider. "Taste or popular", 0 to
+  2 in steps of 0.25, 1 is "Even". If its name or range changes, the order stop changes with it.
+- **The cost:** 635 tall on a phone, more than one screen of Tune, until hidden.
+- **Left out of the picture on purpose:** the learned ranking (when it is fitted, it is the taste
+  mark), the damping rules, and that characters count half. The card says what holds for both.
+- Not built. Checked in the mock only: no errors, no sideways scroll at 400 and 1400, no clipped text.
+
+## 2026-11-27 — Built: Tune's "How For You picks" and the dots on tag rows (builder)
+- Built as the designer's entry above says (DESIGN.md "Tune", "How For You picks (the card)"), in
+  `src/screens/TunePicture.tsx`. At 343 wide it is 343 × 635, as drawn; folded, 56.
+- **Mine:** the newest favorites' thumbs come from one `id:` search for the 15 newest favorite numbers,
+  asked once a visit and kept in memory only. The blacklist and the ratings hide thumbs as in every
+  feed; until the answer comes the nine squares are empty Well.
+- **Mine:** "Hide" is kept per device in localStorage (`tunePictureHidden`), not per account.
+- **Mine:** the second tag falls back to the fewest dots when no tag has exactly one (with two tags
+  of equal weight, both show five).
+- **Mine:** the search stop's sentence follows For You's Date: "the last 7 days … the week's most
+  popular" by default; "today … today's", "this month … the month's", "the last 30 days … their most
+  popular", "posts since 2026-01-01 … their most popular". The number is one search's tags: Breadth,
+  or fewer when e621's tag limit cuts it (Search further's later rounds don't add to it).
+- **Mine, from review:** the strongest tag the dots measure against leaves out pins, since a pin sets
+  its tag to at least 1 and would otherwise thin every row's dots on a small profile. The thumbs are
+  forgotten on sign-out, and a failed ask is tried again next visit.
+- **Mine:** a row that isn't searched (dimmed) dims its dots too, as a muted one does.
+- **To the designer's questions:** the learned ranking scores a post by its tags and its rating (a fitted
+  weight per tag, `model.ts`), so "Taste is how well its tags match yours" holds for both, leaving out
+  the rating; I kept the sentence. "Popular is its favorites for
+  its age" holds: the quality percentile compares favorites against posts of the same age.
+
 ## The blacklist box suggests e621's tags (owner, 2026-11-27)
 
 - Settings › Content's "Tags to hide" box is now the same `TagInput` as Search: after 250 ms it asks
@@ -2229,3 +2277,20 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     hide-favorites don't apply.
   - A failed ask for a comic's pools or pages waits 30 s before it goes again.
 - Not built: a comic's own page (the e621 pool page), reading a comic in the slideshow.
+
+## 2026-11-27 — Tune's picture: the builder's five choices are kept (owner: "Keep and commit")
+- The builder built the card and the dots (draft PR 51, `claude/tune-picture`) and reported five
+  choices of its own. Told of them and asked "Keep the builder's five choices and write them into the
+  spec?", the owner said: "Keep and commit". The owner has not seen the build.
+- Now in DESIGN.md "Tune":
+  1. A thumb the blacklist or the rating setting hides is hidden in the card too; empty Well squares
+     until the thumbs arrive.
+  2. "Hide" is remembered by the device, not the account.
+  3. With no tag at exactly one dot, the second example is from the tags with the fewest dots.
+  4. A row that is not searched dims its dots.
+  5. The dots measure against the strongest unpinned tag. This changes my rule (the strongest tag of
+     all): a pin would have thinned every other row on a small profile.
+- Also written in: the search stop's sentence follows For You's Date, in the builder's wordings.
+- The builder's answer on the learned ranking: it also scores a post's rating, which the card's
+  sentence on Taste leaves out. The sentence stays.
+- Checked by me: the branch holds my design commit and the PR is an open draft. Not run, not seen.

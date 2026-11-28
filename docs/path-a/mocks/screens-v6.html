@@ -1224,6 +1224,97 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
 .p6 .row6 + .row6::before { right: 14px; }
 .p6 .srow6 > .ic.chev.ext { margin: 0 -1px 0 0; }
 .p6 .srow6 > .ic.chev.dn { margin: 0 -3px 0 -2px; }
+
+/* Tune's picture of how For You picks (2026-11-27): three approaches, one switch. Nothing here is picked yet. */
+#root:not([data-tg="ac"]) .tgsw6 .tgac, #root:not([data-tg="a"]) .tgsw6 .tga, #root:not([data-tg="b"]) .tgsw6 .tgb, #root:not([data-tg="c"]) .tgsw6 .tgc,
+#root:not([data-tg="c"]):not([data-tg="ac"]) .tgsw6 .tgdot { display: none; }
+.tgslot6 { margin-top: 16px; }
+.tg6 { padding: 14px 16px 16px; }
+.tg6 .tgtop { display: flex; align-items: center; justify-content: space-between; height: 28px; margin-bottom: 12px; }
+.tg6 .tgtop b { font: var(--t-count); }
+.tg6 .tgtop button { height: 28px; padding: 0 12px; margin-right: -12px; font: var(--t-foot-r); color: var(--link); position: relative; }
+.tg6 .tgtop button::before { content: ""; position: absolute; inset: -8px 0; }
+.tg6 p { margin: 0; font: var(--t-foot); color: var(--muted); text-wrap: pretty; }
+.tg6.fold { padding-bottom: 14px; }
+.tg6.fold .tgtop { margin-bottom: 0; }
+.tg6.fold > :not(.tgtop) { display: none; }
+.tg6 .tagname { font: 500 15px/20px var(--f); color: var(--t-general); }
+.tg6 .s, .pips6.s { color: var(--t-species); } .tg6 .c, .pips6.c { color: var(--t-character); } .tg6 .y, .pips6.y { color: var(--t-copyright); }
+/* A. The path: goo runs from the favorites down to For You */
+.tgpath6 { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.tgpath6 > li { position: relative; padding-left: 40px; min-height: 28px; }
+.tgpath6 .g { position: absolute; left: 0; top: 0; width: 28px; height: calc(100% + 42px); filter: url(#gooM); pointer-events: none; }
+.tgpath6 > li:last-child .g { height: 28px; }
+.tgpath6 .g i { position: absolute; background: #fff; border-radius: 999px; }
+.tgpath6 .g .n { left: 0; top: 0; width: 28px; height: 28px; }
+.tgpath6 .g .n2 { left: 0; bottom: 0; width: 28px; height: 28px; }
+.tgpath6 .g .t { left: 11px; top: 14px; bottom: 14px; width: 6px; }
+.tgpath6 .g .d { left: 8.5px; top: 58%; width: 11px; height: 14px; animation: tgdrip6 1.2s cubic-bezier(.45,0,.75,.5) both; animation-delay: calc(var(--i, 0) * .32s + .3s); }
+@keyframes tgdrip6 { from { top: 18px; } }
+@media (prefers-reduced-motion: reduce) { .tgpath6 .g .d { animation: none; } }
+.tgpath6 .nd { position: absolute; left: 0; top: 0; width: 28px; height: 28px; display: grid; place-items: center; color: var(--ground); }
+.tgpath6 .h { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 28px; }
+.tgpath6 .h b { font: var(--t-count); }
+.tgpath6 .h span { font: var(--t-foot); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tgpath6 .m { margin: 4px 0 8px; }
+.tgth6 { display: flex; gap: 4px; }
+.tgth6 i { width: 24px; height: 24px; border-radius: 8px; background: var(--art); box-shadow: var(--sunk-art); flex: none; }
+.tgth6 i:nth-last-child(2) { opacity: .6; } .tgth6 i:last-child { opacity: .3; }
+.tgbars6 { display: grid; grid-template-columns: max-content 1fr; gap: 0 8px; align-items: center; }
+.tgbars6 span { display: inline-flex; align-items: center; gap: 4px; font: var(--t-foot); font-weight: 500; line-height: 18px; color: var(--t-general); }
+.tgbars6 span .ic { color: var(--muted); }
+.tgbars6 i { height: 8px; width: var(--w); border-radius: 999px; background: currentColor; color: var(--t-general); }
+.tgdots6 { display: grid; grid-template-columns: repeat(28, 1fr); gap: 3px; }
+.tgdots6 i { aspect-ratio: 1; border-radius: 2px; background: var(--well); }
+.tgdots6 i.on { background: var(--link); }
+/* The order: the split follows Tune's "Taste or popular" slider (0 taste only, 1 even, 2 popular counts double) */
+.tgmix6 .mx { display: flex; gap: 2px; height: 12px; }
+.tgmix6 .mx i { min-width: 0; transition: flex-grow .25s cubic-bezier(.2,.8,.2,1); }
+.tgmix6 .a { flex: 1 1 0; background: var(--link); border-radius: 999px 3px 3px 999px; }
+.tgmix6 .b { flex: var(--tgw, 1) 1 0; background: var(--heart); border-radius: 3px 999px 999px 3px; }
+#root[data-tgonly] .tgmix6 .a { border-radius: 999px; } #root[data-tgonly] .tgmix6 .b { display: none; }
+.tgmix6 .ml { display: flex; justify-content: space-between; margin-top: 4px; font: var(--t-foot); color: var(--muted); }
+#root[data-tgonly] .tgmix6 .ml span:last-child { opacity: .45; }
+@media (prefers-reduced-motion: reduce) { .tgmix6 .mx i { transition: none; } }
+/* The tag bars inside the path: short labels, so the bars keep their length */
+.tgpath6 .tgcmp6 { gap: 8px; margin-bottom: 0; }
+.tgpath6 .tgcmp6 .l { margin-bottom: 0; }
+.tgpath6 .tgcmp6 .r { grid-template-columns: 38px 1fr 36px; height: 18px; }
+.tgdots6.two i:nth-child(n+57) { display: none; }
+/* B. One post, weighed */
+.tgpost6 { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+.tgpost6 > i { width: 72px; height: 72px; border-radius: 12px; background: var(--art); box-shadow: var(--sunk-art); flex: none; }
+.tgpost6 .w { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.tgpost6 .w small { font: var(--t-foot); color: var(--muted); }
+.tgpost6 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tgm6 { margin-top: 12px; }
+.tgm6 .l { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.tgm6 .l b { font: var(--t-foot-r); color: var(--text); white-space: nowrap; }
+.tgm6 .l span { font: var(--t-foot); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tgm6 .tr { display: flex; gap: 2px; height: 12px; border-radius: 999px; background: var(--well); box-shadow: var(--sunk); overflow: hidden; }
+.tgm6 .tr i { height: 100%; width: var(--w); background: currentColor; color: var(--t-general); }
+.tgm6 .tr i:last-child { border-radius: 0 999px 999px 0; }
+.tgm6 .tr i.h { color: var(--heart); } .tgm6 .tr i.s { color: var(--t-species); } .tgm6 .tr i.c { color: var(--t-character); }
+.tgsum6 { display: flex; align-items: baseline; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(180,199,217,.1); font: var(--t-foot); color: var(--muted); }
+.tgsum6 .ic { color: var(--link); flex: none; align-self: center; }
+.tgsum6 span:last-child { margin-left: auto; white-space: nowrap; }
+.tgsw6 .srow6 .lbl small { white-space: normal; }
+.tgsum6 b { font: var(--t-count); color: var(--text); }
+/* C. Your tags against e621's; five dots carry a tag's weight into its row */
+.tgcmp6 { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
+.tgcmp6 .l { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.tgcmp6 .v { display: inline-flex; align-items: center; gap: 8px; font: var(--t-foot); color: var(--muted); font-variant-numeric: tabular-nums; }
+.tgcmp6 .r { display: grid; grid-template-columns: 92px 1fr 36px; align-items: center; gap: 8px; height: 20px; font: var(--t-foot); }
+.tgcmp6 .r > span:first-child, .tgcmp6 .r .n { color: var(--muted); }
+.tgcmp6 .r .n { text-align: right; font-variant-numeric: tabular-nums; }
+.tgcmp6 .r .b { display: block; }
+.tgcmp6 .r i { display: block; height: 8px; width: var(--w); min-width: 8px; border-radius: 999px; background: currentColor; }
+.tgcmp6 .r:not(.s):not(.c):not(.y) i { color: var(--t-general); }
+.tgcmp6 .r.e i { color: var(--muted); opacity: .55; }
+.pips6 { display: inline-flex; gap: 3px; flex: none; color: var(--t-general); }
+.pips6 i { width: 6px; height: 6px; border-radius: 999px; background: var(--well); box-shadow: inset 0 1px 0 rgba(0,0,0,.35); }
+.pips6 i.on { background: currentColor; box-shadow: none; }
+.srow6:has(.tog6.mute[aria-pressed="true"]) .pips6 { opacity: .5; }
 </style>
 
 <div class="wrap" id="root">
@@ -1331,6 +1422,44 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
         <tr><th>Why For You picked a post (picked by you: Marked tags)</th><td>Only in Post info</td><td><b>Marked tags:</b> the tags from your tuning stand first in the tag row, each with a 12 spark. <b>A line:</b> "Because you fav jackal and desert" under the picture. <b>Off.</b></td><td>You picked Marked tags. The reason sits on the tag itself, and the post does not grow. A line would make every For You post 26 taller.</td></tr>
         <tr><th>Copy link (picked by you: Left)</th><td>⋯ › "Share post"</td><td>A well, 36 by 28, with the link glyph. <b>Left:</b> at the left end of the footer; on a comic page it stands before the comic's well. <b>By the heart:</b> between the score and the heart. <b>Off.</b> A tap copies the post's link in this app, the glyph is a check for 1.4 s, and the toast says "Link copied".</td><td>You picked Left. The space is empty, and a miss cannot favorite. By the heart is under the thumb, but a miss would favorite the post.</td></tr>
         <tr><th>The feed's ⋯ menu</th><td>Built without a drawing: a title, then rows with icon wells; the wash is 8 from the sides and 20 from the bottom</td><td>A chip's dropdown: the panel with 4 above and below and 16 at the sides, 260 wide; rows 56 tall with a 32 icon well. No title. Right edges lined up with the capsule. The same on a phone and on a computer. A row that cannot be used now is at 45%.</td><td>The fault was the design's: this menu was never drawn. My first drawing put a well of rows under a title; you said its corners and alignment looked out of place, and they were. Other option: a sheet from the bottom on a phone, as a post's ⋯ is.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="tunegfx" aria-label="Tune: a picture of how For You picks">
+    <h2 class="pg-h2" style="margin-top:40px">Tune: a picture of how For You picks</h2>
+    <p class="pg-p dimtxt"><span class="prop6">Picked by you: A with C</span>You asked for a graphic on the Tune page that shows how the tuning and the weighing build For You. I drew three approaches; you asked for A combined with C, saw it, and locked it ("Lock it"). It is drawn first; the other three stay here as the options not picked. Its order stop follows the "Taste or popular" slider that is being built. All of it is drawn from what the app's code does today. Each is a card under "For You learns from your favorites." with "Hide"; hidden, it is one line with "Show". They can be combined. The numbers are examples: in the app they are the person's own.</p>
+    <div class="cols" style="margin-top:28px">
+      <section class="col" aria-label="A with C">
+        <div class="col-head"><h2 class="pg-h3">A with C. The path, with the tag bars in it</h2><p>One card. The path's second stop is now C's picture: two of your tags against e621's. The tag rows keep C's dots.</p></div>
+        <div class="under" id="u-tgac" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="A. The path">
+        <div class="col-head"><h2 class="pg-h3">A. The path</h2><p>The whole way from your favorites to the feed, top to bottom. The white line is goo: it runs from your favorites down to For You. Each stop names the control that changes it.</p></div>
+        <div class="under" id="u-tga" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="B. One post">
+        <div class="col-head"><h2 class="pg-h3">B. One post</h2><p>One post from your own For You with its two marks. The first bar is built from the tags it shares with you, in their colours.</p></div>
+        <div class="under" id="u-tgb" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="C. Your tags against e621's">
+        <div class="col-head"><h2 class="pg-h3">C. Your tags against e621's</h2><p>Two of your tags, each next to its share of e621. It shows why a tag on many favorites can still be weak. Every tag row then carries five dots for its weight.</p></div>
+        <div class="under" id="u-tgc" style="margin-top:0"></div>
+      </section>
+      <section class="col" aria-label="Where it sits">
+        <div class="col-head"><h2 class="pg-h3">Where it sits</h2><p>The Tune page as it is built, with the card under the first line and the "Taste or popular" slider that is being built. Scroll inside the phone. Move that slider and watch the card's order stop. "Hide" folds the card.</p></div>
+        <div class="optg"><span>The card</span><div class="pick" data-opt="tg"><button type="button" data-v="ac" aria-pressed="true">A with C</button><button type="button" data-v="a" aria-pressed="false">A. Path</button><button type="button" data-v="b" aria-pressed="false">B. One post</button><button type="button" data-v="c" aria-pressed="false">C. Tag bars</button></div></div>
+        <div class="phone-holder tgsw6" id="s-tunegfx"></div>
+      </section>
+    </div>
+    <h2 class="pg-h2">The approaches, side by side</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Approach</th><th>The question it answers</th><th>Height on a phone</th><th>What the build needs</th></tr></thead>
+      <tbody>
+        <tr><th>A with C (picked by you)</th><td>Both: how For You gets made, and why one tag weighs more than another.</td><td>635. More than one screen of Tune; "Hide" folds it to one line.</td><td>What A and C need. The order stop reads the "Taste or popular" slider: taste gets 1 part and popular gets the slider's number, 0 to 2.</td></tr>
+        <tr><th>A. The path</th><td>"How does For You get made?" All four steps, and which control touches which step.</td><td>596. It fills the first screen of Tune.</td><td>Only numbers it already has: the favorites read, the tag count, Breadth. The goo line is the mascot's filter.</td></tr>
+        <tr><th>B. One post</th><td>"Why is this post so high?" The two marks a post gets, on a real post.</td><td>291</td><td>The top post of the last ranking and its two marks. With no ranking yet it needs a drawn example. The coloured parts of the first bar are the post's strongest tags; I have not checked with the builder how the learned ranking splits its mark by tag.</td></tr>
+        <tr><th>C. Your tags against e621's</th><td>"Why does this tag weigh more than that one?" The rule behind every weight on this page.</td><td>260. The dots add nothing to a row's height.</td><td>Each tag's share of the favorites and of e621. The build has both. The dots take the place of "weight 3.4".</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -3445,6 +3574,73 @@ button.pwho6 b .ic { color: rgba(255,255,255,.6); flex: none; }
   document.addEventListener('click', e => {
     const c = e.target.closest('.cplink6'); if (c) { c.classList.add('done'); setTimeout(() => c.classList.remove('done'), 1400); return; }
     const m = e.target.closest('.dmore6'); if (m) { m.previousElementSibling.classList.remove('clamp'); m.remove(); }
+  });
+
+  // Tune's picture of how For You picks (2026-11-27): three approaches and where the card sits
+  rootEl.dataset.tg = 'ac';
+  P.tgtag = '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>';
+  P.tgrank = '<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M11 4h10"/><path d="M11 8h7"/><path d="M11 12h4"/>';
+  const tgTop = (t, fold = false) => `<div class="tgtop"><b>${t}</b><button type="button" data-tgfold>${fold ? 'Show' : 'Hide'}</button></div>`;
+  const tgStep = (k, icon, title, note, mini, text, last = false) => `<li><span class="g" aria-hidden="true" style="--i:${k}"><i class="n"></i>${last ? '' : '<i class="t"></i><i class="d"></i><i class="n2"></i>'}</span><span class="nd">${ic(icon, 16, 2.4)}</span><div class="h"><b>${title}</b>${note ? `<span>${note}</span>` : ''}</div>${mini ? `<div class="m">${mini}</div>` : ''}${text ? `<p>${text}</p>` : ''}</li>`;
+  const tgThumbs = `<div class="tgth6">${['mossy otter', 'inkwell fox', 'dune jackal', 'berry wolf', 'pastelbat', 'mossy otter', 'inkwell fox', 'dune jackal', 'berry wolf'].map((a, k) => `<i style="--art:${art(a, k)}"></i>`).join('')}</div>`;
+  const tgBars = `<div class="tgbars6"><span class="s">red fox${ic('pin', 12, 2.4)}</span><i class="s" style="--w:100%"></i><span class="s">otter</span><i class="s" style="--w:76%"></i><span>cozy</span><i style="--w:42%"></i></div>`;
+  const tgDots = `<div class="tgdots6">${Array.from({ length: 84 }, (_, k) => `<i${(k * 37 + 11) % 100 < 27 ? ' class="on"' : ''}></i>`).join('')}</div>`;
+  const tgSplit = `<div class="tgmix6"><div class="mx"><i class="a"></i><i class="b"></i></div><div class="ml"><span>Taste</span><span>Popular</span></div></div>`;
+  // both = A with C's tag bars as its second stop (the owner, 2026-11-27: "A combined with C?")
+  const cardA = (fold = false, both = false) => `<div class="card6 tg6 ${fold ? 'fold' : ''}">${tgTop('How For You picks', fold)}<ol class="tgpath6">
+    ${both ? tgStep(0, 'heart', 'Your favorites', '1,284 read', tgThumbs, '') : tgStep(0, 'heart', 'Your favorites', '1,284', tgThumbs, 'It reads the tags on every one.')}
+    ${both ? tgStep(1, 'tgtag', 'Your tags', 'Pin · Mute', `<div class="tgcmp6">${tgEx('s', 'otter', '8', 4, '2.4%', '0.3%', 12.5, true)}${tgEx('', 'solo', '1.1', 1, '62%', '55%', 89, true)}</div>`, 'A tag weighs more the further your share is above e621\'s. Pin puts one on top.')
+      : tgStep(1, 'tgtag', 'Your tags', 'Pin · Mute', tgBars, 'Tags you favorite far more than e621 does weigh the most. Pin puts one on top.')}
+    ${tgStep(2, 'search', 'The search', 'Breadth · 15 tags', both ? tgDots.replace('tgdots6', 'tgdots6 two') : tgDots, 'It looks through the last 7 days for your top 15 tags, and adds the week\'s most popular.')}
+    ${tgStep(3, 'tgrank', 'The order', 'Taste or popular', tgSplit, 'Taste is how well its tags match yours. Popular is its favorites for its age.')}
+    ${tgStep(4, 'spark', 'For You', 'Best first', '', 'Posts you favorited or muted stay out.', true)}</ol></div>`;
+  const cardB = `<div class="card6 tg6">${tgTop('How a post is weighed')}
+    <div class="tgpost6"><i style="--art:${art('mossy otter', 2)}"></i><div class="w"><small>From your For You today</small><div class="tags"><span class="tag6 s">red fox</span><span class="tag6 s">otter</span><span class="tag6">cozy</span></div></div></div>
+    <div class="tgm6"><div class="l"><b>Your taste</b><span>Better than 92% of posts found</span></div><div class="tr"><i class="s" style="--w:38%"></i><i class="s" style="--w:32%"></i><i style="--w:22%"></i></div></div>
+    <div class="tgm6"><div class="l"><b>Favorites for its age</b><span>More than 71%</span></div><div class="tr"><i class="h" style="--w:71%"></i></div></div>
+    <div class="tgsum6">${ic('spark', 16, 2.2)}<span><b>3rd of 2,340</b> this week</span><span>Split: Even</span></div></div>`;
+  const tgPips = (n, cls = '') => `<span class="pips6 ${cls}" role="img" aria-label="Weight ${n} of 5">${[1, 2, 3, 4, 5].map(k => `<i${k <= n ? ' class="on"' : ''}></i>`).join('')}</span>`;
+  const tgEx = (cls, name, x, pips, mine, site, ws, short = false) => `<div class="ex"><div class="l"><span class="tagname ${cls}">${name}</span><span class="v">${x}× e621${tgPips(pips, cls)}</span></div><div class="r ${cls}"><span>${short ? 'Yours' : 'Your favorites'}</span><span class="b"><i style="--w:100%"></i></span><span class="n">${mine}</span></div><div class="r e"><span>${short ? 'e621' : 'All of e621'}</span><span class="b"><i style="--w:${ws}%"></i></span><span class="n">${site}</span></div></div>`;
+  const cardC = `<div class="card6 tg6">${tgTop('How a tag gets its weight')}<div class="tgcmp6">${tgEx('s', 'otter', '8', 4, '2.4%', '0.3%', 12.5)}${tgEx('', 'solo', '1.1', 1, '62%', '55%', 89)}</div><p>A tag weighs more the further your share is above e621's. The count alone does not decide.</p></div>`;
+  const trowG = (cls, name, n, x, p, pin = false, mute = false, sw = '') => `<div class="srow6"><span class="lbl"><span class="tagname ${cls}">${name}</span><small>${n} favorites</small></span>${tgPips(mute ? 0 : p, cls + ' ' + sw)}<button class="tog6" type="button" data-toggle aria-pressed="${pin}" aria-label="Pin ${name}">${ic('pin', 18, 2.2)}</button><button class="tog6 mute" type="button" data-toggle aria-pressed="${mute}" aria-label="Mute ${name}">${ic('eyeoff', 18, 2.2)}</button></div>`;
+  const tgRows = (sw = '') => `<div class="glabel6"><span>Your tags</span><span style="padding-right:16px">Pin · Mute</span></div><div class="group6 flat" style="margin-bottom:0">${trowG('s', 'red fox', 48, 9, 5, true, false, sw)}${trowG('s', 'otter', 31, 8, 4, false, false, sw)}${trowG('c', 'ember (inkwell)', 22, 30, 3, false, false, sw)}${trowG('', 'cozy', 19, 4, 2, false, false, sw)}${trowG('', 'night', 14, 3, 0, false, true, sw)}</div>`;
+  const tgStrip = html => `<div class="strip p6 pad"><div style="width:375px;max-width:100%;margin:0 auto">${html}</div></div>`;
+  const noGap = c => c.replace('class="card6 tg6', 'style="margin-bottom:0" class="card6 tg6');
+  $('u-tgac').innerHTML = [
+    strip('The card', 'The path, with the tag bars as its second stop. The order stop follows the "Taste or popular" slider: move that slider in the phone and the bar here moves with it.', tgStrip(noGap(cardA(false, true)))),
+    strip('The rows under it', 'From C: five dots in the tag\'s colour, where "weight 3.4" stands today. The same dots are in the card, so the card explains the rows.', tgStrip(tgRows())),
+  ].join('');
+  $('u-tga').innerHTML = [
+    strip('The card', 'The line and its stops are white goo with navy glyphs, as in the jar. A drop runs down each stretch once when the card opens, then it is still. At the right of each stop: the control on this page that changes it.', tgStrip(noGap(cardA()))),
+    strip('Hidden', 'After "Hide", all three approaches fold to this line. The app remembers it.', tgStrip(noGap(cardA(true)))),
+  ].join('');
+  $('u-tgb').innerHTML = strip('The card', 'The first bar is as long as the post\'s taste mark. Its parts are the tags it shares with you: two species tags and a general one here. The second bar is pink, the colour of favorites.', tgStrip(noGap(cardB)));
+  $('u-tgc').innerHTML = [
+    strip('The card', 'In each pair your bar is drawn full width, so the eye compares the two bars of one tag. "otter" is on few favorites but at 8 times e621\'s share: strong. "solo" is on most of them, and on most of e621 too: weak.', tgStrip(noGap(cardC))),
+    strip('The rows under it', 'Five dots in the tag\'s colour, where "weight 3.4" stands today. Five is your strongest tag. A muted tag has none.', tgStrip(tgRows())),
+  ].join('');
+  $('s-tunegfx').innerHTML = phone(`
+    <div class="scroll6">
+      <div class="head6"><div class="titlerow">${back()}</div><h3 class="title6">Tune</h3><p class="sub6">For You learns from your favorites.</p></div>
+      <div class="tgslot6"><div class="tgac">${cardA(false, true)}</div><div class="tga">${cardA()}</div><div class="tgb">${cardB}</div><div class="tgc">${cardC}</div></div>
+      <div class="group6 flat"><div class="srow6"><span class="lbl"><b>1,284 favorites read</b><small>Synced 3 min ago</small></span><button class="btn6 lip6" type="button">${ic('refresh', 16, 2.4)}Rebuild</button></div></div>
+      <div class="card6"><div class="top"><b>Breadth</b><span>15 tags</span></div><input class="range6" type="range" min="2" max="30" value="15" style="--p:46%" data-tgbreadth aria-label="Breadth"><div class="ends6"><span>2</span><span>30</span></div></div>
+      <div class="card6"><div class="top"><b>Taste or popular</b><span data-tgmixv>Even</span></div><input class="range6" type="range" min="0" max="2" step="0.25" value="1" style="--p:50%" data-tgmix aria-label="Taste or popular"><div class="ends6"><span>Taste</span><span>Popular</span></div></div>
+      <div class="group6 flat">${swrow('Search further', 'When your top tags run out, go on with the next ones', false)}${swrow('Filter artists', 'Ranks without artist tags', false)}</div>
+      ${tgRows('tgdot')}
+    </div>` + bottom('For You'));
+  // The mock's sliders: "Taste or popular" moves the order stop's bar in every card; Breadth keeps its own fill
+  document.addEventListener('input', e => {
+    const t = e.target, w = +t.value;
+    if (t.matches('[data-tgbreadth]')) { t.style.setProperty('--p', (w - 2) / 28 * 100 + '%'); t.parentElement.querySelector('.top span').textContent = w + ' tags'; }
+    if (!t.matches('[data-tgmix]')) return;
+    t.style.setProperty('--p', w * 50 + '%'); rootEl.style.setProperty('--tgw', w);
+    if (w === 0) rootEl.dataset.tgonly = ''; else delete rootEl.dataset.tgonly;
+    t.parentElement.querySelector('[data-tgmixv]').textContent = w === 0 ? 'Taste only' : w === 1 ? 'Even' : `${w < 1 ? 'More taste' : 'More popular'} · ${w}`;
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-tgfold]'); if (!b) return;
+    b.textContent = b.closest('.tg6').classList.toggle('fold') ? 'Show' : 'Hide';
   });
 
   // The viewer's hands, enough to try them: one tap hides the buttons, a double tap zooms, a sideways drag turns a comic's page.

@@ -334,6 +334,11 @@ Today's Recommended panel as a screen: sync status + Rebuild, Breadth slider, fi
 Pin / Mute, Muted list. Leaving with changes shows an **Update ranking** pill on For You (the same pill
 as a finished background re-rank); nothing re-ranks on its own.
 
+**How For You picks (owner, 2026-11-27: "Lock it"):** a card under the first line draws the way from
+favorites to feed in five stops, with two of the person's tags against e621's share, and an order bar
+that follows the "Taste or popular" slider. "Hide" folds it. Each tag row carries five dots for its
+weight. See DESIGN.md "Tune".
+
 ### Artists `/artists`
 
 Header: **Artists** · search. Segmented: **Following (42)** · **Suggested**.

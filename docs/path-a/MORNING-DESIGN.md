@@ -127,6 +127,16 @@ After your screenshot of Settings' App rows. Not approved yet.
    else 16. The drawing was at fault; the build matched it. Now 16.
 2. **The line between rows** stops 16 before the panel's right edge, in every list.
 
+## Picked (2026-11-27, Tune's picture)
+
+You asked for a graphic of how For You picks. You locked "A with C".
+
+1. **One card on Tune**, under the first line: five stops from your favorites to For You, joined by
+   a goo line. "Hide" folds it to one line.
+2. **Its tags stop** shows two of your tags against e621's share. Every tag row gets five dots.
+3. **Its order stop** follows the "Taste or popular" slider.
+4. **Its cost:** 635 tall, more than one screen, until hidden.
+
 ## What was made
 
 | Batch | Commit | What | Builder's slice |
