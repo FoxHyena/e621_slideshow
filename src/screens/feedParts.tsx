@@ -36,14 +36,14 @@ export function useShownFeed(feed: Feed | null): void {
 }
 
 /** The live feed for this screen, or null while a saved sign-in is still being checked. */
-export function useFeed(spec: FeedSpec, ratingsOverride: SearchSettings["ratings"] | null): Feed | null {
+export function useFeed(spec: FeedSpec | null, ratingsOverride: SearchSettings["ratings"] | null): Feed | null {
   const session = useStore(getSession().store, (s) => s);
   const savedRatings = useStore(getPrefs().store, (p) => p.search.ratings);
   const reg = getFeeds();
   const generation = useStore(reg.generation, (g) => g);
   const ratings = ratingsOverride ?? savedRatings;
   const feed = useMemo(
-    () => (session.ready ? reg.get(spec, { ratings, creds: session.creds, user: session.user }) : null),
+    () => (session.ready && spec ? reg.get(spec, { ratings, creds: session.creds, user: session.user }) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `generation` re-asks after the registry dropped feeds
     [reg, spec, ratings, session.ready, session.creds, session.user, generation],
   );

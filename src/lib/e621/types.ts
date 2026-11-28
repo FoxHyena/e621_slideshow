@@ -66,6 +66,15 @@ export interface Post {
   flags?: { deleted?: boolean; pending?: boolean; flagged?: boolean };
 }
 
+/** An e621 pool: a "series" is a comic, its pages in `post_ids` order (DESIGN.md "A comic"). */
+export interface Pool {
+  id: number;
+  name: string;
+  category: "series" | "collection";
+  post_ids: number[];
+  updated_at?: string;
+}
+
 export interface AutocompleteTag {
   id: number;
   name: string;

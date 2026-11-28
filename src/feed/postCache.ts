@@ -19,6 +19,11 @@ function remember(user: string | null | undefined, id: number | string, found: P
   return p;
 }
 
+/** Posts that came in a batch (a comic's pages): their pages and the viewer don't ask again. */
+export function rememberPosts(user: string | null | undefined, ids: readonly number[], found: Map<number, Post>) {
+  for (const id of ids) if (!known.has(keyOf(user, id))) remember(user, id, found.get(id));
+}
+
 const asking = new Map<string, Promise<Post | null>>();
 /**
  * Ask e621 for one post, once: a second ask while the first is out (an effect run twice, the viewer

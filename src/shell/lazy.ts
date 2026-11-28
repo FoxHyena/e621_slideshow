@@ -44,6 +44,8 @@ export const NotFoundScreen = lazy(() => shellScreens().then((m) => ({ default: 
 export const Player = lazy(() => player().then((m) => ({ default: m.Player })));
 /** A post's ⋯ sheet rides in the filter sheets' chunk (src/feed/PostMenu.tsx). */
 export const PostMenuSheet = lazy(() => filterSheets().then((m) => ({ default: m.PostMenu })));
+/** A card's comic well rides with the post page (src/feed/comics.tsx). */
+export const ComicWell = lazy(() => artistPage().then((m) => ({ default: m.ComicWell })));
 /** The picture viewer rides in the player's chunk: one more lazy chunk costs the cold load its name list. */
 export const Viewer = lazy(() => player().then((m) => ({ default: m.Viewer })));
 

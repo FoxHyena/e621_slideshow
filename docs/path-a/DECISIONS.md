@@ -2185,3 +2185,34 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     foot asks for the next ones.
   - The tests: later artists now posted more recently, so ranking all pages together would fail the
     "cards stay put" check; the failed More checks it isn't asked again until Try again.
+
+## 2026-11-27 — Built: comics (e621 pools)
+- Owner, asked about a post that is a comic's page: "Build it". Built from DESIGN.md "A post on its
+  own", "A comic", and the mock's comic screens.
+- **Built:**
+  - A feed card whose post is a comic's page has the well at the left of its footer, after Copy link:
+    the pages glyph and "3 / 5". It opens the viewer on that page. Cards that appear together share one
+    request for their pools, not one each.
+  - The viewer on a comic's page: "3 / 5" at the top, the comic bar above the artist row, a sideways
+    drag turns the page. The first and last pages hold back when dragged past. On a computer, two glass
+    buttons at the sides and the arrow keys turn it too. Back still closes the viewer, however many
+    pages were turned.
+  - The comic bar opens the Pages sheet: every page as a thumb, the current one ringed, "Last page
+    <when>", and "Open as a feed".
+  - The post page has the comic's group right after the post: its name and page, then a strip of
+    every page. The row opens the comic as a feed; a thumb opens that page's post.
+- **Picked by me:**
+  - Only e621's "series" pools are comics. A "collection" pool (somebody's set of favorites, say) gets
+    nothing.
+  - Up to 500 pages are fetched, 100 to a request; the first hundred go out as on-screen asks, the
+    rest wait behind them. A longer comic's strip and sheet stop at 500.
+  - "Open as a feed" is the pool's own page order. e621 can't sort a search by page, so the feed is
+    the pool's list of posts, fetched in order, with your ratings and your blacklist applied.
+  - A key press or tap while a page is turning (320 ms) is dropped, not queued.
+  - A turn goes past a page it can't show: deleted, hidden from you by e621, or on your blacklist (unless
+    you chose to see it once). Page numbers stay the pool's. A skipped page isn't fetched ahead.
+    Turning waits until the pages are known (a fraction of a second), so it never lands on one first.
+  - The comic as a feed has only the Media chip. Its order is the pages', so sort, date, score and
+    hide-favorites don't apply.
+  - A failed ask for a comic's pools or pages waits 30 s before it goes again.
+- Not built: a comic's own page (the e621 pool page), reading a comic in the slideshow.

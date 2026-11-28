@@ -26,19 +26,17 @@ export class IdListQueue implements SlideQueue {
   private inflight: Promise<void> | null = null;
 
   constructor(
-    private ids: readonly number[],
+    /** the ids, or how to get them on the first load (a comic's pages: src/feed/comics.tsx) */
+    private ids: readonly number[] | (() => Promise<readonly number[]>),
     private fetch: IdFetch,
     filter: Omit<PostFilter, "seen" | "stats">,
     private onChange: () => void = () => {},
     /** when the list was ranked */
     readonly savedAt: number | null = null,
+    readonly query = "For You",
   ) {
     this.filter = { ...filter, seen: new Set(), stats: this.stats };
-    this.exhausted = ids.length === 0;
-  }
-
-  get query(): string {
-    return "For You";
+    this.exhausted = typeof ids !== "function" && ids.length === 0;
   }
 
   ensure(index: number): Promise<void> {
@@ -78,10 +76,13 @@ export class IdListQueue implements SlideQueue {
     this.loading = true;
     this.onChange();
     try {
+      // (asked again by Try again when this failed)
+      if (typeof this.ids === "function") this.ids = await this.ids();
+      const ids = this.ids;
       // A batch can come back with nothing showable (all deleted or blacklisted): keep going.
       const add: Post[] = [];
-      while (add.length === 0 && this.next < this.ids.length) {
-        const batch = this.ids.slice(this.next, this.next + ID_BATCH);
+      while (add.length === 0 && this.next < ids.length) {
+        const batch = ids.slice(this.next, this.next + ID_BATCH);
         const got = await this.fetch(`id:${batch.join(",")}`, 1, ID_BATCH);
         this.next += batch.length;
         const byId = new Map(got.map((p) => [p.id, p]));
@@ -91,7 +92,7 @@ export class IdListQueue implements SlideQueue {
         }
       }
       this.posts = [...this.posts, ...add];
-      if (this.next >= this.ids.length) this.exhausted = true;
+      if (this.next >= ids.length) this.exhausted = true;
     } catch (e) {
       this.error = e instanceof Error ? e.message : String(e);
     } finally {
