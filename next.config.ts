@@ -1,11 +1,43 @@
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname } from "node:path";
 import type { NextConfig } from "next";
 
-const { version } = JSON.parse(readFileSync(join(import.meta.dirname, "package.json"), "utf8")) as { version: string };
 const isDev = process.env.NODE_ENV === "development";
+// this project's own git only: a copy of the source with no .git inside another repo doesn't take that repo's date
+const git = (args: string) =>
+  execSync(`git ${args}`, {
+    cwd: import.meta.dirname,
+    stdio: ["ignore", "pipe", "ignore"],
+    env: { ...process.env, TZ: "UTC", GIT_CEILING_DIRECTORIES: dirname(import.meta.dirname) },
+  })
+    .toString()
+    .trim();
+
+/**
+ * The version Settings shows (owner, 2026-11-28: "Date, automatic"): the day of the deploy's commit,
+ * in UTC, as 2026.11.28, so nothing is ever bumped by hand. With no git, the day of the build.
+ */
+function appVersion(): string {
+  try {
+    const day = git("log -1 --format=%cd --date=format-local:%Y.%m.%d");
+    if (day) return day;
+  } catch {
+    // no git here (an export of the source): the build's own day
+  }
+  return new Date().toISOString().slice(0, 10).replaceAll("-", ".");
+}
+/** The commit's short id, shown beside the version: two deploys on one day differ by it. */
+function commitId(): string {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7);
+  try {
+    return git("rev-parse --short=7 HEAD");
+  } catch {
+    return "";
+  }
+}
+const version = appVersion();
+const commit = commitId();
 
 /** One id per deploy, the same in every build worker: the commit (Vercel's, else git's), else the version. */
 function buildId(): string {
@@ -55,8 +87,9 @@ const nextConfig: NextConfig = {
   htmlLimitedBots:
     /[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight|TelegramBot|Bluesky|Cardyb|Mastodon|Pleroma|Akkoma|Misskey|synapse|Signal|Iframely|Embedly/i,
   env: {
-    // Settings shows it under the app mark; inlined at build time.
+    // Settings shows it under the app mark, and with the commit in About; inlined at build time.
     APP_VERSION: version,
+    APP_VERSION_LONG: commit ? `${version} · ${commit}` : version,
     // The service worker's cache names and the update check carry it: one per deploy.
     NEXT_PUBLIC_BUILD_ID: buildId(),
   },

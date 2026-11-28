@@ -2316,3 +2316,16 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   - A disabled turn button on the last page still drops keyboard focus.
   - A comic that gains a page mid-visit shows it after a reload.
   - The pill can show "pool:77" for a moment before the comic's name comes in.
+
+## 2026-11-28 — The version is the commit's date (owner: "Date, automatic")
+- Owner: "We should also properly start versioning this, we look to be stuck on 0.1.0". Nothing ever
+  bumped package.json, so Settings said 0.1.0 for every deploy.
+- Offered three: the commit's date, automatic; SemVer bumped by hand in each PR; SemVer plus tags and
+  GitHub Releases. Owner picked "Date, automatic".
+- **Built:** the version is the day of the deploy's commit in UTC, as `2026.11.28`, taken from git at
+  build time in next.config.ts. With no git, it is the build's day.
+  - Settings' footer shows "Version 2026.11.28".
+  - Settings › App's Version row, and its "a new version is ready" line, add the commit's short id:
+    "2026.11.28 · 6cf53c7". Two deploys on one day differ by it.
+  - package.json's `version` is no longer read. The update check still compares build ids, as before.
+- Tests: the footer must match `Version YYYY.MM.DD`, and the Version row must match `YYYY.MM.DD · <7 hex>`.
