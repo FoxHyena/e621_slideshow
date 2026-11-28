@@ -1961,3 +1961,27 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
   corners sit 16 inside the panel's 24. Now a row's value drops the chip's menu: no title, the Panel
   is the track, 220 wide, at the row's right end. The row ends in ⌄, not ›.
 - **Mine:** all of it. Not yet approved by the owner. Measured in the mock, below.
+
+## 2026-11-27 — Built: the post page's title row; a row's value drops the chip's menu
+- From the design commit 8773cd7 (owner: "Commit and send").
+- **The post page:** 16 under the title row, on a phone and on a computer, so Back and the tools capsule stand
+  16 above the panels. The drawing says 12 under a 52 row. The build's row is the 44 controls themselves,
+  so the space is 16 here. On a computer the row already spans both columns, and both columns start level.
+- **A row's value:** Quality, Longest video and Load ahead in Settings, and Quality in Quick settings, now
+  drop the chip's menu. It has no title, is 220 wide, sits 8 under the row, and its right edge is on the
+  row's content edge. The row ends in a muted ⌄ that turns up and white while the menu is open (150 ms, like
+  a chip's).
+- **Mine:**
+  - Transition (Classic only) is the same kind of row, so it drops the same menu.
+  - A row low on the page opens its menu 8 above itself when it doesn't fit below and there's more room
+    above. It rises 4 instead of dropping 4.
+  - Quick settings on a phone: Quality is the sheet's last row, at the screen's foot, so its menu always
+    opens above the row. The sheet stays open under it. Esc, Back or a tap outside closes only the menu.
+- Not checked on a real phone.
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - Focus goes back to the row or chip when a dropdown closes and focus was left nowhere. This was the old
+    sheet's gap too.
+  - The menu is measured at its own width before it decides between above and below.
+  - It opens above only when there's real room there (at least its height, or 160).
+  - The ⌄ keeps still under reduced motion.
+  - The flip test now sets the row at the window's foot and checks that the menu opened above.

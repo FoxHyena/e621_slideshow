@@ -4,7 +4,7 @@
  * The player's sheets (DESIGN.md "Player sheets"): Quick settings (the sliders button) and Post info
  * (ⓘ). Both are the app's Panel sheet, not glass; opening one pauses the slideshow.
  */
-import { ArrowUp, ChevronRight, ExternalLink, Heart, Sparkles } from "lucide-react";
+import { ArrowUp, ChevronDown, ChevronRight, ExternalLink, Heart, Sparkles } from "lucide-react";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
@@ -20,6 +20,7 @@ import { ago, artists, compact } from "@/lib/feed/format";
 import type { PlaybackSettings } from "@/lib/settings";
 import { getNav, type Entry } from "@/nav/history";
 import { blacklistLine, openArtist, openResults } from "@/screens/actions";
+import { Dropdown } from "@/shell/Dropdown";
 import { Sheet, SheetClose } from "@/shell/Sheet";
 import { getPrefs } from "@/state/prefs";
 import { pickedFor } from "@/lib/recommend/weights";
@@ -58,7 +59,7 @@ function usePlaybackSetter(base: Entry) {
 }
 
 /** Style, speed, fit, mute and quality, straight on the sheet. */
-export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
+export function QuickSettingsSheet({ base, playback, picking = false }: { base: Entry; playback: PlaybackSettings; picking?: boolean }) {
   const { set, fromLink, target } = usePlaybackSetter(base);
   const p = playback;
   return (
@@ -111,12 +112,20 @@ export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: 
             data-testid="quick-mute"
           />
         </label>
-        <button type="button" className="list-row" onClick={() => getNav().openSheet("player-quality")} data-testid="quick-quality">
+        <button
+          type="button"
+          className="list-row"
+          onClick={() => getNav().openSheet("player-quality")}
+          aria-haspopup="dialog"
+          aria-expanded={picking}
+          data-menu="player-quality"
+          data-testid="quick-quality"
+        >
           <span className="row-text">
             <b>Quality</b>
           </span>
           <span className="row-value">{QUALITY.find((q) => q.value === p.quality)?.label}</span>
-          <ChevronRight aria-hidden className="row-chev" />
+          <ChevronDown aria-hidden className="row-chev row-drop" />
         </button>
       </div>
       <button
@@ -133,11 +142,11 @@ export function QuickSettingsSheet({ base, playback }: { base: Entry; playback: 
   );
 }
 
-/** Quality, as a menu over Quick settings; Back returns to it. */
+/** Quality, the chip's menu dropped from its row in Quick settings (designer, 2026-11-27); Back returns to it. */
 export function QualitySheet({ base, playback }: { base: Entry; playback: PlaybackSettings }) {
   const { set } = usePlaybackSetter(base);
   return (
-    <Sheet title="Quality" testId="sheet-quality">
+    <Dropdown anchor="player-quality" label="Quality" width={220} menu rowEnd testId="sheet-quality">
       <Menu label="Quality">
         {QUALITY.map((q) => (
           <MenuRow
@@ -153,7 +162,7 @@ export function QualitySheet({ base, playback }: { base: Entry; playback: Playba
           </MenuRow>
         ))}
       </Menu>
-    </Sheet>
+    </Dropdown>
   );
 }
 

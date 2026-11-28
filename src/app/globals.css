@@ -4049,6 +4049,16 @@ html {
   margin: 0 -5px 0 -4px;
   color: var(--color-muted);
 }
+/* a row whose value drops a menu: ⌄, pointing up and white while the menu is open (designer, 2026-11-27) */
+.row-drop {
+  margin: 0 -4px 0 -2px;
+  stroke-width: 2.4;
+  transition: transform 150ms ease-out;
+}
+[aria-expanded="true"] > .row-drop {
+  transform: rotate(180deg);
+  color: var(--color-fg);
+}
 .row-more {
   position: relative;
   display: grid;
@@ -6023,6 +6033,17 @@ li[data-state="done"] .first-step-n svg,
   animation: drop-in 150ms ease-out;
   transform-origin: top left;
 }
+/* over a row low on the page it rises from the row instead */
+.drop[data-up] {
+  animation-name: drop-up;
+  transform-origin: bottom right;
+}
+@keyframes drop-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
 /* it holds focus itself only when nothing in it can be used */
 .drop:focus {
   outline: none;
@@ -6071,6 +6092,9 @@ li[data-state="done"] .first-step-n svg,
 @media (prefers-reduced-motion: reduce) {
   .drop {
     animation: none;
+  }
+  .row-drop {
+    transition: none;
   }
 }
 
@@ -6217,6 +6241,10 @@ li[data-state="done"] .first-step-n svg,
 }
 
 /* ---- the post page (src/screens/PostPage.tsx, DESIGN.md "A post on its own") ---- */
+/* the 44 controls stand 16 above the panels, on a phone and on a computer (designer, 2026-11-27; the row here is the controls, so 16 rather than the drawing's 12 under a 52 row) */
+.post-page > .head-row {
+  margin-bottom: 16px;
+}
 .post-page-main .post {
   margin-bottom: 16px;
 }

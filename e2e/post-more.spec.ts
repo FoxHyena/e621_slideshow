@@ -190,3 +190,132 @@ test("on a computer, under the pointer the bar's post part turns its time and nu
   await expect.poll(() => when.evaluate((e) => getComputedStyle(e).color)).toBe("rgb(255, 255, 255)");
   expect(before).not.toBe("rgb(255, 255, 255)");
 });
+
+/** DESIGN.md "A post on its own", the design commit 8773cd7 (owner: "Commit and send"). */
+for (const w of [390, 1280])
+  test(`the post page: Back and the tools stand 16 above the panels; on a computer the row spans both columns, which start level (${w} wide)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: w, height: 844 });
+    await mockE621(page, POSTS);
+    await page.goto("/post/1149");
+    const pg = page.getByTestId("post-page");
+    await expect(pg.locator(".post-page-main .post").first()).toBeVisible();
+    const m = await pg.evaluate((p) => {
+      const r = (s: string) => p.querySelector(s)!.getBoundingClientRect();
+      const back = r(".head-row > .toolbar-circle");
+      const tools = r(".head-row .tools");
+      const main = r(".post-page-main > *");
+      const side = r(".post-page-side > *");
+      return { backGap: Math.round(main.top - back.bottom), toolsGap: Math.round(main.top - tools.bottom), level: Math.round(side.top - main.top), backX: Math.round(back.left - main.left), toolsX: Math.round(tools.right - (side.right > main.right ? side.right : main.right)) };
+    });
+    expect(m.backGap).toBe(16);
+    expect(m.toolsGap).toBe(16);
+    expect(m.backX).toBe(0);
+    expect(m.toolsX).toBe(0);
+    if (w === 1280) expect(m.level).toBe(0);
+  });
+
+/** DESIGN.md "Menu (one choice from a list)", "A row's value" (design commit 8773cd7). */
+for (const w of [390, 1280])
+  test(`a settings row's value drops the chip's menu: 220 wide, 8 under the row, right edge 16 in from the group's, rows 44, no title; ⌄ points up and white while open (${w} wide)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: w, height: 844 });
+    await mockE621(page);
+    await page.goto("/settings/slideshow");
+    const row = page.getByTestId("slideshow-quality");
+    const chev = row.locator(".row-drop");
+    const muted = await chev.evaluate((e) => getComputedStyle(e).color);
+    expect(muted).not.toBe("rgb(255, 255, 255)");
+    await row.click();
+    const menu = page.getByTestId("sheet-quality");
+    const drop = menu.locator(".drop");
+    await expect(drop).toBeVisible();
+    await page.waitForTimeout(300);
+    const m = await row.evaluate((r) => {
+      const g = r.closest(".list-group")!.getBoundingClientRect();
+      const b = r.getBoundingClientRect();
+      const d = document.querySelector("[data-testid=sheet-quality] .drop")!.getBoundingClientRect();
+      return { w: d.width, gap: Math.round(d.top - b.bottom), inset: Math.round(g.right - d.right) };
+    });
+    expect(m).toEqual({ w: 220, gap: 8, inset: 16 });
+    await expect(menu.getByRole("heading")).toHaveCount(0);
+    for (const h of await menu.getByRole("menuitemradio").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))) expect(h).toBe(44);
+    await expect(row).toHaveAttribute("aria-expanded", "true");
+    await expect.poll(() => chev.evaluate((e) => getComputedStyle(e).color)).toBe("rgb(255, 255, 255)");
+    await expect.poll(() => chev.evaluate((e) => getComputedStyle(e).transform)).not.toBe("none");
+    await menu.getByTestId("choose-original").click();
+    await expect(menu).toHaveCount(0);
+    await expect(row).toContainText("Original");
+    await expect(row).toHaveAttribute("aria-expanded", "false");
+  });
+
+test.describe("Quick settings on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  test("Quality drops its menu over the sheet (above the row, at the screen's foot); the sheet stays; Esc closes only the menu", async ({ page }) => {
+    await mockE621(page);
+    await page.goto("/search?tags=wolf");
+    await page.getByTestId("play-fab").click();
+    await page.getByTestId("quick-settings-button").click();
+    const sheet = page.getByTestId("sheet-quick-settings");
+    await expect(sheet).toBeVisible();
+    await page.waitForTimeout(500); // the sheet has risen
+    const row = page.getByTestId("quick-quality");
+    await row.click();
+    const menu = page.getByTestId("sheet-quality");
+    await expect(menu.locator(".drop")).toBeVisible();
+    await page.waitForTimeout(300); // its drop-in has landed
+    await expect(sheet).toBeVisible();
+    await expect(menu.getByRole("heading")).toHaveCount(0);
+    const m = await row.evaluate((r) => {
+      const b = r.getBoundingClientRect();
+      const d = document.querySelector("[data-testid=sheet-quality] .drop")!.getBoundingClientRect();
+      // the row is the sheet's last, at the screen's foot: no room below, so it rises 8 over the row
+      return { w: d.width, gap: Math.round(b.top - d.bottom), right: Math.round(b.right - parseFloat(getComputedStyle(r).paddingRight) - d.right) };
+    });
+    expect(m).toEqual({ w: 220, gap: 8, right: 0 });
+    await expect(row).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(menu).toHaveCount(0);
+    await expect(sheet).toBeVisible();
+    await expect(row).toBeFocused();
+    await expect(row).toHaveAttribute("aria-expanded", "false");
+    await row.click();
+    await menu.getByTestId("quality-original").click();
+    await expect(menu).toHaveCount(0);
+    await expect(sheet).toBeVisible();
+    await expect(row).toContainText("Original");
+  });
+});
+
+test("a row at the window's foot opens its menu 8 above it, inside the window; one with room opens below; Esc gives focus back to the row", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await mockE621(page);
+  await page.goto("/settings/slideshow");
+  const row = page.getByTestId("slideshow-preloadCount");
+  // the row's foot 40 from the window's: its 6 rows can't fit below
+  await row.evaluate((r) => window.scrollBy(0, r.getBoundingClientRect().bottom - (window.innerHeight - 40)));
+  await row.click();
+  const drop = page.getByTestId("sheet-preloadCount").locator(".drop");
+  await expect(drop).toHaveAttribute("data-up", "true");
+  await page.waitForTimeout(300);
+  const b = (await row.boundingBox())!;
+  const d = (await drop.boundingBox())!;
+  expect(Math.round(b.y - (d.y + d.height))).toBe(8);
+  expect(d.y).toBeGreaterThanOrEqual(16);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("sheet-preloadCount")).toHaveCount(0);
+  await expect(row).toHaveAttribute("aria-expanded", "false");
+  await expect(row).toBeFocused();
+
+  const top = page.getByTestId("slideshow-quality");
+  await top.evaluate((r) => window.scrollBy(0, r.getBoundingClientRect().top - 120));
+  await top.click();
+  const down = page.getByTestId("sheet-quality").locator(".drop");
+  await expect(down).toBeVisible();
+  await expect(down).not.toHaveAttribute("data-up", "true");
+  await page.getByTestId("choose-original").click();
+  await expect(top).toContainText("Original");
+  await expect(top).toBeFocused();
+});

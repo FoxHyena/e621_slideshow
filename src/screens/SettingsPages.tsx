@@ -4,7 +4,7 @@
  * Settings' sub-pages (UX.md "Settings", DESIGN.md "Settings" and "Settings: Account, Content, For
  * You, App"): each a pushed screen with Back, the large title, then groups. Their own chunk.
  */
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, RefreshCw, Send, Share, SlidersHorizontal, SquarePlus, Smartphone } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, ExternalLink, Heart, History, Keyboard, KeyRound, Link2, LogOut, Minus, Plus, RefreshCw, Send, Share, SlidersHorizontal, SquarePlus, Smartphone } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
@@ -19,6 +19,7 @@ import { getNav } from "@/nav/history";
 import { useScreen } from "@/shell/context";
 import { SECTION_LABEL } from "@/shell/screens";
 import { TitleRow } from "@/shell/TitleRow";
+import { Dropdown } from "@/shell/Dropdown";
 import { Sheet } from "@/shell/Sheet";
 import { getArtists } from "@/state/artists";
 import { getFollows } from "@/state/follows";
@@ -396,17 +397,26 @@ function Slideshow() {
   const set = (patch: Partial<PlaybackSettings>) => prefs.setPlayback({ ...prefs.store.get().playback, ...patch });
   const open = (k: ChoiceKey) => getNav().openSheet(`${SHEET}${k}`);
   const valueOf = (k: ChoiceKey) => (CHOICES[k] as { value: unknown; label: string }[]).find((c) => c.value === p[k])?.label ?? String(p[k]);
+  const name = sheet?.startsWith(SHEET) ? sheet.slice(SHEET.length) : null;
+  const picking = name && Object.hasOwn(CHOICES, name) ? (name as ChoiceKey) : null;
+  // a row's value drops the chip's menu at the row's right end (designer, 2026-11-27)
   const choiceRow = (k: ChoiceKey) => (
-    <button type="button" className="list-row" onClick={() => open(k)} aria-haspopup="dialog" data-testid={`slideshow-${k}`}>
+    <button
+      type="button"
+      className="list-row"
+      onClick={() => open(k)}
+      aria-haspopup="dialog"
+      aria-expanded={picking === k}
+      data-menu={`${SHEET}${k}`}
+      data-testid={`slideshow-${k}`}
+    >
       <span className="row-text">
         <b>{TITLES[k]}</b>
       </span>
       <span className="row-value">{valueOf(k)}</span>
-      <ChevronRight aria-hidden className="row-chev" />
+      <ChevronDown aria-hidden className="row-chev row-drop" />
     </button>
   );
-  const name = sheet?.startsWith(SHEET) ? sheet.slice(SHEET.length) : null;
-  const picking = name && Object.hasOwn(CHOICES, name) ? (name as ChoiceKey) : null;
 
   return (
     <>
@@ -450,7 +460,7 @@ function Slideshow() {
         Reset to defaults
       </button>
       {picking && (
-        <Sheet title={TITLES[picking]} testId={`sheet-${picking}`} pop>
+        <Dropdown anchor={`${SHEET}${picking}`} label={TITLES[picking]} width={220} menu rowEnd testId={`sheet-${picking}`}>
           <Menu label={TITLES[picking]}>
             {(CHOICES[picking] as { value: PlaybackSettings[ChoiceKey]; label: string }[]).map((c) => (
               <MenuRow
@@ -466,7 +476,7 @@ function Slideshow() {
               </MenuRow>
             ))}
           </Menu>
-        </Sheet>
+        </Dropdown>
       )}
     </>
   );
