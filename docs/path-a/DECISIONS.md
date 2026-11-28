@@ -2160,6 +2160,19 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - e2e "Rows: a row's end glyph's ink…" measures the drawn ink of each glyph, not its box. The Follow
   from favorites test checks its line still runs to the edge.
 
+## The blacklist box suggests e621's tags (owner, 2026-11-27)
+
+- Settings › Content's "Tags to hide" box is now the same `TagInput` as Search: after 250 ms it asks
+  e621's autocomplete (anonymously) for the word under the caret, with its `-`/`~` kept. Metatags
+  (`rating:e`) and words with `(` aren't asked about.
+- **Mine:** it keeps its own look: no search icon, `type="text"`, `enterKeyHint="done"`, clear button
+  "Clear Tags to hide". The list is Search's list, 8 below the box.
+- **Mine:** Enter with the list open picks the highlighted tag (as in Search); Enter with none open
+  adds the line. So typing `wolf` and pressing Enter twice adds the top suggestion, not `wolf`;
+  Escape first keeps what you typed.
+- From review: an IME's confirming Enter no longer picks a tag (Search too), and the box sets
+  `autoComplete="off"` so the browser's own list doesn't cover ours.
+
 ## 2026-11-27 — Artists › Suggested loads more at the bottom, then says that's everyone
 - Owner: "When we scroll to the bottom it should load in more suggestions or say that it's out".
 - **Change:**

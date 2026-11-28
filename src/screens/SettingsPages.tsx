@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import Avatar from "@/components/Avatar";
 import { Menu, MenuRow } from "@/components/Menu";
 import { StateBlock } from "@/components/State";
-import { Field, Seg, Stepper } from "@/components/v6";
+import { Seg, Stepper } from "@/components/v6";
+import TagInput from "@/components/TagInput";
 import { StyleRow } from "@/player/styles";
 import { DEFAULT_BLACKLIST, mergeBlacklists } from "@/lib/query/blacklist";
 import { DEFAULT_PLAYBACK, type PlaybackSettings } from "@/lib/settings";
@@ -227,6 +228,7 @@ function Content() {
   const prefs = getPrefs();
   const search = useStore(prefs.store, (p) => p.search);
   const signedIn = useStore(getSession().store, (x) => !!x.user && !x.link);
+  const creds = useStore(getSession().store, (x) => x.creds);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   // (a line twice, from e621 or by hand, shows once; Remove takes every copy)
@@ -313,7 +315,20 @@ function Content() {
           add();
         }}
       >
-        <Field value={draft} onChange={setDraft} placeholder="Tags to hide" aria-label="Tags to hide" autoCapitalize="none" autoCorrect="off" spellCheck={false} enterKeyHint="done" data-testid="blacklist-field" />
+        {/* e621's tags suggested as you type, as in Search (owner, 2026-11-27); Enter with none open adds the line */}
+        <TagInput
+          variant="field"
+          kind="text"
+          icon={null}
+          value={draft}
+          onChange={setDraft}
+          creds={creds}
+          placeholder="Tags to hide"
+          label="Tags to hide"
+          clearLabel="Clear Tags to hide"
+          enterKeyHint="done"
+          testId="blacklist-field"
+        />
         <button type="submit" className="btn-tonal" disabled={!draft.trim()} data-testid="blacklist-add">
           <Plus aria-hidden className="state-icon" />
           Add
