@@ -2094,3 +2094,38 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
     place (FeedView), which would otherwise pull the page back down.
 - **Mine:** the name, the words, the 0–2 range and the step.
 - Not changed: the 3 popular pages. The owner asked only for the slider.
+
+## 2026-11-27 — Artists › Suggested picks whom to look up from the artists you don't follow
+- Owner: "I don't know that I'm seeing as many populate as I'd expect".
+- **Cause:** the lookup of newest posts took the top `RECENCY_TOP` (32) of every artist you favorite
+  a lot, followed or not, and only then cut the followed and hidden ones. Someone who follows most of
+  their top artists got a handful of suggestions (the test's case: 2 instead of 9), and the 33rd
+  artist down never got a turn.
+- **Change:**
+  - The 32 are picked from the artists you neither follow nor hid (`toLookUp`). That waits for who you
+    follow to be known, as the cut already did.
+  - The lookup's request count is unchanged: one search per 8 artists (at most 4), plus up to 8
+    single looks for those a batch's page left out.
+  - The score formula is unchanged.
+  - Following or hiding someone within the hour still re-cuts the kept lookup, without asking e621
+    again. A card you follow from Suggested stays in place, as before. The list is shorter by one
+    until the next lookup (an hour on).
+  - The other way round: someone the lookup left out because you followed or hid them then, and now
+    don't (an unfollow, Show in Settings › For You), joins the list when the lookup would have picked
+    them (`rejoiners`). Each gets one small search of their own (3 posts), once per lookup, one at a
+    time, at most 8 per lookup; past that they wait for the next lookup, which picks them anyway. Undo on Not
+    interested or on a follow needs none: they were looked up.
+  - Follow from favorites (`LIST_TOP` 30, `PICKED` 10) and "N artists you favorite a lot" read the
+    same list, so both now count the artists you can still follow.
+  - "No one new to suggest" versus "Not enough favorites yet" now reads how many artists you favorite
+    a lot (`found`), since the looked-up list no longer holds the ones you follow.
+- **Rejected:**
+  - Raising `RECENCY_TOP`: more requests, and it still runs out for someone who follows more.
+  - Spares, or looking up the next 8 lazily as the list shrinks: either adds requests or slots new
+    cards into a list you are reading. The hourly lookup refills it.
+- A fresh code review (owner: one before every draft) found these, now fixed:
+  - Following everyone you favorite a lot said "Not enough favorites yet".
+  - An unfollow within the hour didn't bring the artist back (before, they were in the lookup).
+  - Two quick Shows lost the second one; a Show after the hour sent a wasted search.
+  - A second review: those single searches are capped at 8 per lookup (unfollowing many at once,
+    or on another device, would have sent one each), and a failed one no longer stops the rest.

@@ -1,9 +1,10 @@
 /**
  * Artist suggestions for your own account (ENGINEERING.md §6): Artists › Suggested and Follow from
  * favorites read them. Built from For You's favorites profile (state/rec.ts: one read, shared), the
- * tag cache's post counts and the learned weights, minus who you follow and who you hid. The top
- * ones' newest posts come from a few batched searches (`~a ~b … order:id_desc`), which also give
- * each its three tiles; then the list is ranked once more with recency and kept an hour.
+ * tag cache's post counts and the learned weights. The top ones you neither follow nor hid have
+ * their newest posts looked up in a few batched searches (`~a ~b … order:id_desc`), which also give
+ * each its three tiles; then the list is ranked once more with recency and kept an hour. Following
+ * or hiding someone in that hour re-cuts the list without asking e621 again.
  *
  * A borrowed sign-in (a share link's) has no profile here, so it gets no suggestions.
  */
@@ -15,9 +16,10 @@ import {
   groupByArtist,
   rankCandidates,
   rankWithRecency,
-  RECENCY_TOP,
+  rejoiners,
   tileQueries,
   tileQuery,
+  toLookUp,
   type ArtistCandidate,
   type ArtistSuggestion,
 } from "@/lib/recommend/artists";
@@ -70,6 +72,10 @@ interface Looked {
   at: number;
   /** the looked-up candidates: kept for the hour, so a later fit doesn't reorder what you're reading */
   cands: ArtistCandidate[];
+  /** every candidate when they were picked, best first (a refill asks it) */
+  pool: ArtistCandidate[];
+  /** who has had their own look since (a refill's): each once */
+  asked: Set<string>;
   lastPostAt: Map<string, number>;
   tiles: Map<string, Post[]>;
 }
@@ -111,19 +117,25 @@ function create(): ArtistsApi {
     return (p: Post) => !blacklistedBy(rules, p);
   };
 
+  /** who you follow, once known for this account; null while it is still read (then it's asked for) */
+  const followsOf = (user: string): ReadonlySet<string> | null => {
+    const f = getFollows().store.get();
+    // A failed read goes on with what's known, so Suggested still shows.
+    if (f.status === "idle" || f.status === "loading" || f.user !== user) {
+      void getFollows().ensure();
+      return null;
+    }
+    return f.followed;
+  };
+
   /** what the last cut was made from: the same again changes nothing (rec's progress ticks often) */
   let lastCut: { followed: ReadonlySet<string>; hidden: readonly string[]; l: Looked } | null = null;
 
   /** Followed and hidden out; the list re-cut without asking e621 again. */
   const cut = (cands: ArtistCandidate[], l: Looked) => {
-    const f = getFollows().store.get();
-    // Who you follow isn't known yet (or is still the last account's): a list cut now would offer
-    // them. (A failed read cuts with what's known, so Suggested still shows.)
-    if (f.status === "idle" || f.status === "loading" || f.user !== l.user) {
-      void getFollows().ensure();
-      return patch({ status: "reading", step: "posts" });
-    }
-    const followed = f.followed;
+    // Who you follow isn't known yet (or is still the last account's): a list cut now would offer them.
+    const followed = followsOf(l.user);
+    if (!followed) return patch({ status: "reading", step: "posts" });
     const s = store.get();
     if (s.status === "ready" && lastCut && lastCut.followed === followed && lastCut.hidden === s.hidden && lastCut.l === l) return;
     lastCut = { followed, hidden: s.hidden, l };
@@ -197,10 +209,15 @@ function create(): ArtistsApi {
     // Everyone you favorite a lot, followed or not: following someone then re-cuts, not re-asks.
     if (looked && looked.user === a.name && Date.now() - looked.at < SUGGEST_TTL) {
       same({ favorites, found: got.length });
-      return cut(looked.cands, looked);
+      cut(looked.cands, looked);
+      return void refill();
     }
     if (running) return;
-    const top = got.slice(0, RECENCY_TOP);
+    // The ones to look up are picked from those you neither follow nor hid, so who you follow has to
+    // be known first: the follows store's change runs this again.
+    const followed = followsOf(a.name);
+    if (!followed) return same({ status: "reading", step: "posts", done: undefined, total: undefined, favorites, found: got.length });
+    const top = toLookUp(got, followed, new Set(store.get().hidden));
     const mine = { key: a.name };
     running = mine;
     const e = epoch;
@@ -239,9 +256,62 @@ function create(): ArtistsApi {
       }
       running = null;
       // only the looked-up top are suggested: the rest have no recency or tiles to show
-      looked = { user: a.name, at: Date.now(), cands: top, lastPostAt, tiles };
+      looked = { user: a.name, at: Date.now(), cands: top, pool: got, asked: new Set(), lastPostAt, tiles };
       cut(top, looked);
     })();
+  };
+
+  /** a lookup's refill gives at most this many their own look */
+  const REFILL_MAX = 8;
+  /** a refill is running (one at a time, so two Shows in a row both land) */
+  let refilling = false;
+
+  /**
+   * Someone the lookup left out because you followed or hid them then, and now don't (Show on a
+   * hidden artist, an unfollow): when the lookup would have picked them, they get their own look,
+   * one small search each, and join the list. Each once per lookup and at most REFILL_MAX in all; a
+   * failed look waits for the next lookup.
+   */
+  const refill = async () => {
+    if (refilling) return;
+    refilling = true;
+    try {
+      for (;;) {
+        const l = looked;
+        const a = account();
+        const f = getFollows().store.get();
+        if (!l || !a || a.name !== l.user || running || Date.now() - l.at >= SUGGEST_TTL) return;
+        if (f.status === "idle" || f.status === "loading" || f.user !== l.user) return;
+        const hidden = new Set(store.get().hidden);
+        const [c] = rejoiners(l.pool, l.cands, (n) => f.followed.has(n) || hidden.has(n) || l.asked.has(n));
+        // as many as the lookup's own single looks at most: the rest come with the next lookup
+        if (!c || l.asked.size >= REFILL_MAX) return;
+        l.asked.add(c.name);
+        const e = epoch;
+        const ratings = getPrefs().store.get().search.ratings;
+        const env = { ratings, creds: a.creds, user: getSession().store.get().user };
+        const q = feedQuery({ kind: "search", tags: tileQuery([c.name]), filters: DEFAULT_FILTERS }, env);
+        let posts: Post[];
+        try {
+          posts = await searchPosts(q, 1, 3, a.creds, undefined, "bg");
+        } catch {
+          continue;
+        }
+        // applied to the lookup as it is now (another refill may have joined someone meanwhile);
+        // a fresh lookup or another account since: that one is the list now
+        const cur = looked;
+        if (e !== epoch || !cur || cur.at !== l.at || cur.user !== l.user || cur.cands.some((x) => x.name === c.name)) return;
+        const g = groupByArtist(posts, [c.name], keepPost());
+        const lastPostAt = new Map(cur.lastPostAt);
+        const tiles = new Map(cur.tiles);
+        for (const [n, t] of g.lastPostAt) lastPostAt.set(n, t);
+        for (const [n, t] of g.tiles) tiles.set(n, t);
+        looked = { ...cur, cands: [...cur.cands, c], lastPostAt, tiles };
+        cut(looked.cands, looked);
+      }
+    } finally {
+      refilling = false;
+    }
   };
 
   const api: ArtistsApi = {
@@ -270,6 +340,7 @@ function create(): ArtistsApi {
       const hidden = s.hidden.filter((x) => x !== name);
       storage.saveHiddenArtists(s.user, hidden);
       patch({ hidden });
+      // (the re-cut gives them their own look when the lookup left them out)
       if (looked) run();
     },
   };

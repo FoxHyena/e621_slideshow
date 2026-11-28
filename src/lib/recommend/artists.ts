@@ -8,7 +8,8 @@
  *   score    = affinity × recency × (0.5 + learned)
  *
  * Two passes, so the list doesn't reorder while you read it: rank without recency, look up the top
- * ones' newest posts, rank once more with recency, then show.
+ * ones' newest posts, rank once more with recency, then show. The top ones are picked from the
+ * artists you neither follow nor hid, so following most of your favorites still leaves a full list.
  */
 import type { Post } from "../e621/types";
 import { NOBODY, NOT_ARTISTS } from "../feed/format";
@@ -64,6 +65,38 @@ export function rankCandidates(
     out.push({ name, favs: t.n, posts, base: affinity(t.n, posts) * (0.5 + (w === undefined ? 0.5 : sigmoid(w))) });
   }
   return out.sort((a, b) => b.base - a.base || b.favs - a.favs || a.name.localeCompare(b.name));
+}
+
+/**
+ * Whose newest posts the second pass looks up: the first `n` you neither follow nor hid. (Picked
+ * before the lookup, not cut after it: the lookup is what limits the list, so a cut afterwards
+ * would leave few or none for someone who follows most of the artists they favorite.)
+ */
+export function toLookUp(
+  cands: ArtistCandidate[],
+  followed: ReadonlySet<string>,
+  hidden: ReadonlySet<string>,
+  n = RECENCY_TOP,
+): ArtistCandidate[] {
+  return cands.filter((c) => !followed.has(c.name) && !hidden.has(c.name)).slice(0, n);
+}
+
+/**
+ * Who the lookup left out (followed or hidden then) but would have picked, and `skip` now lets
+ * through (shown again, unfollowed), best first. `pool` is every candidate, best first; `picked`
+ * the looked-up ones.
+ */
+export function rejoiners(
+  pool: ArtistCandidate[],
+  picked: ArtistCandidate[],
+  skip: (name: string) => boolean,
+  n = RECENCY_TOP,
+): ArtistCandidate[] {
+  const have = new Set(picked.map((c) => c.name));
+  const rank = new Map(pool.map((c, i) => [c.name, i]));
+  // fewer than n picked: everyone you could be suggested was, so anyone left out would have been
+  const last = picked.length < n ? Infinity : Math.max(...picked.map((c) => rank.get(c.name) ?? -1));
+  return pool.filter((c, i) => i < last && !have.has(c.name) && !skip(c.name));
 }
 
 /** The second pass: recency from each artist's newest post, then the final order. */
