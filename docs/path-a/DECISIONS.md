@@ -2294,6 +2294,9 @@ Built overnight without the owner; every item below is on MORNING.md to approve 
 - The builder's answer on the learned ranking: it also scores a post's rating, which the card's
   sentence on Taste leaves out. The sentence stays.
 - Checked by me: the branch holds my design commit and the PR is an open draft. Not run, not seen.
+- Later the same day: I asked the owner to open PR 51's preview and check that the card's bar follows
+  "Taste or popular". The owner: "Yeah it looks good". So the line above, "The owner has not seen the
+  build", no longer holds. I still have not run it myself.
 
 ## 2026-11-27 — Comics follow-ups: sign-out clears posts in memory, no "pool:77" in Recent searches, a video link waits for its feed
 - Owner, on what the comics review left open: "Fix all three".
