@@ -43,6 +43,7 @@ import { SearchForm } from "./SearchForm";
 import { shareUrlFor } from "@/player/share";
 import type { Route } from "@/nav/routes";
 import { isLocked, setLockedY } from "@/nav/scroll";
+import { poolIdOf, usePoolFeed } from "@/feed/comics";
 import { ALL_RATINGS, FeedBody, GridSet, GridToggle, NeedsSignIn, PlayFab, PostMenu, postSheet, Toolbar, useFeed } from "./feedParts";
 
 /**
@@ -63,6 +64,8 @@ async function replaceScreen(route: Route, sheetOpen: boolean) {
 // ---- Results ------------------------------------------------------------------
 
 const RESULTS_CHIPS: ChipId[] = ["media", "hideFaved", "sort", "date", "score"];
+/** A comic as a feed is in page order, every page: only what kind of post to show applies. */
+const POOL_CHIPS: ChipId[] = ["media"];
 
 export function ResultsScreen({ params }: { params: string }) {
   const { entry, sheet } = useScreen();
@@ -70,7 +73,11 @@ export function ResultsScreen({ params }: { params: string }) {
   const spec = useMemo<FeedSpec>(() => ({ kind: "search", tags: r.tags, filters: r.filters }), [r]);
   // A link's ratings apply for this visit; a launch shows every rating, like the e621 page it came from.
   const override = r.link?.kind === "share" ? r.link.ratings : r.link?.kind === "launch" ? ALL_RATINGS : null;
-  const feed = useFeed(spec, override);
+  // a comic as a feed (`pool:<id>` alone): its pages in the pool's order (src/feed/comics.tsx)
+  const pool = poolIdOf(r.tags);
+  const plain = useFeed(pool === null ? spec : null, override);
+  const pooled = usePoolFeed(pool, r.filters.media, override);
+  const feed = pooled ?? plain;
   const [grid, setGrid] = useState(false);
   const saved = useStore(getPrefs().store, (p) => p.saved);
   const savedOne = saved.find((s) => s.tags === r.tags);
@@ -170,7 +177,7 @@ export function ResultsScreen({ params }: { params: string }) {
       </Toolbar>
       <ChipsRow
         filters={r.filters}
-        chips={RESULTS_CHIPS}
+        chips={pool === null ? RESULTS_CHIPS : POOL_CHIPS}
         onChange={(f) => go({ ...r, filters: f })}
         onLink={r.link ? () => getNav().openSheet(LINK_SHEET) : null}
       />

@@ -32,6 +32,16 @@ export interface MockPostSpec {
   sources?: string[];
   /** when it was posted (default 2024-05-01) */
   created_at?: string;
+  /** the pools it's in (a comic's pages: `mock.pools`) */
+  pools?: number[];
+}
+
+/** An e621 pool: a "series" is a comic, its pages in `post_ids` order. */
+export interface MockPool {
+  id: number;
+  name: string;
+  category?: "series" | "collection";
+  post_ids: number[];
 }
 
 export function mockPost(spec: MockPostSpec) {
@@ -62,7 +72,7 @@ export function mockPost(spec: MockPostSpec) {
     rating: spec.rating ?? "s",
     uploader_id: 1,
     uploader_name: "uploader",
-    pools: [],
+    pools: spec.pools ?? [],
     sources: spec.sources ?? [],
     description: spec.description ?? "",
     flags: { deleted: false, pending: false, flagged: false },
@@ -126,6 +136,10 @@ export interface E621Mock {
   unknownTags: string[];
   /** GET /tag_subscriptions.json calls */
   subscriptionReads: number;
+  /** e621's pools (GET /pools.json?search[id]=…) */
+  pools: MockPool[];
+  /** ids asked for in each /pools.json request */
+  poolLookups: number[][];
 }
 
 /** Default dataset: 150 safe PNG posts, ids 1150 down to 1001. */
@@ -168,6 +182,8 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
     followLimit: 500,
     unknownTags: [],
     subscriptionReads: 0,
+    pools: [],
+    poolLookups: [],
   };
   /** stable subscription ids per tag, like e621's rows */
   const subIds = new Map<string, number>();
@@ -236,6 +252,13 @@ export async function mockE621(page: Page, specs: MockPostSpec[] = defaultSpecs(
       }
       const n = Number(pageParam ?? 1);
       return postList(list.slice((n - 1) * limit, n * limit));
+    }
+
+    if (url.pathname === "/pools.json") {
+      const ids = (url.searchParams.get("search[id]") ?? "").split(",").filter(Boolean).map(Number);
+      state.poolLookups.push(ids);
+      const found = state.pools.filter((p) => ids.includes(p.id));
+      return json(route, found.map((p) => ({ category: "series", updated_at: "2024-05-01T12:00:00.000-04:00", ...p, post_count: p.post_ids.length })));
     }
 
     if (url.pathname === "/tags/autocomplete.json") {

@@ -7114,3 +7114,222 @@ li:has(> :is(button.list-row, a.list-row, label.list-row):active) + li > .list-r
     transition: none;
   }
 }
+
+/* ============ Comics (DESIGN.md "A post on its own", "A comic"; src/feed/comics.tsx) ============ */
+/* On a feed card: a well at the left of the footer, "3 / 12"; Copy link stands 8 before it */
+.post-copy:has(+ .post-comic) {
+  margin-right: -4px;
+}
+.post-comic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  height: var(--spacing-control-well);
+  margin-right: auto;
+  padding: 0 10px 0 8px;
+  border-radius: 999px;
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  color: var(--color-link);
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
+}
+.post-comic::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.post-comic svg {
+  width: 16px;
+  height: 16px;
+}
+.post-comic:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* On the post page: a row that opens the comic as a feed, then the pages in a sunk well */
+.post-comic-group .list-row {
+  --div: 60px;
+}
+.comic-strip {
+  position: relative; /* the thumbs' offsetLeft is from the strip */
+  display: flex;
+  gap: 8px;
+  margin: 0 8px 8px;
+  padding: 8px;
+  border-radius: var(--radius-art);
+  background: var(--color-well);
+  box-shadow: var(--shadow-sunk);
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.comic-strip::-webkit-scrollbar {
+  display: none;
+}
+.comic-thumb {
+  position: relative;
+  flex: none;
+  width: 56px;
+  aspect-ratio: 5 / 7;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-panel-2);
+  scroll-snap-align: center;
+}
+.comic-thumb::before {
+  content: "";
+  position: absolute;
+  inset: -8px -4px;
+}
+.comic-thumb img,
+.pages-pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.comic-thumb[aria-current] {
+  box-shadow:
+    0 0 0 2px var(--color-well),
+    0 0 0 3.5px var(--color-gold);
+}
+.comic-thumb:focus-visible,
+.pages-grid button:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+/* In the viewer: the comic bar (the player's glass as one capsule), above the artist's row */
+.viewer-comic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--spacing-control);
+  padding: 0 12px 0 14px;
+  border-radius: 999px;
+  background: var(--color-glass-art);
+  -webkit-backdrop-filter: blur(var(--blur-glass-art));
+  backdrop-filter: blur(var(--blur-glass-art));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  text-align: left;
+  transition: transform 100ms ease-out;
+}
+.viewer-comic:active {
+  transform: scale(0.98);
+}
+.viewer-comic > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.viewer-comic b {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-rounded);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.viewer-comic small {
+  flex: none;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.74);
+  font-variant-numeric: tabular-nums;
+}
+.viewer-comic > .viewer-comic-chev {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.6);
+}
+/* the two glass buttons at the picture's sides: a computer's (a phone drags) */
+.viewer-turn {
+  display: none;
+}
+.viewer-turn:disabled {
+  opacity: 0.35;
+}
+@media (min-width: 900px) {
+  .viewer-turn {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    margin-top: -22px;
+  }
+  .viewer-turn[data-side="l"] {
+    left: 16px;
+  }
+  .viewer-turn[data-side="r"] {
+    right: 16px;
+  }
+  .viewer-comic {
+    grid-area: transport;
+    width: 300px;
+  }
+}
+/* The Pages sheet: four thumbs to a row, the number under each, the current one ringed gold */
+.sheet-sub {
+  margin: 0;
+  font-size: var(--text-footnote);
+  line-height: var(--text-footnote--line-height);
+  color: var(--color-muted);
+}
+.pages-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 8px;
+  margin-top: 12px;
+}
+.pages-grid button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--font-rounded);
+  font-size: var(--text-footnote);
+  font-weight: 500;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.pages-pic {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-panel-2);
+  box-shadow: var(--shadow-sunk-art);
+}
+.pages-grid button[aria-current] {
+  color: var(--color-fg);
+}
+.pages-grid button[aria-current] .pages-pic {
+  box-shadow:
+    0 0 0 2px var(--color-panel),
+    0 0 0 3.5px var(--color-gold);
+}
+.pages-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pages-foot small {
+  font-size: var(--text-footnote);
+  color: var(--color-muted);
+}
+.pages-foot .link-row {
+  margin-left: auto;
+}
